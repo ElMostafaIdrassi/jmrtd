@@ -426,7 +426,10 @@ public class PassportService extends PassportApduService implements Serializable
 			byte[] step1EncryptedNonce = Util.unwrapDO((byte)0x80, step1Response);
 
 			/* (Re)initialize the K_pi cipher for decryption. */
-			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[16])); /* FIXME: iv length 16 is independent of keylength? */
+			
+//			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[16])); /* FIXME: iv length 16 is independent of keylength? */
+			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[step1EncryptedNonce.length])); // Fix proposed by Dorian ALADEL dorian.aladel@gemalto.com
+
 			piccNonce = staticPACECipher.doFinal(step1EncryptedNonce);
 		} catch (GeneralSecurityException gse) {
 			LOGGER.severe("Exception: " + gse.getMessage());

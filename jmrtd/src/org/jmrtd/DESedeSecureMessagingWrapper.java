@@ -178,7 +178,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
 		
 		byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
-		byte[] paddedMaskedHeader = Util.pad(maskedHeader);
+		byte[] paddedMaskedHeader = Util.padWithMRZ(maskedHeader);
 
 		boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
 
@@ -197,7 +197,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 		if (lc > 0) {
 			/* If we have command data, encrypt it. */
-			byte[] data = Util.pad(commandAPDU.getData());
+			byte[] data = Util.padWithMRZ(commandAPDU.getData());
 			byte[] ciphertext = cipher.doFinal(data);
 
 			bOut.reset();
@@ -220,7 +220,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		dataOut.writeLong(ssc);
 		dataOut.write(m, 0, m.length);
 		dataOut.flush();
-		byte[] n = Util.pad(bOut.toByteArray());
+		byte[] n = Util.padWithMRZ(bOut.toByteArray());
 
 		/* Compute cryptographic checksum... */
 		mac.init(ksMac);
@@ -385,7 +385,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 			DataOutputStream dataOut = new DataOutputStream(bOut);
 			ssc++;
 			dataOut.writeLong(ssc);
-			byte[] paddedData = Util.pad(rapdu, 0, rapdu.length - 2 - 8 - 2);
+			byte[] paddedData = Util.padWithMRZ(rapdu, 0, rapdu.length - 2 - 8 - 2);
 			dataOut.write(paddedData, 0, paddedData.length);
 			dataOut.flush();
 			dataOut.close();

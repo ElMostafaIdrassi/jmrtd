@@ -93,7 +93,7 @@ import org.jmrtd.lds.SecurityInfo;
  * @author Wojciech Mostowski
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Engelbert Hubbers (hubbers@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author Martijn Oostdijk (martijn.oostdijk@innovalor.com)
  * @author Ronny Wichers Schreur (ronny@cs.ru.nl)
  * 
  * @version $Revision$
@@ -158,6 +158,7 @@ public class Util {
 	 */
 	public static SecretKey deriveKey(byte[] keySeed, String cipherAlg, int keyLength, byte[] nonce, int counter) throws GeneralSecurityException {
 		String digestAlg = inferDigestAlgorithmFromCipherAlgorithmForKeyDerivation(cipherAlg, keyLength);
+		LOGGER.info("DEBUG: key derivation uses digestAlg = " + digestAlg);
 		MessageDigest digest = MessageDigest.getInstance(digestAlg);
 		digest.reset();
 		digest.update(keySeed);
@@ -276,6 +277,44 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
+	 *
+	 * @param in input
+	 *
+	 * @return padded output
+	 */
+	public static byte[] padWithMRZ(/*@ non_null */ byte[] in) {
+		return padWithMRZ(in, 0, in.length);
+	}
+	
+	public static byte[] padWithCAN(/*@ non_null */ byte[] in, int blockSize) {
+		return padWithCAN(in, 0, in.length, blockSize);
+	}
+
+	/*@ requires 0 <= offset && offset < length;
+	  @ requires 0 <= length && length <= in.length;
+	 */
+	public static byte[] padWithMRZ(/*@ non_null */ byte[] in, int offset, int length) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		out.write(in, offset, length);
+		out.write((byte)0x80);
+		while (out.size() % 8 != 0) {
+			out.write((byte)0x00);
+		}
+		return out.toByteArray();
+	}
+	
+	public static byte[] padWithCAN(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		out.write(in, offset, length);
+		out.write((byte)0x80);
+		while (out.size() % blockSize != 0) {
+			out.write((byte)0x00);
+		}
+		return out.toByteArray();
+	}
+	
 	public static long computeSendSequenceCounter(byte[] rndICC, byte[] rndIFD) {
 		if (rndICC == null || rndICC.length != 8
 				|| rndIFD == null || rndIFD.length != 8) {
@@ -293,49 +332,51 @@ public class Util {
 		return ssc;
 	}
 
-	/**
-	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
-	 *
-	 * @param in input
-	 *
-	 * @return padded output
-	 */
-	public static byte[] pad(/*@ non_null */ byte[] in) {
-		return pad(in, 0, in.length);
-	}
-
-	/**
-	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
-	 *
-	 * @param in input
-	 * @param blockSize block size
-	 *
-	 * @return padded output
-	 */
-	public static byte[] pad(/*@ non_null */ byte[] in, int blockSize) {
-		return pad(in, 0, in.length, blockSize);
-	}
+// DEBUG: USE EITHER padMRZ or padCAN as in Dorian's code.
 	
-	/*@ requires 0 <= offset && offset < length;
-	  @ requires 0 <= length && length <= in.length;
-	 */
-	public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length) {
-		return pad(in, offset, length, 64);
-	}
-
-	/*@ requires 0 <= offset && offset < length;
-	  @ requires 0 <= length && length <= in.length;
-	 */
-	public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
-		int blockSizeInBytes = blockSize / 8;
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		out.write(in, offset, length);
-		out.write((byte)0x80);
-		while (out.size() % blockSizeInBytes != 0) {
-			out.write((byte)0x00);
-		}
-		return out.toByteArray();
-	}
+//	/**
+//	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
+//	 *
+//	 * @param in input
+//	 *
+//	 * @return padded output
+//	 */
+//	public static byte[] pad(/*@ non_null */ byte[] in) {
+//		return pad(in, 0, in.length);
+//	}
+//
+//	/**
+//	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
+//	 *
+//	 * @param in input
+//	 * @param blockSize block size
+//	 *
+//	 * @return padded output
+//	 */
+//	public static byte[] pad(/*@ non_null */ byte[] in, int blockSize) {
+//		return pad(in, 0, in.length, blockSize);
+//	}
+//	
+//	/*@ requires 0 <= offset && offset < length;
+//	  @ requires 0 <= length && length <= in.length;
+//	 */
+//	public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length) {
+//		return pad(in, offset, length, 64);
+//	}
+//
+//	/*@ requires 0 <= offset && offset < length;
+//	  @ requires 0 <= length && length <= in.length;
+//	 */
+//	public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
+//		int blockSizeInBytes = blockSize / 8;
+//		ByteArrayOutputStream out = new ByteArrayOutputStream();
+//		out.write(in, offset, length);
+//		out.write((byte)0x80);
+//		while (out.size() % blockSizeInBytes != 0) {
+//			out.write((byte)0x00);
+//		}
+//		return out.toByteArray();
+//	}
 
 	public static byte[] unpad(byte[] in) throws BadPaddingException {
 		int i = in.length - 1;

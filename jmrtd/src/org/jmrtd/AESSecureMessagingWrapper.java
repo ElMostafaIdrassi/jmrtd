@@ -210,7 +210,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 		ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
 
 		byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
-		byte[] paddedMaskedHeader = Util.pad(maskedHeader, 128);
+		byte[] paddedMaskedHeader = Util.padWithCAN(maskedHeader, 128);
 
 		boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
 
@@ -230,7 +230,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 		if (lc > 0) {
 			/* If we have command data, encrypt it. */
-			byte[] data = Util.pad(commandAPDU.getData(), 128);
+			byte[] data = Util.padWithCAN(commandAPDU.getData(), 128);
 			byte[] ciphertext = cipher.doFinal(data);
 
 			bOut.reset();
@@ -253,7 +253,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 		dataOut.writeLong(ssc);
 		dataOut.write(m, 0, m.length);
 		dataOut.flush();
-		byte[] n = Util.pad(bOut.toByteArray(), 128);
+		byte[] n = Util.padWithCAN(bOut.toByteArray(), 128);
 
 		/* Compute cryptographic checksum... */
 		mac.init(ksMac);
@@ -405,6 +405,42 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	}
 
 	private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
-		return true; // FIXME
+		return true; // FIXME: Note this will be a 16 byte Mac?
+	}
+
+	/**
+	 * Gets the SSC as bytes.
+	 * (This appears to work for Dorian Aladel, on 3DES and AES-128 at samples. -- MO)
+	 * 
+	 * @param ssc
+	 * @return
+	 */
+//	private byte[] getSSCAsBytes(long ssc) {
+//		String tmp=Hex.intToHexString((int)ssc);
+//		while (tmp.length()<32)
+//			tmp="0"+tmp;
+//		return Hex.hexStringToBytes(tmp);
+//	}
+	
+	private byte[] getSSCAsBytes(long ssc) {
+		try {
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(16);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+			byteArrayOutputStream.write(0x00);
+
+			DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+			dataOutputStream.writeLong(ssc);
+			dataOutputStream.close();
+			return byteArrayOutputStream.toByteArray();
+		} catch (IOException ioe) {
+			LOGGER.warning("Exception: " + ioe.getMessage());
+		}
+		return null;
 	}
 }

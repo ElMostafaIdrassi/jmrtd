@@ -482,7 +482,7 @@ public class PassportApduService extends CardService {
 			}
 
 			mac.init(kMac);
-			byte[] mactext = mac.doFinal(Util.pad(ciphertext));
+			byte[] mactext = mac.doFinal(Util.padWithMRZ(ciphertext));
 			if (mactext.length != 8) {
 				throw new IllegalStateException("MAC wrong length");
 			}

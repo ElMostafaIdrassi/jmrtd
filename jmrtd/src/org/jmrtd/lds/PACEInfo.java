@@ -1,5 +1,5 @@
 /*
- * JMRTD - A Java API for accessing machine readable travel documents.
+{ * JMRTD - A Java API for accessing machine readable travel documents.
  *
  * Copyright (C) 2006 - 2015  The JMRTD team
  *
@@ -165,10 +165,10 @@ public class PACEInfo extends SecurityInfo {
 		StringBuffer result = new StringBuffer();
 		result.append("PaceInfo");
 		result.append("[");
-		result.append("protocol: " + protocolOID);
+		result.append("protocol: " + toProtocolOIDString(protocolOID));
 		result.append(", version: " + version);
 		if (parameterId >= 0) {
-			result.append(", parameterId: " + parameterId);
+			result.append(", parameterId: " + toStandardizedParamIdString(parameterId));
 		}
 		result.append("]");
 		return result.toString();
@@ -321,7 +321,7 @@ public class PACEInfo extends SecurityInfo {
 			throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
 		}
 	}
-	
+
 	public static AlgorithmParameterSpec toParameterSpec(int stdDomainParam) {
 		switch (stdDomainParam) {
 		case PARAM_ID_GFP_1024_160: return PARAMS_GFP_1024_160;
@@ -338,7 +338,49 @@ public class PACEInfo extends SecurityInfo {
 		case PARAM_ID_ECP_BRAINPOOL_P384_R1: return PARAMS_ECP_BRAINPOOL_P384_R1;
 		case PARAM_ID_ECP_BRAINPOOL_P512_R1: return PARAMS_ECP_BRAINPOOL_P512_R1;
 		case PARAM_ID_ECP_NIST_P521_R1: return PARAMS_ECP_NIST_P521_R1;
-		default: throw new NumberFormatException("Unknown standardized domain parameters");
+		default: throw new NumberFormatException("Unknown standardized domain parameters " + stdDomainParam);
 		}
+	}
+
+	private String toStandardizedParamIdString(int stdDomainParam) {
+		switch (stdDomainParam) {
+		case PARAM_ID_GFP_1024_160: /* 0 */ return "1024-bit MODP Group with 160-bit Prime Order Subgroup";
+		case PARAM_ID_GFP_2048_224: /* 1 */ return "2048-bit MODP Group with 224-bit Prime Order Subgroup";
+		case PARAM_ID_GFP_2048_256: /* 2 */ return "2048-bit MODP Group with 256-bit Prime Order Subgroup";
+		/* 3 - 7 RFU */
+		case PARAM_ID_ECP_NIST_P192_R1: /* 8 */return "NIST P-192 (secp192r1)";
+		case PARAM_ID_ECP_BRAINPOOL_P192_R1:/* 9 */ return "BrainpoolP192r1";
+		case PARAM_ID_ECP_NIST_P224_R1: /* 10 */ return "NIST P-224 (secp224r1)";
+		case PARAM_ID_ECP_BRAINPOOL_P224_R1: /* 11 */ return "BrainpoolP224r1";
+		case PARAM_ID_ECP_NST_P256_R1: /* 12 */ return "NIST P-256 (secp256r1)";
+		case PARAM_ID_ECP_BRAINPOOL_P256_R1: /* 13 */ return "BrainpoolP256r1";
+		case PARAM_ID_ECP_BRAINPOOL_P320_R1: /* 14 */ return "BrainpoolP320r1";
+		case PARAM_ID_ECP_NIST_P384_R1: /* 15 */ return "NIST P-384 (secp384r1)";
+		case PARAM_ID_ECP_BRAINPOOL_P384_R1: /* 16 */ return "BrainpoolP384r1";
+		case PARAM_ID_ECP_BRAINPOOL_P512_R1: /* 17 */ return "BrainpoolP512r1";
+		case PARAM_ID_ECP_NIST_P521_R1: /* 18 */ return "NIST P-521 (secp521r1)";
+		/* 19-31 RFU */
+		default: return Integer.toString(stdDomainParam);
+		}
+	}
+
+	private String toProtocolOIDString(String oid) {
+		if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)) { return "id-PACE-DH-GM-3DES-CBC-CBC"; }
+		if (ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-DH-GM-AES-CBC-CMAC-128"; }
+		if (ID_PACE_DH_GM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-DH-GM-AES-CBC-CMAC-192"; }
+		if (ID_PACE_DH_GM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE-DH-GM-AES-CBC-CMAC-256"; }
+		if (ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)) { return "id-PACE-DH-IM-3DES-CBC-CBC"; }
+		if (ID_PACE_DH_IM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-DH-IM-AES-CBC-CMAC-128"; }
+		if (ID_PACE_DH_IM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-DH-IM-AES-CBC-CMAC-192"; }
+		if (ID_PACE_DH_IM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE_DH-IM-AES-CBC-CMAC-256"; }
+		if (ID_PACE_ECDH_GM_3DES_CBC_CBC.equals(oid)) { return "id-PACE_ECDH-GM-3DES-CBC-CBC"; }
+		if (ID_PACE_ECDH_GM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-ECDH-GM-AES-CBC-CMAC-128"; }
+		if (ID_PACE_ECDH_GM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-ECDH-GM-AES-CBC-CMAC-192"; }
+		if (ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE-ECDH-GM-AES-CBC-CMAC-256"; }
+		if (ID_PACE_ECDH_IM_3DES_CBC_CBC.equals(oid)) { return "id-PACE-ECDH-IM_3DES-CBC-CBC"; }
+		if (ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-ECDH-IM-AES-CBC-CMAC-128"; }
+		if (ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-ECDH-IM-AES-CBC-CMAC-192"; }
+		if (ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE-ECDH-IM-AES-CBC-CMAC-256"; }
+		return oid;
 	}
 }
