@@ -76,7 +76,11 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 
 	public synchronized FileInfo[] getSelectedPath() throws CardServiceException {
 		MRTDFileInfo fileInfo = getFileInfo();
-		return new MRTDFileInfo[]{ fileInfo };
+		if(fileInfo == null) {
+			return null;
+		} else {
+			return new MRTDFileInfo[] { fileInfo };
+		}
 	}
 
 	/*
@@ -152,6 +156,7 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 			byte[] prefix = service.sendReadBinary(0, READ_AHEAD_LENGTH, false);
 			if (prefix == null || prefix.length != READ_AHEAD_LENGTH) {
 				LOGGER.severe("Something is wrong with prefix, prefix = " + Arrays.toString(prefix));
+				return null;
 			}
 			ByteArrayInputStream baInputStream = new ByteArrayInputStream(prefix);
 			TLVInputStream tlvInputStream = new TLVInputStream(baInputStream);

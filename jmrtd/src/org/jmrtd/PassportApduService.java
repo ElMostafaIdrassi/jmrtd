@@ -387,11 +387,11 @@ public class PassportApduService extends CardService {
 			System.arraycopy(data, index, rapduBytes, 0, rapduBytes.length);
 		}
 
-		if (rapduBytes == null | rapduBytes.length == 0) {
+		if (rapduBytes == null || rapduBytes.length == 0) {
 			LOGGER.warning("DEBUG: rapduBytes = " + Arrays.toString(rapduBytes) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
+		} else {
+			checkStatusWordAfterFileOperation(capdu, rapdu);
 		}
-
-		checkStatusWordAfterFileOperation(capdu, rapdu);
 		return rapduBytes;
 	}
 
