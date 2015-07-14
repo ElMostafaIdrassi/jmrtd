@@ -590,7 +590,7 @@ public class PassportService extends PassportApduService implements Serializable
 				wrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
 			} else if (cipherAlg.startsWith("AES")) {
 				long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
-				wrapper = new AESSecureMessagingWrapper(encKey, macKey, ssc, 0L);
+				wrapper = new AESSecureMessagingWrapper(encKey, macKey, ssc);
 			}
 			LOGGER.info("DEBUG: Starting secure messaging based on PACE");
 		} catch (GeneralSecurityException gse) {
@@ -664,9 +664,8 @@ public class PassportService extends PassportApduService implements Serializable
 
 			SecretKey ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
 			SecretKey ksMac = Util.deriveKey(secret, Util.MAC_MODE);
-			long ssc = 0;
 
-			wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc);
+			wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L);
 			state = CA_AUTHENTICATED_STATE;
 			return new ChipAuthenticationResult(keyId, publicKey, keyHash, keyPair);
 		} catch (GeneralSecurityException e) {

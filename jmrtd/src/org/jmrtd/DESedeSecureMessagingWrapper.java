@@ -193,6 +193,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 			do97 = bOut.toByteArray();
 		}
 
+		ssc++;
 		cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
 
 		if (lc > 0) {
@@ -216,7 +217,6 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 		bOut.reset();
 		DataOutputStream dataOut = new DataOutputStream(bOut);
-		ssc++;
 		dataOut.writeLong(ssc);
 		dataOut.write(m, 0, m.length);
 		dataOut.flush();

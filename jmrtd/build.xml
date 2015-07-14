@@ -6,9 +6,9 @@
 
   <property name="groupId" value="org.jmrtd" />
   <property name="artifactId" value="jmrtd" />
-  <property name="version" value="0.5.2" />
+  <property name="version" value="0.5.3-SNAPSHOT" />
 
-  <property name="home" value="/Users/martijn" />
+  <property name="home" value="/Users/martijno" />
   <property name="software" value="${home}/software" />
 
   <path id="maven-ant-tasks.classpath" path="${software}/maven-ant-tasks-2.1.3.jar" />

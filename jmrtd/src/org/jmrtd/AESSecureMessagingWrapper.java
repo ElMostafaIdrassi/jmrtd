@@ -29,6 +29,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -60,6 +61,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
 	private SecretKey ksEnc, ksMac;
+	private transient Cipher sscIVCipher;
 	private transient Cipher cipher;
 	private transient Mac mac;
 
@@ -72,12 +74,12 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	 * 
 	 * @param ksEnc the session key for encryption
 	 * @param ksMac the session key for macs
-	 * @param sscIV the send sequence counter to use as initialization vector
 	 * @param ssc the initial value of the send sequence counter
 	 * 
 	 * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
 	 */
-	public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long sscIV, long ssc) throws GeneralSecurityException {
+	public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
+		LOGGER.info("DEBUG: AESSecureMessagingWrapper, ssc = " + ssc);
 		this.ksEnc = ksEnc;
 		this.ksMac = ksMac;
 		this.ssc = ssc;
@@ -85,57 +87,18 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 		int keyLength = ksEnc.getEncoded().length;
 		LOGGER.info("DEBUG: AES with key length " + keyLength);
 
-		cipher = Cipher.getInstance("AES/ECB/NoPadding");
-		/* Initialize cipher to get IV. */
-		cipher.init(Cipher.ENCRYPT_MODE, ksEnc);
-		
-		LOGGER.info("DEBUG: cipher blocksize = " + cipher.getBlockSize());
-		
+		sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
+		sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
 
-		LOGGER.info("DEBUG: initial iv = " + Hex.bytesToHexString(cipher.getIV()));
-		
-		IvParameterSpec iv = getIV(cipher, sscIV);
-		LOGGER.info("DEBUG: iv = " + Hex.bytesToHexString(iv.getIV()));
-
-		/* Initialized cipher with IV. */
 		cipher = Cipher.getInstance("AES/CBC/NoPadding");
-		cipher.init(Cipher.ENCRYPT_MODE, ksEnc, iv);
+		/* We will init this cipher later (in order to set IV). */
 
 		LOGGER.info("DEBUG: cipher blocksize = " + cipher.getBlockSize());
-		
+		LOGGER.info("DEBUG: initial iv = " + Hex.bytesToHexString(cipher.getIV()));
+
 		String macAlg = "AESCMAC";
 		mac = Mac.getInstance(macAlg);
 		mac.init(ksMac);
-	}
-
-	/**
-	 * Creates the IV by encrypting the SSC.
-	 * 
-	 * @param cipher the cipher to use, should already be initialized
-	 * @param ssc the send sequence counter
-	 * 
-	 * @return the IV param spec
-	 * 
-	 * @throws IllegalBlockSizeException on error
-	 * @throws BadPaddingException on error
-	 */
-	private IvParameterSpec getIV(Cipher cipher, long ssc) throws IllegalBlockSizeException, BadPaddingException {
-		try {
-			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-			DataOutputStream dataOut = new DataOutputStream(bOut);
-			
-			/* SSC is 128bit (16 bytes, two longs) in this case, see TR 03110 F.3. */
-			
-			dataOut.writeLong(0L);
-			dataOut.writeLong(ssc);
-			dataOut.close();
-			byte[] sscBytes = bOut.toByteArray();
-			LOGGER.info("DEBUG: sscBytes.length = " + sscBytes.length);
-			return new IvParameterSpec(cipher.doFinal(sscBytes));
-		} catch (IOException ioe) {
-			LOGGER.severe("Exception: " + ioe.getMessage());
-			return null;
-		}
 	}
 
 	/**
@@ -210,7 +173,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 		ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
 
 		byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
-		byte[] paddedMaskedHeader = Util.padWithCAN(maskedHeader, 128);
+		byte[] paddedMaskedHeader = Util.padWithCAN(maskedHeader, 128); // 128 bits is 16 bytes
 
 		boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
 
@@ -225,12 +188,18 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 			do97 = bOut.toByteArray();
 		}
 
-//		cipher.init(Cipher.ENCRYPT_MODE, ksEnc);
-//		cipher.init(Cipher.ENCRYPT_MODE, ksEnc, getIV(cipher, ssc));
+		LOGGER.info("DEBUG: wrapping CAPDU " + Hex.bytesToHexString(commandAPDU.getBytes()));
+		ssc++;
+		LOGGER.info("DEBUG: Increased ssc to " + ssc);
+		IvParameterSpec ivParams = getIV(ssc);
 
 		if (lc > 0) {
 			/* If we have command data, encrypt it. */
 			byte[] data = Util.padWithCAN(commandAPDU.getData(), 128);
+
+			/* Re-initialize cipher, this time with IV based on SSC. */
+			cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ivParams);
+
 			byte[] ciphertext = cipher.doFinal(data);
 
 			bOut.reset();
@@ -245,14 +214,13 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 		bOut.write(paddedMaskedHeader, 0, paddedMaskedHeader.length);
 		bOut.write(do8587, 0, do8587.length);
 		bOut.write(do97, 0, do97.length);
+
 		byte[] m = bOut.toByteArray();
 
 		bOut.reset();
-		DataOutputStream dataOut = new DataOutputStream(bOut);
-		ssc++;
-		dataOut.writeLong(ssc);
-		dataOut.write(m, 0, m.length);
-		dataOut.flush();
+		bOut.write(ivParams.getIV());
+		bOut.write(m);
+		bOut.flush();
 		byte[] n = Util.padWithCAN(bOut.toByteArray(), 128);
 
 		/* Compute cryptographic checksum... */
@@ -296,8 +264,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 			if (rapdu == null || rapdu.length < 2 || len < 2) {
 				throw new IllegalArgumentException("Invalid response APDU");
 			}
-			cipher.init(Cipher.DECRYPT_MODE, ksEnc);
-			cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(cipher, ssc));
+			cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
 			DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
 			byte[] data = new byte[0];
 			short sw = 0;
@@ -415,13 +382,25 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	 * @param ssc
 	 * @return
 	 */
-//	private byte[] getSSCAsBytes(long ssc) {
-//		String tmp=Hex.intToHexString((int)ssc);
-//		while (tmp.length()<32)
-//			tmp="0"+tmp;
-//		return Hex.hexStringToBytes(tmp);
-//	}
-	
+	//	private byte[] getSSCAsBytes(long ssc) {
+	//		String tmp=Hex.intToHexString((int)ssc);
+	//		while (tmp.length()<32)
+	//			tmp="0"+tmp;
+	//		return Hex.hexStringToBytes(tmp);
+	//	}
+
+	/*
+	 * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
+	 */
+	private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+		byte[] sscBytes = getSSCAsBytes(ssc);
+		byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
+		LOGGER.info("DEBUG: encryptedSSC = " + Hex.bytesToHexString(encryptedSSC));
+		IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
+		LOGGER.info("DEBUG: ivParams.getIV() = " + Hex.bytesToHexString(ivParams.getIV()));
+		return ivParams;
+	}
+
 	private byte[] getSSCAsBytes(long ssc) {
 		try {
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(16);
