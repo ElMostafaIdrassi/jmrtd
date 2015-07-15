@@ -204,21 +204,22 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 			bOut.reset();
 			bOut.write(hasDO85 ? (byte)0x85 : (byte)0x87);
 			bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
-			if(!hasDO85) { bOut.write(0x01); };
+			if (!hasDO85) { bOut.write(0x01); };
 			bOut.write(ciphertext, 0, ciphertext.length);
 			do8587 = bOut.toByteArray();
 		}
 
 		bOut.reset();
-		bOut.write(paddedMaskedHeader, 0, paddedMaskedHeader.length);
-		bOut.write(do8587, 0, do8587.length);
-		bOut.write(do97, 0, do97.length);
+		bOut.write(paddedMaskedHeader);
+		bOut.write(do8587);
+		bOut.write(do97);
+
 		byte[] m = bOut.toByteArray();
 
 		bOut.reset();
 		DataOutputStream dataOut = new DataOutputStream(bOut);
 		dataOut.writeLong(ssc);
-		dataOut.write(m, 0, m.length);
+		dataOut.write(m);
 		dataOut.flush();
 		byte[] n = Util.padWithMRZ(bOut.toByteArray());
 
@@ -227,7 +228,6 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		byte[] cc = mac.doFinal(n);
 		int ccLength = cc.length;
 		if (ccLength != 8) {
-			LOGGER.warning("Found mac length of " + ccLength + ", only using first 8 bytes");
 			ccLength = 8;
 		}
 
@@ -263,6 +263,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 			if (rapdu == null || rapdu.length < 2 || len < 2) {
 				throw new IllegalArgumentException("Invalid response APDU");
 			}
+			ssc++;
 			cipher.init(Cipher.DECRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
 			DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
 			byte[] data = new byte[0];
@@ -383,7 +384,6 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		try {
 			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 			DataOutputStream dataOut = new DataOutputStream(bOut);
-			ssc++;
 			dataOut.writeLong(ssc);
 			byte[] paddedData = Util.padWithMRZ(rapdu, 0, rapdu.length - 2 - 8 - 2);
 			dataOut.write(paddedData, 0, paddedData.length);

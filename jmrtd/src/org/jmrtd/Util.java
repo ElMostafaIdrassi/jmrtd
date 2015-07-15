@@ -1004,10 +1004,6 @@ public class Util {
 				dataIn.readFully(yCoordBytes);
 				dataIn.close();
 
-				//				BigInteger p = getPrime(params);
-				//				BigInteger x = Util.os2fe(xCoordBytes, p);
-				//				BigInteger y = Util.os2fe(yCoordBytes, p);
-
 				BigInteger x = Util.os2i(xCoordBytes);
 				BigInteger y = Util.os2i(yCoordBytes);
 				ECPoint w = new ECPoint(x, y);

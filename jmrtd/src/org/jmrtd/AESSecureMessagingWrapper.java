@@ -43,12 +43,9 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVUtil;
-import net.sf.scuba.util.Hex;
 
 /**
  * An AES secure messaging wrapper for APDUs. Based on TR-SAC.
- * 
- * FIXME: WORK IN PROGRESS
  *
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
  * 	
@@ -79,22 +76,15 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	 * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
 	 */
 	public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
-		LOGGER.info("DEBUG: AESSecureMessagingWrapper, ssc = " + ssc);
 		this.ksEnc = ksEnc;
 		this.ksMac = ksMac;
 		this.ssc = ssc;
-
-		int keyLength = ksEnc.getEncoded().length;
-		LOGGER.info("DEBUG: AES with key length " + keyLength);
 
 		sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
 		sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
 
 		cipher = Cipher.getInstance("AES/CBC/NoPadding");
-		/* We will init this cipher later (in order to set IV). */
-
-		LOGGER.info("DEBUG: cipher blocksize = " + cipher.getBlockSize());
-		LOGGER.info("DEBUG: initial iv = " + Hex.bytesToHexString(cipher.getIV()));
+		/* NOTE: We will init this cipher in wrapCommandAPDU and unwrapResponseAPDU. */
 
 		String macAlg = "AESCMAC";
 		mac = Mac.getInstance(macAlg);
@@ -173,7 +163,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 		ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
 
 		byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
-		byte[] paddedMaskedHeader = Util.padWithCAN(maskedHeader, 128); // 128 bits is 16 bytes
+		byte[] paddedMaskedHeader = Util.padWithCAN(maskedHeader, 16); // 128 bits is 16 bytes
 
 		boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
 
@@ -188,47 +178,44 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 			do97 = bOut.toByteArray();
 		}
 
-		LOGGER.info("DEBUG: wrapping CAPDU " + Hex.bytesToHexString(commandAPDU.getBytes()));
 		ssc++;
-		LOGGER.info("DEBUG: Increased ssc to " + ssc);
-		IvParameterSpec ivParams = getIV(ssc);
+		byte[] sscBytes = getSSCAsBytes(ssc);
 
 		if (lc > 0) {
 			/* If we have command data, encrypt it. */
-			byte[] data = Util.padWithCAN(commandAPDU.getData(), 128);
+			byte[] data = Util.padWithCAN(commandAPDU.getData(), 16);
 
 			/* Re-initialize cipher, this time with IV based on SSC. */
-			cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ivParams);
+			cipher.init(Cipher.ENCRYPT_MODE, ksEnc, getIV(sscBytes));
 
 			byte[] ciphertext = cipher.doFinal(data);
 
 			bOut.reset();
 			bOut.write(hasDO85 ? (byte)0x85 : (byte)0x87);
 			bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
-			if(!hasDO85) { bOut.write(0x01); };
-			bOut.write(ciphertext, 0, ciphertext.length);
+			if (!hasDO85) { bOut.write(0x01); };
+			bOut.write(ciphertext);
 			do8587 = bOut.toByteArray();
 		}
 
 		bOut.reset();
-		bOut.write(paddedMaskedHeader, 0, paddedMaskedHeader.length);
-		bOut.write(do8587, 0, do8587.length);
-		bOut.write(do97, 0, do97.length);
+		bOut.write(paddedMaskedHeader);
+		bOut.write(do8587);
+		bOut.write(do97);
 
 		byte[] m = bOut.toByteArray();
 
 		bOut.reset();
-		bOut.write(ivParams.getIV());
+		bOut.write(sscBytes);
 		bOut.write(m);
 		bOut.flush();
-		byte[] n = Util.padWithCAN(bOut.toByteArray(), 128);
+		byte[] n = Util.padWithCAN(bOut.toByteArray(), 16);
 
 		/* Compute cryptographic checksum... */
 		mac.init(ksMac);
 		byte[] cc = mac.doFinal(n);
 		int ccLength = cc.length;
 		if (ccLength != 8) {
-			LOGGER.warning("Found mac length of " + ccLength + ", only using first 8 bytes");
 			ccLength = 8;
 		}
 
@@ -264,7 +251,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 			if (rapdu == null || rapdu.length < 2 || len < 2) {
 				throw new IllegalArgumentException("Invalid response APDU");
 			}
-			cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
+			ssc++;
+			byte[] sscBytes = getSSCAsBytes(ssc);
+			cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(sscBytes));
 			DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
 			byte[] data = new byte[0];
 			short sw = 0;
@@ -376,31 +365,25 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	}
 
 	/**
-	 * Gets the SSC as bytes.
-	 * (This appears to work for Dorian Aladel, on 3DES and AES-128 at samples. -- MO)
+	 * Gets the IV by encrypting the SSC.
 	 * 
-	 * @param ssc
-	 * @return
-	 */
-	//	private byte[] getSSCAsBytes(long ssc) {
-	//		String tmp=Hex.intToHexString((int)ssc);
-	//		while (tmp.length()<32)
-	//			tmp="0"+tmp;
-	//		return Hex.hexStringToBytes(tmp);
-	//	}
-
-	/*
 	 * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
+	 * 
+	 * @param sscBytes the SSC as blocksize aligned byte array
 	 */
-	private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-		byte[] sscBytes = getSSCAsBytes(ssc);
+	private IvParameterSpec getIV(byte[] sscBytes) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
-		LOGGER.info("DEBUG: encryptedSSC = " + Hex.bytesToHexString(encryptedSSC));
 		IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
-		LOGGER.info("DEBUG: ivParams.getIV() = " + Hex.bytesToHexString(ivParams.getIV()));
 		return ivParams;
 	}
 
+	/**
+	 * Gets the SSC as bytes.
+	 * 
+	 * @param ssc
+	 * 
+	 * @return the ssc as a 16 byte array
+	 */
 	private byte[] getSSCAsBytes(long ssc) {
 		try {
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(16);
@@ -413,6 +396,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 			byteArrayOutputStream.write(0x00);
 			byteArrayOutputStream.write(0x00);
 
+			/* A long will take 8 bytes. */
 			DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 			dataOutputStream.writeLong(ssc);
 			dataOutputStream.close();
