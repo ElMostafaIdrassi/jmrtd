@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.5.3-SNAPSHOT</version>
+  <version>0.5.3</version>
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
   <url>http://jmrtd.org</url>

@@ -6,7 +6,7 @@
 
   <property name="groupId" value="org.jmrtd" />
   <property name="artifactId" value="jmrtd" />
-  <property name="version" value="0.5.3-SNAPSHOT" />
+  <property name="version" value="0.5.3" />
 
   <property name="home" value="/Users/martijno" />
   <property name="software" value="${home}/software" />
@@ -18,7 +18,7 @@
 
   <property name="default_bcprov_lib" value="${software}/bc/jars/bcprov-jdk15on-152.jar" />
   <property name="default_certcvc_lib" value="${software}/cert-cvc-1.4.0/target/cert-cvc.jar" />
-  <property name="default_scuba_lib" value="../scuba_smartcards/dist/lib/scuba-smartcards-0.0.6.jar" />
+  <property name="default_scuba_lib" value="../scuba_smartcards/dist/lib/scuba-smartcards-0.0.8.jar" />
   
   <property environment="env" />
   
