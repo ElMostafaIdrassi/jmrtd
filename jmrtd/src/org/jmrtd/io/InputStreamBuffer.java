@@ -39,7 +39,7 @@ import org.jmrtd.io.FragmentBuffer.Fragment;
 public class InputStreamBuffer {
 
 	private PositionInputStream carrier;
-	private FragmentBuffer buffer;
+	public FragmentBuffer buffer;
 
 	/**
 	 * Creates an input stream buffer.
@@ -118,7 +118,7 @@ public class InputStreamBuffer {
 				} else {
 					/* Get it from the carrier */
 					if (carrier.markSupported()) {
-						syncCarrierPosition();
+						syncCarrierPosition(position);
 					}
 					try {
 						int result = carrier.read();
@@ -157,29 +157,35 @@ public class InputStreamBuffer {
 					len = buffer.getLength() - position;
 				}
 				
-				if (carrier.markSupported()) {
-					syncCarrierPosition();
-				}
-				
 				if (position >= buffer.getLength()) {
 					/* FIXME: is this correct? See FIXME in read(). */
 					return -1;
+				}
+				
+				if (carrier.markSupported()) {
+					syncCarrierPosition(position);
 				}
 
 				Fragment fragment = buffer.getSmallestUnbufferedFragment(position, len);
 				if (fragment.getLength() > 0) {
 					/* Copy buffered prefix to b. */
 					int alreadyBufferedPrefixLength = fragment.getOffset() - position;
+					int unbufferedPostfixLength = fragment.getLength();
 					System.arraycopy(buffer.getBuffer(), position, b, off, alreadyBufferedPrefixLength);
 					position += alreadyBufferedPrefixLength;
-
-					/* Read unbuffered fragment from carrier, directly to b. */
-					int bytesReadFromCarrier = carrier.read(b, off + alreadyBufferedPrefixLength, fragment.getLength());
-					buffer.addFragment(fragment.getOffset(), b, off, bytesReadFromCarrier);
+					
+					if (carrier.markSupported()) {
+						syncCarrierPosition(position);
+					}
+					
+					/* Read unbuffered postfix from carrier, directly to b and buffer it. */
+					int bytesReadFromCarrier = carrier.read(b, off + alreadyBufferedPrefixLength, unbufferedPostfixLength);
+					buffer.addFragment(fragment.getOffset(), b, off + alreadyBufferedPrefixLength, bytesReadFromCarrier);
 					position += bytesReadFromCarrier;
-
+					
 					return alreadyBufferedPrefixLength + bytesReadFromCarrier;					
 				} else {
+					/* No unbuffered fragment. */
 					int length = Math.min(len, buffer.getLength() - position);
 					System.arraycopy(buffer.getBuffer(), position, b, off, length);
 					position += length;
@@ -202,7 +208,7 @@ public class InputStreamBuffer {
 					position += leftInBuffer;
 					long skippedBytes = 0;
 					if (carrier.markSupported()) {
-						syncCarrierPosition();
+						syncCarrierPosition(position);
 						skippedBytes = carrier.skip(n - leftInBuffer);
 						position += (int)skippedBytes;
 					} else {
@@ -244,7 +250,7 @@ public class InputStreamBuffer {
 		 * 
 		 * @throws IOException on error
 		 */
-		private void syncCarrierPosition() throws IOException {
+		private void syncCarrierPosition(int position) throws IOException {
 			if (position == carrier.getPosition()) {
 				return;
 			}

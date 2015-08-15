@@ -71,15 +71,15 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 	private long ssc;
 
+	private boolean doCheckMAC;
+
 	/**
 	 * Constructs a secure messaging wrapper based on the secure messaging
 	 * session keys. The initial value of the send sequence counter is set to
 	 * <code>0L</code>.
 	 * 
-	 * @param ksEnc
-	 *            the session key for encryption
-	 * @param ksMac
-	 *            the session key for macs
+	 * @param ksEnc the session key for encryption
+	 * @param ksMac the session key for macs
 	 * 
 	 * @throws GeneralSecurityException
 	 *             when the available JCE providers cannot provide the necessary
@@ -87,7 +87,25 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 *             ("DESede/CBC/Nopadding" Cipher, "ISO9797Alg3Mac" Mac).
 	 */
 	public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac) throws GeneralSecurityException {
-		this(ksEnc, ksMac, 0L);
+		this(ksEnc, ksMac, true);
+	}
+
+	/**
+	 * Constructs a secure messaging wrapper based on the secure messaging
+	 * session keys. The initial value of the send sequence counter is set to
+	 * <code>0L</code>.
+	 * 
+	 * @param ksEnc the session key for encryption
+	 * @param ksMac the session key for macs
+	 * @param doCheckMAC whether to check the MAC when unwrapping response APDUs
+	 * 
+	 * @throws GeneralSecurityException
+	 *             when the available JCE providers cannot provide the necessary
+	 *             cryptographic primitives
+	 *             ("DESede/CBC/Nopadding" Cipher, "ISO9797Alg3Mac" Mac).
+	 */
+	public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC) throws GeneralSecurityException {
+		this(ksEnc, ksMac, doCheckMAC, 0L);
 	}
 
 	/**
@@ -104,12 +122,31 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 * 
 	 */
 	public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
-		this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", ssc);
+		this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", true, ssc);
+	}
+	
+	/**
+	 * Constructs a secure messaging wrapper based on the secure messaging
+	 * session keys and the initial value of the send sequence counter.
+	 * Used in BAC and EAC 1.
+	 * 
+	 * @param ksEnc the session key for encryption
+	 * @param ksMac the session key for macs
+	 * @param doCheckMAC whether to check the MAC when unwrapping response APDUs
+	 * @param ssc the initial value of the send sequence counter
+	 * 
+	 * @throws NoSuchPaddingException when the available JCE providers cannot provide the necessary cryptographic primitives
+	 * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
+	 * 
+	 */
+	public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
+		this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", doCheckMAC, ssc);
 	}
 
-	private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
+	private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		this.ksEnc = ksEnc;
 		this.ksMac = ksMac;
+		this.doCheckMAC = doCheckMAC;
 		this.ssc = ssc;
 		cipher = Cipher.getInstance(cipherAlg);
 		mac = Mac.getInstance(macAlg);
@@ -288,7 +325,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 				break;
 				}
 			}
-			if (!checkMac(rapdu, cc)) {
+			if (doCheckMAC && !checkMac(rapdu, cc)) {
 				throw new IllegalStateException("Invalid MAC");
 			}
 			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
