@@ -232,6 +232,7 @@ public class PassportService extends PassportApduService implements Serializable
 		fs = new MRTDFileSystem(this);
 
 		state = SESSION_STOPPED_STATE;
+		LOGGER.info("DEBUG: isExtendedAPDULengthSupported: " + isExtendedAPDULengthSupported());
 	}
 
 	/**

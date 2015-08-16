@@ -282,6 +282,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		byte[] data = bOut.toByteArray();
 
 		CommandAPDU wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
+		
+		/* FIXME: If extended length APDUs are supported (they must for EAC, that 256 should be 65536). See bug #26 in SF bugtracker. -- MO */
+//		wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
+		
 		return wc;
 	}
 
