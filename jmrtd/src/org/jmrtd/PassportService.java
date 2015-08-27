@@ -186,12 +186,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 	private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
 
-	/**
-	 * The file read block size, some passports cannot handle large values
-	 * 
-	 * @deprecated hack
-	 */
-	public static int maxBlockSize = 223;
+	public static final int DEFAULT_MAX_BLOCKSIZE = 224;
 
 	private static final int SESSION_STOPPED_STATE = 0;
 
@@ -209,6 +204,13 @@ public class PassportService extends PassportApduService implements Serializable
 
 	private static final int TA_AUTHENTICATED_STATE = 5;
 
+	/**
+	 * The file read block size, some passports cannot handle large values
+	 * 
+	 * @deprecated hack
+	 */
+	public int maxBlockSize;
+	
 	private int state;
 
 	/**
@@ -227,14 +229,27 @@ public class PassportService extends PassportApduService implements Serializable
 	 * @throws CardServiceException on error
 	 */
 	public PassportService(CardService service) throws CardServiceException {
+		this(service, DEFAULT_MAX_BLOCKSIZE);
+	}
+	
+	/**
+	 * Creates a new passport service for accessing the passport.
+	 * 
+	 * @param service another service which will deal with sending the APDUs to the card
+	 * @param maxBlockSize maximum size for plain text APDUs
+	 * 
+	 * @throws CardServiceException on error
+	 */
+	public PassportService(CardService service, int maxBlockSize) throws CardServiceException {
 		super(service);
+		this.maxBlockSize = maxBlockSize;
 		random = new SecureRandom(); /* for BAC */
 		fs = new MRTDFileSystem(this);
 
 		state = SESSION_STOPPED_STATE;
 		LOGGER.info("DEBUG: isExtendedAPDULengthSupported: " + isExtendedAPDULengthSupported());
 	}
-
+	
 	/**
 	 * Opens a session to the card. As of 0.4.10 this no longer auto selects the passport application,
 	 * caller is responsible to call #sendSelectApplet(boolean) now.
