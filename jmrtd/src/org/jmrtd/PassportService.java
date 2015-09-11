@@ -313,7 +313,7 @@ public class PassportService extends PassportApduService implements Serializable
 			try {
 				doBAC(kEnc, kMac);
 			} catch (CardServiceException cse) {
-				LOGGER.warning("BAC failed for BAC key \"" + bacKey + "\"");
+				LOGGER.warning("BAC failed");
 				throw cse;
 			}
 		} catch (GeneralSecurityException gse) {
