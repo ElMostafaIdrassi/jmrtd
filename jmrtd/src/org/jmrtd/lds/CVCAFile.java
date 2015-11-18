@@ -23,6 +23,7 @@
 package org.jmrtd.lds;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -125,7 +126,7 @@ public class CVCAFile extends AbstractLDSFile {
 		dataIn.readFully(data);
 		caReference = new String(data);
 		tag = dataIn.read();
-		if (tag != 0) {
+		if (tag != 0 && tag != -1) {
 			if (tag != CAR_TAG) { throw new IllegalArgumentException("Wrong tag."); }
 			length = dataIn.read();
 			if (length > 16) { throw new IllegalArgumentException("Wrong length."); }
