@@ -548,7 +548,6 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 			return Arrays.equals(digestBytes, signature);
 		}
 
-
 		/* For RSA_SA_PSS
 		 *    1. the default hash is SHA1,
 		 *    2. The hash id is not encoded in OID

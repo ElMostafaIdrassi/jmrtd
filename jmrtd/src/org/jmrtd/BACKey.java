@@ -45,6 +45,13 @@ public class BACKey implements BACKeySpec {
 	protected BACKey() {
 	}
 	
+	/**
+	 * Creates a BAC key.
+	 * 
+	 * @param documentNumber the document number string, cannot be <code>null</code>
+	 * @param dateOfBirth the date of birth string in <i>yymmdd</i> format, cannot be <code>null</code>
+	 * @param dateOfExpiry the date of expiry string in <i>yymmdd</i> format, cannot be <code>null</code>
+	 */
 	public BACKey(String documentNumber, String dateOfBirth, String dateOfExpiry) {
 		if (documentNumber == null) {
 			throw new IllegalArgumentException("Illegal document number");
@@ -61,28 +68,61 @@ public class BACKey implements BACKeySpec {
 		this.dateOfExpiry = dateOfExpiry;
 	}
 	
+	/**
+	 * Creates a BAC key.
+	 * 
+	 * @param documentNumber the document number string, cannot be <code>null</code>
+	 * @param dateOfBirth the date of birth, cannot be <code>null</code>
+	 * @param dateOfExpiry the date of expiry, cannot be <code>null</code>
+	 */
 	public BACKey(String documentNumber, Date dateOfBirth, Date dateOfExpiry) {
 		this(documentNumber, toString(dateOfBirth), toString(dateOfExpiry));
 	}
 
+	/**
+	 * Gets the document number string.
+	 * 
+	 * @return the document number string
+	 */
 	public String getDocumentNumber() {
 		return documentNumber;
 	}
 
+	/**
+	 * Gets the date of birth string.
+	 * 
+	 * @return a date in <i>yymmdd</i> format
+	 */
 	public String getDateOfBirth() {
 		return dateOfBirth;
 	}
 
+	/**
+	 * Gets the date of expiry string.
+	 * 
+	 * @return a date in <i>yymmdd</i> format
+	 */
 	public String getDateOfExpiry() {
 		return dateOfExpiry;
 	}
 
+	/**
+	 * Gets a textual representation of this BAC key.
+	 * 
+	 * @return a textual representation of this BAC key
+	 */
 	public String toString() {
 		assert(dateOfBirth != null && dateOfBirth.length() == 6);
 		assert(dateOfExpiry != null && dateOfExpiry.length() == 6);
 		return documentNumber + ", " + dateOfBirth + ", " + dateOfExpiry;
 	}
 
+	/**
+	 * Gets the hash code of this BAC key.
+	 * Document number, date of birth, and date of expiry (with year in <i>yy</i> precision) are taken into account.
+	 * 
+	 * @return a hash code
+	 */
 	public int hashCode() {
 		int result = 5;
 		result = 61 * result + (documentNumber == null ? 0 : documentNumber.hashCode());
@@ -91,6 +131,13 @@ public class BACKey implements BACKeySpec {
 		return result;
 	}
 
+	/**
+	 * Tests equality of this BAC key with respect to another object.
+	 * 
+	 * @param o another object
+	 * 
+	 * @return whether this BAC key equals another object
+	 */
 	public boolean equals(Object o) {
 		if (o == null) { return false; }
 		if (!o.getClass().equals(this.getClass())) { return false; }

@@ -24,6 +24,13 @@ package org.jmrtd;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 
+/**
+ * Secure messaging wrapper.
+ * 
+ * @author The JMRTD team
+ * 
+ * @version $Revision: $
+ */
 public abstract class SecureMessagingWrapper implements APDUWrapper {
 
 	public abstract long getSendSequenceCounter();
