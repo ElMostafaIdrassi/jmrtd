@@ -219,8 +219,8 @@ public class FaceImageInfo extends AbstractImageInfo {
 			InputStream imageInputStream, int imageLength, int imageDataType) throws IOException {
 		super(TYPE_PORTRAIT, width, height, imageInputStream, imageLength, toMimeType(imageDataType));
 		if (imageInputStream == null) { throw new IllegalArgumentException("Null image"); }
-		this.gender = gender;
-		this.eyeColor = eyeColor;
+		this.gender = gender == null ? Gender.UNSPECIFIED : gender;
+		this.eyeColor = eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor;
 		this.featureMask = featureMask;
 		this.hairColor = hairColor;
 		this.expression = expression;
@@ -490,8 +490,8 @@ public class FaceImageInfo extends AbstractImageInfo {
 	public String toString() {
 		StringBuffer out = new StringBuffer();
 		out.append("Image size: "); out.append(getWidth() + " x " + getHeight()); out.append("\n");
-		out.append("Gender: "); out.append(gender); out.append("\n");
-		out.append("Eye color: "); out.append(eyeColor); out.append("\n");
+		out.append("Gender: "); out.append(gender == null ? Gender.UNSPECIFIED : gender); out.append("\n");
+		out.append("Eye color: "); out.append(eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor); out.append("\n");
 		out.append("Hair color: "); out.append(hairColorToString()); out.append("\n");
 		out.append("Feature mask: "); out.append(featureMaskToString()); out.append("\n");
 		out.append("Expression: "); out.append(expressionToString()); out.append("\n");
@@ -515,20 +515,20 @@ public class FaceImageInfo extends AbstractImageInfo {
 		DataOutputStream dataOut = new DataOutputStream(outputStream);
 
 		/* Facial Information (16) */
-		dataOut.writeShort(featurePoints.length);						/* 2 */
-		dataOut.writeByte(gender.toInt());								/* 1 */
-		dataOut.writeByte(eyeColor.toInt());							/* 1 */
-		dataOut.writeByte(hairColor);									/* 1 */
-		dataOut.writeByte((byte)((featureMask & 0xFF0000L) >> 16));		/* 1 */
-		dataOut.writeByte((byte)((featureMask & 0x00FF00L) >> 8));		/* 1 */
-		dataOut.writeByte((byte)(featureMask & 0x0000FFL));				/* 1 */
-		dataOut.writeShort(expression);									/* 2 */
-		for (int i = 0; i < 3; i++) {									/* 3 */
+		dataOut.writeShort(featurePoints.length);												/* 2 */
+		dataOut.writeByte(gender == null ? Gender.UNSPECIFIED.toInt() : gender.toInt());		/* 1 */
+		dataOut.writeByte(eyeColor == null ? EyeColor.UNSPECIFIED.toInt() : eyeColor.toInt());	/* 1 */
+		dataOut.writeByte(hairColor);															/* 1 */
+		dataOut.writeByte((byte)((featureMask & 0xFF0000L) >> 16));								/* 1 */
+		dataOut.writeByte((byte)((featureMask & 0x00FF00L) >> 8));								/* 1 */
+		dataOut.writeByte((byte)(featureMask & 0x0000FFL));										/* 1 */
+		dataOut.writeShort(expression);															/* 2 */
+		for (int i = 0; i < 3; i++) {															/* 3 */
 			int b = poseAngle[i];
 			//	FIXME: used to be:			(0 <= poseAngle[i] && poseAngle[i] <= 180) ? poseAngle[i] / 2 + 1 : 181 + poseAngle[i] / 2;
 			dataOut.writeByte(b);
 		}
-		for (int i = 0; i < 3; i++) {									/* 3 */
+		for (int i = 0; i < 3; i++) {															/* 3 */
 			dataOut.writeByte(poseAngleUncertainty[i]);
 		}
 
@@ -543,14 +543,14 @@ public class FaceImageInfo extends AbstractImageInfo {
 		}
 
 		/* Image Information (12) */
-		dataOut.writeByte(faceImageType);		/* 1 */
-		dataOut.writeByte(imageDataType);		/* 1 */
-		dataOut.writeShort(getWidth());			/* 2 */
-		dataOut.writeShort(getHeight());		/* 2 */
-		dataOut.writeByte(colorSpace);		/* 1 */
-		dataOut.writeByte(sourceType);			/* 1 */
-		dataOut.writeShort(deviceType);			/* 2 */
-		dataOut.writeShort(quality);			/* 2 */
+		dataOut.writeByte(faceImageType);														/* 1 */
+		dataOut.writeByte(imageDataType);														/* 1 */
+		dataOut.writeShort(getWidth());															/* 2 */
+		dataOut.writeShort(getHeight());														/* 2 */
+		dataOut.writeByte(colorSpace);															/* 1 */
+		dataOut.writeByte(sourceType);															/* 1 */
+		dataOut.writeShort(deviceType);															/* 2 */
+		dataOut.writeShort(quality);															/* 2 */
 
 		/*
 		 * Image data type code based on Section 5.8.1
@@ -737,8 +737,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	 * 
 	 * @version $Revision$
 	 */
-	public static class FeaturePoint
-	{
+	public static class FeaturePoint {
 		private int type;
 		private int majorCode;
 		private int minorCode;
