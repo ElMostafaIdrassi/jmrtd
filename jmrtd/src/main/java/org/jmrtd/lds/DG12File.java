@@ -73,7 +73,7 @@ public class DG12File extends DataGroup {
 	private String issuingAuthority;
 	private Date dateOfIssue;
 	private List<String> namesOfOtherPersons;
-	private String endorseMentsAndObservations;
+	private String endorsementsAndObservations;
 	private String taxOrExitRequirements;
 	private byte[] imageOfFront;
 	private byte[] imageOfRear;
@@ -106,7 +106,7 @@ public class DG12File extends DataGroup {
 		this.issuingAuthority = issuingAuthority;
 		this.dateOfIssue = dateOfIssue;
 		this.namesOfOtherPersons = namesOfOtherPersons == null ? new ArrayList<String>() : new ArrayList<String>(namesOfOtherPersons);
-		this.endorseMentsAndObservations = endorseMentsAndObservations;
+		this.endorsementsAndObservations = endorsementsAndObservations;
 		this.taxOrExitRequirements = taxOrExitRequirements;
 		this.imageOfFront = imageOfFront;
 		this.imageOfRear = imageOfRear;
@@ -164,7 +164,7 @@ public class DG12File extends DataGroup {
 		if(issuingAuthority != null) { tagPresenceList.add(ISSUING_AUTHORITY_TAG); }
 		if(dateOfIssue != null) { tagPresenceList.add(DATE_OF_ISSUE_TAG); }
 		if(namesOfOtherPersons != null && namesOfOtherPersons.size() > 0) { tagPresenceList.add(NAME_OF_OTHER_PERSON_TAG); }
-		if(endorseMentsAndObservations != null) { tagPresenceList.add(ENDORSEMENTS_AND_OBSERVATIONS_TAG); }
+		if(endorsementsAndObservations != null) { tagPresenceList.add(ENDORSEMENTS_AND_OBSERVATIONS_TAG); }
 		if(taxOrExitRequirements != null) { tagPresenceList.add(TAX_OR_EXIT_REQUIREMENTS_TAG); }
 		if(imageOfFront != null) { tagPresenceList.add(IMAGE_OF_FRONT_TAG); }
 		if(imageOfRear != null) { tagPresenceList.add(IMAGE_OF_REAR_TAG); }
@@ -254,11 +254,11 @@ public class DG12File extends DataGroup {
 	private void parseEndorsementsAndObservations(byte[] value) {
 		try {
 			String field = new String(value, "UTF-8");
-			endorseMentsAndObservations = field.trim();
+			endorsementsAndObservations = field.trim();
 		} catch (UnsupportedEncodingException usee) {
 			/* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
 			LOGGER.severe("Exception: " + usee.getMessage());
-			endorseMentsAndObservations = new String(value).trim();
+			endorsementsAndObservations = new String(value).trim();
 		}
 	}
 
@@ -355,7 +355,7 @@ public class DG12File extends DataGroup {
 	 * @return the endorsementsAndObservations
 	 */
 	public String getEndorsementsAndObservations() {
-		return endorseMentsAndObservations;
+		return endorsementsAndObservations;
 	}
 
 	/**
@@ -418,7 +418,7 @@ public class DG12File extends DataGroup {
 		result.append(issuingAuthority == null ? "" : issuingAuthority); result.append(", ");
 		result.append(dateOfIssue == null ? "" : SDF.format(dateOfIssue)); result.append(", ");
 		result.append(namesOfOtherPersons == null || namesOfOtherPersons.size() == 0 ? "" : namesOfOtherPersons); result.append(", ");
-		result.append(endorseMentsAndObservations == null ? "" : endorseMentsAndObservations); result.append(", ");
+		result.append(endorsementsAndObservations == null ? "" : endorsementsAndObservations); result.append(", ");
 		result.append(taxOrExitRequirements == null ? "" : taxOrExitRequirements); result.append(", ");
 		result.append(imageOfFront == null ? "" : "image (" + imageOfFront.length + ")"); result.append(", ");
 		result.append(imageOfRear == null ? "" : "image (" + imageOfRear.length + ")"); result.append(", ");
@@ -474,7 +474,7 @@ public class DG12File extends DataGroup {
 				break; 
 			case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
 				tlvOut.writeTag(tag);
-				tlvOut.writeValue(endorseMentsAndObservations.trim().getBytes("UTF-8"));
+				tlvOut.writeValue(endorsementsAndObservations.trim().getBytes("UTF-8"));
 				break;
 			case TAX_OR_EXIT_REQUIREMENTS_TAG:
 				tlvOut.writeTag(tag);
