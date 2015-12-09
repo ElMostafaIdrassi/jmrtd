@@ -862,7 +862,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 			DataGroupHash hash = new DataGroupHash(dataGroupNumber, new DEROctetString(hashBytes));
 			dataGroupHashesArray[i++] = hash;
 		}
-		AlgorithmIdentifier digestAlgorithmIdentifier = AlgorithmIdentifier.getInstance(lookupOIDByMnemonic(digestAlgorithm));
+		AlgorithmIdentifier digestAlgorithmIdentifier = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
 		LDSVersionInfo ldsVersionInfo;
 		LDSSecurityObject securityObject = null;
 		if (ldsVersion == null) {
@@ -884,8 +884,8 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 		BigInteger serial = ((X509Certificate)docSigningCertificate).getSerialNumber();
 		SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
 
-		AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(lookupOIDByMnemonic(digestAlgorithm)); 
-		AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm));
+		AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
+		AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
 
 		ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, content); // struct containing the hash of content
 		ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
