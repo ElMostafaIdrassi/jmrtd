@@ -67,6 +67,11 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 	private PassportService service;
 	private Map<Short, MRTDFileInfo> fileInfos;
 
+	/**
+	 * Creates a file system.
+	 * 
+	 * @param service the card service
+	 */
 	public MRTDFileSystem(PassportService service) {
 		this.service = service;
 		this.fileInfos = new HashMap<Short, MRTDFileInfo>();
@@ -74,6 +79,13 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 		this.isSelected = false;
 	}
 
+	/**
+	 * Gets the selected path.
+	 * 
+	 * @return the path components
+	 * 
+	 * @throws CardServiceException on error
+	 */
 	public synchronized FileInfo[] getSelectedPath() throws CardServiceException {
 		MRTDFileInfo fileInfo = getFileInfo();
 		if(fileInfo == null) {
@@ -83,6 +95,13 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 		}
 	}
 
+	/**
+	 * Selects a file.
+	 * 
+	 * @param fid indicates the file to select
+	 * 
+	 * @throws CardServiceException on error communicating over the service
+	 */
 	/*
 	 * NOTE: This doesn't actually send a select file command. ReadBinary will do so
 	 * if needed.
@@ -93,6 +112,14 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 		isSelected = false;
 	}
 
+	/**
+	 * Reads a block of bytes.
+	 * 
+	 * @param offset offset index
+	 * @param length the number of bytes to read
+	 * 
+	 * @return a copy of the bytes read
+	 */
 	public synchronized byte[] readBinary(int offset, int length) throws CardServiceException {
 		MRTDFileInfo fileInfo = null;
 		try {
@@ -185,23 +212,57 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 		private short fid;
 		private FragmentBuffer buffer;
 
+		/**
+		 * Constructs a file info.
+		 * 
+		 * @param fid indicates which file
+		 * @param length length of the contents of the file
+		 */
 		public MRTDFileInfo(short fid, int length) {
 			this.fid = fid;
 			this.buffer = new FragmentBuffer(length);
 		}
 
+		/**
+		 * Gets the buffer.
+		 * 
+		 * @return the buffer
+		 */
 		public byte[] getBuffer() {
 			return buffer.getBuffer();
 		}
 
+		/**
+		 * Gets the file identifier.
+		 * 
+		 * @return file identifier
+		 */
 		public short getFID() { return fid; }
 
+		/**
+		 * Gets the length of the file.
+		 * 
+		 * @return the length of the file
+		 */
 		public int getFileLength() { return buffer.getLength(); }
 
+		/**
+		 * Gets a textual representation of this file info.
+		 * 
+		 * @return a textual representation of this file info
+		 */
 		public String toString() {
 			return Integer.toHexString(fid);
 		}
 
+		/**
+		 * Gets the smallest unbuffered fragment included in <code>offset</code> and <code>offset + length - 1</code>.
+		 * 
+		 * @param offset the offset
+		 * @param length the length
+		 * 
+		 * @return a fragment smaller than or equal to the fragment indicated by <code>offset</code> and <code>length</code>
+		 */
 		public Fragment getSmallestUnbufferedFragment(int offset, int length) {
 			return buffer.getSmallestUnbufferedFragment(offset, length);
 		}

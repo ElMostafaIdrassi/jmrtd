@@ -55,7 +55,7 @@ public class CardAccessFile {
 	private static final long serialVersionUID = -3536507558193769951L;
 
 	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
+
 	/** The security infos that make up this file. */
 	private Set<SecurityInfo> securityInfos;
 
@@ -111,6 +111,12 @@ public class CardAccessFile {
 		return securityInfos;
 	}
 
+	/**
+	 * Gets the PACE infos embedded in this card access file.
+	 * If no infos are present, an empty list is returned.
+	 * 
+	 * @return a list of PACE infos
+	 */
 	public Collection<PACEInfo> getPACEInfos() {
 		List<PACEInfo> paceInfos = new ArrayList<PACEInfo>(securityInfos.size());
 		for (SecurityInfo securityInfo: securityInfos) {
@@ -121,19 +127,36 @@ public class CardAccessFile {
 		return paceInfos;
 	}
 	
+	/**
+	 * Gets the signature algorithm object identifier.
+	 * 
+	 * @return signature algorithm OID
+	 */
 	public String toString() {
 		return "CardAccessFile [" + securityInfos.toString() + "]";
 	}
 
-	public boolean equals(Object obj) {
-		if (obj == null) { return false; }
-		if (!(obj.getClass().equals(this.getClass()))) { return false; }
-		CardAccessFile other = (CardAccessFile)obj;
+	/**
+	 * Tests equality with respect to another object.
+	 * 
+	 * @param otherObj another object
+	 * 
+	 * @return whether this object equals the other object
+	 */
+	public boolean equals(Object otherObj) {
+		if (otherObj == null) { return false; }
+		if (!(otherObj.getClass().equals(this.getClass()))) { return false; }
+		CardAccessFile other = (CardAccessFile)otherObj;
 		if (securityInfos == null) { return  other.securityInfos == null; }
 		if (other.securityInfos == null) { return securityInfos == null; }
 		return securityInfos.equals(other.securityInfos);
 	}
 
+	/**
+	 * Gets a hash code of this object.
+	 * 
+	 * @return the hash code
+	 */
 	public int hashCode() {
 		return 7 * securityInfos.hashCode() + 61;
 	}

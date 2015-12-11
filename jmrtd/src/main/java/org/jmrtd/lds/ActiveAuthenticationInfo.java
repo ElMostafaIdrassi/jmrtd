@@ -129,6 +129,11 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 		return signatureAlgorithmOID;
 	}
 
+	/**
+	 * Gets a textual representation of this object.
+	 * 
+	 * @return a textual representation of this object
+	 */
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("ActiveAuthenticationInfo");
@@ -138,13 +143,13 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 		return result.toString();
 	}
 
-	public int hashCode() {
-		return 12345
-				+ 3 * (oid == null ? 0 : oid.hashCode())
-				+ 5 * version
-				+ 11 * (signatureAlgorithmOID == null ? 1 : signatureAlgorithmOID.hashCode());
-	}
-
+	/**
+	 * Tests equality with respect to another object.
+	 * 
+	 * @param other another object
+	 * 
+	 * @return whether this object equals the other object
+	 */
 	public boolean equals(Object other) {
 		if (other == null) { return false; }
 		if (other == this) { return true; }
@@ -152,7 +157,38 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 		ActiveAuthenticationInfo otherActiveAuthenticationInfo = (ActiveAuthenticationInfo)other;
 		return getDERObject().equals(otherActiveAuthenticationInfo.getDERObject());
 	}
+	
+	/**
+	 * Gets a hash code of this object.
+	 * 
+	 * @return the hash code
+	 */
+	public int hashCode() {
+		return 12345
+				+ 3 * (oid == null ? 0 : oid.hashCode())
+				+ 5 * version
+				+ 11 * (signatureAlgorithmOID == null ? 1 : signatureAlgorithmOID.hashCode());
+	}
 
+	/**
+	 * Translates an OID string to a Java mnemonic algorithm string.
+	 * 
+	 * @param oid the OID string
+	 * 
+	 * @return a mnemonic algorithm string
+	 * 
+	 * @throws NoSuchAlgorithmException if the OID was not recognized
+	 */
+	public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {		
+		if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "SHA1withECDSA"; }
+		if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "SHA224withECDSA"; }
+		if (ECDSA_PLAIN_SHA256_OID.equals(oid)) { return "SHA256withECDSA"; }
+		if (ECDSA_PLAIN_SHA384_OID.equals(oid)) { return "SHA384withECDSA"; }
+		if (ECDSA_PLAIN_SHA512_OID.equals(oid)) { return "SHA512withECDSA"; }
+		if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) { return "RIPEMD160withECDSA"; }
+		throw new NoSuchAlgorithmException("Unknown OID " + oid);
+	}
+	
 	/* ONLY NON-PUBLIC METHODS BELOW */
 
 	/**
@@ -188,15 +224,5 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 			LOGGER.severe("Exception: " + e.getMessage());
 			throw new IllegalArgumentException("Malformed ActiveAuthenticationInfo.");
 		}
-	}
-
-	public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {		
-		if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "SHA1withECDSA"; }
-		if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "SHA224withECDSA"; }
-		if (ECDSA_PLAIN_SHA256_OID.equals(oid)) { return "SHA256withECDSA"; }
-		if (ECDSA_PLAIN_SHA384_OID.equals(oid)) { return "SHA384withECDSA"; }
-		if (ECDSA_PLAIN_SHA512_OID.equals(oid)) { return "SHA512withECDSA"; }
-		if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) { return "RIPEMD160withECDSA"; }
-		throw new NoSuchAlgorithmException("Unknown OID " + oid);
 	}
 }

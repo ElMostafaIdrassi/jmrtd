@@ -53,6 +53,13 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
 
 	private static final int CV_CERTIFICATE_TAG = 0x7F21;
 
+	/**
+	 * Generates the certificate based on an input source.
+	 * 
+	 * @param inputStream the input source
+	 * 
+	 * @throws CertificateException on parsing errors
+	 */
 	public Certificate engineGenerateCertificate(InputStream inputStream) throws CertificateException {
 		try {
 			/* Read certificate as byte[] */

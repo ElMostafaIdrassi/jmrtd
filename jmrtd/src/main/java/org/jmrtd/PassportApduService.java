@@ -171,28 +171,64 @@ public class PassportApduService extends CardService {
 		return service.transmit(capdu);
 	}
 
+	/**
+	 * Gets the answer to reset bytes.
+	 * 
+	 * @return the answer to reset bytes
+	 */
 	public byte[] getATR() {
 		return atr;
 	}
 
+	/**
+	 * Closes the service.
+	 */
 	public void close() {
 		if (service != null) {
 			service.close();
 		}
 	}
 
+	/**
+	 * Sets the service.
+	 * 
+	 * @param service the carrier service that is decorated by this service
+	 * 
+	 * @param service the carrier service
+	 */
+	/* FIXME: why is this here? -- MO */
 	public void setService(CardService service) {
 		this.service = service;
 	}
 
+	/**
+	 * Adds a listener.
+	 * 
+	 * @param l a listener
+	 */
 	public void addAPDUListener(APDUListener l) {
 		service.addAPDUListener(l);
 	}
 
+	/**
+	 * Removes a listener.
+	 * 
+	 * @param l a listener
+	 */
 	public void removeAPDUListener(APDUListener l) {
 		service.removeAPDUListener(l);
 	}
 
+	/**
+	 * Transmits an APDU.
+	 * 
+	 * @param wrapper the secure messaging wrapper
+	 * @param capdu the APDU to send
+	 * 
+	 * @return the APDU received from the PICC
+	 * 
+	 * @throws CardServiceException if tranceiving failed
+	 */
 	private ResponseAPDU transmit(APDUWrapper wrapper, CommandAPDU capdu) throws CardServiceException {
 		CommandAPDU plainCapdu = capdu;
 		if (wrapper != null) {
@@ -254,6 +290,13 @@ public class PassportApduService extends CardService {
 		checkStatusWordAfterFileOperation(capdu, rapdu);
 	}
 
+	/**
+	 * Selects a file.
+	 * 
+	 * @param fid the file identifier
+	 * 
+	 * @throws CardServiceException on error
+	 */
 	public synchronized void sendSelectFile(short fid) throws CardServiceException {
 		sendSelectFile(null, fid);
 	}
@@ -720,6 +763,15 @@ public class PassportApduService extends CardService {
 		return responseData;
 	}
 
+	/**
+	 * Sends a perform security operation command in extended length mode.
+	 * 
+	 * @param wrapper secure messaging wrapper
+	 * @param certBodyData the certificate body
+	 * @param certSignatureData signature data
+	 * 
+	 * @throws CardServiceException on error communicating over the service
+	 */
 	public synchronized void sendPSOExtendedLengthMode(APDUWrapper wrapper, byte[] certBodyData, byte[] certSignatureData)
 			throws CardServiceException {
 		byte[] certData = new byte[certBodyData.length + certSignatureData.length];
@@ -732,8 +784,16 @@ public class PassportApduService extends CardService {
 		if (sw != ISO7816.SW_NO_ERROR) { throw new CardServiceException("Sending PSO failed", sw); }
 	}
 
-	public synchronized void sendPSOChainMode(APDUWrapper wrapper, byte[] certBodyData, byte[] certSignatureData)
-			throws CardServiceException {
+	/**
+	 * Sends a perform security operation command in chain mode.
+	 * 
+	 * @param wrapper secure messaging wrapper
+	 * @param certBodyData the certificate body
+	 * @param certSignatureData signature data
+	 * 
+	 * @throws CardServiceException on error communicating over the service
+	 */
+	public synchronized void sendPSOChainMode(APDUWrapper wrapper, byte[] certBodyData, byte[] certSignatureData) throws CardServiceException {
 		byte[] certData = new byte[certBodyData.length + certSignatureData.length];
 		System.arraycopy(certBodyData, 0, certData, 0, certBodyData.length);
 		System.arraycopy(certSignatureData, 0, certData, certBodyData.length, certSignatureData.length);
@@ -767,10 +827,20 @@ public class PassportApduService extends CardService {
 		}
 	}
 
+	/**
+	 * Adds a plain text listener.
+	 * 
+	 * @param l a listener
+	 */
 	public void addPlainTextAPDUListener(APDUListener l) {
 		if (plainTextAPDUListeners != null) { plainTextAPDUListeners.add(l); }
 	}
-
+	
+	/**
+	 * Removes a plain text listener.
+	 * 
+	 * @param l a listener
+	 */
 	public void removePlainTextAPDUListener(APDUListener l) {
 		if (plainTextAPDUListeners != null) { plainTextAPDUListeners.add(l); }
 	}

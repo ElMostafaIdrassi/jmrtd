@@ -180,13 +180,15 @@ public class PassportService extends PassportApduService implements Serializable
 	SF_SOD = 0x1D,
 	SF_CVCA = 0x1C;
 
+	/** YYMMDD format. */
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
 
+	/** The default maximal blocksize used for unencrypted APDUs. */
+	public static final int DEFAULT_MAX_BLOCKSIZE = 224;
+	
 	private final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
 	private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-
-	public static final int DEFAULT_MAX_BLOCKSIZE = 224;
 
 	private static final int SESSION_STOPPED_STATE = 0;
 
@@ -353,6 +355,11 @@ public class PassportService extends PassportApduService implements Serializable
 		state = BAC_AUTHENTICATED_STATE;
 	}
 
+	/**
+	 * Selects a file.
+	 * 
+	 * @param fid a file identifier
+	 */
 	public synchronized void sendSelectFile(short fid) throws CardServiceException {
 		sendSelectFile(wrapper, fid);
 	}

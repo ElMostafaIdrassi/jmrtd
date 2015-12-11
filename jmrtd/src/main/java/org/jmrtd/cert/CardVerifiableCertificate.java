@@ -98,7 +98,7 @@ public class CardVerifiableCertificate extends Certificate {
 	 * or similar with RSA.
 	 */
 	/**
-	 * Construcst a certificate.
+	 * Constructs a certificate.
 	 * 
 	 * @param authorityReference authority reference
 	 * @param holderReference holder reference
@@ -367,6 +367,7 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Returns the signature (just the value, without the <code>0x5F37</code> tag).
+	 * 
 	 * @return the signature bytes
 	 * 
 	 * @throws CertificateException if certificate doesn't contain a signature
@@ -379,6 +380,13 @@ public class CardVerifiableCertificate extends Certificate {
 		}
 	}
 
+	/**
+	 * Tests for equality with respect to another object.
+	 * 
+	 * @param otherObj the other object
+	 * 
+	 * @return whether this certificate equals the other object
+	 */
 	public boolean equals(Object otherObj) {
 		if (otherObj == null) { return false; }
 		if (this == otherObj) { return true; }
@@ -386,6 +394,11 @@ public class CardVerifiableCertificate extends Certificate {
 		return this.cvCertificate.equals(((CardVerifiableCertificate)otherObj).cvCertificate);
 	}
 
+	/**
+	 * Gets a hash code for this object.
+	 * 
+	 * @return a hash code for this object
+	 */
 	public int hashCode() {
 		return cvCertificate.hashCode() * 2 - 1030507011;
 	}

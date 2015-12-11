@@ -51,7 +51,7 @@ public class TerminalAuthenticationResult  {
 	private byte[] cardChallenge;
 
 	/**
-	 * Constructs a new event.
+	 * Constructs a new terminal authentication result.
 	 * 
 	 * @param chipAuthenticationResult the chip authentication result
 	 * @param caReference the CA
@@ -129,6 +129,11 @@ public class TerminalAuthenticationResult  {
 		return cardChallenge;
 	}
 
+	/**
+	 * Gets a textual representation of this terminal authentication result.
+	 * 
+	 * @return a textual representation of this terminal authentication result
+	 */
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("EACEvent [chipAuthenticationResult = " + chipAuthenticationResult + ", ");

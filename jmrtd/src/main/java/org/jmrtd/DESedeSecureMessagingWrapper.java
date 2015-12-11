@@ -63,6 +63,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+	/** Initialization vector consisting of 8 zero bytes. */
 	public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
 
 	private SecretKey ksEnc, ksMac;
@@ -197,6 +198,16 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 			LOGGER.severe("Exception: " + ioe.getMessage());
 			throw new IllegalStateException(ioe.toString());
 		}
+	}
+	
+	/**
+	 * Gets the current value of the send sequence counter.
+	 * 
+	 * @return the current value of the send sequence counter.
+	 */
+	@Override
+	public long getSendSequenceCounter() {
+		return ssc;
 	}
 
 	/**
@@ -441,15 +452,5 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		} catch (IOException ioe) {
 			return false;
 		}
-	}
-
-	/**
-	 * Gets the current value of the send sequence counter.
-	 * 
-	 * @return the current value of the send sequence counter.
-	 */
-	@Override
-	public long getSendSequenceCounter() {
-		return ssc;
 	}	
 }

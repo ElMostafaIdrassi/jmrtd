@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * A BAC key entry.
+ * A BAC key.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *

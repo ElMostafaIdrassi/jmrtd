@@ -84,6 +84,11 @@ public class CVCPrincipal implements Principal, Serializable {
 		return country.toAlpha2Code() + mnemonic + seqNumber;
 	}
 	
+	/**
+	 * Gets a textual representation of this principal.
+	 * 
+	 * @return a textual representation of this principal
+	 */
 	public String toString() {
 		return country.toAlpha2Code() + "/" + mnemonic + "/" + seqNumber;
 	}
@@ -115,6 +120,13 @@ public class CVCPrincipal implements Principal, Serializable {
 		return seqNumber;
 	}
 
+	/**
+	 * Tests for equality with respect to another object.
+	 * 
+	 * @param otherObj another object
+	 * 
+	 * @return whether this principal equals the other object
+	 */
 	public boolean equals(Object otherObj) {
 		if (otherObj == null) { return false; }
 		if (otherObj == this) { return true; }
@@ -125,6 +137,11 @@ public class CVCPrincipal implements Principal, Serializable {
 			&& otherPrincipal.seqNumber.equals(this.seqNumber);
 	}
 
+	/**
+	 * Gets a hash code of this object.
+	 * 
+	 * @return the hash code
+	 */
 	public int hashCode() {
 		return 2 * getName().hashCode() + 1231211;
 	}

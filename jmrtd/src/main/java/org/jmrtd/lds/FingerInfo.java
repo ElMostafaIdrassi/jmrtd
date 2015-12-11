@@ -325,7 +325,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 		}
 		if (dataLength != constructedDataLength) {
 			LOGGER.warning("DEBUG: constructedDataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
-//			throw new IllegalStateException("DEBUG: constructed DataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
+//			throw new IllegalStateException("DEBUG: constructedDataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
 		}
 	}
 
