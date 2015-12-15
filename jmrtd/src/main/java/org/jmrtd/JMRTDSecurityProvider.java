@@ -38,18 +38,6 @@ import java.util.logging.Logger;
  *    <li>{@link java.security.cert.CertificateFactory} &quot;CVC&quot;
  *    	  (a factory for {@link org.jmrtd.cert.CardVerifiableCertificate} instances)
  *    </li>
- *    <li>{@link java.security.cert.CertStore} &quot;PKD&quot;
- *       (LDAP based <code>CertStore</code>,
- *       where the directory contains CSCA and document signer certificates)
- *    </li>
- *    <li>{@link java.security.cert.CertStore} &quot;JKS&quot;
- *       (<code>KeyStore</code> based <code>CertStore</code>,
- *       where the JKS formatted <code>KeyStore</code> contains CSCA certificates)
- *    </li>
- *    <li>{@link java.security.cert.CertStore} &quot;PKCS12&quot;
- *       (<code>KeyStore</code> based <code>CertStore</code>,
- *       where the PKCS#12 formatted <code>KeyStore</code> contains CSCA certificates)
- *    </li>
  * </ul>
  *
  * @author The JMRTD team (info@jmrtd.org)

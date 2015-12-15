@@ -58,11 +58,11 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  * 
  * Based on ICAO-TR-PKI. Defines the following commands:
  * <ul>
- * <li><code>GET CHALLENGE</code></li>
- * <li><code>EXTERNAL AUTHENTICATE</code></li>
- * <li><code>INTERNAL AUTHENTICATE</code> (using secure messaging)</li>
- * <li><code>SELECT FILE</code> (using secure messaging)</li>
- * <li><code>READ BINARY</code> (using secure messaging)</li>
+ *     <li><code>GET CHALLENGE</code></li>
+ *     <li><code>EXTERNAL AUTHENTICATE</code></li>
+ *     <li><code>INTERNAL AUTHENTICATE</code> (using secure messaging)</li>
+ *     <li><code>SELECT FILE</code> (using secure messaging)</li>
+ *     <li><code>READ BINARY</code> (using secure messaging)</li>
  * </ul>
  * 
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
@@ -121,8 +121,8 @@ public class PassportApduService extends CardService {
 	 *             when the available JCE providers cannot provide the necessary
 	 *             cryptographic primitives:
 	 *             <ul>
-	 *             <li>Cipher: "DESede/CBC/Nopadding"</li>
-	 *             <li>Mac: "ISO9797Alg3Mac"</li>
+	 *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
+	 *             	   <li>Mac: "ISO9797Alg3Mac"</li>
 	 *             </ul>
 	 */
 	public PassportApduService(CardService service) throws CardServiceException {

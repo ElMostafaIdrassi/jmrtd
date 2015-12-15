@@ -228,7 +228,13 @@ public class PassportService extends PassportApduService implements Serializable
 	 * 
 	 * @param service another service which will deal with sending the apdus to the card
 	 * 
-	 * @throws CardServiceException on error
+	 * @throws CardServiceException
+	 *             when the available JCE providers cannot provide the necessary
+	 *             cryptographic primitives:
+	 *             <ul>
+	 *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
+	 *                 <li>Mac: "ISO9797Alg3Mac"</li>
+	 *             </ul>
 	 */
 	public PassportService(CardService service) throws CardServiceException {
 		this(service, DEFAULT_MAX_BLOCKSIZE);
@@ -240,7 +246,13 @@ public class PassportService extends PassportApduService implements Serializable
 	 * @param service another service which will deal with sending the APDUs to the card
 	 * @param maxBlockSize maximum size for plain text APDUs
 	 * 
-	 * @throws CardServiceException on error
+	 * @throws CardServiceException
+	 *             when the available JCE providers cannot provide the necessary
+	 *             cryptographic primitives:
+	 *             <ul>
+	 *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
+	 *                 <li>Mac: "ISO9797Alg3Mac"</li>
+	 *             </ul>
 	 */
 	public PassportService(CardService service, int maxBlockSize) throws CardServiceException {
 		super(service);

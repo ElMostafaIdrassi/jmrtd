@@ -153,8 +153,7 @@ public class MRZInfo extends AbstractLDSInfo {
 			String nationality,
 			String optionalData2,
 			String primaryIdentifier,
-			String secondaryIdentifier
-			) {
+			String secondaryIdentifier) {
 		if (documentCode == null || documentCode.length() < 1 || documentCode.length() > 2
 				|| !(documentCode.startsWith("C") || documentCode.startsWith("I") || documentCode.startsWith("A"))) {
 			throw new IllegalArgumentException("Wrong document code: " + documentCode);
@@ -667,7 +666,9 @@ public class MRZInfo extends AbstractLDSInfo {
 	}
 
 	/**
-	 * Whether this MRZ info is identical to the other one.
+	 * Whether this MRZ info is identical to some other object.
+	 *
+	 * @param obj the other object
 	 *
 	 * @return a boolean
 	 */
