@@ -37,7 +37,7 @@ import org.jmrtd.io.SplittableInputStream;
  * Base class for data group files.
  *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public abstract class DataGroup extends AbstractLDSFile {
@@ -52,7 +52,7 @@ public abstract class DataGroup extends AbstractLDSFile {
 	/**
 	 * Constructs a data group. This constructor
 	 * is only visible to the other classes in this package.
-	 * 
+	 *
 	 * @param dataGroupTag data group tag
 	 */
 	DataGroup(int dataGroupTag) {
@@ -63,10 +63,10 @@ public abstract class DataGroup extends AbstractLDSFile {
 	 * Constructs a data group from the DER encoded data in the
 	 * given input stream. Tag and length are read, so the input stream
 	 * is positioned just before the value.
-	 * 
+	 *
 	 * @param dataGroupTag data group tag
 	 * @param inputStream an input stream
-	 * 
+	 *
 	 * @throws IOException on error reading input stream
 	 */
 	protected DataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
@@ -76,9 +76,9 @@ public abstract class DataGroup extends AbstractLDSFile {
 
 	/**
 	 * Reads the contents of this data group, including tag and length from an input stream.
-	 * 
+	 *
 	 * @param inputStream the stream to read from
-	 * 
+	 *
 	 * @throws IOException if reading from the stream fails
 	 */
 	protected void readObject(InputStream inputStream) throws IOException {
@@ -107,9 +107,9 @@ public abstract class DataGroup extends AbstractLDSFile {
 	 * Reads the contents of the data group from an input stream.
 	 * Client code implementing this method should only read the contents
 	 * from the input stream, not the tag or length of the data group.
-	 * 
+	 *
 	 * @param inputStream the input stream to read from
-	 * 
+	 *
 	 * @throws IOException on error reading from input stream
 	 */
 	protected abstract void readContent(InputStream inputStream) throws IOException;
@@ -118,16 +118,16 @@ public abstract class DataGroup extends AbstractLDSFile {
 	 * Writes the contents of the data group to an output stream.
 	 * Client code implementing this method should only write the contents
 	 * to the output stream, not the tag or length of the data group.
-	 * 
+	 *
 	 * @param outputStream the output stream to write to
-	 * 
+	 *
 	 * @throws IOException on error writing to output stream
 	 */
 	protected abstract void writeContent(OutputStream outputStream) throws IOException;
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {
@@ -136,7 +136,7 @@ public abstract class DataGroup extends AbstractLDSFile {
 
 	/**
 	 * The data group tag.
-	 * 
+	 *
 	 * @return the tag of the data group
 	 */
 	public int getTag() {
@@ -145,7 +145,7 @@ public abstract class DataGroup extends AbstractLDSFile {
 
 	/**
 	 * Gets the value part of this DG.
-	 * 
+	 *
 	 * @return the value as byte array
 	 */
 	private byte[] getContent() {
@@ -163,7 +163,7 @@ public abstract class DataGroup extends AbstractLDSFile {
 
 	/**
 	 * The length of the value of the data group.
-	 * 
+	 *
 	 * @return the length of the value of the data group
 	 */
 	public int getLength() {

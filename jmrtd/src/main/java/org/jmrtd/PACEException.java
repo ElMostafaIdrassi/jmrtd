@@ -26,9 +26,9 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * An exception to signal errors during execution of the PACE protocol.
- * 
+ *
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class PACEException extends CardServiceException {
@@ -37,7 +37,7 @@ public class PACEException extends CardServiceException {
 
 	/**
 	 * Creates a PACEException.
-	 * 
+	 *
 	 * @param msg a message
 	 */
 	public PACEException(String msg) {
@@ -46,7 +46,7 @@ public class PACEException extends CardServiceException {
 
 	/**
 	 * Creates a PACEException with a specific status word.
-	 * 
+	 *
 	 * @param msg a message
 	 * @param sw the status word that caused this CardServiceException
 	 */

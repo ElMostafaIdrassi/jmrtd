@@ -55,7 +55,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  * responsible for maintaining information about the state of the authentication
  * or secure messaging protocols. It merely offers the basic functionality for
  * sending passport specific APDUs to the passport.
- * 
+ *
  * Based on ICAO-TR-PKI. Defines the following commands:
  * <ul>
  *     <li><code>GET CHALLENGE</code></li>
@@ -64,11 +64,11 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  *     <li><code>SELECT FILE</code> (using secure messaging)</li>
  *     <li><code>READ BINARY</code> (using secure messaging)</li>
  * </ul>
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Wojciech Mostowski (woj@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class PassportApduService extends CardService {
@@ -112,11 +112,11 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Creates a new passport APDU sending service.
-	 * 
+	 *
 	 * @param service
 	 *            another service which will deal with sending the APDUs to the
 	 *            card
-	 * 
+	 *
 	 * @throws CardServiceException
 	 *             when the available JCE providers cannot provide the necessary
 	 *             cryptographic primitives:
@@ -141,7 +141,7 @@ public class PassportApduService extends CardService {
 	/**
 	 * Opens a session by connecting to the card. Since version 0.5.1 this method no longer automatically
 	 * selects the MRTD applet, caller (for instance {@link PassportService}) is responsible to do this now.
-	 * 
+	 *
 	 * @throws CardServiceException on failure to open the service
 	 */
 	public void open() throws CardServiceException {
@@ -153,7 +153,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Whether this service is open.
-	 * 
+	 *
 	 * @return a boolean
 	 */
 	public synchronized boolean isOpen() {
@@ -173,7 +173,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Gets the answer to reset bytes.
-	 * 
+	 *
 	 * @return the answer to reset bytes
 	 */
 	public byte[] getATR() {
@@ -191,9 +191,9 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sets the service.
-	 * 
+	 *
 	 * @param service the carrier service that is decorated by this service
-	 * 
+	 *
 	 * @param service the carrier service
 	 */
 	/* FIXME: why is this here? -- MO */
@@ -203,7 +203,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Adds a listener.
-	 * 
+	 *
 	 * @param l a listener
 	 */
 	public void addAPDUListener(APDUListener l) {
@@ -212,7 +212,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Removes a listener.
-	 * 
+	 *
 	 * @param l a listener
 	 */
 	public void removeAPDUListener(APDUListener l) {
@@ -221,12 +221,12 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Transmits an APDU.
-	 * 
+	 *
 	 * @param wrapper the secure messaging wrapper
 	 * @param capdu the APDU to send
-	 * 
+	 *
 	 * @return the APDU received from the PICC
-	 * 
+	 *
 	 * @throws CardServiceException if tranceiving failed
 	 */
 	private ResponseAPDU transmit(APDUWrapper wrapper, CommandAPDU capdu) throws CardServiceException {
@@ -277,10 +277,10 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a <code>SELECT APPLET</code> command to the card.
-	 * 
+	 *
 	 * @param wrapper the secure messaging wrapper to use
 	 * @param aid the applet to select
-	 * 
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized void sendSelectApplet(APDUWrapper wrapper, byte[] aid) throws CardServiceException {
@@ -292,9 +292,9 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Selects a file.
-	 * 
+	 *
 	 * @param fid the file identifier
-	 * 
+	 *
 	 * @throws CardServiceException on error
 	 */
 	public synchronized void sendSelectFile(short fid) throws CardServiceException {
@@ -304,10 +304,10 @@ public class PassportApduService extends CardService {
 	/**
 	 * Sends a <code>SELECT FILE</code> command to the passport. Secure
 	 * messaging will be applied to the command and response apdu.
-	 * 
+	 *
 	 * @param wrapper the secure messaging wrapper to use
 	 * @param fid the file to select
-	 * 
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized void sendSelectFile(APDUWrapper wrapper, short fid) throws CardServiceException {
@@ -324,13 +324,13 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a <code>READ BINARY</code> command to the passport.
-	 * 
+	 *
 	 * @param offset offset into the file
 	 * @param le the expected length of the file to read
 	 * @param longRead whether to use extended length APDUs
-	 * 
+	 *
 	 * @return a byte array of length <code>le</code> with (the specified part of) the contents of the currently selected file
-	 *         
+	 *
 	 * @throws CardServiceException if the command was not successful
 	 */
 	public synchronized byte[] sendReadBinary(short offset, int le, boolean longRead) throws CardServiceException {
@@ -340,14 +340,14 @@ public class PassportApduService extends CardService {
 	/**
 	 * Sends a <code>READ BINARY</code> command to the passport. Secure
 	 * messaging will be applied to the command and response apdu.
-	 * 
+	 *
 	 * @param wrapper the secure messaging wrapper to use
 	 * @param offset offset into the file
 	 * @param le the expected length of the file to read
 	 * @param isExtendedLength whether it should be a long (INS=B1) read
-	 * 
+	 *
 	 * @return a byte array of length at most <code>le</code> with (the specified part of) the contents of the currently selected file
-	 * 
+	 *
 	 * @throws CardServiceException if the command was not successful
 	 */
 	public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int offset, int le, boolean isExtendedLength) throws CardServiceException {
@@ -440,9 +440,9 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a <code>GET CHALLENGE</code> command to the passport.
-	 * 
+	 *
 	 * @return a byte array of length 8 containing the challenge
-	 * 
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized byte[] sendGetChallenge() throws CardServiceException {
@@ -451,11 +451,11 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a <code>GET CHALLENGE</code> command to the passport.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
-	 * 
+	 *
 	 * @return a byte array of length 8 containing the challenge
-	 * 
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized byte[] sendGetChallenge(APDUWrapper wrapper) throws CardServiceException {
@@ -467,12 +467,12 @@ public class PassportApduService extends CardService {
 	/**
 	 * Sends an <code>INTERNAL AUTHENTICATE</code> command to the passport.
 	 * This is part of AA.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param rndIFD the challenge to send
-	 * 
+	 *
 	 * @return the response from the passport (status word removed)
-	 * 
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException {
@@ -488,17 +488,17 @@ public class PassportApduService extends CardService {
 	 * The resulting byte array has length 32 and contains <code>rndICC</code>
 	 * (first 8 bytes), <code>rndIFD</code> (next 8 bytes), their key material "
 	 * <code>kICC</code>" (last 16 bytes).
-	 * 
+	 *
 	 * @param rndIFD our challenge
 	 * @param rndICC their challenge
 	 * @param kIFD our key material
 	 * @param kEnc the static encryption key
 	 * @param kMac the static mac key
-	 * 
+	 *
 	 * @return a byte array of length 32 containing the response that was sent
 	 *         by the passport, decrypted (using <code>kEnc</code>) and verified
 	 *         (using <code>kMac</code>)
-	 *         
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized byte[] sendMutualAuth(byte[] rndIFD, byte[] rndICC, byte[] kIFD, SecretKey kEnc, SecretKey kMac) throws CardServiceException {
@@ -536,7 +536,7 @@ public class PassportApduService extends CardService {
 			byte[] data = new byte[32 + 8];
 			System.arraycopy(ciphertext, 0, data, 0, 32);
 			System.arraycopy(mactext, 0, data, 32, 8);
-			int le = 40; /* 40 means max ne is 40 (0x28). */ 
+			int le = 40; /* 40 means max ne is 40 (0x28). */
 			CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
 			ResponseAPDU rapdu = transmit(capdu);
 
@@ -561,7 +561,7 @@ public class PassportApduService extends CardService {
 
 			/*
 			 * byte[] eICC = new byte[32]; System.arraycopy(rapdu, 0, eICC, 0, 32);
-			 * 
+			 *
 			 * byte[] mICC = new byte[8]; System.arraycopy(rapdu, 32, mICC, 0, 8);
 			 */
 
@@ -580,7 +580,7 @@ public class PassportApduService extends CardService {
 	/**
 	 * Sends the EXTERNAL AUTHENTICATE command.
 	 * This is used in EAC-TA.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param signature terminal signature
 	 *
@@ -597,7 +597,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * The MSE KAT APDU, see EAC 1.11 spec, Section B.1
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param keyData key data object (tag 0x91)
 	 * @param idData key id data object (tag 0x84), can be null
@@ -640,7 +640,7 @@ public class PassportApduService extends CardService {
 	/**
 	 * The MSE AT APDU for TA, see EAC 1.11 spec, Section B.2.
 	 * Note that caller is responsible for prefixing the byte[] params with specified tags.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param data public key reference data object (should already be prefixed with tag 0x83)
 	 *
@@ -658,7 +658,7 @@ public class PassportApduService extends CardService {
 	/**
 	 * The MSE AT APDU for PACE, see ICAO TR-SAC-1.01, Section 3.2.1, BSI TR 03110 v2.03 B11.1.
 	 * Note that (for now) caller is responsible for prefixing the byte[] params with specified tags.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param oid OID of the protocol to select (this method will prefix <code>0x80</code>)
 	 * @param refPublicKeyOrSecretKey value specifying whether to use MRZ (<code>0x01</code>) or CAN (<code>0x02</code>) (this method will prefix <code>0x83</code>)
@@ -738,13 +738,13 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a General Authenticate command.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param data data to be sent, without the <code>0x7C</code> prefix (this method will add it)
 	 * @param isLast indicates whether this is the last command in the chain
 	 *
 	 * @return dynamic authentication data without the <code>0x7C</code> prefix (this method will remove it)
-	 * 
+	 *
 	 * @throws CardServiceException on error
 	 */
 	public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException {
@@ -765,11 +765,11 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a perform security operation command in extended length mode.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param certBodyData the certificate body
 	 * @param certSignatureData signature data
-	 * 
+	 *
 	 * @throws CardServiceException on error communicating over the service
 	 */
 	public synchronized void sendPSOExtendedLengthMode(APDUWrapper wrapper, byte[] certBodyData, byte[] certSignatureData)
@@ -786,11 +786,11 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Sends a perform security operation command in chain mode.
-	 * 
+	 *
 	 * @param wrapper secure messaging wrapper
 	 * @param certBodyData the certificate body
 	 * @param certSignatureData signature data
-	 * 
+	 *
 	 * @throws CardServiceException on error communicating over the service
 	 */
 	public synchronized void sendPSOChainMode(APDUWrapper wrapper, byte[] certBodyData, byte[] certSignatureData) throws CardServiceException {
@@ -829,7 +829,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Adds a plain text listener.
-	 * 
+	 *
 	 * @param l a listener
 	 */
 	public void addPlainTextAPDUListener(APDUListener l) {
@@ -838,7 +838,7 @@ public class PassportApduService extends CardService {
 	
 	/**
 	 * Removes a plain text listener.
-	 * 
+	 *
 	 * @param l a listener
 	 */
 	public void removePlainTextAPDUListener(APDUListener l) {
@@ -847,7 +847,7 @@ public class PassportApduService extends CardService {
 
 	/**
 	 * Notifies listeners about APDU event.
-	 * 
+	 *
 	 * @param count count
 	 * @param capdu command APDU
 	 * @param rapdu response APDU

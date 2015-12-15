@@ -83,26 +83,6 @@ public class DisplayedImageInfoTest extends TestCase {
 		}
 	}
 
-	public void testNumExtractImage() {
-		for (int width = 100; width < 1000; width += 200) {
-			for (int height = 100; height < 1000; height += 200) {
-				DisplayedImageInfo imageInfo = createNonEmptyTestObject(ImageInfo.TYPE_PORTRAIT, width, height);
-				testExtractImage(imageInfo, width, height);
-			}
-		}
-	}
-
-	public void testExtractImage(DisplayedImageInfo imageInfo, int expectedWidth, int expectedHeight) {
-		try {
-//			RenderedImage image = ImageUtil.read(imageInfo.getImageInputStream(), imageInfo.getImageLength(), imageInfo.getMimeType());
-//			assertNotNull(image);
-//			assertEquals(image.getWidth(), expectedWidth);
-//			assertEquals(image.getHeight(), expectedHeight);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
-
 	public void testValidType() {
 		DisplayedImageInfo signatureInfo = createNonEmptyTestObject(ImageInfo.TYPE_SIGNATURE_OR_MARK, 800, 266);
 		testValidType(signatureInfo);

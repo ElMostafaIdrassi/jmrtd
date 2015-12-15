@@ -49,10 +49,10 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	private static final long serialVersionUID = -1751069410327594067L;
 	
-	/** Eye color code based on Section 5.5.4 of ISO 19794-5. */   
+	/** Eye color code based on Section 5.5.4 of ISO 19794-5. */
 	public enum EyeColor {
-		UNSPECIFIED { public int toInt() { return EYE_COLOR_UNSPECIFIED; } }, 
-		BLACK { public int toInt() { return EYE_COLOR_BLACK; } }, 
+		UNSPECIFIED { public int toInt() { return EYE_COLOR_UNSPECIFIED; } },
+		BLACK { public int toInt() { return EYE_COLOR_BLACK; } },
 		BLUE { public int toInt() { return EYE_COLOR_BLUE; } },
 		BROWN{ public int toInt() { return EYE_COLOR_BROWN; } },
 		GRAY{ public int toInt() { return EYE_COLOR_GRAY; } },
@@ -115,7 +115,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	FEATURE_DISTORTING_MEDICAL_CONDITION = 0x000400;
 
 	/** Expression code based on Section 5.5.7 of ISO 19794-5. */
-	public enum Expression { UNSPECIFIED, NEUTRAL, SMILE_CLOSED, SMILE_OPEN, RAISED_EYEBROWS, EYES_LOOKING_AWAY, SQUINTING, FROWNING }; 
+	public enum Expression { UNSPECIFIED, NEUTRAL, SMILE_CLOSED, SMILE_OPEN, RAISED_EYEBROWS, EYES_LOOKING_AWAY, SQUINTING, FROWNING };
 	public static final short
 	EXPRESSION_UNSPECIFIED = 0x0000,
 	EXPRESSION_NEUTRAL = 0x0001,
@@ -127,7 +127,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	EXPRESSION_FROWNING = 0x0007;
 
 	/** Face image type code based on Section 5.7.1 of ISO 19794-5. */
-	public enum FaceImageType { BASIC, FULL_FRONTAL, TOKEN_FRONTAL }; 
+	public enum FaceImageType { BASIC, FULL_FRONTAL, TOKEN_FRONTAL };
 	public static final int
 	FACE_IMAGE_TYPE_BASIC = 0x00,
 	FACE_IMAGE_TYPE_FULL_FRONTAL = 0x01,
@@ -140,7 +140,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	IMAGE_DATA_TYPE_JPEG2000 = 0x01;
 
 	/** Color space code based on Section 5.7.4 of ISO 19794-5. */
-	public enum ImageColorSpace { UNSPECIFIED, RGB24, YUV422, GRAY8, OTHER }; 
+	public enum ImageColorSpace { UNSPECIFIED, RGB24, YUV422, GRAY8, OTHER };
 	public static final int
 	IMAGE_COLOR_SPACE_UNSPECIFIED = 0x00,
 	IMAGE_COLOR_SPACE_RGB24 = 0x01,
@@ -182,7 +182,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs a new face information data structure instance.
-	 * 
+	 *
 	 * @param gender gender
 	 * @param eyeColor eye color
 	 * @param featureMask feature mask (least significant 3 bytes)
@@ -201,7 +201,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	 * @param imageInputStream encoded image bytes
 	 * @param imageLength length of encoded image
 	 * @param imageDataType either IMAGE_DATA_TYPE_JPEG or IMAGE_DATA_TYPE_JPEG2000
-	 * 
+	 *
 	 * @throws IOException on error reading input
 	 */
 	public FaceImageInfo(Gender gender, EyeColor eyeColor,
@@ -248,9 +248,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs a new face information structure from binary encoding.
-	 * 
+	 *
 	 * @param inputStream an input stream
-	 * 
+	 *
 	 * @throws IOException if input cannot be read
 	 */
 	public FaceImageInfo(InputStream inputStream) throws IOException {
@@ -324,9 +324,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Writes this face image info to output stream.
-	 * 
+	 *
 	 * @param outputStream an output stream
-	 * 
+	 *
 	 * @throws IOException if writing fails
 	 */
 	public void writeObject(OutputStream outputStream) throws IOException {
@@ -342,7 +342,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the record length.
-	 * 
+	 *
 	 * @return the record length
 	 */
 	public long getRecordLength() {
@@ -352,7 +352,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the available feature points of this face.
-	 * 
+	 *
 	 * @return feature points
 	 */
 	public FeaturePoint[] getFeaturePoints() {
@@ -362,7 +362,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the expression
 	 * (neutral, smiling, eyebrow raised, etc).
-	 * 
+	 *
 	 * @return expression
 	 */
 	public int getExpression() {
@@ -372,7 +372,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the eye color
 	 * (black, blue, brown, etc).
-	 * 
+	 *
 	 * @return eye color
 	 */
 	public EyeColor getEyeColor() {
@@ -382,7 +382,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the gender
 	 * (male, female, etc).
-	 * 
+	 *
 	 * @return gender
 	 */
 	public Gender getGender() {
@@ -392,7 +392,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the hair color
 	 * (bald, black, blonde, etc).
-	 * 
+	 *
 	 * @return hair color
 	 */
 	public int getHairColor() {
@@ -402,7 +402,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the face image type
 	 * (full frontal, token frontal, etc).
-	 * 
+	 *
 	 * @return face image type
 	 */
 	public int getFaceImageType() {
@@ -415,7 +415,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the quality as unsigned integer.
-	 * 
+	 *
 	 * @return quality
 	 */
 	public int getQuality() {
@@ -425,7 +425,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the source type
 	 * (camera, scanner, etc).
-	 * 
+	 *
 	 * @return source type
 	 */
 	public int getSourceType() {
@@ -439,7 +439,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the image color space
 	 * (rgb, grayscale, etc).
-	 * 
+	 *
 	 * @return image color space
 	 */
 	public int getColorSpace() {
@@ -448,7 +448,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the device type.
-	 * 
+	 *
 	 * @return device type
 	 */
 	public int getDeviceType() {
@@ -458,7 +458,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the pose angle as an integer array of length 3,
 	 * containing yaw, pitch, and roll angle in encoded form.
-	 * 
+	 *
 	 * @return an integer array of length 3
 	 */
 	public int[] getPoseAngle() {
@@ -470,7 +470,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the pose angle uncertainty as an integer array of length 3,
 	 * containing yaw, pitch, and roll angle uncertainty.
-	 * 
+	 *
 	 * @return an integer array of length 3
 	 */
 	public int[] getPoseAngleUncertainty() {
@@ -481,9 +481,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Generates a textual representation of this object.
-	 * 
+	 *
 	 * @return a textual representation of this object
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	/* TODO: rename this method, distinguish between a pretty print version to be used in JMRTD GUI and a proper toString() */
@@ -732,9 +732,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Feature points as described in Section 5.6.3 of ISO/IEC FCD 19794-5.
-	 * 
+	 *
 	 * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
-	 * 
+	 *
 	 * @version $Revision$
 	 */
 	public static class FeaturePoint {
@@ -746,7 +746,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Constructs a new feature point.
-		 * 
+		 *
 		 * @param type feature point type
 		 * @param majorCode major code
 		 * @param minorCode minor code
@@ -764,7 +764,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Constructs a new feature point.
-		 * 
+		 *
 		 * @param type feature point type
 		 * @param code combined major and minor code
 		 * @param x X-coordinate
@@ -776,7 +776,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Gets the major code of this point.
-		 * 
+		 *
 		 * @return major code
 		 */
 		public int getMajorCode() {
@@ -785,7 +785,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Gets the minor code of this point.
-		 * 
+		 *
 		 * @return minor code
 		 */
 		public int getMinorCode() {
@@ -794,7 +794,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Gets the type of this point.
-		 * 
+		 *
 		 * @return type
 		 */
 		public int getType() {
@@ -803,7 +803,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Gets the X-coordinate of this point.
-		 * 
+		 *
 		 * @return X-coordinate
 		 */
 		public int getX() {
@@ -812,7 +812,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Gets the Y-coordinate of this point.
-		 * 
+		 *
 		 * @return Y-coordinate
 		 */
 		public int getY() {
@@ -821,9 +821,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 
 		/**
 		 * Generates a textual representation of this point.
-		 * 
+		 *
 		 * @return a textual representation of this point
-		 * 
+		 *
 		 * @see java.lang.Object#toString()
 		 */
 		public String toString() {

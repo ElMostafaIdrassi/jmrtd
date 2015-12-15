@@ -37,10 +37,10 @@ import java.util.logging.Logger;
 /**
  * File structure for the EF_DG15 file.
  * Datagroup 15 contains the public key used in AA.
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class DG15File extends DataGroup {
@@ -53,7 +53,7 @@ public class DG15File extends DataGroup {
 
 	/**
 	 * Constructs a new file.
-	 * 
+	 *
 	 * @param publicKey the key to store in this file
 	 */
 	public DG15File(PublicKey publicKey) {
@@ -63,9 +63,9 @@ public class DG15File extends DataGroup {
 
 	/**
 	 * Constructs a new file from binary representation.
-	 * 
+	 *
 	 * @param inputStream an input stream
-	 * 
+	 *
 	 * @throws IOException on error reading from input stream
 	 */
 	public DG15File(InputStream inputStream) throws IOException {
@@ -107,7 +107,7 @@ public class DG15File extends DataGroup {
 
 	/**
 	 * Gets the public key stored in this file.
-	 * 
+	 *
 	 * @return the public key
 	 */
 	public PublicKey getPublicKey() {

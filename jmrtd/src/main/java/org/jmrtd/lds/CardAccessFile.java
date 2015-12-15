@@ -41,13 +41,13 @@ import org.bouncycastle.asn1.DLSet;
 
 /**
  * Card access file stores a set of SecurityInfos for PACE.
- * 
+ *
  * FIXME: Strictly speaking this file is not part of the LDS (or even the MRTD application)! Move it out of this package? -- MO
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.5.1
  */
 public class CardAccessFile {
@@ -61,7 +61,7 @@ public class CardAccessFile {
 
 	/**
 	 * Constructs a new file from the provided data.
-	 *  
+	 *
 	 * @param securityInfos a list of security infos
 	 */
 	public CardAccessFile(Collection<SecurityInfo> securityInfos) {
@@ -71,9 +71,9 @@ public class CardAccessFile {
 
 	/**
 	 * Constructs a new file from the data in an input stream.
-	 * 
+	 *
 	 * @param inputStream the input stream to parse the data from
-	 * 
+	 *
 	 * @throws IOException on error reading input stream
 	 */
 	public CardAccessFile(InputStream inputStream) throws IOException {
@@ -104,7 +104,7 @@ public class CardAccessFile {
 
 	/**
 	 * Gets the security infos as an unordered collection.
-	 * 
+	 *
 	 * @return security infos
 	 */
 	public Collection<SecurityInfo> getSecurityInfos() {
@@ -114,7 +114,7 @@ public class CardAccessFile {
 	/**
 	 * Gets the PACE infos embedded in this card access file.
 	 * If no infos are present, an empty list is returned.
-	 * 
+	 *
 	 * @return a list of PACE infos
 	 */
 	public Collection<PACEInfo> getPACEInfos() {
@@ -129,7 +129,7 @@ public class CardAccessFile {
 	
 	/**
 	 * Gets the signature algorithm object identifier.
-	 * 
+	 *
 	 * @return signature algorithm OID
 	 */
 	public String toString() {
@@ -138,9 +138,9 @@ public class CardAccessFile {
 
 	/**
 	 * Tests equality with respect to another object.
-	 * 
+	 *
 	 * @param otherObj another object
-	 * 
+	 *
 	 * @return whether this object equals the other object
 	 */
 	public boolean equals(Object otherObj) {
@@ -154,7 +154,7 @@ public class CardAccessFile {
 
 	/**
 	 * Gets a hash code of this object.
-	 * 
+	 *
 	 * @return the hash code
 	 */
 	public int hashCode() {

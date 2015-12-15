@@ -87,7 +87,7 @@ import org.jmrtd.lds.SecurityInfo;
 
 /**
  * Some static helper functions. Mostly dealing with low-level crypto.
- * 
+ *
  * @deprecated The visibility of this class will be changed to package.
  *
  * @author Wojciech Mostowski
@@ -95,7 +95,7 @@ import org.jmrtd.lds.SecurityInfo;
  * @author Engelbert Hubbers (hubbers@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@innovalor.com)
  * @author Ronny Wichers Schreur (ronny@cs.ru.nl)
- * 
+ *
  * @version $Revision$
  */
 public class Util {
@@ -118,9 +118,9 @@ public class Util {
 	 *
 	 * @param keySeed the key seed.
 	 * @param mode either <code>ENC_MODE</code> or <code>MAC_MODE</code>
-	 * 
+	 *
 	 * @return the key
-	 * 
+	 *
 	 * @throws GeneralSecurityException on security error
 	 */
 	public static SecretKey deriveKey(byte[] keySeed, int mode) throws GeneralSecurityException {
@@ -134,9 +134,9 @@ public class Util {
 	 * @param cipherAlgName either AES or DESede
 	 * @param keyLength key length in bits
 	 * @param mode either <code>ENC_MODE</code> or <code>MAC_MODE</code>
-	 * 
+	 *
 	 * @return the key.
-	 * 
+	 *
 	 * @throws GeneralSecurityException on security error
 	 */	
 	public static SecretKey deriveKey(byte[] keySeed, String cipherAlgName, int keyLength, int mode) throws GeneralSecurityException {	
@@ -145,7 +145,7 @@ public class Util {
 
 	/**
 	 * Derives a shared key.
-	 * 
+	 *
 	 * @param keySeed the shared secret, as octets
 	 * @param cipherAlg in Java mnemonic notation (for example "DESede", "AES")
 	 * @param keyLength length in bits
@@ -211,7 +211,7 @@ public class Util {
 	 * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
 	 *
 	 * @return a byte array of length 16 containing the key seed
-	 * 
+	 *
 	 * @throws GeneralSecurityException on security error
 	 */
 	public static byte[] computeKeySeedForBAC(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
@@ -226,7 +226,7 @@ public class Util {
 	 * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
 	 *
 	 * @return a byte array of length 16 containing the key seed
-	 * 
+	 *
 	 * @throws GeneralSecurityException on security error
 	 */
 	public static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
@@ -246,7 +246,7 @@ public class Util {
 	 * @param doTruncate whether to truncate the resulting output to 16 bytes
 	 *
 	 * @return a byte array of length 16 containing the key seed
-	 * 
+	 *
 	 * @throws GeneralSecurityException on security error
 	 */
 	public static byte[] computeKeySeed(String documentNumber, String dateOfBirth, String dateOfExpiry, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
@@ -395,14 +395,14 @@ public class Util {
 	 * Recovers the M1 part of the message sent back by the AA protocol
 	 * (INTERNAL AUTHENTICATE command). The algorithm is described in
 	 * ISO 9796-2:2002 9.3.
-	 * 
+	 *
 	 * Based on code by Ronny (ronny@cs.ru.nl) who presumably ripped this
-	 * from Bouncy Castle. 
-	 * 
+	 * from Bouncy Castle.
+	 *
 	 * @param digestLength should be 20
 	 * @param plaintext response from card, already 'decrypted' (using the
 	 * AA public key)
-	 * 
+	 *
 	 * @return the m1 part of the message
 	 */
 	public static byte[] recoverMessage(int digestLength, byte[] plaintext) {
@@ -496,7 +496,7 @@ public class Util {
 	 *
 	 * @param val positive integer
 	 * @param length length
-	 * 
+	 *
 	 * @return octet string
 	 */
 	public static byte[] i2os(BigInteger val, int length) {
@@ -512,7 +512,7 @@ public class Util {
 
 	/**
 	 * Converts an integer to an octet string.
-	 * 
+	 *
 	 * @param val positive integer
 	 * @return octet string
 	 */
@@ -531,7 +531,7 @@ public class Util {
 	 * Based on BSI TR 03111 Section 3.1.2.
 	 *
 	 * @param bytes octet string
-	 * 
+	 *
 	 * @return positive integer
 	 */
 	public static BigInteger os2i(byte[] bytes) {
@@ -546,7 +546,7 @@ public class Util {
 	 * @param bytes octet string
 	 * @param offset offset of octet string
 	 * @param length length of octet string
-	 * 
+	 *
 	 * @return positive integer
 	 */
 	public static BigInteger os2i(byte[] bytes, int offset, int length) {
@@ -565,7 +565,7 @@ public class Util {
 	 *
 	 * @param bytes octet string
 	 * @param p modulus
-	 * 
+	 *
 	 * @return positive integer
 	 */
 	public static BigInteger os2fe(byte[] bytes, BigInteger p) {
@@ -575,7 +575,7 @@ public class Util {
 	/**
 	 * Encode an EC public key point.
 	 * Prefixes a <code>0x04</code> (without a length).
-	 * 
+	 *
 	 * @param point public key point
 	 *
 	 * @return an octet string
@@ -598,7 +598,7 @@ public class Util {
 	/* Best effort. FIXME: test and improve. -- MO */
 	/**
 	 * Infers a digest algorithm mnemonic from a signature algorithm mnemonic.
-	 * 
+	 *
 	 * @param signatureAlgorithm a signature algorithm
 	 * @return a digest algorithm, or null if inference failed
 	 */
@@ -636,9 +636,9 @@ public class Util {
 
 	/**
 	 * The public key algorithm (like RSA or) with some extra information (like 1024 bits).
-	 * 
+	 *
 	 * @param publicKey a public key
-	 * 
+	 *
 	 * @return the algorithm
 	 */
 	public static String getDetailedPublicKeyAlgorithm(PublicKey publicKey) {
@@ -660,9 +660,9 @@ public class Util {
 
 	/**
 	 * Gets the curve name if known (or null).
-	 * 
+	 *
 	 * @param params an specification of the curve
-	 * 
+	 *
 	 * @return the name
 	 */
 	public static String getCurveName(ECParameterSpec params) {
@@ -677,7 +677,7 @@ public class Util {
 
 	/**
 	 * Translates (named) curve spec to JCA compliant explicit param spec.
-	 * 
+	 *
 	 * @param params an EC parameter spec, possibly named
 	 *
 	 * @return another spec not name based
@@ -741,9 +741,9 @@ public class Util {
 
 	/**
 	 * Translates internal BC named curve spec to BC provided JCA compliant named curve spec.
-	 * 
+	 *
 	 * @param namedParamSpec a named EC parameter spec
-	 * 
+	 *
 	 * @return a JCA compliant named EC parameter spec
 	 */
 	public static org.bouncycastle.jce.spec.ECNamedCurveSpec toECNamedCurveSpec(org.bouncycastle.jce.spec.ECNamedCurveParameterSpec namedParamSpec) {
@@ -759,7 +759,7 @@ public class Util {
 	/*
 	 * NOTE: Woj, I moved this here from DG14File, seemed more appropriate here. -- MO
 	 * FIXME: Do we still need this now that we have reconstructPublicKey? -- MO
-	 * 
+	 *
 	 * Woj says: Here we need to some hocus-pokus, the EAC specification require for
 	 * all the key information to include the domain parameters explicitly. This is
 	 * not what Bouncy Castle does by default. But we first have to check if this is
@@ -846,9 +846,9 @@ public class Util {
 
 	/**
 	 * Reconstructs the public key to use explicit domain params for EC public keys
-	 * 
+	 *
 	 * @param publicKey the public key
-	 * 
+	 *
 	 * @return the same public key (if not EC or error), or a reconstructed one (if EC)
 	 */
 	public static PublicKey reconstructPublicKey(PublicKey publicKey) {
@@ -869,15 +869,15 @@ public class Util {
 
 	/**
 	 * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
-	 * 
+	 *
 	 * For signing authentication token, not for sending to smart card.
 	 * Assumes context is known.
-	 * 
+	 *
 	 * @param oid object identifier
 	 * @param publicKey public key
-	 * 
+	 *
 	 * @return encoded public key data object for signing as authentication token
-	 * 
+	 *
 	 * @throws InvalidKeyException when public key is not DH or EC
 	 */
 	public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey) throws InvalidKeyException {
@@ -886,15 +886,15 @@ public class Util {
 
 	/**
 	 * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
-	 * 
+	 *
 	 * For signing authentication token, not for sending to smart card.
-	 * 
+	 *
 	 * @param oid object identifier
 	 * @param publicKey public key
 	 * @param isContextKnown whether context of public key is known to receiver (we will not include domain parameters in that case).
-	 * 
+	 *
 	 * @return encoded public key data object for signing as authentication token
-	 * 
+	 *
 	 * @throws InvalidKeyException when public key is not DH or EC
 	 */
 	public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey, boolean isContextKnown) throws InvalidKeyException {
@@ -961,9 +961,9 @@ public class Util {
 	 * Write uncompressed coordinates (for EC) or public value (DH).
 	 *
 	 * @param publicKey public key
-	 * 
+	 *
 	 * @return encoding for smart card
-	 * 
+	 *
 	 * @throws InvalidKeyException if the key type is not EC or DH
 	 */
 	public static byte[] encodePublicKeyForSmartCard(PublicKey publicKey) throws InvalidKeyException {
@@ -1056,14 +1056,14 @@ public class Util {
 	 * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
 	 * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
 	 * received ephemeral public key (i.e. excluding the domain parameters, cf. Section 4.5.3)
-	 * using an authentication code and the key KS MAC derived from the key agreement. 
-	 * 
+	 * using an authentication code and the key KS MAC derived from the key agreement.
+	 *
 	 * @param oid the object identifier as indicated in MSE Set AT
 	 * @param macKey the KS MAC key derived from the key agreement
 	 * @param publicKey the received public key
-	 * 
+	 *
 	 * @return the authentication code
-	 * 
+	 *
 	 * @throws GeneralSecurityException on error while performing the MAC operation
 	 */
 	public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
@@ -1082,9 +1082,9 @@ public class Util {
 
 	/**
 	 * Infer an EAC object identifier for an EC or DH public key.
-	 * 
+	 *
 	 * @param publicKey a public key
-	 * 
+	 *
 	 * @return either ID_PK_ECDH or ID_PK_DH
 	 */
 	public static String inferProtocolIdentifier(PublicKey publicKey) {
@@ -1214,7 +1214,7 @@ public class Util {
 
 	/**
 	 * This just solves the curve equation for y.
-	 * 
+	 *
 	 * @param affineX the x coord of a point on the curve
 	 * @param params EC parameters for curve over Fp
 	 * @return the corresponding y coord

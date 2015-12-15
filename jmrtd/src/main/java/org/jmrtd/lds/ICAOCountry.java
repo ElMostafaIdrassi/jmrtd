@@ -27,9 +27,9 @@ import net.sf.scuba.data.Country;
 /**
  * Special ICAO countries not covered in {@link net.sf.scuba.data.ISOCountry}.
  * Contributed by Aleksandar Kamburov (wise_guybg).
- * 
+ *
  * @author Aleksandar Kamburov (wise_guybg)
- * 
+ *
  * @version $Revision$
  */
 public class ICAOCountry extends Country {
@@ -66,9 +66,9 @@ public class ICAOCountry extends Country {
 	
 	/**
 	 * Gets an ICAO country instance.
-	 * 
+	 *
 	 * @param alpha3Code a three-digit ICAO country code
-	 * 
+	 *
 	 * @return an ICAO country
 	 */
 	public static Country getInstance(String alpha3Code) {
@@ -106,7 +106,7 @@ public class ICAOCountry extends Country {
 
 	/**
 	 * Gets the full name of the country.
-	 * 
+	 *
 	 * @return a country name
 	 */
 	public String getName() {
@@ -115,7 +115,7 @@ public class ICAOCountry extends Country {
 
 	/**
 	 * Gets the adjectival form corresponding to the country.
-	 * 
+	 *
 	 * @return the nationality
 	 */
 	public String getNationality() {
@@ -124,7 +124,7 @@ public class ICAOCountry extends Country {
 
 	/**
 	 * Gets the two-digit country code.
-	 * 
+	 *
 	 * @return a two-digit country code
 	 */
 	public String toAlpha2Code() {
@@ -133,7 +133,7 @@ public class ICAOCountry extends Country {
 
 	/**
 	 * Gets the three-digit country code.
-	 * 
+	 *
 	 * @return a three-digit country code
 	 */
 	public String toAlpha3Code() {

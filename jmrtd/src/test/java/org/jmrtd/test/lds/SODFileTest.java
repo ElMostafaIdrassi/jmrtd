@@ -147,14 +147,14 @@ public class SODFileTest extends TestCase {
 
 			X500Principal issuer = sodFile.getIssuerX500Principal();
 
-			LOGGER.info("DEBUG: issuer = " + issuer);
+//			LOGGER.info("DEBUG: issuer = " + issuer);
 
 			String issuerName = issuer.getName(X500Principal.RFC2253);
 			assertNotNull(issuerName);
 
 			if (issuer != null && certificate != null) {
 				X500Principal certIssuer = certificate.getIssuerX500Principal();
-				LOGGER.info("DEBUG: certIssuer = " + certIssuer);
+//				LOGGER.info("DEBUG: certIssuer = " + certIssuer);
 				String certIssuerName = certIssuer.getName(X500Principal.RFC2253);
 				assertNotNull(certIssuerName);
 				//				assertTrue("issuerName = \"" + issuerName + "\", certIssuerName = \"" + certIssuerName + "\"",

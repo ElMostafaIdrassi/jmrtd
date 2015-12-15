@@ -44,9 +44,9 @@ import net.sf.scuba.util.Hex;
 /**
  * File structure for the EF_DG12 file.
  * Datagroup 12 contains additional document detail(s).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class DG12File extends DataGroup {
@@ -116,9 +116,9 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Constructs a new file.
-	 * 
+	 *
 	 * @param inputStream an input stream
-	 * 
+	 *
 	 * @throws IOException on error reading from input stream
 	 */
 	public DG12File(InputStream inputStream) throws IOException {
@@ -155,7 +155,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets the tags of fields actually present in this file.
-	 * 
+	 *
 	 * @return a list of tags
 	 */
 	public List<Integer> getTagPresenceList() {
@@ -324,7 +324,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets the issuing authority.
-	 * 
+	 *
 	 * @return the issuingAuthority
 	 */
 	public String getIssuingAuthority() {
@@ -333,7 +333,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets the date of issuance.
-	 * 
+	 *
 	 * @return the dateOfIssue
 	 */
 	public Date getDateOfIssue() {
@@ -342,7 +342,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets name of other person.
-	 * 
+	 *
 	 * @return the nameOfOtherPerson
 	 */
 	public List<String> getNamesOfOtherPersons() {
@@ -351,7 +351,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets endorsements and observations.
-	 * 
+	 *
 	 * @return the endorsementsAndObservations
 	 */
 	public String getEndorsementsAndObservations() {
@@ -360,7 +360,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets tax or exit requirements.
-	 * 
+	 *
 	 * @return the taxOrExitRequirements
 	 */
 	public String getTaxOrExitRequirements() {
@@ -369,7 +369,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets image of front.
-	 * 
+	 *
 	 * @return the imageOfFront
 	 */
 	public byte[] getImageOfFront() {
@@ -378,7 +378,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets image of rear.
-	 * 
+	 *
 	 * @return the imageOfRear
 	 */
 	public byte[] getImageOfRear() {
@@ -387,7 +387,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets date and time of personalization.
-	 * 
+	 *
 	 * @return the dateAndTimeOfPersonalization
 	 */
 	public Date getDateAndTimeOfPersonalization() {
@@ -396,7 +396,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets the personalization system serial number.
-	 * 
+	 *
 	 * @return the personalizationSystemSerialNumber
 	 */
 	public String getPersonalizationSystemSerialNumber() {
@@ -409,7 +409,7 @@ public class DG12File extends DataGroup {
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {
@@ -471,7 +471,7 @@ public class DG12File extends DataGroup {
 					tlvOut.writeValue(nameOfOtherPerson.trim().getBytes("UTF-8"));
 				}
 				tlvOut.writeValueEnd(); /* CONTENT_SPECIFIC_CONSTRUCTED_TAG */
-				break; 
+				break;
 			case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
 				tlvOut.writeTag(tag);
 				tlvOut.writeValue(endorsementsAndObservations.trim().getBytes("UTF-8"));

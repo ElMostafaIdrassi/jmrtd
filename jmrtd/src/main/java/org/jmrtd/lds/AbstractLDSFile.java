@@ -30,10 +30,10 @@ import java.util.logging.Logger;
 
 /**
  * Base class for all files (EF_COM, EF_SOD, and data groups) in the LDS.
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 abstract class AbstractLDSFile implements LDSFile {
@@ -52,7 +52,7 @@ abstract class AbstractLDSFile implements LDSFile {
 	/**
 	 * Gets the contents of this file as byte array,
 	 * includes the ICAO tag and length.
-	 * 
+	 *
 	 * @return a byte array containing the file
 	 */
 	public byte[] getEncoded() {
@@ -70,18 +70,18 @@ abstract class AbstractLDSFile implements LDSFile {
 	
 	/**
 	 * Reads the file from an input stream.
-	 * 
+	 *
 	 * @param inputStream the input stream to read from
-	 * 
+	 *
 	 * @throws IOException if reading fails
 	 */
 	protected abstract void readObject(InputStream inputStream) throws IOException;
 
 	/**
 	 * Writes the file to an output stream.
-	 * 
+	 *
 	 * @param outputStream the output stream to write to
-	 * 
+	 *
 	 * @throws IOException if writing fails
 	 */
 	protected abstract void writeObject(OutputStream outputStream) throws IOException;

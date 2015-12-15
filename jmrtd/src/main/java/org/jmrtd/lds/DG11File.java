@@ -45,7 +45,7 @@ import net.sf.scuba.util.Hex;
 /**
  * File structure for the EF_DG11 file.
  * Datagroup 11 contains additional personal detail(s).
- * 
+ *
  * All fields are optional. See Section 16 of LDS-TR.
  * <ol>
  * <li>Name of Holder (Primary and Secondary Identifiers, in full)</li>
@@ -63,9 +63,9 @@ import net.sf.scuba.util.Hex;
  * <li>Other Travel Document Numbers</li>
  * <li>Custody Information</li>
  * </ol>
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class DG11File extends DataGroup {
@@ -85,7 +85,7 @@ public class DG11File extends DataGroup {
 	PROFESSION_TAG = 0x5F13,
 	TITLE_TAG = 0x5F14,
 	PERSONAL_SUMMARY_TAG = 0x5F15,
-	PROOF_OF_CITIZENSHIP_TAG = 0x5F16, // Compressed image per ISO/IEC 10918 
+	PROOF_OF_CITIZENSHIP_TAG = 0x5F16, // Compressed image per ISO/IEC 10918
 	OTHER_VALID_TD_NUMBERS_TAG = 0x5F17, // Separated by '<'
 	CUSTODY_INFORMATION_TAG = 0x5F18;
 
@@ -155,9 +155,9 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Constructs a file from binary representation.
-	 * 
+	 *
 	 * @param inputStream an input stream
-	 * 
+	 *
 	 * @throws IOException if reading fails
 	 */
 	public DG11File(InputStream inputStream) throws IOException {
@@ -399,7 +399,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets list of tags of fields actually present.
-	 * 
+	 *
 	 * @return list of tags
 	 */
 	public List<Integer> getTagPresenceList() {
@@ -449,7 +449,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the full name of the holder (primary and secondary identifiers).
-	 * 
+	 *
 	 * @return the name of holder
 	 */
 	public String getNameOfHolder() {
@@ -458,7 +458,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the other names.
-	 * 
+	 *
 	 * @return the other names, or empty list when not present
 	 */
 	public List<String> getOtherNames() {
@@ -467,7 +467,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the personal number.
-	 * 
+	 *
 	 * @return the personal number
 	 */
 	public String getPersonalNumber() {
@@ -476,7 +476,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the full date of birth.
-	 * 
+	 *
 	 * @return the full date of birth
 	 */
 	public Date getFullDateOfBirth() {
@@ -485,7 +485,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the place of birth.
-	 * 
+	 *
 	 * @return the place of birth
 	 */
 	public List<String> getPlaceOfBirth() {
@@ -494,7 +494,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the permanent address.
-	 * 
+	 *
 	 * @return the permanentAddress
 	 */
 	public List<String> getPermanentAddress() {
@@ -503,7 +503,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the telephone number.
-	 * 
+	 *
 	 * @return the telephone
 	 */
 	public String getTelephone() {
@@ -512,7 +512,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the profession.
-	 * 
+	 *
 	 * @return the profession
 	 */
 	public String getProfession() {
@@ -521,7 +521,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the title.
-	 * 
+	 *
 	 * @return the title
 	 */
 	public String getTitle() {
@@ -530,7 +530,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the personal summary.
-	 * 
+	 *
 	 * @return the personalSummary
 	 */
 	public String getPersonalSummary() {
@@ -539,7 +539,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the proof of citizenship.
-	 * 
+	 *
 	 * @return the proofOfCitizenship
 	 */
 	public byte[] getProofOfCitizenship() {
@@ -548,7 +548,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets the other valid TD numbers.
-	 * 
+	 *
 	 * @return the otherValidTDNumbers
 	 */
 	public List<String> getOtherValidTDNumbers() {
@@ -557,7 +557,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets custody information.
-	 * 
+	 *
 	 * @return the custodyInformation
 	 */
 	public String getCustodyInformation() {
@@ -566,7 +566,7 @@ public class DG11File extends DataGroup {
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {

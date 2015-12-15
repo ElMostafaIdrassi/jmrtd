@@ -39,12 +39,12 @@ import org.jmrtd.cbeff.ISO781611;
  * Datagroup containing a list of biometric information templates (BITs).
  * The {@link DG2File}, {@link DG3File}, and {@link DG4File} datagroups
  * are based on this type.
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @param <R> the type of the elements
- * 
+ *
  * @version $Revision$
  */
 abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
@@ -66,7 +66,7 @@ abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
 	
 	/**
 	 * Constructs an instance.
-	 * 
+	 *
 	 * @param inputStream an input stream
 	 * @param dataGroupTag the datagroup tag to use
 	 * @param biometricDataGroupTag the biometric data block tag to use (either <code>5F2E</code> or <code>7F2E</code>).
@@ -142,9 +142,9 @@ abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
 	 * method at the end of their {@link #writeContent(OutputStream)} method to add
 	 * some random data if the record contains zero biometric templates.
 	 * See supplement to ICAO Doc 9303 R7-p1_v2_sIII_0057.
-	 * 
+	 *
 	 * @param outputStream the outputstream
-	 * 
+	 *
 	 * @throws IOException on I/O errors
 	 */
 	protected void writeOptionalRandomData(OutputStream outputStream) throws IOException {

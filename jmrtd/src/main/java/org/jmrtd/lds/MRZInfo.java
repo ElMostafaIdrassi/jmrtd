@@ -193,7 +193,7 @@ public class MRZInfo extends AbstractLDSInfo {
 	/**
 	 * Creates a new MRZ based on the text input.
 	 * The text input may contain newlines, which will be ignored.
-	 * 
+	 *
 	 * @param str input text
 	 */
 	public MRZInfo(String str) {
@@ -297,7 +297,7 @@ public class MRZInfo extends AbstractLDSInfo {
 	/**
 	 * Writes the MRZ to an output stream.
 	 * This just outputs the MRZ characters, and does not add newlines.
-	 * 
+	 *
 	 * @param outputStream the output stream to write to
 	 */
 	public void writeObject(OutputStream outputStream) throws IOException {
@@ -318,9 +318,9 @@ public class MRZInfo extends AbstractLDSInfo {
 				 * reserved of optional data element (character position 29 to 35 of
 				 * the lower machine readable line) followed by a check digit and a
 				 * filler character.
-				 * 
+				 *
 				 * Corresponds to Doc 9303 pt 3 vol 1 page V-10 (note j) (FIXED by Paulo Assumcao)
-				 * 
+				 *
 				 * Also see R3-p1_v2_sIV_0041 in Supplement to Doc 9303, release 11.
 				 */
 				writeString(documentNumber.substring(0, 9), dataOut, 9);
@@ -489,7 +489,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
 	/**
 	 * Gets the document holder's first names.
-	 * 
+	 *
 	 * @return the secondary identifier
 	 */
 	public String getSecondaryIdentifier() {
@@ -579,7 +579,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
 	/**
 	 * Gets the contents of the first optional data field for ID-1 and ID-3 style MRZs.
-	 * 
+	 *
 	 * @return optional data 1
 	 */
 	public String getOptionalData1() {
@@ -588,7 +588,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
 	/**
 	 * Gets the contents of the second optional data field for ID-1 style MRZs.
-	 * 
+	 *
 	 * @return optional data 2
 	 */
 	public String getOptionalData2() {
@@ -597,7 +597,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
 	/**
 	 * Sets the contents for the second optional data field for ID-1 style MRZs.
-	 * 
+	 *
 	 * @param optionalData2 optional data 2
 	 */
 	public void setOptionalData2(String optionalData2) {
@@ -881,10 +881,10 @@ public class MRZInfo extends AbstractLDSInfo {
 
 	/**
 	 * Tests equality of two MRZ string while ignoring extra filler characters.
-	 * 
+	 *
 	 * @param str1 an MRZ string
 	 * @param str2 another MRZ string
-	 * 
+	 *
 	 * @return a boolean indicating whether the strings are equal modulo filler characters
 	 */
 	public static boolean equalsModuloFillerChars(String str1, String str2) {
@@ -897,18 +897,18 @@ public class MRZInfo extends AbstractLDSInfo {
 
 	/**
 	 * Determines the document type based on the document code (the first two characters of the MRZ).
-	 * 
+	 *
 	 * ICAO Doc 9303 part 3 vol 1 defines MRTDs with 3-line MRZs,
 	 * in this case the document code starts with "A", "C", or "I"
 	 * according to note j to Section 6.6 (page V-9).
-	 * 
+	 *
 	 * ICAO Doc 9303 part 2 defines MRVs with 2-line MRZs,
-	 * in this case the document code starts with "V". 
-	 * 
+	 * in this case the document code starts with "V".
+	 *
 	 * ICAO Doc 9303 part 1 vol 1 defines MRPs with 2-line MRZs,
 	 * in this case the document code starts with "P"
 	 * according to Section 9.6 (page IV-15).
-	 * 
+	 *
 	 * @param documentCode a two letter code
 	 *
 	 * @return a document type, one of {@link #DOC_TYPE_ID1}, {@link #DOC_TYPE_ID2},
@@ -965,10 +965,10 @@ public class MRZInfo extends AbstractLDSInfo {
 			/*
 			 * Based on 6.6 in Part V of Doc 9303 Part 3 Vol 1.
 			 * Composite check digit in position 30 is computed over:
-			 * 
+			 *
 			 * Upper line:
 			 * 6-30, i.e., documentNumber, documentNumberCheckDigit, personalNumber(15)
-			 * 
+			 *
 			 * Middle line:
 			 * 1-7, i.e., dateOfBirth, dateOfBirthCheckDigit
 			 * 9-15, i.e., dateOfExpiry, dateOfExpiryCheckDigit

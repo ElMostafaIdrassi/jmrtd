@@ -68,11 +68,11 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	 * Constructs a secure messaging wrapper based on the secure messaging
 	 * session keys and the initial value of the send sequence counter.
 	 * Used in BAC and EAC 1.
-	 * 
+	 *
 	 * @param ksEnc the session key for encryption
 	 * @param ksMac the session key for macs
 	 * @param ssc the initial value of the send sequence counter
-	 * 
+	 *
 	 * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
 	 */
 	public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
@@ -93,7 +93,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * Gets the current value of the send sequence counter.
-	 * 
+	 *
 	 * @return the current value of the send sequence counter.
 	 */
 	public long getSendSequenceCounter() {
@@ -123,10 +123,10 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * Unwraps the buffer of a response APDU.
-	 * 
+	 *
 	 * @param responseAPDU buffer containing the response apdu
 	 * @param len length of the actual response apdu
-	 * 
+	 *
 	 * @return a new byte array containing the unwrapped buffer
 	 */
 	public ResponseAPDU unwrap(ResponseAPDU responseAPDU, int len) {
@@ -239,10 +239,10 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	/**
 	 * Does the actual decoding of a response apdu. Based on Section E.3 of
 	 * TR-PKI, especially the examples.
-	 * 
+	 *
 	 * @param rapdu buffer containing the apdu data
 	 * @param len length of the apdu data
-	 * 
+	 *
 	 * @return a byte array containing the unwrapped apdu buffer
 	 */
 	private byte[] unwrapResponseAPDU(byte[] rapdu, int len) throws GeneralSecurityException, IOException {
@@ -290,7 +290,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * The <code>0x87</code> tag has already been read.
-	 * 
+	 *
 	 * @param inputStream inputstream to read from
 	 */
 	private byte[] readDO87(DataInputStream inputStream, boolean do85) throws IOException, GeneralSecurityException {
@@ -332,7 +332,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * The <code>0x99</code> tag has already been read.
-	 * 
+	 *
 	 * @param in inputstream to read from.
 	 */
 	private short readDO99(DataInputStream in) throws IOException {
@@ -347,7 +347,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * The <code>0x8E</code> tag has already been read.
-	 * 
+	 *
 	 * @param inputStream inputstream to read from.
 	 */
 	private byte[] readDO8E(DataInputStream inputStream) throws IOException, GeneralSecurityException {
@@ -366,9 +366,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * Gets the IV by encrypting the SSC.
-	 * 
+	 *
 	 * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
-	 * 
+	 *
 	 * @param sscBytes the SSC as blocksize aligned byte array
 	 */
 	private IvParameterSpec getIV(byte[] sscBytes) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -379,9 +379,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
 	/**
 	 * Gets the SSC as bytes.
-	 * 
+	 *
 	 * @param ssc
-	 * 
+	 *
 	 * @return the ssc as a 16 byte array
 	 */
 	private byte[] getSSCAsBytes(long ssc) {

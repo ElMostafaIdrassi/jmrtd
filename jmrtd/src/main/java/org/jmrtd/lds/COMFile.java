@@ -38,10 +38,10 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * File structure for the EF_COM file.
  * This file contains the common data (version and
  * data group presence table) information.
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not a DataGroup, consider changing the name of the DataGroup class. */
@@ -61,14 +61,14 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Constructs a new COM file.
-	 * 
+	 *
 	 * @param versionLDS a numerical string of length 2
 	 * @param updateLevelLDS a numerical string of length 2
 	 * @param majorVersionUnicode a numerical string of length 2
 	 * @param minorVersionUnicode a numerical string of length 2
 	 * @param releaseLevelUnicode a numerical string of length 2
 	 * @param tagList a list of ICAO data group tags
-	 * 
+	 *
 	 * @throws IllegalArgumentException if the input is not well-formed
 	 */
 	public COMFile(String versionLDS, String updateLevelLDS,
@@ -80,7 +80,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Constructs a new COM file.
-	 * 
+	 *
 	 * @param ldsVer a "x.y" version number
 	 * @param unicodeVer a "x.y.z" version number
 	 * @param tagList list of tags
@@ -137,10 +137,10 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 	/**
 	 * Constructs a new EF_COM file based on the encoded
 	 * value in <code>in</code>.
-	 * 
+	 *
 	 * @param in should contain a TLV object with appropriate
 	 *           tag and contents
-	 * 
+	 *
 	 * @throws IOException if the input could not be decoded
 	 */
 	public COMFile(InputStream in) throws IOException {
@@ -187,7 +187,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 	/**
 	 * Gets the LDS version as a dot seperated string
 	 * containing version and update level.
-	 * 
+	 *
 	 * @return a string of the form "a.b"
 	 */
 	public String getLDSVersion() {
@@ -205,7 +205,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 	/**
 	 * Gets the unicode version as a dot seperated string
 	 * containing major version, minor version, and release level.
-	 * 
+	 *
 	 * @return a string of the form "aa.bb.cc"
 	 */
 	public String getUnicodeVersion() {
@@ -227,7 +227,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the ICAO datagroup tags as a list of bytes.
-	 * 
+	 *
 	 * @return a list of bytes
 	 */
 	public int[] getTagList() {
@@ -241,7 +241,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Inserts a tag in a proper place if not already present
-	 * 
+	 *
 	 * @param tag tag to insert
 	 */
 	public void insertTag(Integer tag) {
@@ -267,7 +267,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {
@@ -291,7 +291,7 @@ public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Whether other is equal to this file.
-	 * 
+	 *
 	 * @return a boolean
 	 */
 	public boolean equals(Object other) {

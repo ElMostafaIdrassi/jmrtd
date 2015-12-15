@@ -54,7 +54,7 @@ import net.sf.scuba.tlv.TLVUtil;
  *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision: 1559 $
  */
 public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper implements Serializable {
@@ -78,10 +78,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 * Constructs a secure messaging wrapper based on the secure messaging
 	 * session keys. The initial value of the send sequence counter is set to
 	 * <code>0L</code>.
-	 * 
+	 *
 	 * @param ksEnc the session key for encryption
 	 * @param ksMac the session key for macs
-	 * 
+	 *
 	 * @throws GeneralSecurityException
 	 *             when the available JCE providers cannot provide the necessary
 	 *             cryptographic primitives
@@ -95,11 +95,11 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 * Constructs a secure messaging wrapper based on the secure messaging
 	 * session keys. The initial value of the send sequence counter is set to
 	 * <code>0L</code>.
-	 * 
+	 *
 	 * @param ksEnc the session key for encryption
 	 * @param ksMac the session key for macs
 	 * @param doCheckMAC whether to check the MAC when unwrapping response APDUs
-	 * 
+	 *
 	 * @throws GeneralSecurityException
 	 *             when the available JCE providers cannot provide the necessary
 	 *             cryptographic primitives
@@ -113,14 +113,14 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 * Constructs a secure messaging wrapper based on the secure messaging
 	 * session keys and the initial value of the send sequence counter.
 	 * Used in BAC and EAC 1.
-	 * 
+	 *
 	 * @param ksEnc the session key for encryption
 	 * @param ksMac the session key for macs
 	 * @param ssc the initial value of the send sequence counter
-	 * 
+	 *
 	 * @throws NoSuchPaddingException when the available JCE providers cannot provide the necessary cryptographic primitives
 	 * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
-	 * 
+	 *
 	 */
 	public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", true, ssc);
@@ -130,15 +130,15 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 * Constructs a secure messaging wrapper based on the secure messaging
 	 * session keys and the initial value of the send sequence counter.
 	 * Used in BAC and EAC 1.
-	 * 
+	 *
 	 * @param ksEnc the session key for encryption
 	 * @param ksMac the session key for macs
 	 * @param doCheckMAC whether to check the MAC when unwrapping response APDUs
 	 * @param ssc the initial value of the send sequence counter
-	 * 
+	 *
 	 * @throws NoSuchPaddingException when the available JCE providers cannot provide the necessary cryptographic primitives
 	 * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
-	 * 
+	 *
 	 */
 	public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", doCheckMAC, ssc);
@@ -179,7 +179,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	 *
 	 * @param responseAPDU buffer containing the response apdu
 	 * @param len length of the actual response apdu
-	 * 
+	 *
 	 * @return a new byte array containing the unwrapped buffer
 	 */
 	public ResponseAPDU unwrap(ResponseAPDU responseAPDU, int len) {
@@ -202,7 +202,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	
 	/**
 	 * Gets the current value of the send sequence counter.
-	 * 
+	 *
 	 * @return the current value of the send sequence counter.
 	 */
 	@Override
@@ -296,17 +296,17 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 		
 		/* FIXME: If extended length APDUs are supported (they must for EAC, that 256 should be 65536). See bug #26 in SF bugtracker. -- MO */
 //		wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
-		
+
 		return wc;
 	}
 
 	/**
 	 * Does the actual decoding of a response apdu. Based on Section E.3 of
 	 * TR-PKI, especially the examples.
-	 * 
+	 *
 	 * @param rapdu buffer containing the apdu data
 	 * @param len length of the apdu data
-	 * 
+	 *
 	 * @return a byte array containing the unwrapped apdu buffer
 	 */
 	private byte[] unwrapResponseAPDU(byte[] rapdu, int len) throws GeneralSecurityException, IOException {
@@ -362,7 +362,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 	/**
 	 * The <code>0x87</code> tag has already been read.
-	 * 
+	 *
 	 * @param inputStream inputstream to read from
 	 */
 	private byte[] readDO87(DataInputStream inputStream, boolean do85) throws IOException, GeneralSecurityException {
@@ -404,7 +404,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 	/**
 	 * The <code>0x99</code> tag has already been read.
-	 * 
+	 *
 	 * @param inputStream inputstream to read from.
 	 */
 	private short readDO99(DataInputStream inputStream) throws IOException {
@@ -419,7 +419,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
 	/**
 	 * The <code>0x8E</code> tag has already been read.
-	 * 
+	 *
 	 * @param inputStream inputstream to read from.
 	 */
 	private byte[] readDO8E(DataInputStream inputStream) throws IOException, GeneralSecurityException {

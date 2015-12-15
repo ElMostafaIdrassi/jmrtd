@@ -105,11 +105,11 @@ public class FaceImageInfoTest extends TestCase {
 		try {
 			InputStream imageInputStream = imageInfo.getImageInputStream();
 			int imageLength = imageInfo.getImageLength();
+			assertTrue(imageLength >= 0);
 			String imageMimeType = imageInfo.getMimeType();
-//			BufferedImage image = ImageUtil.read(imageInputStream, imageLength, imageMimeType);
-//			assertNotNull(image);
-//			assertEquals(image.getWidth(), expectedWidth);
-//			assertEquals(image.getHeight(), expectedHeight);
+			assertNotNull(imageMimeType);
+			assertTrue(imageMimeType.toLowerCase().startsWith("image"));
+			imageInputStream.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());

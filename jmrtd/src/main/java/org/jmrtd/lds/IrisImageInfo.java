@@ -32,7 +32,7 @@ import java.io.OutputStream;
  * Iris image header and image data
  * based on Section 6.5.3 and Table 4 of
  * ISO/IEC 19794-6 2005.
- * 
+ *
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
  *
  * @version $Revision$
@@ -69,7 +69,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs an iris image info.
-	 * 
+	 *
 	 * @param imageNumber the image number
 	 * @param quality quality
 	 * @param rotationAngle rotation angle
@@ -79,7 +79,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 	 * @param imageBytes the encoded image
 	 * @param imageLength the length of the encoded image
 	 * @param imageFormat the image format used for encoding
-	 * 
+	 *
 	 * @throws IOException on error reading the image input stream
 	 */
 	public IrisImageInfo(int imageNumber, int quality, int rotationAngle, int rotationAngleUncertainty,
@@ -94,14 +94,14 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs an iris image info.
-	 * 
+	 *
 	 * @param imageNumber the image number
 	 * @param width width
 	 * @param height height
 	 * @param imageBytes the encoded image
 	 * @param imageLength the length of the encoded image
 	 * @param imageFormat the image format used for encoding
-	 * 
+	 *
 	 * @throws IOException on error reading the image stream
 	 */
 	public IrisImageInfo(int imageNumber, int width, int height, InputStream imageBytes, int imageLength, int imageFormat) throws IOException {
@@ -111,10 +111,10 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs a new iris image record.
-	 * 
+	 *
 	 * @param inputStream input stream
 	 * @param imageFormat the image format used for encoding
-	 * 
+	 *
 	 * @throws IOException if input cannot be read
 	 */
 	IrisImageInfo(InputStream inputStream, int imageFormat) throws IOException {
@@ -126,7 +126,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the image format.
-	 * 
+	 *
 	 * @return the image format
 	 */
 	public int getImageFormat() {
@@ -135,7 +135,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Gets the image number.
-	 * 
+	 *
 	 * @return the image number
 	 */
 	public int getImageNumber() {
@@ -144,7 +144,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the quality.
-	 * 
+	 *
 	 * @return the image quality
 	 */
 	public int getQuality() {
@@ -153,7 +153,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Gets the rotation angle.
-	 * 
+	 *
 	 * @return the rotationAngle
 	 */
 	public int getRotationAngle() {
@@ -162,7 +162,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the rotation angle uncertainty.
-	 * 
+	 *
 	 * @return the rotationAngleUncertainty
 	 */
 	public int getRotationAngleUncertainty() {
@@ -171,7 +171,7 @@ public class IrisImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Gets the record length.
-	 * 
+	 *
 	 * @return the record length
 	 */
 	public long getRecordLength() {
@@ -180,9 +180,9 @@ public class IrisImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Generates a textual representation of this object.
-	 * 
+	 *
 	 * @return a textual representation of this object
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {

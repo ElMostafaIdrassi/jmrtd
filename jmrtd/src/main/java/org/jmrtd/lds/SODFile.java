@@ -81,13 +81,13 @@ import org.jmrtd.JMRTDSecurityProvider;
 /**
  * File structure for the EF_SOD file (the Document Security Object).
  * Based on Appendix 3 of Doc 9303 Part 1 Vol 2.
- * 
+ *
  * Basically the Document Security Object is a SignedData type as specified in
  * <a href="http://www.ietf.org/rfc/rfc3369.txt">RFC 3369</a>.
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not a DataGroup, consider changing the name of the DataGroup class. */
@@ -101,9 +101,9 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * OID to indicate content-type in encapContentInfo.
-	 * 
+	 *
 	 * <pre>
-	 * id-icao-ldsSecurityObject OBJECT IDENTIFIER ::= 
+	 * id-icao-ldsSecurityObject OBJECT IDENTIFIER ::=
 	 *    {joint-iso-itu-t(2) international-organizations(23) icao(136) mrtd(1) security(1) ldsSecurityObject(1)}
 	 * </pre>
 	 */
@@ -113,7 +113,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * This TC_SOD_IOD is apparently used in
 	 * "PKI for Machine Readable Travel Documents Offering ICC Read-Only Access Version - 1.1, Annex C".
 	 * Seen in live French and Belgian MRTDs.
-	 * 
+	 *
 	 * <pre>
 	 * id-icao-ldsSecurityObjectid OBJECT IDENTIFIER ::=
 	 *    {iso(1) identified-organization(3) icao(27) atn-end-system-air(1) security(1) ldsSecurityObject(1)}
@@ -124,7 +124,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	/**
 	 * This is used in some test MRTDs.
 	 * Appears to have been included in a "worked example" somewhere and perhaps used in live documents.
-	 * 
+	 *
 	 * <pre>
 	 * id-sdu-ldsSecurityObjectid OBJECT IDENTIFIER :=
 	 *    {iso(1) member-body(2) nl(528) nederlandse-organisatie(1) enschede-sdu(1006) 1 20 1}
@@ -168,7 +168,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
 	 * @param encryptedDigest ???
 	 * @param docSigningCertificate the document signing certificate
-	 * 
+	 *
 	 * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
 	 * @throws CertificateException if the document signing certificate cannot be used
 	 */
@@ -197,8 +197,8 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
 	 * @param privateKey private key to sign the data
 	 * @param docSigningCertificate the document signing certificate
-	 * @param provider specific signature provider that should be used to create the signature 
-	 * 
+	 * @param provider specific signature provider that should be used to create the signature
+	 *
 	 * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
 	 * @throws CertificateException if the document signing certificate cannot be used
 	 */
@@ -260,7 +260,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
 	 * @param privateKey private key to sign the data
 	 * @param docSigningCertificate the document signing certificate
-	 * 
+	 *
 	 * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
 	 * @throws CertificateException if the document signing certificate cannot be used
 	 */
@@ -286,7 +286,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * Constructs a Security Object data structure.
 	 *
 	 * @param inputStream some inputstream
-	 * 
+	 *
 	 * @throws IOException if something goes wrong
 	 */
 	public SODFile(InputStream inputStream) throws IOException {
@@ -378,7 +378,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the e-content inside the signed data strucure.
-	 * 
+	 *
 	 * @return the e-content
 	 */
 	public byte[] getEContent() {
@@ -387,12 +387,12 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the name of the algorithm used in the data group hashes.
-	 * 
+	 *
 	 * @return an algorithm string such as "SHA-1" or "SHA-256"
 	 */
 	public String getDigestAlgorithm() {
 		try {
-			return lookupMnemonicByOID(getLDSSecurityObject(signedData).getDigestAlgorithmIdentifier().getAlgorithm().getId());      
+			return lookupMnemonicByOID(getLDSSecurityObject(signedData).getDigestAlgorithmIdentifier().getAlgorithm().getId());
 		} catch (NoSuchAlgorithmException nsae) {
 			LOGGER.severe("Exception: " + nsae.getMessage());
 			return null; // throw new IllegalStateException(nsae.toString());
@@ -401,7 +401,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the name of the digest algorithm used in the signature.
-	 * 
+	 *
 	 * @return an algorithm string such as "SHA-1" or "SHA-256"
 	 */
 	public String getSignerInfoDigestAlgorithm() {
@@ -417,7 +417,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the name of the digest encryption algorithm used in the signature.
-	 * 
+	 *
 	 * @return an algorithm string such as "SHA256withRSA"
 	 */
 	public String getDigestEncryptionAlgorithm() {
@@ -425,7 +425,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 			SignerInfo signerInfo = getSignerInfo(signedData);
 			String digestEncryptionAlgorithmOID = signerInfo.getDigestEncryptionAlgorithm().getAlgorithm().getId();
 			if (digestEncryptionAlgorithmOID == null) { return null; }
-			return lookupMnemonicByOID(digestEncryptionAlgorithmOID);      
+			return lookupMnemonicByOID(digestEncryptionAlgorithmOID);
 		} catch (NoSuchAlgorithmException nsae) {
 			LOGGER.severe("Exception: " + nsae.getMessage());
 			return null; // throw new IllegalStateException(nsae.toString());
@@ -452,7 +452,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * Gets the version of unicode if stored in the Security Object (SOd).
 	 *
 	 * @return the unicode version in "aabbcc" format or null if LDS &lt; V1.8
-	 * 
+	 *
 	 * @since LDS V1.8
 	 */
 	public String getUnicodeVersion() {
@@ -471,7 +471,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * using the country signing certificate.
 	 *
 	 * @return the document signing certificate
-	 * 
+	 *
 	 * @throws CertificateException when certificate not be constructed from this SOd
 	 */
 	public X509Certificate getDocSigningCertificate() throws CertificateException {
@@ -508,15 +508,15 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	 * Verifies the signature over the contents of the security object.
 	 * Clients can also use the accessors of this class and check the
 	 * validity of the signature for themselves.
-	 * 
+	 *
 	 * See RFC 3369, Cryptographic Message Syntax, August 2002,
 	 * Section 5.4 for details.
-	 * 
+	 *
 	 * @param docSigningCert the certificate to use
 	 *        (should be X509 certificate)
-	 * 
+	 *
 	 * @return status of the verification
-	 * 
+	 *
 	 * @throws GeneralSecurityException if something goes wrong
 	 */
 	/* FIXME: move this out of lds package. */
@@ -532,7 +532,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 		}
 
 		/*
-		 * For the cases where the signature is simply a digest (haven't seen a passport like this, 
+		 * For the cases where the signature is simply a digest (haven't seen a passport like this,
 		 * thus this is guessing)
 		 */
 		if (digestEncryptionAlgorithm == null) {
@@ -578,7 +578,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the issuer of the document signing certificate.
-	 * 
+	 *
 	 * @return a certificate issuer
 	 */
 	public X500Principal getIssuerX500Principal() {
@@ -595,7 +595,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the serial number of the document signing certificate.
-	 * 
+	 *
 	 * @return a certificate serial number
 	 */
 	public BigInteger getSerialNumber() {
@@ -606,7 +606,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {
@@ -647,9 +647,9 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 	/**
 	 * Reads the security object (containing the hashes
 	 * of the data groups) found in the SignedData field.
-	 * 
+	 *
 	 * @return the security object
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private static LDSSecurityObject getLDSSecurityObject(SignedData signedData) {
@@ -681,17 +681,17 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the contents of the security object over which the
-	 * signature is to be computed. 
-	 * 
+	 * signature is to be computed.
+	 *
 	 * See RFC 3369, Cryptographic Message Syntax, August 2002,
 	 * Section 5.4 for details.
-	 * 
+	 *
 	 * FIXME: Maybe throw an exception instead of issuing warnings
 	 * on stderr if signed attributes don't check out.
 	 *
 	 * @see #getDocSigningCertificate()
 	 * @see #getSignature()
-	 * 
+	 *
 	 * @return the contents of the security object over which the
 	 *         signature is to be computed
 	 */
@@ -755,9 +755,9 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 
 	/**
 	 * Gets the stored signature of the security object.
-	 * 
+	 *
 	 * @see #getDocSigningCertificate()
-	 * 
+	 *
 	 * @return the signature
 	 */
 	private static byte[] getEncryptedDigest(SignedData signedData) {
@@ -960,8 +960,8 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
 		if(name.equalsIgnoreCase("SHA-384") || name.equalsIgnoreCase("SHA384")) { return NISTObjectIdentifiers.id_sha384.getId(); }
 		if(name.equalsIgnoreCase("SHA-512") || name.equalsIgnoreCase("SHA512")) { return NISTObjectIdentifiers.id_sha512.getId(); }
 		if (name.equalsIgnoreCase("RSA")) { return PKCS1_RSA_OID; }
-		if (name.equalsIgnoreCase("MD2withRSA")) { return PKCS1_MD2_WITH_RSA_OID; } 
-		if (name.equalsIgnoreCase("MD4withRSA")) { return PKCS1_MD4_WITH_RSA_OID; } 
+		if (name.equalsIgnoreCase("MD2withRSA")) { return PKCS1_MD2_WITH_RSA_OID; }
+		if (name.equalsIgnoreCase("MD4withRSA")) { return PKCS1_MD4_WITH_RSA_OID; }
 		if (name.equalsIgnoreCase("MD5withRSA")) { return  PKCS1_MD5_WITH_RSA_OID; }
 		if (name.equalsIgnoreCase("SHA1withRSA")) { return  PKCS1_SHA1_WITH_RSA_OID; }
 		if (name.equalsIgnoreCase("SHA256withRSA")) { return PKCS1_SHA256_WITH_RSA_OID; }

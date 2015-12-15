@@ -26,16 +26,16 @@ import net.sf.scuba.smartcards.APDUWrapper;
 
 /**
  * Secure messaging wrapper.
- * 
+ *
  * @author The JMRTD team
- * 
+ *
  * @version $Revision: $
  */
 public abstract class SecureMessagingWrapper implements APDUWrapper {
 
 	/**
 	 * Gets the send sequence counter.
-	 * 
+	 *
 	 * @return the send sequence counter
 	 */
 	public abstract long getSendSequenceCounter();

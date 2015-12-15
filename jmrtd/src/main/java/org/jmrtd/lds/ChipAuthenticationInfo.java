@@ -34,7 +34,7 @@ import org.bouncycastle.asn1.DLSequence;
 /**
  * A concrete SecurityInfo structure that stores chip authentication info,
  * see EAC 1.11 specification.
- * 
+ *
  * This data structure provides detailed information on an implementation of
  * Chip Authentication.
  * <ul>
@@ -46,9 +46,9 @@ import org.bouncycastle.asn1.DLSequence;
  *     It MUST be used if the MRTD chip provides multiple public keys for Chip
  *     Authentication.</li>
  * </ul>
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
- * 
+ *
  * FIXME: dependency on BC?
  */
 public class ChipAuthenticationInfo extends SecurityInfo {
@@ -65,7 +65,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Constructs a new object.
-	 * 
+	 *
 	 * @param oid
 	 *            a proper EAC identifier
 	 * @param version
@@ -82,7 +82,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Constructs a new object.
-	 * 
+	 *
 	 * @param oid
 	 *            a proper EAC identifier
 	 * @param version
@@ -109,7 +109,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 	/**
 	 * Returns a key identifier stored in this ChipAuthenticationInfo structure, null
 	 * if not present
-	 * 
+	 *
 	 * @return key identifier stored in this ChipAuthenticationInfo structure
 	 */
 	public BigInteger getKeyId() {
@@ -136,9 +136,9 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 	/**
 	 * Checks whether the given object identifier identifies a
 	 * ChipAuthenticationInfo structure.
-	 * 
+	 *
 	 * FIXME: for EAC 1.11 only the 3DES OIDs are allowed.
-	 * 
+	 *
 	 * @param oid
 	 *            object identifier
 	 * @return true if the match is positive

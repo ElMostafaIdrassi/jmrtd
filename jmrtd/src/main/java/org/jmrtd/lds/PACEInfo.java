@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- * 
+ *
  * $Id$
  */
 
@@ -39,11 +39,11 @@ import org.jmrtd.Util;
 
 /**
  * PACE Info object as per SAC TR 1.01, November 11, 2010.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.5.0
  */
 public class PACEInfo extends SecurityInfo {
@@ -96,7 +96,7 @@ public class PACEInfo extends SecurityInfo {
 
 	/**
 	 * Creates a PACEInfo instance.
-	 * 
+	 *
 	 * @param oid the OID
 	 * @param version should be 2
 	 * @param parameterId either a standardized domain parameter id from table 6 or a proprietary domain parameter

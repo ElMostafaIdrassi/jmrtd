@@ -68,11 +68,11 @@ import org.jmrtd.lds.PACEInfo;
  * Card service for reading files (such as data groups) and using the BAC and AA
  * protocols on the passport. Defines secure messaging. Defines active
  * authentication.
- * 
+ *
  * Based on ICAO-TR-PKI and ICAO-TR-LDS.
- * 
+ *
  * Usage:
- * 
+ *
  * <pre>
  *        open() ==&gt;&lt;br /&gt;
  *        sendSelectApplet() ==&gt;&lt;br /&gt;
@@ -85,7 +85,7 @@ import org.jmrtd.lds.PACEInfo;
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Wojciech Mostowski (woj@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision:352 $
  */
 public class PassportService extends PassportApduService implements Serializable {
@@ -208,7 +208,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * The file read block size, some passports cannot handle large values
-	 * 
+	 *
 	 * @deprecated hack
 	 */
 	public int maxBlockSize;
@@ -225,9 +225,9 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * Creates a new passport service for accessing the passport.
-	 * 
+	 *
 	 * @param service another service which will deal with sending the apdus to the card
-	 * 
+	 *
 	 * @throws CardServiceException
 	 *             when the available JCE providers cannot provide the necessary
 	 *             cryptographic primitives:
@@ -242,10 +242,10 @@ public class PassportService extends PassportApduService implements Serializable
 	
 	/**
 	 * Creates a new passport service for accessing the passport.
-	 * 
+	 *
 	 * @param service another service which will deal with sending the APDUs to the card
 	 * @param maxBlockSize maximum size for plain text APDUs
-	 * 
+	 *
 	 * @throws CardServiceException
 	 *             when the available JCE providers cannot provide the necessary
 	 *             cryptographic primitives:
@@ -267,7 +267,7 @@ public class PassportService extends PassportApduService implements Serializable
 	/**
 	 * Opens a session to the card. As of 0.4.10 this no longer auto selects the passport application,
 	 * caller is responsible to call #sendSelectApplet(boolean) now.
-	 * 
+	 *
 	 * @throws CardServiceException on error
 	 */
 	public void open() throws CardServiceException {
@@ -284,9 +284,9 @@ public class PassportService extends PassportApduService implements Serializable
 	 * Selects the MRTD card side applet. If PACE has been executed successfully previously, then the card has authenticated
 	 * us and a secure messaging channel has been established. If not, then the caller should request BAC execution as a next
 	 * step.
-	 * 
+	 *
 	 * @param hasPACESucceeded indicates whether PACE has been executed successfully (in which case a secure messaging channel has been established)
-	 * 
+	 *
 	 * @throws CardServiceException on error
 	 */
 	public void sendSelectApplet(boolean hasPACESucceeded) throws CardServiceException {
@@ -302,7 +302,7 @@ public class PassportService extends PassportApduService implements Serializable
 	
 	/**
 	 * Whether this service is open.
-	 * 
+	 *
 	 * @return a boolean
 	 */
 	public boolean isOpen() {
@@ -311,11 +311,11 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * Performs the <i>Basic Access Control</i> protocol.
-	 * 
+	 *
 	 * @param bacKey the key based on the document number,
 	 *               the card holder's birth date,
 	 *               and the document's expiry date
-	 * 
+	 *
 	 * @throws CardServiceException if authentication failed
 	 */
 	public synchronized void doBAC(BACKeySpec bacKey) throws CardServiceException {
@@ -340,10 +340,10 @@ public class PassportService extends PassportApduService implements Serializable
 	 * It does BAC using kEnc and kMac keys, usually calculated
 	 * from the document number, the card holder's date of birth,
 	 * and the card's date of expiry.
-	 * 
+	 *
 	 * @param kEnc 3DES key required for BAC
 	 * @param kMac 3DES key required for BAC
-	 * 
+	 *
 	 * @throws CardServiceException if authentication failed
 	 * @throws GeneralSecurityException on security primitives related problems
 	 */
@@ -369,7 +369,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * Selects a file.
-	 * 
+	 *
 	 * @param fid a file identifier
 	 */
 	public synchronized void sendSelectFile(short fid) throws CardServiceException {
@@ -378,13 +378,13 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * Sends a <code>READ BINARY</code> command to the passport, use wrapper when secure channel set up.
-	 * 
+	 *
 	 * @param offset offset into the file
 	 * @param le the expected length of the file to read
 	 * @param longRead whether to use extended length APDUs
-	 * 
+	 *
 	 * @return a byte array of length <code>le</code> with (the specified part of) the contents of the currently selected file
-	 *         
+	 *
 	 * @throws CardServiceException on tranceive error
 	 */
 	public synchronized byte[] sendReadBinary(int offset, int le, boolean longRead) throws CardServiceException {
@@ -393,7 +393,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * Performs the PACE 2.0 / SAC protocol.
-	 * 
+	 *
 	 * @param keySpec the MRZ
 	 * @param oid as specified in the PACEInfo, indicates GM or IM, DH or ECDH, cipher, digest, length
 	 * @param params explicit static domain parameters the domain params for DH or ECDH
@@ -438,7 +438,7 @@ public class PassportService extends PassportApduService implements Serializable
 			throw new PACEException("PICC side error in static PACE key derivation step", cse.getSW());
 		}
 
-		/* 
+		/*
 		 * PCD and PICC exchange a chain of general authenticate commands.
 		 * Steps 1 to 4 below correspond with steps in table in 3.3 of
 		 * ICAO TR-SAC 1.01.
@@ -446,10 +446,10 @@ public class PassportService extends PassportApduService implements Serializable
 
 		/*
 		 * 1. Encrypted Nonce 		- --- Absent				- 0x80 Encrypted Nonce
-		 * 
+		 *
 		 * Receive encrypted nonce z = E(K_pi, s).
 		 * (This is steps 1-3 in Table 4.4 in BSI 03111 2.0.)
-		 * 
+		 *
 		 * Decrypt nonce s = D(K_pi, z).
 		 * (This is step 4 in Table 4.4 in BSI 03111 2.0.)
 		 */
@@ -475,10 +475,10 @@ public class PassportService extends PassportApduService implements Serializable
 
 		/*
 		 * 2. Map Nonce 			- 0x81 Mapping Data			- 0x82 Mapping Data
-		 * 
+		 *
 		 * (This is step 3.a) in the protocol in TR-SAC.)
 		 * (This is step 5 in Table 4.4 in BSI 03111 2.0.)
-		 * 
+		 *
 		 * Receive additional data required for map (i.e. a public key from PICC, and (conditionally) a nonce t).
 		 * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
 		 */
@@ -537,7 +537,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 		/*
 		 * 3. Perform Key Agreement	- 0x83 Ephemeral Public Key	- 0x84 Ephemeral Public Key
-		 * 
+		 *
 		 * Choose random ephemeral key pair (SK_PCD~, PK_PCD~, D~).
 		 * Exchange PK_PCD~ and PK_PICC~ with PICC.
 		 * Check that PK_PCD~ and PK_PICC~ differ.
@@ -590,7 +590,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 		/*
 		 * 4. Mutual Authentication	- 0x85 Authentication Token	- 0x86 Authentication Token
-		 * 
+		 *
 		 * Compute authentication token T_PCD = MAC(K_mac, PK_PICC~).
 		 * Exchange authentication token T_PCD and T_PICC with PICC.
 		 * Check authentication token T_PICC.
@@ -613,7 +613,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 		/*
 		 * Start secure messaging.
-		 * 
+		 *
 		 * 4.6 of TR-SAC: If Secure Messaging is restarted, the SSC is used as follows:
 		 *  - The commands used for key agreement are protected with the old session keys and old SSC.
 		 *    This applies in particular for the response of the last command used for session key agreement.
@@ -638,12 +638,12 @@ public class PassportService extends PassportApduService implements Serializable
 	 * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
 	 * ver. 1.11. In short, we authenticate the chip with (EC)DH key agreement
 	 * protocol and create new secure messaging keys.
-	 * 
+	 *
 	 * @param keyId passport's public key id (stored in DG14), -1 if none
 	 * @param publicKey passport's public key (stored in DG14)
-	 * 
+	 *
 	 * @return the chip authentication result
-	 * 
+	 *
 	 * @throws CardServiceException if CA failed or some error occurred
 	 */
 	public synchronized ChipAuthenticationResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
@@ -709,7 +709,7 @@ public class PassportService extends PassportApduService implements Serializable
 	}
 
 	/* From BSI-03110 v1.1, B.2:
-	 * 
+	 *
 	 * <pre>
 	 * The following sequence of commands SHALL be used to implement Terminal Authentication:
 	 * 	1. MSE:Set DST
@@ -727,16 +727,16 @@ public class PassportService extends PassportApduService implements Serializable
 	 * certificates to the card for verification, get a challenge from the
 	 * card, sign it with terminal private key, and send back to the card
 	 * for verification.
-	 * 
+	 *
 	 * @param caReference reference issuer
 	 * @param terminalCertificates terminal certificate chain
 	 * @param terminalKey terminal private key
 	 * @param taAlg algorithm
 	 * @param chipAuthenticationResult the chip authentication result
 	 * @param documentNumber the document number
-	 * 
+	 *
 	 * @return the challenge from the card
-	 * 
+	 *
 	 * @throws CardServiceException on error
 	 */
 	public synchronized TerminalAuthenticationResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
@@ -867,14 +867,14 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * Performs the <i>Active Authentication</i> protocol.
-	 * 
+	 *
 	 * @param publicKey the public key to use (usually read from the card)
 	 * @param digestAlgorithm the digest algorithm to use, or null
 	 * @param signatureAlgorithm signature algorithm
 	 * @param challenge challenge
-	 * 
+	 *
 	 * @return a boolean indicating whether the card was authenticated
-	 * 
+	 *
 	 * @throws CardServiceException on error
 	 */
 	public byte[] doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
@@ -905,7 +905,7 @@ public class PassportService extends PassportApduService implements Serializable
 	/**
 	 * Gets the wrapper. Returns <code>null</code> until BAC has been
 	 * performed.
-	 * 
+	 *
 	 * @return the wrapper
 	 */
 	public APDUWrapper getWrapper() {
@@ -914,7 +914,7 @@ public class PassportService extends PassportApduService implements Serializable
 
 	/**
 	 * @deprecated hack
-	 * 
+	 *
 	 * @param wrapper wrapper
 	 */
 	public void setWrapper(SecureMessagingWrapper wrapper) {
@@ -924,11 +924,11 @@ public class PassportService extends PassportApduService implements Serializable
 	/**
 	 * Gets the file as an input stream indicated by a file identifier.
 	 * The resulting input stream will send APDUs to the card.
-	 * 
+	 *
 	 * @param fid ICAO file identifier
-	 * 
+	 *
 	 * @return the file as an input stream
-	 * 
+	 *
 	 * @throws CardServiceException if the file cannot be read
 	 */
 	public synchronized CardFileInputStream getInputStream(short fid) throws CardServiceException {

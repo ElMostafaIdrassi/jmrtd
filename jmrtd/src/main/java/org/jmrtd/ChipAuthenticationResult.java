@@ -7,7 +7,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -28,9 +28,9 @@ import java.security.PublicKey;
 
 /**
  * Result of EAC-CA protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision: $
  */
 public class ChipAuthenticationResult {
@@ -42,7 +42,7 @@ public class ChipAuthenticationResult {
 
 	/**
 	 * Creates a result.
-	 * 
+	 *
 	 * @param keyId the key identifier of the ICC's public key or -1
 	 * @param publicKey the ICC's public key
 	 * @param keyHash the hash of the key
@@ -75,7 +75,7 @@ public class ChipAuthenticationResult {
 
 	/**
 	 * Gets the hash of the key.
-	 * 
+	 *
 	 * @return the hash of the key
 	 */
 	public byte[] getKeyHash() {
@@ -84,7 +84,7 @@ public class ChipAuthenticationResult {
 
 	/**
 	 * The ephemeral key pair resulting from chip authentication.
-	 * 
+	 *
 	 * @return a key pair
 	 */
 	public KeyPair getKeyPair() {

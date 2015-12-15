@@ -42,10 +42,10 @@ import org.jmrtd.cbeff.StandardBiometricHeader;
  * File structure for the EF_DG2 file.
  * Datagroup 2 contains the facial features of the document holder.
  * See A 13.3 in MRTD's LDS document (or equivalent in Doc 9303).
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class DG2File extends CBEFFDataGroup<FaceInfo> {
@@ -68,7 +68,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
 	
 	/**
 	 * Creates a new file with the specified records.
-	 * 
+	 *
 	 * @param faceInfos records
 	 */
 	public DG2File(List<FaceInfo> faceInfos) {
@@ -79,7 +79,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
 	 * Creates a new file based on an input stream.
 	 *
 	 * @param inputStream an input stream
-	 * 
+	 *
 	 * @throws IOException on error reading from input stream
 	 */
 	public DG2File(InputStream inputStream) throws IOException {
@@ -118,7 +118,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {
@@ -127,21 +127,21 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
 
 	/**
 	 * Gets the face infos embedded in this file.
-	 * 
+	 *
 	 * @return face infos
 	 */
 	public List<FaceInfo> getFaceInfos() { return getSubRecords(); }
 
 	/**
 	 * Adds a face info to this file.
-	 * 
+	 *
 	 * @param faceInfo the face info to add
 	 */
 	public void addFaceInfo(FaceInfo faceInfo) { add(faceInfo); }
 	
 	/**
 	 * Removes a face info from this file.
-	 * 
+	 *
 	 * @param index the index of the face info to remove
 	 */
 	public void removeFaceInfo(int index) { remove(index); }

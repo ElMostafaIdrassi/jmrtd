@@ -7,7 +7,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -33,10 +33,10 @@ import org.jmrtd.cert.CardVerifiableCertificate;
 
 /**
  * Result of EAC protocols.
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class TerminalAuthenticationResult  {
@@ -52,7 +52,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Constructs a new terminal authentication result.
-	 * 
+	 *
 	 * @param chipAuthenticationResult the chip authentication result
 	 * @param caReference the CA
 	 * @param terminalCertificates terminal certificates
@@ -75,7 +75,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Gets the chip authentication result;
-	 * 
+	 *
 	 * @return the chip authenticaiton result
 	 */
 	public ChipAuthenticationResult getChipAuthenticationResult() {
@@ -84,7 +84,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Gets CA certificate's reference used during EAC.
-	 * 
+	 *
 	 * @return CA certificate's reference
 	 */
 	public CVCPrincipal getCAReference() {
@@ -94,7 +94,7 @@ public class TerminalAuthenticationResult  {
 	/**
 	 * Gets the chain of CVCertificates used to authenticate the terminal to
 	 * the card.
-	 * 
+	 *
 	 * @return the chain of CVCertificates used to authenticate the terminal to
 	 *         the card
 	 */
@@ -104,7 +104,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Gets the terminal private key used during EAC.
-	 * 
+	 *
 	 * @return the terminal private key
 	 */
 	public PrivateKey getTerminalKey() {
@@ -113,7 +113,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Gets the id of the card used during EAC.
-	 * 
+	 *
 	 * @return the id of the card
 	 */
 	public String getDocumentNumber() {
@@ -122,7 +122,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Gets the card's challenge generated during EAC.
-	 * 
+	 *
 	 * @return the card's challenge
 	 */
 	public byte[] getCardChallenge() {
@@ -131,7 +131,7 @@ public class TerminalAuthenticationResult  {
 
 	/**
 	 * Gets a textual representation of this terminal authentication result.
-	 * 
+	 *
 	 * @return a textual representation of this terminal authentication result
 	 */
 	public String toString() {

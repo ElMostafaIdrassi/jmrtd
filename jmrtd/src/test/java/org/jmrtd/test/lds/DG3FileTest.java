@@ -74,11 +74,6 @@ public class DG3FileTest extends TestCase {
 					byte[] bytes = new byte[length];
 					DataInputStream dataIn = new DataInputStream(imageInfo.getImageInputStream());
 					dataIn.readFully(bytes);
-
-//					RenderedImage image = ImageUtil.read(new ByteArrayInputStream(bytes), imageInfo.getImageLength(), imageInfo.getMimeType());
-
-//					RenderedImage image = ImageUtil.read(imageInfo.getImageInputStream(), imageInfo.getImageLength(), imageInfo.getMimeType());
-//					LOGGER.info("DEBUG: fingerprint " + imageInfoNumber + "/" + imageInfoCount + " in record " + recordNumber + "/" + recordCount + " has " + image.getWidth() + " x " + image.getHeight());
 				}
 				recordNumber ++;
 			}
@@ -151,10 +146,6 @@ public class DG3FileTest extends TestCase {
 				int fingerImageInfoIndex = 0;
 				for (FingerImageInfo fingerImageInfo: fingerImageInfos) {
 					FingerImageInfo fingerImageInfo1 = fingerImageInfos1.get(fingerImageInfoIndex);
-//					RenderedImage image = ImageUtil.read(fingerImageInfo.getImageInputStream(), fingerImageInfo.getImageLength(), fingerImageInfo.getMimeType());
-//					RenderedImage image1 = ImageUtil.read(fingerImageInfo1.getImageInputStream(), fingerImageInfo1.getImageLength(), fingerImageInfo1.getMimeType());
-//					assertEquals(image.getHeight(), image1.getHeight());
-//					assertEquals(image.getWidth(), image1.getWidth());
 					fingerImageInfoIndex ++;
 				}
 				fingerInfoIndex ++;
@@ -205,20 +196,6 @@ public class DG3FileTest extends TestCase {
 			int l2 = i2.getImageLength();
 			byte[] b2 = new byte[l2];
 			(new DataInputStream(i2.getImageInputStream())).readFully(b2);
-
-//			RenderedImage image = ImageUtil.read(new ByteArrayInputStream(b2), l2, i2.getMimeType());
-
-//			DataOutputStream out1 = new DataOutputStream(new FileOutputStream("tmp/img1.wsq"));
-//			out1.write(b1);
-//			out1.flush();
-//			out1.close();
-//
-//			DataOutputStream out2 = new DataOutputStream(new FileOutputStream("tmp/img2.wsq"));
-//			out2.write(b2);
-//			out2.flush();
-//			out2.close();
-
-//			LOGGER.info("DEBUG: " + Hex.bytesToPrettyString(b1));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -236,7 +213,7 @@ public class DG3FileTest extends TestCase {
 					DataInputStream dataInputStream = new DataInputStream(fingerImageInfo.getImageInputStream());
 					byte[] imageBytes = new byte[64]; // FIXME: first check 64 < fingerImageInfo.getImageLength()
 					dataInputStream.readFully(imageBytes);
-					LOGGER.info("DEBUG:\n" + Hex.bytesToPrettyString(imageBytes));
+					// LOGGER.info("DEBUG:\n" + Hex.bytesToPrettyString(imageBytes));
 				}
 			}
 		} catch (Exception e) {
@@ -265,12 +242,6 @@ public class DG3FileTest extends TestCase {
 			DataInputStream imgDataIn = new DataInputStream(imageInfo.getImageInputStream());
 			imgDataIn.readFully(imgBytes);
 			assertEquals("FFA0FFA4003A0907000932D3263C000AE0F31A84010A41EFF1BC010B8E27653F000BE179A4DD00092EFF55D3010AF933D1B6010BF2871F37000A2677DA0CFFA5", Hex.bytesToHexString(imgBytes, 0, 64));
-
-			LOGGER.info("DEBUG:\n" + Hex.bytesToHexString(imgBytes, 0, 64));
-
-
-//			RenderedImage image = ImageUtil.read(new ByteArrayInputStream(imgBytes), imageInfo.getImageLength(), imageInfo.getMimeType());
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -292,8 +263,8 @@ public class DG3FileTest extends TestCase {
 			byte[] img2Bytes = new byte[img2Length];
 			img2In.readFully(img2Bytes);
 
-			LOGGER.info("DEBUG: img1 (" + img1Bytes.length + ")\n" + Hex.bytesToHexString(img1Bytes, 0, 256));
-			LOGGER.info("DEBUG: img2 (" + img2Bytes.length + ")\n" + Hex.bytesToHexString(img2Bytes, 0, 256));
+			// LOGGER.info("DEBUG: img1 (" + img1Bytes.length + ")\n" + Hex.bytesToHexString(img1Bytes, 0, 256));
+			// LOGGER.info("DEBUG: img2 (" + img2Bytes.length + ")\n" + Hex.bytesToHexString(img2Bytes, 0, 256));
 
 			assertEquals(Hex.bytesToHexString(img2Bytes, 0, 32), "FFA0FFA4003A0907000932D3263C000AE0F31A84010A41EFF1BC010B8E27653F");
 		} catch (Exception e) {

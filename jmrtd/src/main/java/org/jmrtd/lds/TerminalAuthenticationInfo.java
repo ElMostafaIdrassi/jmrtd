@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- * 
+ *
  * $Id$
  */
 
@@ -36,7 +36,7 @@ import org.bouncycastle.asn1.DLSequence;
 /**
  * A concrete SecurityInfo structure that stores terminal authentication
  * info, see EAC 1.11 specification.
- * 
+ *
  * This data structure provides detailed information on an implementation of Terminal Authentication.
  * <ul>
  * <li>The object identifier <code>protocol</code> SHALL identify the Terminal
@@ -47,9 +47,9 @@ import org.bouncycastle.asn1.DLSequence;
  *     identifier of the file EF.CVCA. It MUST be used, if the default (short) file
  *     identifier is not used.</li>
  * </ul>
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
- * 
+ *
  * @version $Revision$
  */
 public class TerminalAuthenticationInfo extends SecurityInfo {
@@ -66,7 +66,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Constructs a new object.
-	 * 
+	 *
 	 * @param oid
 	 *            the id_TA identifier
 	 * @param version
@@ -83,7 +83,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Constructs a new object.
-	 * 
+	 *
 	 * @param identifier
 	 *            the id_TA identifier
 	 * @param version
@@ -104,7 +104,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 	/**
 	 * Constructs a new object with the required object identifier and version
 	 * number and file identifier and short file identifier (possibly -1).
-	 * 
+	 *
 	 * @param fileId
 	 *            a file identifier reference to the efCVCA file
 	 * @param shortFileId
@@ -126,7 +126,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Gets the object identifier of this TA security info.
-	 * 
+	 *
 	 * @return an object identifier
 	 */
 	public String getObjectIdentifier() {
@@ -135,7 +135,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Returns the efCVCA file identifier stored in this file, -1 if none
-	 * 
+	 *
 	 * @return the efCVCA file identifier stored in this file
 	 */
 	public int getFileId() {
@@ -145,7 +145,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 	/**
 	 * Returns the efCVCA short file identifier stored in this file, -1 if none
 	 * or not present
-	 * 
+	 *
 	 * @return the efCVCA short file identifier stored in this file
 	 */
 	public byte getShortFileId() {
@@ -183,7 +183,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 	/**
 	 * Checks whether the given object identifier identifies a
 	 * TerminalAuthenticationInfo structure.
-	 * 
+	 *
 	 * @param id
 	 *            object identifier
 	 * @return true if the match is positive

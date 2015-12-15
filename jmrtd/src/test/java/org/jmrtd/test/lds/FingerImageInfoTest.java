@@ -126,32 +126,11 @@ public class FingerImageInfoTest extends TestCase {
 			String mimeType = imageInfo.getMimeType();
 			assertNotNull(mimeType);
 			assertTrue("image/x-wsq".equals(mimeType) || "image/jpeg2000".equals(mimeType) || "image/jpeg".equals(mimeType));
-//			BufferedImage image = ImageUtil.read(imageInfo.getImageInputStream(), imageInfo.getImageLength(), mimeType);
-//			assertEquals(imageInfo.getWidth(), image.getWidth());
-//			assertEquals(imageInfo.getHeight(), image.getHeight());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
-
-	//	public void testExtractImage() {
-	//		FingerImageInfo imageInfo = createRightIndexFingerTestObject();
-	//		testExtractImage(imageInfo, 545, 622);
-	//	}
-
-	//	public void testExtractImage(FingerImageInfo imageInfo, int expectedWidth, int expectedHeight) {
-	//		try {
-	//			BufferedImage image = ImageUtil.read(imageInfo.getImageInputStream(), imageInfo.getImageLength(), imageInfo.getMimeType());
-	//			assertNotNull(image);
-	//			assertEquals(image.getType(), BufferedImage.TYPE_BYTE_GRAY);
-	//			assertEquals(image.getWidth(), expectedWidth);
-	//			assertEquals(image.getHeight(), expectedHeight);
-	//		} catch (Exception e) {
-	//			e.printStackTrace();
-	//			fail(e.getMessage());
-	//		}
-	//	}
 
 	public void testViewCountAndNumber() {
 		FingerImageInfo fingerImageInfo = createRightIndexFingerTestObject();
@@ -161,8 +140,6 @@ public class FingerImageInfoTest extends TestCase {
 	public void testViewCountAndNumber(FingerImageInfo fingerImageInfo) {
 		int viewCount = fingerImageInfo.getViewCount();
 		int viewNumber = fingerImageInfo.getViewCount();
-		LOGGER.info("DEBUG: viewCount = " + viewCount);
-		LOGGER.info("DEBUG: viewNumber = " + viewNumber);
 		assertTrue(viewCount >= 1);
 		assertTrue(viewNumber <= viewCount);
 	}
@@ -181,27 +158,12 @@ public class FingerImageInfoTest extends TestCase {
 		FingerImageInfo fingerImageInfo = createRightIndexFingerTestObject();
 		int imageLength = fingerImageInfo.getImageLength();
 		int recordLength = (int)fingerImageInfo.getRecordLength();
-		LOGGER.info("DEBUG: imageLength = " + imageLength);
-		LOGGER.info("DEBUG: recordLength = " + recordLength);
 		assertTrue(imageLength < recordLength);
 	}
 
 	public static FingerImageInfo createNonEmptyTestObject() {
 		return createNonEmptyTestObject(createTrivialJPGBytes(200, 200), 200, 200, "image/jpeg");
 	}
-
-//	public static FingerImageInfo createNonEmptyTestObject(byte[] imageBytes, String mimeType) {
-//		try {
-//			BufferedImage image = ImageUtil.read(new ByteArrayInputStream(imageBytes), imageBytes.length, mimeType);
-//			int width = image.getWidth();
-//			int height = image.getHeight();
-//			return createNonEmptyTestObject(imageBytes, width, height, mimeType);
-//		} catch (IOException ioe) {
-//			ioe.printStackTrace();
-//			fail(ioe.getMessage());
-//			return null;
-//		}
-//	}
 
 	public static String
 	JPEG_MIME_TYPE = "image/jpeg",

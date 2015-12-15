@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- * 
+ *
  * $Id$
  */
 
@@ -33,27 +33,27 @@ import org.bouncycastle.asn1.DLSequence;
 
 /*
  * <pre>
- * ActiveAuthenticationInfo ::= SEQUENCE { 
- *    protocol id-icao-mrtd-security-aaProtocolObject, 
- *    version INTEGER -- MUST be 1 
- *    signatureAlgorithm OBJECT IDENTIFIER 
- * } 
+ * ActiveAuthenticationInfo ::= SEQUENCE {
+ *    protocol id-icao-mrtd-security-aaProtocolObject,
+ *    version INTEGER -- MUST be 1
+ *    signatureAlgorithm OBJECT IDENTIFIER
+ * }
  *
- * -- Object Identifiers 
- * id-icao OBJECT IDENTIFIER ::= {2 23 136} 
- * id-icao-mrtd OBJECT IDENTIFIER ::= {id-icao 1} 
- * id-icao-mrtd-security OBJECT IDENTIFIER ::= {id-icao-mrtd 1} 
+ * -- Object Identifiers
+ * id-icao OBJECT IDENTIFIER ::= {2 23 136}
+ * id-icao-mrtd OBJECT IDENTIFIER ::= {id-icao 1}
+ * id-icao-mrtd-security OBJECT IDENTIFIER ::= {id-icao-mrtd 1}
  *
- * id-icao-mrtd-security-aaProtocolObject OBJECT IDENTIFIER ::= 
- *    {id-icao-mrtd-security 5} 
+ * id-icao-mrtd-security-aaProtocolObject OBJECT IDENTIFIER ::=
+ *    {id-icao-mrtd-security 5}
  * </pre>
  */
 /**
  * A concrete SecurityInfo structure that stores active authentication
  * info, see TR-LDS-PKI Maintenance V1.0.
- * 
+ *
  * @author JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class ActiveAuthenticationInfo extends SecurityInfo {
@@ -80,7 +80,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Constructs a new object.
-	 * 
+	 *
 	 * @param oid the id_AA identifier
 	 * @param version has to be 1
 	 * @param the signature algorithm OID
@@ -113,7 +113,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Gets the object identifier of this AA security info.
-	 * 
+	 *
 	 * @return an object identifier
 	 */
 	public String getObjectIdentifier() {
@@ -122,7 +122,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Gets the signature algorithm object identifier.
-	 * 
+	 *
 	 * @return signature algorithm OID
 	 */
 	public String getSignatureAlgorithmOID() {
@@ -131,7 +131,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Gets a textual representation of this object.
-	 * 
+	 *
 	 * @return a textual representation of this object
 	 */
 	public String toString() {
@@ -145,9 +145,9 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Tests equality with respect to another object.
-	 * 
+	 *
 	 * @param other another object
-	 * 
+	 *
 	 * @return whether this object equals the other object
 	 */
 	public boolean equals(Object other) {
@@ -160,7 +160,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 	
 	/**
 	 * Gets a hash code of this object.
-	 * 
+	 *
 	 * @return the hash code
 	 */
 	public int hashCode() {
@@ -172,11 +172,11 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
 	/**
 	 * Translates an OID string to a Java mnemonic algorithm string.
-	 * 
+	 *
 	 * @param oid the OID string
-	 * 
+	 *
 	 * @return a mnemonic algorithm string
-	 * 
+	 *
 	 * @throws NoSuchAlgorithmException if the OID was not recognized
 	 */
 	public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {		
@@ -194,7 +194,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 	/**
 	 * Checks whether the given object identifier identifies a
 	 * ActiveAuthenticationInfo structure.
-	 * 
+	 *
 	 * @param id
 	 *            object identifier
 	 * @return true if the match is positive

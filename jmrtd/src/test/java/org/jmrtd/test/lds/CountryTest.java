@@ -17,7 +17,7 @@ public class CountryTest extends TestCase {
 		Country[] values = Country.values();
 		assertNotNull(values);
 		for (Country country: values) {
-			LOGGER.info("DEBUG: country = " + country);
+			// LOGGER.info("DEBUG: country = " + country);
 		}
 	}
 
@@ -34,7 +34,9 @@ public class CountryTest extends TestCase {
 
 	public void testTaiwan() {
 		Country icaoCountry = ICAOCountry.getInstance("TWN");
+		assertNotNull(icaoCountry);
 		Country unicodeCountry = Country.getInstance("TWN");
+		assertNotNull(unicodeCountry);
 		assertEquals(icaoCountry, unicodeCountry);
 		assertFalse(icaoCountry.getName().toLowerCase().contains("china"));
 	}
@@ -46,7 +48,10 @@ public class CountryTest extends TestCase {
 	}
 
 	public void testUtopia() {
-		Country country = Country.getInstance("UT");
-		assertNotNull(country);
+		Country utopia = Country.getInstance("UT");
+		assertNotNull(utopia);
+		Country alsoUtopia = Country.getInstance("UTO");
+		assertNotNull(alsoUtopia);
+		assertEquals(alsoUtopia, utopia);
 	}
 }

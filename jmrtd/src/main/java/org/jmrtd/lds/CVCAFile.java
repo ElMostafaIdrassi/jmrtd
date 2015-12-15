@@ -203,7 +203,7 @@ public class CVCAFile extends AbstractLDSFile {
 
 	/**
 	 * Computes a hash code of this CVCAFile.
-	 * 
+	 *
 	 * @return a hash code
 	 */
 	public int hashCode() {
@@ -214,7 +214,7 @@ public class CVCAFile extends AbstractLDSFile {
 
 	/**
 	 * Gets the length of the content of this CVCA file. This always returns {@value #LENGTH}.
-	 * 
+	 *
 	 * @return {@value #LENGTH}
 	 */
 	public int getLength() {

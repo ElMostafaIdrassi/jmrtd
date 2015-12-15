@@ -54,15 +54,15 @@ import org.ejbca.cvc.exception.ConstructionException;
 
 /**
  * Card verifiable certificates as specified in TR 03110.
- * 
+ *
  * Just a wrapper around <code>org.ejbca.cvc.CVCertificate</code> by Keijo Kurkinen of EJBCA.org,
  * so that we can subclass <code>java.security.cert.Certificate</code>.
- * 
+ *
  * We also hide some of the internal structure (no more calls to get the "body" just to get some
  * attributes).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class CardVerifiableCertificate extends Certificate {
@@ -78,7 +78,7 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Constructs a wrapper.
-	 * 
+	 *
 	 * @param cvCertificate the EJCBA CVC to wrap
 	 */
 	protected CardVerifiableCertificate(org.ejbca.cvc.CVCertificate cvCertificate) {
@@ -99,7 +99,7 @@ public class CardVerifiableCertificate extends Certificate {
 	 */
 	/**
 	 * Constructs a certificate.
-	 * 
+	 *
 	 * @param authorityReference authority reference
 	 * @param holderReference holder reference
 	 * @param publicKey public key
@@ -135,7 +135,7 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Gets the signature algorithm.
-	 * 
+	 *
 	 * @return an algorithm name
 	 */
 	public String getSigAlgName() {
@@ -271,9 +271,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * The DER encoded certificate body.
-	 * 
+	 *
 	 * @return DER encoded certificate body
-	 * 
+	 *
 	 * @throws CertificateException on error
 	 * @throws IOException on error
 	 */
@@ -287,9 +287,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Returns 'Effective Date'.
-	 * 
+	 *
 	 * @return the effective date
-	 * 
+	 *
 	 * @throws CertificateException on error
 	 */
 	public Date getNotBefore() throws CertificateException {
@@ -302,9 +302,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Returns 'Expiration Date'.
-	 * 
+	 *
 	 * @return the expiration date
-	 * 
+	 *
 	 * @throws CertificateException on error
 	 */
 	public Date getNotAfter() throws CertificateException {
@@ -317,9 +317,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Gets the authority reference.
-	 * 
+	 *
 	 * @return the authority reference
-	 * 
+	 *
 	 * @throws CertificateException if the authority reference field is not present
 	 */
 	public CVCPrincipal getAuthorityReference() throws CertificateException {
@@ -335,9 +335,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Gets the holder reference.
-	 * 
+	 *
 	 * @return the holder reference
-	 * 
+	 *
 	 * @throws CertificateException if the authority reference field is not present
 	 */
 	public CVCPrincipal getHolderReference() throws CertificateException {
@@ -367,9 +367,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Returns the signature (just the value, without the <code>0x5F37</code> tag).
-	 * 
+	 *
 	 * @return the signature bytes
-	 * 
+	 *
 	 * @throws CertificateException if certificate doesn't contain a signature
 	 */
 	public byte[] getSignature() throws CertificateException {
@@ -382,9 +382,9 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Tests for equality with respect to another object.
-	 * 
+	 *
 	 * @param otherObj the other object
-	 * 
+	 *
 	 * @return whether this certificate equals the other object
 	 */
 	public boolean equals(Object otherObj) {
@@ -396,7 +396,7 @@ public class CardVerifiableCertificate extends Certificate {
 
 	/**
 	 * Gets a hash code for this object.
-	 * 
+	 *
 	 * @return a hash code for this object
 	 */
 	public int hashCode() {

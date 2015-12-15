@@ -41,9 +41,9 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 /**
  * Abstract base class for security info structure.
  * See the EAC 1.11 specification.
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
- * 
+ *
  * FIXME: dependency on BC in interface?
  */
 public abstract class SecurityInfo extends AbstractLDSInfo {
@@ -120,18 +120,18 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
 	
 	/**
 	 * Returns a DER object with this SecurityInfo data (DER sequence)
-	 * 
+	 *
 	 * @return a DER object with this SecurityInfo data
-	 * 
+	 *
 	 * @deprecated Remove this method from visible interface (because of dependency on BC API)
 	 */
 	abstract ASN1Primitive getDERObject();
 	
 	/**
 	 * Writes this SecurityInfo to output stream.
-	 * 
+	 *
 	 * @param outputStream an ouput stream
-	 * 
+	 *
 	 * @throws IOException if writing fails
 	 */
 	public void writeObject(OutputStream outputStream) throws IOException {
@@ -144,16 +144,16 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
 	
 	/**
 	 * Returns the object identifier of this SecurityInfo.
-	 * 
+	 *
 	 * @return this SecurityInfo object identifier
 	 */
 	public abstract String getObjectIdentifier();
 	
 	/**
 	 * Factory method for creating security info objects given an input.
-	 * 
+	 *
 	 * @param obj the input
-	 * 
+	 *
 	 * @return a concrete security info object
 	 */
 	static SecurityInfo getInstance(ASN1Primitive obj) {

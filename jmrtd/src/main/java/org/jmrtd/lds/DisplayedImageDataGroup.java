@@ -34,9 +34,9 @@ import net.sf.scuba.tlv.TLVOutputStream;
 /**
  * File structure for displayed image template files.
  * Abstract super class for DG5 - DG7.
- * 
+ *
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 abstract class DisplayedImageDataGroup extends DataGroup {
@@ -65,7 +65,7 @@ abstract class DisplayedImageDataGroup extends DataGroup {
 
 	/**
 	 * Constructs a displayed image data group from binary representation.
-	 * 
+	 *
 	 * @param dataGroupTag a tag indicating DG5, DG6, or DG7
 	 * @param in an input stream
 	 */
@@ -88,7 +88,7 @@ abstract class DisplayedImageDataGroup extends DataGroup {
 		int count = (tlvIn.readValue()[0] & 0xFF);
 		for (int i = 0; i < count; i++) {
 			DisplayedImageInfo imageInfo = new DisplayedImageInfo(tlvIn);
-			if (i == 0) { 
+			if (i == 0) {
 				displayedImageTagToUse = imageInfo.getDisplayedImageTag();
 			} else if (imageInfo.getDisplayedImageTag() != displayedImageTagToUse){
 				throw new IOException("Found images with different displayed image tags inside displayed image datagroup");

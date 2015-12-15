@@ -49,7 +49,7 @@ import org.bouncycastle.asn1.DLSet;
  * To us the interesting bits are: the map of public keys (EC or DH),
  * the map of protocol identifiers which should match the key's map (not
  * checked here!), and the file identifier of the efCVCA file.
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
  */
 public class DG14File extends DataGroup {
@@ -63,7 +63,7 @@ public class DG14File extends DataGroup {
 
 	/**
 	 * Constructs a new DG14 file from the provided data.
-	 *  
+	 *
 	 * @param securityInfos a list of security infos
 	 */
 	public DG14File(Collection<SecurityInfo> securityInfos) {
@@ -74,9 +74,9 @@ public class DG14File extends DataGroup {
 
 	/**
 	 * Constructs a new DG14 file from the data in an input stream.
-	 * 
+	 *
 	 * @param inputStream the input stream to parse the data from
-	 * 
+	 *
 	 * @throws IOException on error reading from input stream
 	 */
 	public DG14File(InputStream inputStream) throws IOException {
@@ -112,7 +112,7 @@ public class DG14File extends DataGroup {
 	/**
 	 * Gets the list of file identifier references to efCVCA files, possibly
 	 * empty.
-	 * 
+	 *
 	 * @return the list of file identifier references
 	 */
 	public List<Short> getCVCAFileIds() {
@@ -130,9 +130,9 @@ public class DG14File extends DataGroup {
 
 	/**
 	 * Gets a corresponding short file ID.
-	 * 
+	 *
 	 * @param fileId the file ID
-	 * 
+	 *
 	 * @return an SFI for the given file ID, -1 if not present
 	 */
 	public byte getCVCAShortFileId(int fileId) {
@@ -150,7 +150,7 @@ public class DG14File extends DataGroup {
 	 * Gets the mapping of key identifiers to EAC protocol identifiers
 	 * contained in this file. The key identifier may be -1 if there is only one
 	 * protocol identifier.
-	 * 
+	 *
 	 * @return the mapping of key identifiers to EAC protocol identifiers
 	 */
 	public Map<BigInteger, String> getChipAuthenticationInfos() {
@@ -181,7 +181,7 @@ public class DG14File extends DataGroup {
 	/**
 	 * Gets the mapping of key identifiers to public keys. The key identifier
 	 * may be -1 if there is only one key.
-	 * 
+	 *
 	 * @return the mapping of key identifiers to public keys
 	 */
 	public Map<BigInteger, PublicKey> getChipAuthenticationPublicKeyInfos() {
@@ -200,7 +200,7 @@ public class DG14File extends DataGroup {
 
 	/**
 	 * Gets the security infos as an unordered collection.
-	 * 
+	 *
 	 * @return security infos
 	 */
 	public Collection<SecurityInfo> getSecurityInfos() {

@@ -41,7 +41,7 @@ import org.jmrtd.Util;
 /**
  * A concrete SecurityInfo structure that stores chip authentication public
  * key info, see EAC TR 03110 1.11 specification.
- * 
+ *
  * This data structure provides a Chip Authentication Public Key of the MRTD chip.
  * <ul>
  * <li>The object identifier <code>protocol</code> SHALL identify the type of the public key
@@ -52,9 +52,9 @@ import org.jmrtd.Util;
  *     It MUST be used if the MRTD chip provides multiple public keys for Chip
  *     Authentication.</li>
  * </ul>
- * 
+ *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
- * 
+ *
  * FIXME: interface dependency on BC classes?
  * FIXME: maybe clean up some of these constructors...
  */
@@ -72,7 +72,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 
 	/**
 	 * Constructs a new object.
-	 * 
+	 *
 	 * @param oid
 	 *            a proper EAC identifier
 	 * @param publicKeyInfo
@@ -93,7 +93,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 
 	/**
 	 * Creates a public key info structure.
-	 * 
+	 *
 	 * @param publicKey Either a DH public key or an EC public key
 	 * @param keyId key identifier
 	 */
@@ -103,7 +103,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 
 	/**
 	 * Creates a public key info structure.
-	 * 
+	 *
 	 * @param publicKey Either a DH public key or an EC public key
 	 */
 	public ChipAuthenticationPublicKeyInfo(PublicKey publicKey) {
@@ -127,7 +127,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 	/**
 	 * Returns a key identifier stored in this ChipAuthenticationPublicKeyInfo
 	 * structure, null if not present
-	 * 
+	 *
 	 * @return key identifier stored in this ChipAuthenticationPublicKeyInfo
 	 *         structure
 	 */
@@ -138,7 +138,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 	/**
 	 * Returns a SubjectPublicKeyInfo contained in this
 	 * ChipAuthenticationPublicKeyInfo structure.
-	 * 
+	 *
 	 * @return SubjectPublicKeyInfo contained in this
 	 *         ChipAuthenticationPublicKeyInfo structure
 	 */
@@ -164,9 +164,9 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 	/**
 	 * Checks whether the given object identifier identifies a
 	 * ChipAuthenticationPublicKeyInfo structure.
-	 * 
+	 *
 	 * @param oid object identifier
-	 * 
+	 *
 	 * @return true if the match is positive
 	 */
 	public static boolean checkRequiredIdentifier(String oid) {

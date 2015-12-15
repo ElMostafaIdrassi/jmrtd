@@ -128,73 +128,6 @@ public class DG4FileTest extends TestCase {
 		}
 	}
 
-//	public void testFileFromLDS() {
-//		testFileFromLDS(new File("samples/lds/bsi2008.zip"));
-//	}
-
-//	public void testFileFromLDS(File zipFile) {
-//		try {
-//			MRTDTrustStore trustStore = new MRTDTrustStore();
-//			Passport passport = new Passport(zipFile, trustStore);
-//			LDS lds = passport.getLDS();
-//
-//			DG2File dg2 = lds.getDG2File();
-//			byte[] dummy1 = dg2.getEncoded();
-//
-//			DG3File dg3 = lds.getDG3File();
-//			byte[] dummy2 = dg3.getEncoded();
-//
-//			DG4File dg4 = lds.getDG4File();
-//
-//			boolean showFrame = false;
-//
-//			List<IrisInfo> recordInfos = dg4.getIrisInfos();
-//			int recordCount = recordInfos.size();
-//			int recordNumber = 1;
-//			LOGGER.info("DEBUG: Number of iris records = " + recordCount);
-//			for (IrisInfo record: recordInfos) {
-//				List<IrisBiometricSubtypeInfo> subtypeInfos = record.getIrisBiometricSubtypeInfos();
-//				int subtypeInfoCount = subtypeInfos.size();
-//				LOGGER.info("DEBUG: Number of subtypes in iris record " + recordNumber + " is " + subtypeInfoCount);
-//				int imageInfoNumber = 1;
-//				for (IrisBiometricSubtypeInfo subtypeInfo: subtypeInfos) {
-//					List<IrisImageInfo> imageInfos = subtypeInfo.getIrisImageInfos();
-//					int imageInfoCount = imageInfos.size();
-//					LOGGER.info("DEBUG: Number of image infos in iris subtype record " + imageInfoNumber + " is " + imageInfoCount);
-//					for (IrisImageInfo imageInfo: imageInfos) {
-//						int length = imageInfo.getImageLength();
-//						byte[] bytes = new byte[length];
-//						InputStream inputStream = imageInfo.getImageInputStream();
-//
-//						//						DataInputStream dataIn = new DataInputStream(inputStream);
-//						//						dataIn.readFully(bytes);
-//						//						inputStream = new ByteArrayInputStream(bytes);
-//
-//						BufferedImage image = ImageUtil.read(inputStream, length, imageInfo.getMimeType());
-//
-//						LOGGER.info("DEBUG: iris " + imageInfoNumber + "/" + imageInfoCount + " in record " + recordNumber + "/" + recordCount + " has " + image.getWidth() + " x " + image.getHeight());
-//
-//						//						JFrame frame = new JFrame(); showFrame = true;
-//						//						frame.getContentPane().add(new JLabel(new ImageIcon(image)));
-//						//						frame.pack();
-//						//						frame.setVisible(true);
-//					}
-//					subtypeInfoCount ++;
-//				}
-//				recordNumber ++;
-//			}
-//
-//			if (showFrame) {
-//				long time = System.currentTimeMillis();
-//				while (System.currentTimeMillis() - time < 5000) {
-//					/* Busy wait to show decoded images. */
-//				}
-//			}
-//		} catch (Exception e) {
-//			fail(e.getMessage());
-//		}
-//	}
-
 	public void testFile() {
 		try {
 			DG4File dg4 = getTestObject();
@@ -216,9 +149,6 @@ public class DG4FileTest extends TestCase {
 						byte[] bytes = new byte[length];
 						DataInputStream dataIn = new DataInputStream(imageInfo.getImageInputStream());
 						dataIn.readFully(bytes);
-
-//						RenderedImage image = ImageUtil.read(new ByteArrayInputStream(bytes), imageInfo.getImageLength(), imageInfo.getMimeType());
-//						LOGGER.info("DEBUG: iris " + imageInfoNumber + "/" + imageInfoCount + " in record " + recordNumber + "/" + recordCount + " has " + image.getWidth() + " x " + image.getHeight());
 					}
 					subtypeInfoCount ++;
 				}

@@ -38,7 +38,7 @@ import org.jmrtd.cbeff.CBEFFInfo;
  * of ISO/IEC FCD 19794-4 aka Annex F.
  *
  * TODO: proper enums for data types
- * 
+ *
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
  *
  * @version $Revision$
@@ -109,7 +109,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs a finger image info.
-	 * 
+	 *
 	 * @param position finger position according to ISO 19794-4
 	 * @param viewCount number of views
 	 * @param viewNumber the view number
@@ -120,7 +120,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	 * @param imageBytes encoded image bytes
 	 * @param imageLength length of encoded image
 	 * @param compressionAlgorithm image encoding type according to ISO 19794-4
-	 * 
+	 *
 	 * @throws IOException if input cannot be read
 	 */
 	public FingerImageInfo(int position,
@@ -140,10 +140,10 @@ public class FingerImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Constructs a new finger information record.
-	 * 
+	 *
 	 * @param inputStream input stream
 	 * @param compressionAlgorithm image format type (which is given in the general record header, not for each individual image)
-	 * 
+	 *
 	 * @throws IOException if input cannot be read
 	 */
 	public FingerImageInfo(InputStream inputStream, int compressionAlgorithm) throws IOException {
@@ -156,7 +156,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the quality of the overall scanned finger/palm image as a number
 	 * between 0 and 100. As specified in 7.2.5 of ISO 19794-4.
-	 * 
+	 *
 	 * @return the quality of the overall scanned finger/palm image as a number between 0 and 100
 	 */
 	public int getQuality() {
@@ -165,7 +165,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the finger/palm position. As specified in Section 7.2.2 of ISO 19794-4.
-	 * 
+	 *
 	 * @return a constant representing the position (see constant definitions starting with <code>POSITION_</code>)
 	 */
 	public int getPosition() {
@@ -191,7 +191,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the total number of specific views available for this finger.
 	 * As specified in Section 7.2.3 of ISO 19794-4.
-	 * 
+	 *
 	 * @return the total number of specific views available for this finger
 	 */
 	public int getViewCount() {
@@ -201,7 +201,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	/**
 	 * Gets the specific image view number associated with the finger.
 	 * As specified in Section 7.2.4 of ISO 19794-4.
-	 * 
+	 *
 	 * @return the specific image view number associated with the finger
 	 */
 	public int getViewNumber() {
@@ -239,11 +239,11 @@ public class FingerImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Writes the biometric data to <code>out</code>.
-	 * 
+	 *
 	 * Based on Table 4 in Section 8.3 of ISO/IEC FCD 19794-4.
-	 * 
+	 *
 	 * @param out stream to write to
-	 * 
+	 *
 	 * @throws IOException if writing to out fails
 	 */
 	protected void writeObject(OutputStream out) throws IOException {		
@@ -274,7 +274,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Gets the record length.
-	 * 
+	 *
 	 * @return the record length
 	 */
 	public long getRecordLength() {
@@ -284,7 +284,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Gets the format type.
-	 * 
+	 *
 	 * @return a byte array of length 2
 	 */
 	public byte[] getFormatType() {
@@ -293,7 +293,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Gets the biometric sub-type.
-	 * 
+	 *
 	 * @return the ICAO/CBEFF (BHT) biometric sub-type
 	 */
 	public int getBiometricSubtype() {
@@ -302,9 +302,9 @@ public class FingerImageInfo extends AbstractImageInfo {
 
 	/**
 	 * Generates a textual representation of this object.
-	 * 
+	 *
 	 * @return a textual representation of this object
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
@@ -374,7 +374,7 @@ public class FingerImageInfo extends AbstractImageInfo {
 	
 	/**
 	 * Converts from ISO (FRH) coding to ICAO/CBEFF (BHT) coding.
-	 * 
+	 *
 	 * <table>
 	 * <tr> <td>Finger</td>       <td>BHT coding</td> <td>FRH coding</td> </tr>
 	 * <tr> <td>Right thumb</td>  <td> 5</td>         <td> 1</td> </tr>
@@ -388,9 +388,9 @@ public class FingerImageInfo extends AbstractImageInfo {
 	 * <tr> <td>Left ring</td>    <td>18</td>         <td> 9</td> </tr>
 	 * <tr> <td>Left little</td>  <td>22</td>         <td>10</td> </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param an ISO finger position
-	 * 
+	 *
 	 * @return an ICAO biometric subtype
 	 */
 	private static int toBiometricSubtype(int position) {

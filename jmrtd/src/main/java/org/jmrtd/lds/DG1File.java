@@ -33,10 +33,10 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * File structure for the EF_DG1 file.
  * Datagroup 1 contains the Machine
  * Readable Zone information.
- * 
+ *
  * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
- * 
+ *
  * @version $Revision$
  */
 public class DG1File extends DataGroup {
@@ -49,7 +49,7 @@ public class DG1File extends DataGroup {
 
 	/**
 	 * Creates a new file based on MRZ information.
-	 * 
+	 *
 	 * @param mrzInfo the MRZ information to store in this file
 	 */
 	public DG1File(MRZInfo mrzInfo) {
@@ -77,7 +77,7 @@ public class DG1File extends DataGroup {
 
 	/**
 	 * Gets the MRZ information stored in this file.
-	 * 
+	 *
 	 * @return the MRZ information
 	 */
 	public MRZInfo getMRZInfo() {
@@ -86,7 +86,7 @@ public class DG1File extends DataGroup {
 
 	/**
 	 * Gets a textual representation of this file.
-	 * 
+	 *
 	 * @return a textual representation of this file
 	 */
 	public String toString() {

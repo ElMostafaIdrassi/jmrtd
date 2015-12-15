@@ -32,11 +32,11 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
  * PACE Domain Parameter Info object as per SAC TR 1.01, November 11, 2010.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.5.0
  */
 public class PACEDomainParameterInfo extends SecurityInfo {
@@ -60,9 +60,9 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 	private int parameterId;
 
 	/**
-	 * 
+	 *
 	 * @param protocolOID Must be @see SecurityInfo.#ID_PACE_DH_GM, @see SecurityInfo.#ID_PACE_ECDH_GM, @see SecurityInfo.#ID_PACE_DH_IM, @see SecurityInfo.#ID_PACE_ECDH_IM
-	 * @param parameters Parameters 
+	 * @param parameters Parameters
 	 */
 	public PACEDomainParameterInfo(String protocolOID, ASN1Encodable parameters) {
 		this(protocolOID, parameters, -1);
@@ -86,7 +86,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
 	/**
 	 * Gets the parameter id, or -1 if this is the only domain parameter info.
-	 * 
+	 *
 	 * @return the parameter id or -1
 	 */
 	public int getParameterId() {
