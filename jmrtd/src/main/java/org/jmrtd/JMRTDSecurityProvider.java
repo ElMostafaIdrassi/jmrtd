@@ -65,11 +65,14 @@ public class JMRTDSecurityProvider extends Provider {
 	private static final Provider JMRTD_PROVIDER = new JMRTDSecurityProvider();
 
 	static {
-				if (BC_PROVIDER != null) { Security.insertProviderAt(BC_PROVIDER, 1); }
-				if (SC_PROVIDER != null) { Security.insertProviderAt(SC_PROVIDER, 2); }
-				if (JMRTD_PROVIDER != null) { Security.insertProviderAt(JMRTD_PROVIDER, 3); }
+		if (BC_PROVIDER != null) { Security.insertProviderAt(BC_PROVIDER, 1); }
+		if (SC_PROVIDER != null) { Security.insertProviderAt(SC_PROVIDER, 2); }
+		if (JMRTD_PROVIDER != null) { Security.insertProviderAt(JMRTD_PROVIDER, 3); }
 	}
 
+	/**
+	 * Creates the provider.
+	 */
 	private JMRTDSecurityProvider() {
 		super("JMRTD", 0.1, "JMRTD Security Provider");
 		
@@ -120,14 +123,11 @@ public class JMRTDSecurityProvider extends Provider {
 		}
 	}
 
-	private void replicateFromProvider(String serviceName, String algorithmName, Provider provider) {
-		String name = serviceName + "." + algorithmName;
-		Object service = provider.get(name);
-		if (service != null) {
-			put(name, service);
-		}
-	}
-
+	/**
+	 * Gets the provider.
+	 * 
+	 * @return the provider
+	 */
 	public static Provider getInstance() {
 		return JMRTD_PROVIDER;
 	}
@@ -193,6 +193,14 @@ public class JMRTDSecurityProvider extends Provider {
 		if (BC_PROVIDER != null) { return BC_PROVIDER; }
 		LOGGER.severe("No Bouncy or Spongy provider");
 		return null;
+	}
+	
+	private void replicateFromProvider(String serviceName, String algorithmName, Provider provider) {
+		String name = serviceName + "." + algorithmName;
+		Object service = provider.get(name);
+		if (service != null) {
+			put(name, service);
+		}
 	}
 
 	private static Provider getProvider(String serviceName, String algorithmName) {

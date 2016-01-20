@@ -154,11 +154,11 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	}
 
 	/**
-	 * Wraps the apdu buffer <code>capdu</code> of a command apdu.
+	 * Wraps the APDU buffer <code>capdu</code> of a command APDU.
 	 * As a side effect, this method increments the internal send
 	 * sequence counter maintained by this wrapper.
 	 *
-	 * @param commandAPDU buffer containing the command apdu
+	 * @param commandAPDU buffer containing the command APDU
 	 *
 	 * @return length of the command apdu after wrapping
 	 */
@@ -177,12 +177,11 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	/**
 	 * Unwraps the apdu buffer <code>rapdu</code> of a response apdu.
 	 *
-	 * @param responseAPDU buffer containing the response apdu
-	 * @param len length of the actual response apdu
+	 * @param responseAPDU the response APDU
 	 *
 	 * @return a new byte array containing the unwrapped buffer
 	 */
-	public ResponseAPDU unwrap(ResponseAPDU responseAPDU, int len) {
+	public ResponseAPDU unwrap(ResponseAPDU responseAPDU) {
 		try {
 			byte[] rapdu = responseAPDU.getBytes();
 			if (rapdu.length == 2) {
@@ -190,7 +189,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 				throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
 				/* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
 			}
-			return new ResponseAPDU(unwrapResponseAPDU(rapdu, len));
+			return new ResponseAPDU(unwrapResponseAPDU(rapdu));
 		} catch (GeneralSecurityException gse) {
 			LOGGER.severe("Exception: " + gse.getMessage());
 			throw new IllegalStateException(gse.toString());
@@ -301,18 +300,17 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 	}
 
 	/**
-	 * Does the actual decoding of a response apdu. Based on Section E.3 of
+	 * Does the actual decoding of a response APDU. Based on Section E.3 of
 	 * TR-PKI, especially the examples.
 	 *
-	 * @param rapdu buffer containing the apdu data
-	 * @param len length of the apdu data
+	 * @param rapdu buffer containing the APDU data
 	 *
-	 * @return a byte array containing the unwrapped apdu buffer
+	 * @return a byte array containing the unwrapped APDU buffer
 	 */
-	private byte[] unwrapResponseAPDU(byte[] rapdu, int len) throws GeneralSecurityException, IOException {
+	private byte[] unwrapResponseAPDU(byte[] rapdu) throws GeneralSecurityException, IOException {
 		long oldssc = ssc;
 		try {
-			if (rapdu == null || rapdu.length < 2 || len < 2) {
+			if (rapdu == null || rapdu.length < 2) {
 				throw new IllegalArgumentException("Invalid response APDU");
 			}
 			ssc++;

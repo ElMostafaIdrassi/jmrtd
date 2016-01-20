@@ -242,7 +242,7 @@ public class PassportApduService extends CardService {
 					throw new CardServiceException("Exception during transmission of wrapped APDU"
 							+ "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);
 				} else {
-					rapdu = wrapper.unwrap(rapdu, rapdu.getBytes().length);
+					rapdu = wrapper.unwrap(rapdu);
 				}
 			} catch (Exception e) {
 				if (e instanceof CardServiceException) {

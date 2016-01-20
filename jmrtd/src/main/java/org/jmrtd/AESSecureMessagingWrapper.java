@@ -124,12 +124,11 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	/**
 	 * Unwraps the buffer of a response APDU.
 	 *
-	 * @param responseAPDU buffer containing the response apdu
-	 * @param len length of the actual response apdu
+	 * @param responseAPDU the response APDU
 	 *
 	 * @return a new byte array containing the unwrapped buffer
 	 */
-	public ResponseAPDU unwrap(ResponseAPDU responseAPDU, int len) {
+	public ResponseAPDU unwrap(ResponseAPDU responseAPDU) {
 		try {
 			byte[] rapdu = responseAPDU.getBytes();
 			if (rapdu.length == 2) {
@@ -137,7 +136,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 				throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
 				/* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
 			}
-			return new ResponseAPDU(unwrapResponseAPDU(rapdu, len));
+			return new ResponseAPDU(unwrapResponseAPDU(rapdu));
 		} catch (GeneralSecurityException gse) {
 			LOGGER.severe("Exception: " + gse.getMessage());
 			throw new IllegalStateException(gse.toString());
@@ -245,10 +244,10 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 	 *
 	 * @return a byte array containing the unwrapped apdu buffer
 	 */
-	private byte[] unwrapResponseAPDU(byte[] rapdu, int len) throws GeneralSecurityException, IOException {
+	private byte[] unwrapResponseAPDU(byte[] rapdu) throws GeneralSecurityException, IOException {
 		long oldssc = ssc;
 		try {
-			if (rapdu == null || rapdu.length < 2 || len < 2) {
+			if (rapdu == null || rapdu.length < 2) {
 				throw new IllegalArgumentException("Invalid response APDU");
 			}
 			ssc++;

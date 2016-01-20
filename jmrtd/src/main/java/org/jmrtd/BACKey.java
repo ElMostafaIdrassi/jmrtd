@@ -42,6 +42,9 @@ public class BACKey implements BACKeySpec {
 	private String dateOfBirth;
 	private String dateOfExpiry;
 
+	/**
+	 * Creates an empty BAC key entry.
+	 */
 	protected BACKey() {
 	}
 	

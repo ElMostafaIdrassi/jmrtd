@@ -38,16 +38,16 @@
     <dependency>
       <groupId>net.sf.scuba</groupId>
       <artifactId>scuba-smartcards</artifactId>
-      <version>0.0.8</version>
+      <version>0.0.9-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.53</version>
+      <version>1.54</version>
     </dependency>
 
-   <dependency>
+    <dependency>
       <groupId>org.ejbca.cvc</groupId>
       <artifactId>cert-cvc</artifactId>
       <version>1.4.0</version>
@@ -82,14 +82,14 @@
     </snapshotRepository>
   </distributionManagement>
 
-  <build>  
+  <build>
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
         <version>1.6.3</version>
         <extensions>true</extensions>
-       <configuration>
+        <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
@@ -99,7 +99,7 @@
   </build>
 
   <profiles>
-    <profile> 
+    <profile>
       <id>release</id>
       <build>
         <plugins>
