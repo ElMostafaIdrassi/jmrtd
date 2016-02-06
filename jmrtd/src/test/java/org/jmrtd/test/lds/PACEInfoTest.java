@@ -8,14 +8,17 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -23,6 +26,7 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPrivateKeySpec;
 import javax.crypto.spec.DHPublicKeySpec;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
@@ -35,7 +39,7 @@ public class PACEInfoTest extends TestCase {
 	private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
 
 	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
+
 	//	PARAM_ID_GFP_1024_160 = 0,
 	//	PARAM_ID_GFP_2048_224 = 1,
 	//	PARAM_ID_GFP_2048_256 = 2,
@@ -164,7 +168,7 @@ public class PACEInfoTest extends TestCase {
 			String dateOfBirth = "640812"; /* Check digit 5 */
 			String dateOfExpiry = "101031"; /* Check digit 8 */
 			byte[] paceInfoBytes = Hex.hexStringToBytes("3012060A 04007F00 07020204 02020201 0202010D");
-			
+
 			PACEInfo paceInfo = PACEInfo.createPACEInfo(paceInfoBytes);
 			assertNotNull(paceInfo);
 			int paramId = paceInfo.getParameterId();
@@ -172,15 +176,15 @@ public class PACEInfoTest extends TestCase {
 
 			assertEquals("0.4.0.127.0.7.2.2.4.2.2", oid);
 			assertEquals(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128, oid);
-			
+
 			assertEquals(13, paramId);
 			assertEquals(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, paramId);
-			
+
 			AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paramId);
 			assertTrue(params instanceof ECParameterSpec);
 			ECParameterSpec ecParams = (ECParameterSpec)params;
 			KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
-			
+
 			String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
 			assertEquals(cipherAlg, "AES");
 			String digestAlg = PACEInfo.toDigestAlgorithm(oid);
@@ -191,7 +195,7 @@ public class PACEInfoTest extends TestCase {
 			/* Given */
 			byte[] expectedKeySeed = Hex.hexStringToBytes("7E2D2A41 C74EA0B3 8CD36F86 3939BFA8 E9032AAD");
 			byte[] expectedEncodedSecretKey = Hex.hexStringToBytes("89DED1B2 6624EC1E 634C1989 302849DD");
-			
+
 			/* FIXME: SHA-1 hardcoded here? */
 			byte[] keySeed = Util.computeKeySeed(serialNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
 			LOGGER.info("DEBUG: keySeed = " + Hex.bytesToHexString(keySeed));
@@ -630,6 +634,18 @@ public class PACEInfoTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
+		}
+	}
+
+	public void testBlockSize() {
+		try {
+			Security.addProvider(new BouncyCastleProvider());
+			String cipherAlg = "DESede";
+			Cipher cipher = Cipher.getInstance(cipherAlg + "/CBC/NoPadding");
+			LOGGER.info("DEBUG: blocksize in bits = " + 8 * cipher.getBlockSize());
+		} catch (GeneralSecurityException gse) {
+			LOGGER.log(Level.WARNING, "Exception", gse);
+			fail(gse.getMessage());
 		}
 	}
 }

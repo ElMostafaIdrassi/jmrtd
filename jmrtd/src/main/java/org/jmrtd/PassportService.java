@@ -69,7 +69,8 @@ import org.jmrtd.lds.PACEInfo;
  * protocols on the passport. Defines secure messaging. Defines active
  * authentication.
  *
- * Based on ICAO-TR-PKI and ICAO-TR-LDS.
+ * Based on Doc 9303.
+ * Originally based on ICAO-TR-PKI and ICAO-TR-LDS.
  *
  * Usage:
  *
@@ -463,7 +464,8 @@ public class PassportService extends PassportApduService implements Serializable
 			/* (Re)initialize the K_pi cipher for decryption. */
 			
 //			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[16])); /* FIXME: iv length 16 is independent of keylength? */
-			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[step1EncryptedNonce.length])); // Fix proposed by Dorian ALADEL dorian.aladel@gemalto.com
+//			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[step1EncryptedNonce.length])); // Fix proposed by Dorian ALADEL (dorian.aladel@gemalto.com)
+			staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[staticPACECipher.getBlockSize()])); // Fix proposed by Halvdan Grelland (halvdanhg@gmail.com)
 
 			piccNonce = staticPACECipher.doFinal(step1EncryptedNonce);
 		} catch (GeneralSecurityException gse) {
