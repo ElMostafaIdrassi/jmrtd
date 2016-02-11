@@ -32,11 +32,11 @@ import java.io.Serializable;
  * @version $Revision$
  */
 public interface LDSElement extends Serializable {
-
-	/**
-	 * Gets the encoded contents of this LDS info.
-	 * 
-	 * @return a byte array containing the encoding of this LDS info
-	 */
-	byte[] getEncoded();
+  
+  /**
+   * Gets the encoded contents of this LDS info.
+   * 
+   * @return a byte array containing the encoding of this LDS info
+   */
+  byte[] getEncoded();
 }

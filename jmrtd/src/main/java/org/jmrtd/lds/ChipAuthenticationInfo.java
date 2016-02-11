@@ -52,123 +52,123 @@ import org.bouncycastle.asn1.DLSequence;
  * FIXME: dependency on BC?
  */
 public class ChipAuthenticationInfo extends SecurityInfo {
-
-	private static final long serialVersionUID = 5591988305059068535L;
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
-	public static final int VERSION_NUM = 1;
-
-	private String oid;
-	private int version;
-	private BigInteger keyId;
-
-	/**
-	 * Constructs a new object.
-	 *
-	 * @param oid
-	 *            a proper EAC identifier
-	 * @param version
-	 *            has to be 1
-	 * @param keyId
-	 *            the key identifier
-	 */
-	public ChipAuthenticationInfo(String oid, int version, BigInteger keyId) {
-		this.oid = oid;
-		this.version = version;
-		this.keyId = keyId;
-		checkFields();
-	}
-
-	/**
-	 * Constructs a new object.
-	 *
-	 * @param oid
-	 *            a proper EAC identifier
-	 * @param version
-	 *            has to be 1
-	 */
-	public ChipAuthenticationInfo(String oid, int version) {
-		this(oid, version, BigInteger.valueOf(-1));
-	}
-
-	ASN1Primitive getDERObject() {
-		ASN1EncodableVector v = new ASN1EncodableVector();
-		v.add(new ASN1ObjectIdentifier(oid));
-		v.add(new ASN1Integer(version));
-		if (keyId.compareTo(BigInteger.ZERO) >= 0) {
-			v.add(new ASN1Integer(keyId));
-		}
-		return new DLSequence(v);
-	}
-	
-	public String getObjectIdentifier() {
-		return oid;
-	}
-
-	/**
-	 * Returns a key identifier stored in this ChipAuthenticationInfo structure, null
-	 * if not present
-	 *
-	 * @return key identifier stored in this ChipAuthenticationInfo structure
-	 */
-	public BigInteger getKeyId() {
-		return keyId;
-	}
-
-	/**
-	 * Checks the correctness of the data for this instance of SecurityInfo
-	 */
-	protected void checkFields() {
-		try {
-			if (!checkRequiredIdentifier(oid)) {
-				throw new IllegalArgumentException("Wrong identifier: "	+ oid);
-			}
-			if (version != VERSION_NUM) {
-				throw new IllegalArgumentException("Wrong version");
-			}
-		} catch (Exception e) {
-			LOGGER.severe("Exception: " + e.getMessage());
-			throw new IllegalArgumentException("Malformed ChipAuthenticationInfo.");
-		}
-	}
-
-	/**
-	 * Checks whether the given object identifier identifies a
-	 * ChipAuthenticationInfo structure.
-	 *
-	 * FIXME: for EAC 1.11 only the 3DES OIDs are allowed.
-	 *
-	 * @param oid
-	 *            object identifier
-	 * @return true if the match is positive
-	 */
-	static boolean checkRequiredIdentifier(String oid) {
-		return ID_CA_DH_3DES_CBC_CBC_OID.equals(oid)
-				|| ID_CA_ECDH_3DES_CBC_CBC_OID.equals(oid)
-				|| ID_CA_DH_AES_CBC_CMAC_128_OID.equals(oid)
-				|| ID_CA_DH_AES_CBC_CMAC_192_OID.equals(oid)
-				|| ID_CA_DH_AES_CBC_CMAC_256_OID.equals(oid)
-				|| ID_CA_ECDH_AES_CBC_CMAC_128_OID.equals(oid)
-				|| ID_CA_ECDH_AES_CBC_CMAC_192_OID.equals(oid)
-				|| ID_CA_ECDH_AES_CBC_CMAC_256_OID.equals(oid);
-	}
-	
-	public String toString() {
-		return  "ChipAuthenticationInfo [oid = " + oid + ", version = " + version + ", keyId = " + keyId + "]";
-	}
-	
-	public int hashCode() {
-		return 3 + 11 * (oid == null ? 0 : oid.hashCode()) + 61 * version + 1991 * keyId.hashCode();
-	}
-	
-	public boolean equals(Object other) {
-		if (other == null) { return false; }
-		if (other == this) { return true; }
-		if (!ChipAuthenticationInfo.class.equals(other.getClass())) { return false; }
-		ChipAuthenticationInfo otherChipAuthenticationInfo = (ChipAuthenticationInfo)other;
-		return oid.equals(otherChipAuthenticationInfo.oid)
-			&& version == otherChipAuthenticationInfo.version
-			&& keyId.equals(otherChipAuthenticationInfo.keyId);
-	}
+  
+  private static final long serialVersionUID = 5591988305059068535L;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  public static final int VERSION_NUM = 1;
+  
+  private String oid;
+  private int version;
+  private BigInteger keyId;
+  
+  /**
+   * Constructs a new object.
+   *
+   * @param oid
+   *            a proper EAC identifier
+   * @param version
+   *            has to be 1
+   * @param keyId
+   *            the key identifier
+   */
+  public ChipAuthenticationInfo(String oid, int version, BigInteger keyId) {
+    this.oid = oid;
+    this.version = version;
+    this.keyId = keyId;
+    checkFields();
+  }
+  
+  /**
+   * Constructs a new object.
+   *
+   * @param oid
+   *            a proper EAC identifier
+   * @param version
+   *            has to be 1
+   */
+  public ChipAuthenticationInfo(String oid, int version) {
+    this(oid, version, BigInteger.valueOf(-1));
+  }
+  
+  ASN1Primitive getDERObject() {
+    ASN1EncodableVector v = new ASN1EncodableVector();
+    v.add(new ASN1ObjectIdentifier(oid));
+    v.add(new ASN1Integer(version));
+    if (keyId.compareTo(BigInteger.ZERO) >= 0) {
+      v.add(new ASN1Integer(keyId));
+    }
+    return new DLSequence(v);
+  }
+  
+  public String getObjectIdentifier() {
+    return oid;
+  }
+  
+  /**
+   * Returns a key identifier stored in this ChipAuthenticationInfo structure, null
+   * if not present
+   *
+   * @return key identifier stored in this ChipAuthenticationInfo structure
+   */
+  public BigInteger getKeyId() {
+    return keyId;
+  }
+  
+  /**
+   * Checks the correctness of the data for this instance of SecurityInfo
+   */
+  protected void checkFields() {
+    try {
+      if (!checkRequiredIdentifier(oid)) {
+        throw new IllegalArgumentException("Wrong identifier: "	+ oid);
+      }
+      if (version != VERSION_NUM) {
+        throw new IllegalArgumentException("Wrong version");
+      }
+    } catch (Exception e) {
+      LOGGER.severe("Exception: " + e.getMessage());
+      throw new IllegalArgumentException("Malformed ChipAuthenticationInfo.");
+    }
+  }
+  
+  /**
+   * Checks whether the given object identifier identifies a
+   * ChipAuthenticationInfo structure.
+   *
+   * FIXME: for EAC 1.11 only the 3DES OIDs are allowed.
+   *
+   * @param oid
+   *            object identifier
+   * @return true if the match is positive
+   */
+  static boolean checkRequiredIdentifier(String oid) {
+    return ID_CA_DH_3DES_CBC_CBC_OID.equals(oid)
+        || ID_CA_ECDH_3DES_CBC_CBC_OID.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_128_OID.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_192_OID.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_256_OID.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_128_OID.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_192_OID.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_256_OID.equals(oid);
+  }
+  
+  public String toString() {
+    return  "ChipAuthenticationInfo [oid = " + oid + ", version = " + version + ", keyId = " + keyId + "]";
+  }
+  
+  public int hashCode() {
+    return 3 + 11 * (oid == null ? 0 : oid.hashCode()) + 61 * version + 1991 * keyId.hashCode();
+  }
+  
+  public boolean equals(Object other) {
+    if (other == null) { return false; }
+    if (other == this) { return true; }
+    if (!ChipAuthenticationInfo.class.equals(other.getClass())) { return false; }
+    ChipAuthenticationInfo otherChipAuthenticationInfo = (ChipAuthenticationInfo)other;
+    return oid.equals(otherChipAuthenticationInfo.oid)
+        && version == otherChipAuthenticationInfo.version
+        && keyId.equals(otherChipAuthenticationInfo.keyId);
+  }
 }

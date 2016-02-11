@@ -41,170 +41,170 @@ import net.sf.scuba.data.Gender;
 import net.sf.scuba.util.Hex;
 
 public class FaceImageInfoTest extends TestCase {
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
-	public FaceImageInfoTest(String name) {
-		super(name);
-	}
-
-	public void testToString() {
-		FaceImageInfo imageInfo = createNonEmptyTestObject();
-		try {
-			assertNotNull(imageInfo);
-			String asString = imageInfo.toString();
-			assertNotNull(asString);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.toString());
-		}
-	}
-
-	public void testNonNullEncoded() {
-		FaceImageInfo imageInfo = createNonEmptyTestObject();
-		assertNotNull(imageInfo);
-		byte[] encoded = imageInfo.getEncoded();
-		assertNotNull(encoded);
-	}
-
-	public void testEncodeDecode() {
-		testEncodeDecode(createNonEmptyTestObject());
-	}
-
-	public void testEncodeDecode(FaceImageInfo original) {
-		try {
-			byte[] encoded = original.getEncoded();
-			assertNotNull(encoded);
-			ByteArrayInputStream in = new ByteArrayInputStream(encoded);
-			FaceImageInfo copy = new FaceImageInfo(in);
-			assertEquals(original, copy);
-			byte[] encodedCopy = copy.getEncoded();
-			assertNotNull(encodedCopy);
-			assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.toString());
-		}
-	}
-
-	public void testNumExtractImageOnce() {
-		FaceImageInfo imageInfo = createNonEmptyTestObject(50, 50);
-		testExtractImage(imageInfo, 50, 50);
-	}
-
-	public void testNumExtractImage() {
-		for (int width = 100; width < 1000; width += 200) {
-			for (int height = 100; height < 1000; height += 200) {
-				FaceImageInfo imageInfo = createNonEmptyTestObject(width, height);
-				testExtractImage(imageInfo, width, height);
-			}
-		}
-	}
-
-	public void testExtractImage(FaceImageInfo imageInfo, int expectedWidth, int expectedHeight) {
-		try {
-			InputStream imageInputStream = imageInfo.getImageInputStream();
-			int imageLength = imageInfo.getImageLength();
-			assertTrue(imageLength >= 0);
-			String imageMimeType = imageInfo.getMimeType();
-			assertNotNull(imageMimeType);
-			assertTrue(imageMimeType.toLowerCase().startsWith("image"));
-			imageInputStream.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
-
-	public void testValidType() {
-		FaceImageInfo portraitInfo = createTestObject();
-		testValidType(portraitInfo);
-	}
-
-	public void testValidType(FaceImageInfo imageInfo) {
-		int type = imageInfo.getType();
-		assertEquals(type, ImageInfo.TYPE_PORTRAIT);
-	}
-
-	public void testLength() {
-		FaceImageInfo faceImageInfo = createTestObject();
-		int imageLength = faceImageInfo.getImageLength();
-		int recordLength = (int)faceImageInfo.getRecordLength();
-		assertTrue(imageLength < recordLength);
-	}
-
-	public static FaceImageInfo createTestObject() {
-		return createNonEmptyTestObject(300, 400);
-	}
-
-	public static FaceImageInfo createNonEmptyTestObject() {
-		return createNonEmptyTestObject(1, 1);
-	}
-
-	public void testCreateAndExtract() {
-
-		try {
-			FaceImageInfo imageInfo = createNonEmptyTestObject();
-			DataInputStream imageInputStream = new DataInputStream(imageInfo.getImageInputStream());
-			int imageLength = imageInfo.getImageLength();
-			byte[] imageBytes = new byte[imageLength];
-			imageInputStream.readFully(imageBytes);
-			imageInputStream.close();
-			LOGGER.info("DEBUG: imageBytes.length = " + imageBytes.length);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
-
-	public static FaceImageInfo createNonEmptyTestObject(int width, int height) {
-		try {
-			byte[] imageBytes = createTrivialJPEGBytes(width, height);
-			Gender gender = Gender.UNSPECIFIED;
-			EyeColor eyeColor = EyeColor.UNSPECIFIED;
-			int hairColor = FaceImageInfo.HAIR_COLOR_UNSPECIFIED;
-			int featureMask = 0;
-			short expression = FaceImageInfo.EXPRESSION_UNSPECIFIED;
-			int[] poseAngle = { 0, 0, 0 };
-			int[] poseAngleUncertainty = { 0, 0, 0 };
-			int faceImageType = FaceImageInfo.FACE_IMAGE_TYPE_FULL_FRONTAL;
-			int colorSpace = 0x00;
-			int sourceType = FaceImageInfo.SOURCE_TYPE_UNSPECIFIED;
-			int deviceType = 0x0000;
-			int quality = 0x0000;
-			int imageDataType = FaceImageInfo.IMAGE_DATA_TYPE_JPEG;	
-			FeaturePoint[] featurePoints = new FeaturePoint[0];
-			FaceImageInfo imageInfo = new FaceImageInfo(
-					gender,  eyeColor, hairColor,
-					featureMask,
-					expression,
-					poseAngle, poseAngleUncertainty,
-					faceImageType,
-					colorSpace,
-					sourceType,
-					deviceType,
-					quality,
-					featurePoints,
-					width, height,
-					new ByteArrayInputStream(imageBytes), imageBytes.length, imageDataType);
-			return imageInfo;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private static byte[] createTrivialJPEGBytes(int width, int height) {
-		try {
-			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ImageIO.write(image, "jpg", out);
-			out.flush();
-			byte[] bytes = out.toByteArray();
-			return bytes;
-		} catch (Exception e) {
-			fail(e.toString());
-			return null;
-		}
-	}
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  public FaceImageInfoTest(String name) {
+    super(name);
+  }
+  
+  public void testToString() {
+    FaceImageInfo imageInfo = createNonEmptyTestObject();
+    try {
+      assertNotNull(imageInfo);
+      String asString = imageInfo.toString();
+      assertNotNull(asString);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.toString());
+    }
+  }
+  
+  public void testNonNullEncoded() {
+    FaceImageInfo imageInfo = createNonEmptyTestObject();
+    assertNotNull(imageInfo);
+    byte[] encoded = imageInfo.getEncoded();
+    assertNotNull(encoded);
+  }
+  
+  public void testEncodeDecode() {
+    testEncodeDecode(createNonEmptyTestObject());
+  }
+  
+  public void testEncodeDecode(FaceImageInfo original) {
+    try {
+      byte[] encoded = original.getEncoded();
+      assertNotNull(encoded);
+      ByteArrayInputStream in = new ByteArrayInputStream(encoded);
+      FaceImageInfo copy = new FaceImageInfo(in);
+      assertEquals(original, copy);
+      byte[] encodedCopy = copy.getEncoded();
+      assertNotNull(encodedCopy);
+      assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.toString());
+    }
+  }
+  
+  public void testNumExtractImageOnce() {
+    FaceImageInfo imageInfo = createNonEmptyTestObject(50, 50);
+    testExtractImage(imageInfo, 50, 50);
+  }
+  
+  public void testNumExtractImage() {
+    for (int width = 100; width < 1000; width += 200) {
+      for (int height = 100; height < 1000; height += 200) {
+        FaceImageInfo imageInfo = createNonEmptyTestObject(width, height);
+        testExtractImage(imageInfo, width, height);
+      }
+    }
+  }
+  
+  public void testExtractImage(FaceImageInfo imageInfo, int expectedWidth, int expectedHeight) {
+    try {
+      InputStream imageInputStream = imageInfo.getImageInputStream();
+      int imageLength = imageInfo.getImageLength();
+      assertTrue(imageLength >= 0);
+      String imageMimeType = imageInfo.getMimeType();
+      assertNotNull(imageMimeType);
+      assertTrue(imageMimeType.toLowerCase().startsWith("image"));
+      imageInputStream.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+  
+  public void testValidType() {
+    FaceImageInfo portraitInfo = createTestObject();
+    testValidType(portraitInfo);
+  }
+  
+  public void testValidType(FaceImageInfo imageInfo) {
+    int type = imageInfo.getType();
+    assertEquals(type, ImageInfo.TYPE_PORTRAIT);
+  }
+  
+  public void testLength() {
+    FaceImageInfo faceImageInfo = createTestObject();
+    int imageLength = faceImageInfo.getImageLength();
+    int recordLength = (int)faceImageInfo.getRecordLength();
+    assertTrue(imageLength < recordLength);
+  }
+  
+  public static FaceImageInfo createTestObject() {
+    return createNonEmptyTestObject(300, 400);
+  }
+  
+  public static FaceImageInfo createNonEmptyTestObject() {
+    return createNonEmptyTestObject(1, 1);
+  }
+  
+  public void testCreateAndExtract() {
+    
+    try {
+      FaceImageInfo imageInfo = createNonEmptyTestObject();
+      DataInputStream imageInputStream = new DataInputStream(imageInfo.getImageInputStream());
+      int imageLength = imageInfo.getImageLength();
+      byte[] imageBytes = new byte[imageLength];
+      imageInputStream.readFully(imageBytes);
+      imageInputStream.close();
+      LOGGER.info("DEBUG: imageBytes.length = " + imageBytes.length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+  
+  public static FaceImageInfo createNonEmptyTestObject(int width, int height) {
+    try {
+      byte[] imageBytes = createTrivialJPEGBytes(width, height);
+      Gender gender = Gender.UNSPECIFIED;
+      EyeColor eyeColor = EyeColor.UNSPECIFIED;
+      int hairColor = FaceImageInfo.HAIR_COLOR_UNSPECIFIED;
+      int featureMask = 0;
+      short expression = FaceImageInfo.EXPRESSION_UNSPECIFIED;
+      int[] poseAngle = { 0, 0, 0 };
+      int[] poseAngleUncertainty = { 0, 0, 0 };
+      int faceImageType = FaceImageInfo.FACE_IMAGE_TYPE_FULL_FRONTAL;
+      int colorSpace = 0x00;
+      int sourceType = FaceImageInfo.SOURCE_TYPE_UNSPECIFIED;
+      int deviceType = 0x0000;
+      int quality = 0x0000;
+      int imageDataType = FaceImageInfo.IMAGE_DATA_TYPE_JPEG;	
+      FeaturePoint[] featurePoints = new FeaturePoint[0];
+      FaceImageInfo imageInfo = new FaceImageInfo(
+          gender,  eyeColor, hairColor,
+          featureMask,
+          expression,
+          poseAngle, poseAngleUncertainty,
+          faceImageType,
+          colorSpace,
+          sourceType,
+          deviceType,
+          quality,
+          featurePoints,
+          width, height,
+          new ByteArrayInputStream(imageBytes), imageBytes.length, imageDataType);
+      return imageInfo;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+  
+  private static byte[] createTrivialJPEGBytes(int width, int height) {
+    try {
+      BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      ImageIO.write(image, "jpg", out);
+      out.flush();
+      byte[] bytes = out.toByteArray();
+      return bytes;
+    } catch (Exception e) {
+      fail(e.toString());
+      return null;
+    }
+  }
 }

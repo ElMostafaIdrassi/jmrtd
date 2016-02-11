@@ -32,25 +32,25 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @version $Revision$
  */
 public class PACEException extends CardServiceException {
-
-	private static final long serialVersionUID = 8383980807753919040L;
-
-	/**
-	 * Creates a PACEException.
-	 *
-	 * @param msg a message
-	 */
-	public PACEException(String msg) {
-		super(msg);
-	}
-
-	/**
-	 * Creates a PACEException with a specific status word.
-	 *
-	 * @param msg a message
-	 * @param sw the status word that caused this CardServiceException
-	 */
-	public PACEException(String msg, int sw) {
-		super(msg, sw);
-	}
+  
+  private static final long serialVersionUID = 8383980807753919040L;
+  
+  /**
+   * Creates a PACEException.
+   *
+   * @param msg a message
+   */
+  public PACEException(String msg) {
+    super(msg);
+  }
+  
+  /**
+   * Creates a PACEException with a specific status word.
+   *
+   * @param msg a message
+   * @param sw the status word that caused this CardServiceException
+   */
+  public PACEException(String msg, int sw) {
+    super(msg, sw);
+  }
 }

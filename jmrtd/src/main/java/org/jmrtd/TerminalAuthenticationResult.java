@@ -40,123 +40,123 @@ import org.jmrtd.cert.CardVerifiableCertificate;
  * @version $Revision$
  */
 public class TerminalAuthenticationResult  {
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
-	private ChipAuthenticationResult chipAuthenticationResult;
-	private CVCPrincipal caReference;
-	private List<CardVerifiableCertificate> terminalCertificates = new ArrayList<CardVerifiableCertificate>();
-	private PrivateKey terminalKey;
-	private String documentNumber;
-	private byte[] cardChallenge;
-
-	/**
-	 * Constructs a new terminal authentication result.
-	 *
-	 * @param chipAuthenticationResult the chip authentication result
-	 * @param caReference the CA
-	 * @param terminalCertificates terminal certificates
-	 * @param terminalKey the terminal's private key
-	 * @param documentNumber the documentNumber
-	 * @param cardChallenge the challenge
-	 */
-	public TerminalAuthenticationResult(ChipAuthenticationResult chipAuthenticationResult, CVCPrincipal caReference,
-			List<CardVerifiableCertificate> terminalCertificates, PrivateKey terminalKey,
-			String documentNumber, byte[] cardChallenge) {
-		this.chipAuthenticationResult = chipAuthenticationResult;
-		this.caReference = caReference;
-		for (CardVerifiableCertificate c : terminalCertificates) {
-			this.terminalCertificates.add(c);
-		}
-		this.terminalKey = terminalKey;
-		this.documentNumber = documentNumber;
-		this.cardChallenge = cardChallenge;
-	}
-
-	/**
-	 * Gets the chip authentication result;
-	 *
-	 * @return the chip authenticaiton result
-	 */
-	public ChipAuthenticationResult getChipAuthenticationResult() {
-		return chipAuthenticationResult;
-	}
-
-	/**
-	 * Gets CA certificate's reference used during EAC.
-	 *
-	 * @return CA certificate's reference
-	 */
-	public CVCPrincipal getCAReference() {
-		return caReference;
-	}
-
-	/**
-	 * Gets the chain of CVCertificates used to authenticate the terminal to
-	 * the card.
-	 *
-	 * @return the chain of CVCertificates used to authenticate the terminal to
-	 *         the card
-	 */
-	public List<CardVerifiableCertificate> getCVCertificates() {
-		return terminalCertificates;
-	}
-
-	/**
-	 * Gets the terminal private key used during EAC.
-	 *
-	 * @return the terminal private key
-	 */
-	public PrivateKey getTerminalKey() {
-		return terminalKey;
-	}
-
-	/**
-	 * Gets the id of the card used during EAC.
-	 *
-	 * @return the id of the card
-	 */
-	public String getDocumentNumber() {
-		return documentNumber;
-	}
-
-	/**
-	 * Gets the card's challenge generated during EAC.
-	 *
-	 * @return the card's challenge
-	 */
-	public byte[] getCardChallenge() {
-		return cardChallenge;
-	}
-
-	/**
-	 * Gets a textual representation of this terminal authentication result.
-	 *
-	 * @return a textual representation of this terminal authentication result
-	 */
-	public String toString() {
-		StringBuffer result = new StringBuffer();
-		result.append("EACEvent [chipAuthenticationResult = " + chipAuthenticationResult + ", ");
-		//    	result.append("cardKey = " + cardKey + ", ");
-		//    	result.append("keyPair = " + keyPair + ", ");
-		result.append("caReference = " + caReference + ", ");
-		for (CardVerifiableCertificate cert: terminalCertificates) {
-			try {
-				CVCPrincipal reference = cert.getHolderReference();
-				if (!caReference.equals(reference)) {
-					result.append("holderReference = " + reference + ", ");
-				}
-			} catch (CertificateException ce) {
-				result.append("holderReference = ???, ");
-				LOGGER.severe("Exception: " + ce.getMessage());
-			}
-
-		}
-		//        result.append("terminalCertificates = " + terminalCertificates + ", ");
-		//        result.append("terminalKey = " + terminalKey + ", ");
-		//        result.append("documentNumber = " + documentNumber + ", ");
-		//        result.append("cardChallenge = " + cardChallenge + ", ");
-		result.append("]");
-		return result.toString();
-	}
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private ChipAuthenticationResult chipAuthenticationResult;
+  private CVCPrincipal caReference;
+  private List<CardVerifiableCertificate> terminalCertificates = new ArrayList<CardVerifiableCertificate>();
+  private PrivateKey terminalKey;
+  private String documentNumber;
+  private byte[] cardChallenge;
+  
+  /**
+   * Constructs a new terminal authentication result.
+   *
+   * @param chipAuthenticationResult the chip authentication result
+   * @param caReference the CA
+   * @param terminalCertificates terminal certificates
+   * @param terminalKey the terminal's private key
+   * @param documentNumber the documentNumber
+   * @param cardChallenge the challenge
+   */
+  public TerminalAuthenticationResult(ChipAuthenticationResult chipAuthenticationResult, CVCPrincipal caReference,
+      List<CardVerifiableCertificate> terminalCertificates, PrivateKey terminalKey,
+      String documentNumber, byte[] cardChallenge) {
+    this.chipAuthenticationResult = chipAuthenticationResult;
+    this.caReference = caReference;
+    for (CardVerifiableCertificate c : terminalCertificates) {
+      this.terminalCertificates.add(c);
+    }
+    this.terminalKey = terminalKey;
+    this.documentNumber = documentNumber;
+    this.cardChallenge = cardChallenge;
+  }
+  
+  /**
+   * Gets the chip authentication result;
+   *
+   * @return the chip authenticaiton result
+   */
+  public ChipAuthenticationResult getChipAuthenticationResult() {
+    return chipAuthenticationResult;
+  }
+  
+  /**
+   * Gets CA certificate's reference used during EAC.
+   *
+   * @return CA certificate's reference
+   */
+  public CVCPrincipal getCAReference() {
+    return caReference;
+  }
+  
+  /**
+   * Gets the chain of CVCertificates used to authenticate the terminal to
+   * the card.
+   *
+   * @return the chain of CVCertificates used to authenticate the terminal to
+   *         the card
+   */
+  public List<CardVerifiableCertificate> getCVCertificates() {
+    return terminalCertificates;
+  }
+  
+  /**
+   * Gets the terminal private key used during EAC.
+   *
+   * @return the terminal private key
+   */
+  public PrivateKey getTerminalKey() {
+    return terminalKey;
+  }
+  
+  /**
+   * Gets the id of the card used during EAC.
+   *
+   * @return the id of the card
+   */
+  public String getDocumentNumber() {
+    return documentNumber;
+  }
+  
+  /**
+   * Gets the card's challenge generated during EAC.
+   *
+   * @return the card's challenge
+   */
+  public byte[] getCardChallenge() {
+    return cardChallenge;
+  }
+  
+  /**
+   * Gets a textual representation of this terminal authentication result.
+   *
+   * @return a textual representation of this terminal authentication result
+   */
+  public String toString() {
+    StringBuffer result = new StringBuffer();
+    result.append("EACEvent [chipAuthenticationResult = " + chipAuthenticationResult + ", ");
+    //    	result.append("cardKey = " + cardKey + ", ");
+    //    	result.append("keyPair = " + keyPair + ", ");
+    result.append("caReference = " + caReference + ", ");
+    for (CardVerifiableCertificate cert: terminalCertificates) {
+      try {
+        CVCPrincipal reference = cert.getHolderReference();
+        if (!caReference.equals(reference)) {
+          result.append("holderReference = " + reference + ", ");
+        }
+      } catch (CertificateException ce) {
+        result.append("holderReference = ???, ");
+        LOGGER.severe("Exception: " + ce.getMessage());
+      }
+      
+    }
+    //        result.append("terminalCertificates = " + terminalCertificates + ", ");
+    //        result.append("terminalKey = " + terminalKey + ", ");
+    //        result.append("documentNumber = " + documentNumber + ", ");
+    //        result.append("cardChallenge = " + cardChallenge + ", ");
+    result.append("]");
+    return result.toString();
+  }
 }

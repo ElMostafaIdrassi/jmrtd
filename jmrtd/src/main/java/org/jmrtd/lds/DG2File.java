@@ -49,100 +49,100 @@ import org.jmrtd.cbeff.StandardBiometricHeader;
  * @version $Revision$
  */
 public class DG2File extends CBEFFDataGroup<FaceInfo> {
-
-	private static final long serialVersionUID = 414300652684010416L;
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
-	private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FaceInfo>() {
-		public FaceInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
-			return new FaceInfo(sbh, inputStream);
-		}
-	});
-
-	private static final ISO781611Encoder<FaceInfo> ENCODER = new ISO781611Encoder<FaceInfo>(new BiometricDataBlockEncoder<FaceInfo>() {
-		public void encode(FaceInfo info, OutputStream outputStream) throws IOException {
-			info.writeObject(outputStream);
-		}
-	});
-	
-	/**
-	 * Creates a new file with the specified records.
-	 *
-	 * @param faceInfos records
-	 */
-	public DG2File(List<FaceInfo> faceInfos) {
-		super(EF_DG2_TAG, faceInfos);
-	}
-
-	/**
-	 * Creates a new file based on an input stream.
-	 *
-	 * @param inputStream an input stream
-	 *
-	 * @throws IOException on error reading from input stream
-	 */
-	public DG2File(InputStream inputStream) throws IOException {
-		super(EF_DG2_TAG, inputStream);
-	}
-
-	protected void readContent(InputStream inputStream) throws IOException {
-		ComplexCBEFFInfo complexCBEFFInfo = DECODER.decode(inputStream);
-		List<CBEFFInfo> records = complexCBEFFInfo.getSubRecords();
-		for (CBEFFInfo cbeffInfo: records) {
-			if (!(cbeffInfo instanceof SimpleCBEFFInfo<?>)) {
-				throw new IOException("Was expecting a SimpleCBEFFInfo, found " + cbeffInfo.getClass().getSimpleName());
-			}
-			SimpleCBEFFInfo<?> simpleCBEFFInfo = (SimpleCBEFFInfo<?>)cbeffInfo;
-			BiometricDataBlock bdb = simpleCBEFFInfo.getBiometricDataBlock();
-			if (!(bdb instanceof FaceInfo)) {
-				throw new IOException("Was expecting a FaceInfo, found " + bdb.getClass().getSimpleName());
-			}
-			FaceInfo faceInfo = (FaceInfo)bdb;
-			add(faceInfo);
-		}
-		
-		/* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
-	}
-
-	protected void writeContent(OutputStream outputStream) throws IOException {
-		ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
-		List<FaceInfo> faceInfos = getSubRecords();
-		for (FaceInfo faceInfo: faceInfos) {
-			SimpleCBEFFInfo<FaceInfo> simpleCBEFFInfo = new SimpleCBEFFInfo<FaceInfo>(faceInfo);
-			cbeffInfo.add(simpleCBEFFInfo);
-		}
-		ENCODER.encode(cbeffInfo, outputStream);
-	}
-
-
-	/**
-	 * Gets a textual representation of this file.
-	 *
-	 * @return a textual representation of this file
-	 */
-	public String toString() {
-		return "DG2File [" + super.toString() + "]";
-	}
-
-	/**
-	 * Gets the face infos embedded in this file.
-	 *
-	 * @return face infos
-	 */
-	public List<FaceInfo> getFaceInfos() { return getSubRecords(); }
-
-	/**
-	 * Adds a face info to this file.
-	 *
-	 * @param faceInfo the face info to add
-	 */
-	public void addFaceInfo(FaceInfo faceInfo) { add(faceInfo); }
-	
-	/**
-	 * Removes a face info from this file.
-	 *
-	 * @param index the index of the face info to remove
-	 */
-	public void removeFaceInfo(int index) { remove(index); }
+  
+  private static final long serialVersionUID = 414300652684010416L;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FaceInfo>() {
+    public FaceInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+      return new FaceInfo(sbh, inputStream);
+    }
+  });
+  
+  private static final ISO781611Encoder<FaceInfo> ENCODER = new ISO781611Encoder<FaceInfo>(new BiometricDataBlockEncoder<FaceInfo>() {
+    public void encode(FaceInfo info, OutputStream outputStream) throws IOException {
+      info.writeObject(outputStream);
+    }
+  });
+  
+  /**
+   * Creates a new file with the specified records.
+   *
+   * @param faceInfos records
+   */
+  public DG2File(List<FaceInfo> faceInfos) {
+    super(EF_DG2_TAG, faceInfos);
+  }
+  
+  /**
+   * Creates a new file based on an input stream.
+   *
+   * @param inputStream an input stream
+   *
+   * @throws IOException on error reading from input stream
+   */
+  public DG2File(InputStream inputStream) throws IOException {
+    super(EF_DG2_TAG, inputStream);
+  }
+  
+  protected void readContent(InputStream inputStream) throws IOException {
+    ComplexCBEFFInfo complexCBEFFInfo = DECODER.decode(inputStream);
+    List<CBEFFInfo> records = complexCBEFFInfo.getSubRecords();
+    for (CBEFFInfo cbeffInfo: records) {
+      if (!(cbeffInfo instanceof SimpleCBEFFInfo<?>)) {
+        throw new IOException("Was expecting a SimpleCBEFFInfo, found " + cbeffInfo.getClass().getSimpleName());
+      }
+      SimpleCBEFFInfo<?> simpleCBEFFInfo = (SimpleCBEFFInfo<?>)cbeffInfo;
+      BiometricDataBlock bdb = simpleCBEFFInfo.getBiometricDataBlock();
+      if (!(bdb instanceof FaceInfo)) {
+        throw new IOException("Was expecting a FaceInfo, found " + bdb.getClass().getSimpleName());
+      }
+      FaceInfo faceInfo = (FaceInfo)bdb;
+      add(faceInfo);
+    }
+    
+    /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
+  }
+  
+  protected void writeContent(OutputStream outputStream) throws IOException {
+    ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
+    List<FaceInfo> faceInfos = getSubRecords();
+    for (FaceInfo faceInfo: faceInfos) {
+      SimpleCBEFFInfo<FaceInfo> simpleCBEFFInfo = new SimpleCBEFFInfo<FaceInfo>(faceInfo);
+      cbeffInfo.add(simpleCBEFFInfo);
+    }
+    ENCODER.encode(cbeffInfo, outputStream);
+  }
+  
+  
+  /**
+   * Gets a textual representation of this file.
+   *
+   * @return a textual representation of this file
+   */
+  public String toString() {
+    return "DG2File [" + super.toString() + "]";
+  }
+  
+  /**
+   * Gets the face infos embedded in this file.
+   *
+   * @return face infos
+   */
+  public List<FaceInfo> getFaceInfos() { return getSubRecords(); }
+  
+  /**
+   * Adds a face info to this file.
+   *
+   * @param faceInfo the face info to add
+   */
+  public void addFaceInfo(FaceInfo faceInfo) { add(faceInfo); }
+  
+  /**
+   * Removes a face info from this file.
+   *
+   * @param index the index of the face info to remove
+   */
+  public void removeFaceInfo(int index) { remove(index); }
 }

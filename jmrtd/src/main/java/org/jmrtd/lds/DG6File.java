@@ -33,17 +33,17 @@ import java.io.InputStream;
  * @version $Revision$
  */
 public class DG6File extends DisplayedImageDataGroup {
-
-	private static final long serialVersionUID = -583717105472408528L;
-
-	/**
-	 * Constructs a new file from binary representation.
-	 * 
-	 * @param inputStream an input stream
-	 * 
-	 * @throws IOException on error reading input stream
-	 */
-	public DG6File(InputStream inputStream) throws IOException {
-		super(EF_DG6_TAG, inputStream);
-	}
+  
+  private static final long serialVersionUID = -583717105472408528L;
+  
+  /**
+   * Constructs a new file from binary representation.
+   * 
+   * @param inputStream an input stream
+   * 
+   * @throws IOException on error reading input stream
+   */
+  public DG6File(InputStream inputStream) throws IOException {
+    super(EF_DG6_TAG, inputStream);
+  }
 }

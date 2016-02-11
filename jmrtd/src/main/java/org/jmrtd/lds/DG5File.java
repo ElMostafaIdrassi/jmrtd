@@ -34,26 +34,26 @@ import java.util.List;
  * @version $Revision$
  */
 public class DG5File extends DisplayedImageDataGroup {
-
-	private static final long serialVersionUID = 923840683207218244L;
-
-	/**
-	 * Constructs a new file from a list of displayed images.
-	 * 
-	 * @param images the displayed images, all of which should be of type <i>Portrait</i>
-	 */
-	public DG5File(List<DisplayedImageInfo> images) {
-		super(EF_DG5_TAG, images, DisplayedImageInfo.DISPLAYED_PORTRAIT_TAG);
-	}
-
-	/**
-	 * Constructs a new file from binary representation.
-	 * 
-	 * @param inputStream an input stream
-	 * 
-	 * @throws IOException on error reading input stream
-	 */
-	public DG5File(InputStream inputStream) throws IOException {
-		super(EF_DG5_TAG, inputStream);
-	}
+  
+  private static final long serialVersionUID = 923840683207218244L;
+  
+  /**
+   * Constructs a new file from a list of displayed images.
+   * 
+   * @param images the displayed images, all of which should be of type <i>Portrait</i>
+   */
+  public DG5File(List<DisplayedImageInfo> images) {
+    super(EF_DG5_TAG, images, DisplayedImageInfo.DISPLAYED_PORTRAIT_TAG);
+  }
+  
+  /**
+   * Constructs a new file from binary representation.
+   * 
+   * @param inputStream an input stream
+   * 
+   * @throws IOException on error reading input stream
+   */
+  public DG5File(InputStream inputStream) throws IOException {
+    super(EF_DG5_TAG, inputStream);
+  }
 }

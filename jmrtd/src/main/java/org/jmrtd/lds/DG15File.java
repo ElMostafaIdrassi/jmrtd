@@ -44,88 +44,88 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 public class DG15File extends DataGroup {
-
-	private static final long serialVersionUID = 3834304239673755744L;
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
-	private PublicKey publicKey;
-
-	/**
-	 * Constructs a new file.
-	 *
-	 * @param publicKey the key to store in this file
-	 */
-	public DG15File(PublicKey publicKey) {
-		super(EF_DG15_TAG);
-		this.publicKey = publicKey;
-	}
-
-	/**
-	 * Constructs a new file from binary representation.
-	 *
-	 * @param inputStream an input stream
-	 *
-	 * @throws IOException on error reading from input stream
-	 */
-	public DG15File(InputStream inputStream) throws IOException {
-		super(EF_DG15_TAG, inputStream);
-	}
-
-	protected void readContent(InputStream inputStream) throws IOException {
-		DataInputStream dataInputStream = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
-		try {
-			byte[] value = new byte[getLength()];
-			dataInputStream.readFully(value);
-
-			publicKey = getPublicKey(value);
-		} catch (GeneralSecurityException e) {
-			throw new IllegalArgumentException(e.toString());
-		}
-	}
-
-	private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {
-		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
-
-		String[] algorithms = { "RSA", "EC" };
-
-		for (String algorithm: algorithms) {
-			try {
-				KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-				PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
-				return publicKey;
-			} catch (InvalidKeySpecException ikse) {
-				/* NOTE: Ignore, try next algorithm. */
-			}
-		}
-		throw new InvalidAlgorithmParameterException();
-	}
-
-	protected void writeContent(OutputStream out) throws IOException {
-		out.write(publicKey.getEncoded());
-	}
-
-	/**
-	 * Gets the public key stored in this file.
-	 *
-	 * @return the public key
-	 */
-	public PublicKey getPublicKey() {
-		return publicKey;
-	}
-
-	public boolean equals(Object obj) {
-		if (obj == null) { return false; }
-		if (obj.getClass() != this.getClass()) { return false; }
-		DG15File other = (DG15File)obj;
-		return publicKey.equals(other.publicKey);
-	}
-
-	public int hashCode() {
-		return 5 * publicKey.hashCode() + 61;
-	}
-
-	public String toString() {
-		return "DG15File [" + publicKey.toString() + "]";
-	}
+  
+  private static final long serialVersionUID = 3834304239673755744L;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private PublicKey publicKey;
+  
+  /**
+   * Constructs a new file.
+   *
+   * @param publicKey the key to store in this file
+   */
+  public DG15File(PublicKey publicKey) {
+    super(EF_DG15_TAG);
+    this.publicKey = publicKey;
+  }
+  
+  /**
+   * Constructs a new file from binary representation.
+   *
+   * @param inputStream an input stream
+   *
+   * @throws IOException on error reading from input stream
+   */
+  public DG15File(InputStream inputStream) throws IOException {
+    super(EF_DG15_TAG, inputStream);
+  }
+  
+  protected void readContent(InputStream inputStream) throws IOException {
+    DataInputStream dataInputStream = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
+    try {
+      byte[] value = new byte[getLength()];
+      dataInputStream.readFully(value);
+      
+      publicKey = getPublicKey(value);
+    } catch (GeneralSecurityException e) {
+      throw new IllegalArgumentException(e.toString());
+    }
+  }
+  
+  private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {
+    X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
+    
+    String[] algorithms = { "RSA", "EC" };
+    
+    for (String algorithm: algorithms) {
+      try {
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
+        return publicKey;
+      } catch (InvalidKeySpecException ikse) {
+        /* NOTE: Ignore, try next algorithm. */
+      }
+    }
+    throw new InvalidAlgorithmParameterException();
+  }
+  
+  protected void writeContent(OutputStream out) throws IOException {
+    out.write(publicKey.getEncoded());
+  }
+  
+  /**
+   * Gets the public key stored in this file.
+   *
+   * @return the public key
+   */
+  public PublicKey getPublicKey() {
+    return publicKey;
+  }
+  
+  public boolean equals(Object obj) {
+    if (obj == null) { return false; }
+    if (obj.getClass() != this.getClass()) { return false; }
+    DG15File other = (DG15File)obj;
+    return publicKey.equals(other.publicKey);
+  }
+  
+  public int hashCode() {
+    return 5 * publicKey.hashCode() + 61;
+  }
+  
+  public String toString() {
+    return "DG15File [" + publicKey.toString() + "]";
+  }
 }

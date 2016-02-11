@@ -35,22 +35,22 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 abstract class AbstractLDSInfo implements LDSElement {
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
-	private static final long serialVersionUID = -2340098256249194537L;
-
-	public byte[] getEncoded() {
-		try {
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			writeObject(outputStream);
-			outputStream.flush();
-			return outputStream.toByteArray();
-		} catch (IOException ioe) {
-			LOGGER.severe("Exception: " + ioe.getMessage());
-			return null;
-		}
-	}
-
-	abstract void writeObject(OutputStream outputStream) throws IOException;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final long serialVersionUID = -2340098256249194537L;
+  
+  public byte[] getEncoded() {
+    try {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      writeObject(outputStream);
+      outputStream.flush();
+      return outputStream.toByteArray();
+    } catch (IOException ioe) {
+      LOGGER.severe("Exception: " + ioe.getMessage());
+      return null;
+    }
+  }
+  
+  abstract void writeObject(OutputStream outputStream) throws IOException;
 }

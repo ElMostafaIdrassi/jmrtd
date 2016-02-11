@@ -50,60 +50,60 @@ import org.ejbca.cvc.exception.ParseException;
  * @see CardVerifiableCertificate
  */
 public class CVCertificateFactorySpi extends CertificateFactorySpi {
-
-	private static final int CV_CERTIFICATE_TAG = 0x7F21;
-
-	/**
-	 * Generates the certificate based on an input source.
-	 * 
-	 * @param inputStream the input source
-	 * 
-	 * @throws CertificateException on parsing errors
-	 */
-	public Certificate engineGenerateCertificate(InputStream inputStream) throws CertificateException {
-		try {
-			/* Read certificate as byte[] */
-			TLVInputStream tlvIn = new TLVInputStream(inputStream);
-			int tag = tlvIn.readTag();
-			if (tag != CV_CERTIFICATE_TAG) { throw new CertificateException("Expected CV_CERTIFICATE_TAG, found " + Integer.toHexString(tag)); }
-			/* int length = */ tlvIn.readLength();
-			byte[] value = tlvIn.readValue();
-			
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			TLVOutputStream tlvOut = new TLVOutputStream(out);
-			tlvOut.writeTag(CV_CERTIFICATE_TAG);
-			tlvOut.writeValue(value);
-			tlvOut.close();
-			CVCObject parsedObject = CertificateParser.parseCertificate(out.toByteArray());
-			return new CardVerifiableCertificate((org.ejbca.cvc.CVCertificate)parsedObject);
-		} catch (IOException ioe) {
-			throw new CertificateException(ioe.getMessage());
-		} catch (ConstructionException ce) {
-			throw new CertificateException(ce.getMessage());
-		} catch (ParseException pe) {
-			throw new CertificateException(pe.getMessage());
-		}
-	}
-
-	/**
-	 * Not implemented.
-	 * 
-	 * @param inputStream input stream
-	 */
-	public CRL engineGenerateCRL(InputStream inputStream) throws CRLException {
-		return null; // TODO
-	}
-
-	/**
-	 * Not implemented.
-	 * 
-	 * @param inputStream input stream
-	 */
-	public Collection<? extends CRL> engineGenerateCRLs(InputStream inputStream) throws CRLException {
-		return null; // TODO
-	}
-
-	public Collection<? extends Certificate> engineGenerateCertificates(InputStream in) throws CertificateException {
-		return null; // TODO
-	}
+  
+  private static final int CV_CERTIFICATE_TAG = 0x7F21;
+  
+  /**
+   * Generates the certificate based on an input source.
+   * 
+   * @param inputStream the input source
+   * 
+   * @throws CertificateException on parsing errors
+   */
+  public Certificate engineGenerateCertificate(InputStream inputStream) throws CertificateException {
+    try {
+      /* Read certificate as byte[] */
+      TLVInputStream tlvIn = new TLVInputStream(inputStream);
+      int tag = tlvIn.readTag();
+      if (tag != CV_CERTIFICATE_TAG) { throw new CertificateException("Expected CV_CERTIFICATE_TAG, found " + Integer.toHexString(tag)); }
+      /* int length = */ tlvIn.readLength();
+      byte[] value = tlvIn.readValue();
+      
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      TLVOutputStream tlvOut = new TLVOutputStream(out);
+      tlvOut.writeTag(CV_CERTIFICATE_TAG);
+      tlvOut.writeValue(value);
+      tlvOut.close();
+      CVCObject parsedObject = CertificateParser.parseCertificate(out.toByteArray());
+      return new CardVerifiableCertificate((org.ejbca.cvc.CVCertificate)parsedObject);
+    } catch (IOException ioe) {
+      throw new CertificateException(ioe.getMessage());
+    } catch (ConstructionException ce) {
+      throw new CertificateException(ce.getMessage());
+    } catch (ParseException pe) {
+      throw new CertificateException(pe.getMessage());
+    }
+  }
+  
+  /**
+   * Not implemented.
+   * 
+   * @param inputStream input stream
+   */
+  public CRL engineGenerateCRL(InputStream inputStream) throws CRLException {
+    return null; // TODO
+  }
+  
+  /**
+   * Not implemented.
+   * 
+   * @param inputStream input stream
+   */
+  public Collection<? extends CRL> engineGenerateCRLs(InputStream inputStream) throws CRLException {
+    return null; // TODO
+  }
+  
+  public Collection<? extends Certificate> engineGenerateCertificates(InputStream in) throws CertificateException {
+    return null; // TODO
+  }
 }

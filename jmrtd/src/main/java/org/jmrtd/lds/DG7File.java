@@ -34,26 +34,26 @@ import java.util.List;
  * @version $Revision$
  */
 public class DG7File extends DisplayedImageDataGroup {
-
-	private static final long serialVersionUID = 7189545112850471359L;
-
-	/**
-	 * Constructs a new file from a list of displayed images.
-	 * 
-	 * @param images the displayed images, all of which should be of type <i>Signature or mark</i>
-	 */
-	public DG7File(List<DisplayedImageInfo> images) {
-		super(EF_DG7_TAG, images, DisplayedImageInfo.DISPLAYED_SIGNATURE_OR_MARK_TAG);
-	}
-
-	/**
-	 * Constructs a new file from binary representation.
-	 * 
-	 * @param inputStream an input stream
-	 * 
-	 * @throws IOException on error reading input stream
-	 */
-	public DG7File(InputStream inputStream) throws IOException {
-		super(EF_DG7_TAG, inputStream);
-	}
+  
+  private static final long serialVersionUID = 7189545112850471359L;
+  
+  /**
+   * Constructs a new file from a list of displayed images.
+   * 
+   * @param images the displayed images, all of which should be of type <i>Signature or mark</i>
+   */
+  public DG7File(List<DisplayedImageInfo> images) {
+    super(EF_DG7_TAG, images, DisplayedImageInfo.DISPLAYED_SIGNATURE_OR_MARK_TAG);
+  }
+  
+  /**
+   * Constructs a new file from binary representation.
+   * 
+   * @param inputStream an input stream
+   * 
+   * @throws IOException on error reading input stream
+   */
+  public DG7File(InputStream inputStream) throws IOException {
+    super(EF_DG7_TAG, inputStream);
+  }
 }

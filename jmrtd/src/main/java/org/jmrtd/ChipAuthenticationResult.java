@@ -34,60 +34,60 @@ import java.security.PublicKey;
  * @version $Revision: $
  */
 public class ChipAuthenticationResult {
-
-	private BigInteger keyId;
-	private PublicKey publicKey;
-	private byte[] keyHash;
-	private KeyPair keyPair;
-
-	/**
-	 * Creates a result.
-	 *
-	 * @param keyId the key identifier of the ICC's public key or -1
-	 * @param publicKey the ICC's public key
-	 * @param keyHash the hash of the key
-	 * @param keyPair the key pair
-	 */
-	public ChipAuthenticationResult(BigInteger keyId, PublicKey publicKey, byte[] keyHash, KeyPair keyPair) {
-		this.keyId = keyId;
-		this.publicKey = publicKey;
-		this.keyHash = keyHash;
-		this.keyPair = keyPair;
-	}
-
-	/**
-	 * Gets the ICC's public key identifier
-	 *
-	 * @return the key id or -1
-	 */
-	public BigInteger getKeyId() {
-		return keyId;
-	}
-	
-	/**
-	 * Gets the ICC's public key that was used as input to chip authentication protocol
-	 *
-	 * @return the public key
-	 */
-	public PublicKey getPublicKey() {
-		return publicKey;
-	}
-
-	/**
-	 * Gets the hash of the key.
-	 *
-	 * @return the hash of the key
-	 */
-	public byte[] getKeyHash() {
-		return keyHash;
-	}
-
-	/**
-	 * The ephemeral key pair resulting from chip authentication.
-	 *
-	 * @return a key pair
-	 */
-	public KeyPair getKeyPair() {
-		return keyPair;
-	}
+  
+  private BigInteger keyId;
+  private PublicKey publicKey;
+  private byte[] keyHash;
+  private KeyPair keyPair;
+  
+  /**
+   * Creates a result.
+   *
+   * @param keyId the key identifier of the ICC's public key or -1
+   * @param publicKey the ICC's public key
+   * @param keyHash the hash of the key
+   * @param keyPair the key pair
+   */
+  public ChipAuthenticationResult(BigInteger keyId, PublicKey publicKey, byte[] keyHash, KeyPair keyPair) {
+    this.keyId = keyId;
+    this.publicKey = publicKey;
+    this.keyHash = keyHash;
+    this.keyPair = keyPair;
+  }
+  
+  /**
+   * Gets the ICC's public key identifier
+   *
+   * @return the key id or -1
+   */
+  public BigInteger getKeyId() {
+    return keyId;
+  }
+  
+  /**
+   * Gets the ICC's public key that was used as input to chip authentication protocol
+   *
+   * @return the public key
+   */
+  public PublicKey getPublicKey() {
+    return publicKey;
+  }
+  
+  /**
+   * Gets the hash of the key.
+   *
+   * @return the hash of the key
+   */
+  public byte[] getKeyHash() {
+    return keyHash;
+  }
+  
+  /**
+   * The ephemeral key pair resulting from chip authentication.
+   *
+   * @return a key pair
+   */
+  public KeyPair getKeyPair() {
+    return keyPair;
+  }
 }

@@ -37,52 +37,52 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 abstract class AbstractLDSFile implements LDSFile {
-
-	private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-	
-	private static final long serialVersionUID = -4908935713109830409L;
-
-	/**
-	 * Constructor only visible to the other
-	 * classes in this package.
-	 */
-	AbstractLDSFile() {
-	}
-
-	/**
-	 * Gets the contents of this file as byte array,
-	 * includes the ICAO tag and length.
-	 *
-	 * @return a byte array containing the file
-	 */
-	public byte[] getEncoded() {
-		try {
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			writeObject(out);
-			out.flush();
-			out.close();
-			return out.toByteArray();
-		} catch (IOException ioe) {
-			LOGGER.severe("Exception: " + ioe.getMessage());
-			return null;
-		}
-	}
-	
-	/**
-	 * Reads the file from an input stream.
-	 *
-	 * @param inputStream the input stream to read from
-	 *
-	 * @throws IOException if reading fails
-	 */
-	protected abstract void readObject(InputStream inputStream) throws IOException;
-
-	/**
-	 * Writes the file to an output stream.
-	 *
-	 * @param outputStream the output stream to write to
-	 *
-	 * @throws IOException if writing fails
-	 */
-	protected abstract void writeObject(OutputStream outputStream) throws IOException;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final long serialVersionUID = -4908935713109830409L;
+  
+  /**
+   * Constructor only visible to the other
+   * classes in this package.
+   */
+  AbstractLDSFile() {
+  }
+  
+  /**
+   * Gets the contents of this file as byte array,
+   * includes the ICAO tag and length.
+   *
+   * @return a byte array containing the file
+   */
+  public byte[] getEncoded() {
+    try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      writeObject(out);
+      out.flush();
+      out.close();
+      return out.toByteArray();
+    } catch (IOException ioe) {
+      LOGGER.severe("Exception: " + ioe.getMessage());
+      return null;
+    }
+  }
+  
+  /**
+   * Reads the file from an input stream.
+   *
+   * @param inputStream the input stream to read from
+   *
+   * @throws IOException if reading fails
+   */
+  protected abstract void readObject(InputStream inputStream) throws IOException;
+  
+  /**
+   * Writes the file to an output stream.
+   *
+   * @param outputStream the output stream to write to
+   *
+   * @throws IOException if writing fails
+   */
+  protected abstract void writeObject(OutputStream outputStream) throws IOException;
 }

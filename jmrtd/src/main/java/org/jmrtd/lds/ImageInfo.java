@@ -30,71 +30,71 @@ import java.io.InputStream;
  * @author The JMRTD team (info@jmrtd.org)
  */
 public interface ImageInfo extends LDSElement {
-
-	/** Mime-types. */
-	static String
-	JPEG_MIME_TYPE = "image/jpeg",
-	JPEG2000_MIME_TYPE = "image/jp2",
-	WSQ_MIME_TYPE = "image/x-wsq";
-	
-	/** Type of image. */
-	static final int
-	TYPE_PORTRAIT = 0,
-	TYPE_SIGNATURE_OR_MARK = 1,
-	TYPE_FINGER = 2,
-	TYPE_IRIS = 3;
-	
-	/**
-	 * Gets the (biometric) type of the image.
-	 * One of
-	 * {@link #TYPE_PORTRAIT},
-	 * {@link #TYPE_SIGNATURE_OR_MARK},
-	 * {@link #TYPE_FINGER},
-	 * {@link #TYPE_IRIS}.
-	 * 
-	 * @return type of image
-	 */
-	int getType();
-	
-	/**
-	 * Gets the mime-type of the encoded image as a <code>String</code>.
-	 * 
-	 * @return mime-type string
-	 */
-	String getMimeType();
-	
-	/**
-	 * Gets the width of the image in pixels.
-	 * 
-	 * @return image width
-	 */
-	int getWidth();
-	
-	/**
-	 * Gets the height of the image in pixels.
-	 * 
-	 * @return image height
-	 */
-	int getHeight();
-	
-	/**
-	 * Gets the length of the total record (header and data) in bytes.
-	 * 
-	 * @return the length of the record
-	 */
-	long getRecordLength();
-	
-	/**
-	 * Gets the length of the encoded image in bytes.
-	 * 
-	 * @return the length of the image bytes
-	 */
-	int getImageLength();
-	
-	/**
-	 * Gets an input stream from which the image bytes can be read.
-	 * 
-	 * @return image input stream
-	 */
-	InputStream getImageInputStream();
+  
+  /** Mime-types. */
+  static String
+  JPEG_MIME_TYPE = "image/jpeg",
+  JPEG2000_MIME_TYPE = "image/jp2",
+  WSQ_MIME_TYPE = "image/x-wsq";
+  
+  /** Type of image. */
+  static final int
+  TYPE_PORTRAIT = 0,
+  TYPE_SIGNATURE_OR_MARK = 1,
+  TYPE_FINGER = 2,
+  TYPE_IRIS = 3;
+  
+  /**
+   * Gets the (biometric) type of the image.
+   * One of
+   * {@link #TYPE_PORTRAIT},
+   * {@link #TYPE_SIGNATURE_OR_MARK},
+   * {@link #TYPE_FINGER},
+   * {@link #TYPE_IRIS}.
+   * 
+   * @return type of image
+   */
+  int getType();
+  
+  /**
+   * Gets the mime-type of the encoded image as a <code>String</code>.
+   * 
+   * @return mime-type string
+   */
+  String getMimeType();
+  
+  /**
+   * Gets the width of the image in pixels.
+   * 
+   * @return image width
+   */
+  int getWidth();
+  
+  /**
+   * Gets the height of the image in pixels.
+   * 
+   * @return image height
+   */
+  int getHeight();
+  
+  /**
+   * Gets the length of the total record (header and data) in bytes.
+   * 
+   * @return the length of the record
+   */
+  long getRecordLength();
+  
+  /**
+   * Gets the length of the encoded image in bytes.
+   * 
+   * @return the length of the image bytes
+   */
+  int getImageLength();
+  
+  /**
+   * Gets an input stream from which the image bytes can be read.
+   * 
+   * @return image input stream
+   */
+  InputStream getImageInputStream();
 }

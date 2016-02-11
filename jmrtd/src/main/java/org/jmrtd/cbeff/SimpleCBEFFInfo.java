@@ -36,24 +36,24 @@ package org.jmrtd.cbeff;
  * @since 0.4.7
  */
 public class SimpleCBEFFInfo<B extends BiometricDataBlock> implements CBEFFInfo {
-
-	private B bdb;
-	
-	/**
-	 * Constructs a simple CBEFF info from the given BDB.
-	 * 
-	 * @param bdb a biometric data block
-	 */
-	public SimpleCBEFFInfo(B bdb) {
-		this.bdb = bdb;
-	}
-	
-	/**
-	 * Gets the biometric data block from this simple CBEFF info.
-	 * 
-	 * @return a biometric data block
-	 */
-	public B getBiometricDataBlock() {
-		return bdb;
-	}
+  
+  private B bdb;
+  
+  /**
+   * Constructs a simple CBEFF info from the given BDB.
+   * 
+   * @param bdb a biometric data block
+   */
+  public SimpleCBEFFInfo(B bdb) {
+    this.bdb = bdb;
+  }
+  
+  /**
+   * Gets the biometric data block from this simple CBEFF info.
+   * 
+   * @return a biometric data block
+   */
+  public B getBiometricDataBlock() {
+    return bdb;
+  }
 }
