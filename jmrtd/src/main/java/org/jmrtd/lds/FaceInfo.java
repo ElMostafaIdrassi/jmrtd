@@ -42,6 +42,8 @@ import org.jmrtd.cbeff.StandardBiometricHeader;
  * See 5.1 of ISO 19794-5.
  * 
  * @author The JMRTD team (info@jmrtd.org)
+ * 
+ * @version $Revision$
  */
 public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements BiometricDataBlock {
   

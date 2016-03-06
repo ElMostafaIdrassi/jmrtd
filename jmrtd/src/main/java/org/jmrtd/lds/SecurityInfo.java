@@ -38,13 +38,17 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 
+/* FIXME: dependency on BC in interface? */
+
 /**
  * Abstract base class for security info structure.
- * See the EAC 1.11 specification.
+ * See the BSI EAC 1.11 specification.
+ * See the ICAO TR - SAC v1.1 specification.
  *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
- *
- * FIXME: dependency on BC in interface?
+ * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * 
+ * @version $Revision$
  */
 public abstract class SecurityInfo extends AbstractLDSInfo {
   
@@ -95,6 +99,9 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   ID_PACE_ECDH_IM = ID_PACE + ".4";
   
   public static final String
+  ID_PACE_ECDH_CAM = ID_PACE + ".6";
+    
+  public static final String
   ID_PACE_DH_GM_3DES_CBC_CBC = ID_PACE_DH_GM + ".1", /* 0.4.0.127.0.7.2.2.4.1.1, id-PACE-DH-GM-3DES-CBC-CBC */
   ID_PACE_DH_GM_AES_CBC_CMAC_128 = ID_PACE_DH_GM + ".2", /* 0.4.0.127.0.7.2.2.4.1.2, id-PACE-DH-GM-AES-CBC-CMAC-128 */
   ID_PACE_DH_GM_AES_CBC_CMAC_192 = ID_PACE_DH_GM + ".3", /* 0.4.0.127.0.7.2.2.4.1.3, id-PACE-DH-GM-AES-CBC-CMAC-192 */
@@ -117,6 +124,11 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   ID_PACE_ECDH_IM_AES_CBC_CMAC_128 = ID_PACE_ECDH_IM + ".2", /* 0.4.0.127.0.7.2.2.4.4.2, id-PACE-ECDH-IM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_192 = ID_PACE_ECDH_IM + ".3", /* 0.4.0.127.0.7.2.2.4.4.3, id-PACE-ECDH-IM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_256 = ID_PACE_ECDH_IM + ".4"; /* 0.4.0.127.0.7.2.2.4.4.4, id-PACE-ECDH-IM-AES-CBC-CMAC-256 */
+  
+  public static final String
+  ID_PACE_ECDH_CAM_AES_CBC_CMAC_128 = ID_PACE_ECDH_CAM + ".2", /* 0.4.0.127.0.7.2.2.4.6.2, id-PACE-ECDH-CAM-AES-CBC-CMAC-128 */
+  ID_PACE_ECDH_CAM_AES_CBC_CMAC_192 = ID_PACE_ECDH_CAM + ".3", /* 0.4.0.127.0.7.2.2.4.6.3, id-PACE-ECDH-CAM-AES-CBC-CMAC-192 */
+  ID_PACE_ECDH_CAM_AES_CBC_CMAC_256 = ID_PACE_ECDH_CAM + ".4"; /* 0.4.0.127.0.7.2.2.4.6.4, id-PACE-ECDH-CAM-AES-CBC-CMAC-256 */
   
   /**
    * Returns a DER object with this SecurityInfo data (DER sequence)
@@ -225,9 +237,9 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   }
   
   protected static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {
-    if (ID_PK_DH_OID.equals(oid)) { return "id_PK_DH"; }
-    if (ID_PK_ECDH_OID.equals(oid)) { return "id_PK_ECDH"; }
-    if (ID_TA_OID.equals(oid)) { return "id_TA"; }
+    if (ID_PK_DH_OID.equals(oid)) { return "id-PK-DH"; }
+    if (ID_PK_ECDH_OID.equals(oid)) { return "id-PK-ECDH"; }
+    if (ID_TA_OID.equals(oid)) { return "id-TA"; }
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 }

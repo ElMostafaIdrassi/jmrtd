@@ -48,6 +48,8 @@ import org.bouncycastle.asn1.DLSequence;
  * </ul>
  *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
+ * 
+ * @version $Revision$
  *
  * FIXME: dependency on BC?
  */

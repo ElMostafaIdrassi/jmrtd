@@ -50,8 +50,8 @@ public class PACEInfo extends SecurityInfo {
   
   private static final long serialVersionUID = 7960925013249578359L;
   
-  /** Generic mapping and Integrated mapping. */
-  public enum MappingType { GM, IM };
+  /** Generic mapping and Integrated mapping and CAM mapping. */
+  public enum MappingType { GM, IM, CAM };
   
   /** Standardized domain parameters. Based on Table 6. */
   public static final int
@@ -217,6 +217,10 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) {
       return MappingType.IM;
+    } else if (ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
+      return MappingType.CAM;
     }
     //		return null;
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
@@ -239,7 +243,10 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_IM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) {
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "ECDH";
     }
     //		return null;
@@ -264,7 +271,10 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) {
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "AES";
     }
     //			return null;
@@ -279,16 +289,19 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
         || ID_PACE_DH_IM_AES_CBC_CMAC_128.equals(oid)
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_128.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)) {
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)) {
       return "SHA-1";
     } else if (ID_PACE_DH_GM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_DH_IM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_DH_GM_AES_CBC_CMAC_256.equals(oid)
         || ID_PACE_DH_IM_AES_CBC_CMAC_256.equals(oid)
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) {
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "SHA-256";
     }
     //			return null;
@@ -304,17 +317,19 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_DH_IM_AES_CBC_CMAC_128.equals(oid)
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_128.equals(oid)
         || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)
-        ) {
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)) {
       return 128;
     } else if (ID_PACE_DH_GM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_DH_IM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)) {
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)) {
       return 192;
     } else if (ID_PACE_DH_GM_AES_CBC_CMAC_256.equals(oid)
         || ID_PACE_DH_IM_AES_CBC_CMAC_256.equals(oid)
         || ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) {
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return 256;
     } else {
       // return -1;
@@ -381,6 +396,9 @@ public class PACEInfo extends SecurityInfo {
     if (ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-ECDH-IM-AES-CBC-CMAC-128"; }
     if (ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-ECDH-IM-AES-CBC-CMAC-192"; }
     if (ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE-ECDH-IM-AES-CBC-CMAC-256"; }
+    if (ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-ECDH-CAM-AES-CBC-CMAC-128"; }
+    if (ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-ECDH-CAM-AES-CBC-CMAC-192"; }
+    if (ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE-ECDH-CAM-AES-CBC-CMAC-256"; }    
     return oid;
   }
 }

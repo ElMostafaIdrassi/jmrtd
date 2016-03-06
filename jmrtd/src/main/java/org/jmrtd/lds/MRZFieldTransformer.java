@@ -39,12 +39,12 @@ public interface MRZFieldTransformer {
   /**
    * Truncates the primary and secondary identifiers. The resulting array has length
    * 2 and contains the truncated primary and secondary identifiers.
-   * 
+   *
    * Each identifier consists of components separated by <code>&quot;&lt;&quot;</code>.
    * The maximum length of the resulting
    * <code>primaryIdentifier + &quot;&lt;&lt;&quot; secondaryIdentifier</code>
    * is <code>length</code>.
-   * 
+   *
    * @param primaryIdentifier the original primary identifier
    * @param secondaryIdentifier the original secondary identifier
    * @param length the maximum length of the resulting identifier (including the <code>&quot;&lt;&lt;&quot;</code>
@@ -55,7 +55,7 @@ public interface MRZFieldTransformer {
   
   /**
    * Transliterates <code>text</code>, replacing non-ISO characters with ISO characters.
-   * 
+   *
    * @param text some text containing non-ISO characters
    *
    * @return the same text containing only ISO characters

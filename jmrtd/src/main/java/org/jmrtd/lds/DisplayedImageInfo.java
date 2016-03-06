@@ -36,7 +36,7 @@ import net.sf.scuba.tlv.TLVUtil;
  * 
  * @author The JMRTD team (info@jmrtd.org)
  *
- * @version $Id$
+ * @version $Revision$
  */
 public class DisplayedImageInfo extends AbstractImageInfo {
   

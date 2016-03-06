@@ -28,6 +28,8 @@ import java.io.InputStream;
  * Common interface type for records containing an encoded image.
  * 
  * @author The JMRTD team (info@jmrtd.org)
+ * 
+ * @version $Revision$
  */
 public interface ImageInfo extends LDSElement {
   

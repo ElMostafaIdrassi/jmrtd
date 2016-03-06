@@ -143,15 +143,23 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
   
   public static boolean checkRequiredIdentifier(String oid) {
-    return ID_PACE_DH_GM.equals(oid) || ID_PACE_ECDH_GM.equals(oid) || ID_PACE_DH_IM.equals(oid) || ID_PACE_ECDH_IM.equals(oid);
+    return ID_PACE_DH_GM.equals(oid)
+        || ID_PACE_ECDH_GM.equals(oid)
+        || ID_PACE_DH_IM.equals(oid)
+        || ID_PACE_ECDH_IM.equals(oid)
+//        || ID_PACE_DH_CAM.equals(oid) /* FIXME: TR-SAC v1.1 page 30? */
+        || ID_PACE_ECDH_CAM.equals(oid);
   }
   
   /* ONLY PRIVATE METHODS BELOW */
   
   private static AlgorithmIdentifier toAlgorithmIdentifier(String protocolOID, ASN1Encodable parameters) {
-    if (ID_PACE_DH_GM.equals(protocolOID) || ID_PACE_DH_IM.equals(protocolOID)) {
+    if (ID_PACE_DH_GM.equals(protocolOID)
+        || ID_PACE_DH_IM.equals(protocolOID)) {
       return new AlgorithmIdentifier(new ASN1ObjectIdentifier(ID_DH_PUBLIC_NUMBER), parameters);
-    } else if (ID_PACE_ECDH_GM.equals(protocolOID) || ID_PACE_ECDH_IM.equals(protocolOID)) {
+    } else if (ID_PACE_ECDH_GM.equals(protocolOID)
+        || ID_PACE_ECDH_IM.equals(protocolOID)
+        || ID_PACE_ECDH_CAM.equals(protocolOID)) {
       return new AlgorithmIdentifier(new ASN1ObjectIdentifier(ID_EC_PUBLIC_KEY), parameters);
     }
     throw new IllegalArgumentException("Cannot infer algorithm OID from protocol OID: " + protocolOID);

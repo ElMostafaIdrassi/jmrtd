@@ -134,7 +134,7 @@ public class PassportService extends PassportApduService implements Serializable
   /** Data group 13 contains optional details. */
   public static final short EF_DG13 = 0x010D;
   
-  /** Data group 14 is RFU. */
+  /** Data group 14 contains security infos. */
   public static final short EF_DG14 = 0x010E;
   
   /** Data group 15 contains the public key used for Active Authentication. */

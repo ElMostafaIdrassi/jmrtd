@@ -54,6 +54,8 @@ import org.jmrtd.Util;
  * </ul>
  *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
+ * 
+ * @version $Revision$
  *
  * FIXME: interface dependency on BC classes?
  * FIXME: maybe clean up some of these constructors...

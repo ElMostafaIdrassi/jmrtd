@@ -62,7 +62,7 @@ public class CardAccessFile {
   /**
    * Constructs a new file from the provided data.
    *
-   * @param securityInfos a list of security infos
+   * @param securityInfos a non-empty list of security infos
    */
   public CardAccessFile(Collection<SecurityInfo> securityInfos) {
     if (securityInfos == null) { throw new IllegalArgumentException("Null securityInfos"); }

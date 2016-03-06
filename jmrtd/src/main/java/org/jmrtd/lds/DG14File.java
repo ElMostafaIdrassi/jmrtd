@@ -51,6 +51,8 @@ import org.bouncycastle.asn1.DLSet;
  * checked here!), and the file identifier of the efCVCA file.
  *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
+ * 
+ * @version $Revision$
  */
 public class DG14File extends DataGroup {
   
