@@ -30,6 +30,7 @@ import java.security.Provider;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
@@ -78,7 +79,7 @@ public class PassportApduService extends CardService {
   MRZ_PACE_KEY_REFERENCE = 0x01,
   CAN_PACE_KEY_REFERENCE = 0x02,
   PIN_PACE_KEY_REFERENCE = 0x03,
-  PUK_PACE_REFERENCE = 0x04;
+  PUK_PACE_KEY_REFERENCE = 0x04;
   
   private static final long serialVersionUID = 2451509825132976178L;
   
@@ -133,7 +134,7 @@ public class PassportApduService extends CardService {
       mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
       cipher = Cipher.getInstance("DESede/CBC/NoPadding");
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
+      LOGGER.log(Level.SEVERE, "Unexpected security exception during initialization", gse);
       throw new CardServiceException(gse.toString());
     }
   }
@@ -161,12 +162,18 @@ public class PassportApduService extends CardService {
   }
   
   /**
-   * TO CLARIFY: If the card responds with a status word other than 0x9000,
-   * ie. an staus word indicating an error, this method does NOT throw a
-   * CardServiceException, but it returns this as error code as result.
-   * Right? This can cause confusion, as most other method DO translate any
-   * status words indicating errors into CardServiceExceptions.
-   */
+   * Tranceives an APDU.
+   *
+   * If the card responds with a status word other than {@code 0x9000} this method does
+   * NOT throw a {@linkplain CardServiceException}, but it returns this as error code
+   * as result.
+
+   * @param capdu the command APDU
+   * 
+   * @return the response APDU
+   * 
+   * @throws CardServiceException on error
+   */ 
   public synchronized ResponseAPDU transmit(CommandAPDU capdu) throws CardServiceException {
     return service.transmit(capdu);
   }
@@ -638,7 +645,9 @@ public class PassportApduService extends CardService {
   }
   
   /**
-   * The MSE AT APDU for TA, see EAC 1.11 spec, Section B.2.
+   * The MSE Set AT APDU for TA, see EAC 1.11 spec, Section B.2.
+   * MANAGE SECURITY ENVIRONMENT command with SET Authentication Template function.
+   * 
    * Note that caller is responsible for prefixing the byte[] params with specified tags.
    *
    * @param wrapper secure messaging wrapper
@@ -654,6 +663,11 @@ public class PassportApduService extends CardService {
       throw new CardServiceException("Sending MSE AT failed", sw);
     }
   }
+  
+  /*
+   * FIXME: Make prefixing 0x8x tags responsibilities consistent between ext auth and mutual auth
+   * Now: above method makes caller responsible, below method callee is responsible. -- MO
+   */
   
   /**
    * The MSE AT APDU for PACE, see ICAO TR-SAC-1.01, Section 3.2.1, BSI TR 03110 v2.03 B11.1.
@@ -684,7 +698,8 @@ public class PassportApduService extends CardService {
       oidTLVIn.close();
       oidBytes = Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
     } catch (IOException ioe) {
-      throw new IllegalArgumentException("Illegal OID: " + oid + " (" + ioe.getMessage() + ")");
+      LOGGER.log(Level.WARNING, "Unexpected exception interpreting OID \"" + oid + "\"", ioe);
+      throw new IllegalArgumentException("Illegal OID: \"" + oid + "\" (" + ioe.getMessage() + ")");
     }
     
     /*
@@ -694,7 +709,9 @@ public class PassportApduService extends CardService {
     if (!(refPublicKeyOrSecretKey == MRZ_PACE_KEY_REFERENCE
         || refPublicKeyOrSecretKey == CAN_PACE_KEY_REFERENCE
         || refPublicKeyOrSecretKey == PIN_PACE_KEY_REFERENCE
-        || refPublicKeyOrSecretKey == PUK_PACE_REFERENCE)) { throw new IllegalArgumentException("Unsupported key type reference (MRZ, CAN, etc), found " + refPublicKeyOrSecretKey); }
+        || refPublicKeyOrSecretKey == PUK_PACE_KEY_REFERENCE)) {
+      throw new IllegalArgumentException("Unsupported key type reference (MRZ, CAN, etc), found " + refPublicKeyOrSecretKey);
+    }
     
     byte[] refPublicKeyOrSecretKeyBytes = Util.wrapDO((byte)0x83, new byte[] { (byte)refPublicKeyOrSecretKey }); /* FIXME: define constant for 0x83 */
     
@@ -720,7 +737,7 @@ public class PassportApduService extends CardService {
       }
     } catch (IOException ioe) {
       /* NOTE: should never happen. */
-      LOGGER.severe("Error while copying data: " + ioe.getMessage());
+      LOGGER.log(Level.SEVERE, "Error while copying data", ioe);
       throw new IllegalStateException("Error while copying data");
     }
     byte[] data = dataOutputStream.toByteArray();
@@ -868,8 +885,8 @@ public class PassportApduService extends CardService {
         return;
       case ISO7816.SW_FILE_NOT_FOUND:
         throw new CardServiceException("File not found, " + commandResponseMessage, sw);
-      case ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED:
-      case ISO7816.SW_CONDITIONS_NOT_SATISFIED:
+      case ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED: /* NOTE: fall through. */
+      case ISO7816.SW_CONDITIONS_NOT_SATISFIED: /* NOTE: fall through. */
       case ISO7816.SW_COMMAND_NOT_ALLOWED:
         throw new CardServiceException("Access to file denied, " + commandResponseMessage, sw);
     }

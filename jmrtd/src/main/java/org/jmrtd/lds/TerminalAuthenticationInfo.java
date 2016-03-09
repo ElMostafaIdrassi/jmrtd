@@ -58,7 +58,8 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  public static final int VERSION_NUM = 1;
+  public static final int VERSION_NUM_1 = 1;
+  private static final int VERSION_NUM_2 = 2;
   
   private String oid;
   private int version;
@@ -95,10 +96,10 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   
   /**
    * Constructs a terminal authentication info using id_TA identifier {@link #ID_TA_OID}
-   * and version {@value #VERSION_NUM}.
+   * and version {@value #VERSION_NUM_1}.
    */
   public TerminalAuthenticationInfo() {
-    this(ID_TA_OID, VERSION_NUM);
+    this(ID_TA_OID, VERSION_NUM_1);
   }
   
   /**
@@ -111,7 +112,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
    *            short file id for the above file, -1 if none
    */
   public TerminalAuthenticationInfo(short fileId, byte shortFileId) {
-    this(ID_TA_OID, VERSION_NUM, constructEFCVCA(fileId, shortFileId));
+    this(ID_TA_OID, VERSION_NUM_1, constructEFCVCA(fileId, shortFileId));
   }
   
   ASN1Primitive getDERObject() {
@@ -197,8 +198,13 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
    */
   private void checkFields() {
     try {
-      if (!checkRequiredIdentifier(oid)) { throw new IllegalArgumentException("Wrong identifier: " + oid); }
-      if (version != VERSION_NUM) { throw new IllegalArgumentException("Wrong version"); }
+      if (!checkRequiredIdentifier(oid)) {
+        throw new IllegalArgumentException("Wrong identifier: " + oid);
+      }
+      if (version != VERSION_NUM_1 && version != VERSION_NUM_2) {
+        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_NUM_1 + " or " + VERSION_NUM_2
+            + ", found " + version);
+      }
       if (efCVCA != null) {
         DEROctetString fid = (DEROctetString)efCVCA.getObjectAt(0);
         if (fid.getOctets().length != 2) { throw new IllegalArgumentException("Malformed FID."); }

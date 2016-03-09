@@ -109,8 +109,8 @@ public class DG14FileTest extends TestCase {
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));
-      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM, BigInteger.valueOf(1)));
-      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM, BigInteger.valueOf(2)));
+      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1, BigInteger.valueOf(1)));
+      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1, BigInteger.valueOf(2)));
       securityInfos.add(new TerminalAuthenticationInfo());
       DG14File dg14File2 = new DG14File(securityInfos);
       assertNotNull(dg14File2.getChipAuthenticationInfos());
@@ -473,8 +473,8 @@ public class DG14FileTest extends TestCase {
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));	
-      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM, BigInteger.valueOf(1)));
-      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM, BigInteger.valueOf(2)));
+      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1, BigInteger.valueOf(1)));
+      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1, BigInteger.valueOf(2)));
       securityInfos.add(new TerminalAuthenticationInfo());
       securityInfos.add(new PACEInfo(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P224_R1));
       DG14File dg14 = new DG14File(securityInfos);
@@ -538,7 +538,7 @@ public class DG14FileTest extends TestCase {
   
   private DG14File getGWSample() throws GeneralSecurityException {
     Collection<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
-    securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM));
+    securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1));
     securityInfos.add(getGWSampleChipAuthenticationPublicKeyInfo());
     DG14File dg14 = new DG14File(securityInfos);
     return dg14;
@@ -592,8 +592,8 @@ public class DG14FileTest extends TestCase {
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));	
-      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM, BigInteger.valueOf(1)));
-      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM, BigInteger.valueOf(2)));
+      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1, BigInteger.valueOf(1)));
+      securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC_OID, ChipAuthenticationInfo.VERSION_NUM_1, BigInteger.valueOf(2)));
       securityInfos.add(new TerminalAuthenticationInfo());
       securityInfos.add(new PACEInfo(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P224_R1));
       DG14File dg14 = new DG14File(securityInfos);

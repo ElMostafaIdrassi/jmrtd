@@ -32,13 +32,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactorySpi;
 import java.util.Collection;
 
-import net.sf.scuba.tlv.TLVInputStream;
-import net.sf.scuba.tlv.TLVOutputStream;
-
 import org.ejbca.cvc.CVCObject;
 import org.ejbca.cvc.CertificateParser;
 import org.ejbca.cvc.exception.ConstructionException;
 import org.ejbca.cvc.exception.ParseException;
+
+import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * Card verifiable certificate factory.

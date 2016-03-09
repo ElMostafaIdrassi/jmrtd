@@ -40,8 +40,6 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import net.sf.scuba.data.Country;
-
 import org.ejbca.cvc.AccessRightEnum;
 import org.ejbca.cvc.AlgorithmUtil;
 import org.ejbca.cvc.AuthorizationRoleEnum;
@@ -51,6 +49,8 @@ import org.ejbca.cvc.HolderReferenceField;
 import org.ejbca.cvc.OIDField;
 import org.ejbca.cvc.ReferenceField;
 import org.ejbca.cvc.exception.ConstructionException;
+
+import net.sf.scuba.data.Country;
 
 /**
  * Card verifiable certificates as specified in TR 03110.

@@ -56,6 +56,7 @@ import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
 import org.jmrtd.lds.MRZInfo;
 import org.jmrtd.lds.PACEInfo;
+import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardFileInputStream;
@@ -143,8 +144,11 @@ public class PassportService extends PassportApduService implements Serializable
   /** Data group 16 contains person(s) to notify. */
   public static final short EF_DG16 = 0x0110;
   
-  /** CardAccess. */
+  /** Card Access. */
   public static final short EF_CARD_ACCESS = 0x011C;
+  
+  /** Card Security. */
+  public static final short EF_CARD_SECURITY = 0x011D;
   
   /** The security document. */
   public static final short EF_SOD = 0x011D;
@@ -222,6 +226,7 @@ public class PassportService extends PassportApduService implements Serializable
   protected SecureMessagingWrapper wrapper;
   
   protected Random random;
+  
   private MRTDFileSystem fs;
   
   /**
@@ -597,6 +602,7 @@ public class PassportService extends PassportApduService implements Serializable
      * Exchange authentication token T_PCD and T_PICC with PICC.
      * Check authentication token T_PICC.
      */
+    byte[] encryptedChipAuthenticationData = null;
     try {
       LOGGER.info("DEBUG: macKey = (" + macKey.getEncoded().length + ") " + Hex.bytesToHexString(macKey.getEncoded()));
       byte[] pcdToken = Util.generateAuthenticationToken(oid, macKey, piccPublicKey);
@@ -606,6 +612,10 @@ public class PassportService extends PassportApduService implements Serializable
       byte[] expectedPICCToken = Util.generateAuthenticationToken(oid, macKey, pcdPublicKey);
       if (!Arrays.equals(expectedPICCToken, piccToken)) {
         throw new GeneralSecurityException("PICC authentication token mismatch");
+      }
+      
+      if (mappingType == MappingType.CAM) {
+        encryptedChipAuthenticationData = Util.unwrapDO((byte)0x8A, step4Data);
       }
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side exception in authentication token generation step: " + gse.getMessage());
@@ -633,6 +643,20 @@ public class PassportService extends PassportApduService implements Serializable
     } catch (GeneralSecurityException gse) {
       LOGGER.severe("Exception: " + gse.getMessage());
       throw new IllegalStateException("Security exception in secure messaging establishment: " + gse.getMessage());
+    }
+    
+    if (MappingType.CAM.equals(mappingType)) {
+      LOGGER.info("DEBUG: Inspecting EF.CardSecurity for Chip Authentication Mapping");
+      /*
+       * TODO:
+       *    - read and verify CardSecurity
+       *    - use the Public Key from CardSecurity together with the Mapping Data and
+       *      the Chip Authentication Data received as part of PACE-CAM to authenticate
+       *      the chip (section 3.4.4.2).
+       *      
+       *    The terminal SHALL decrypt A_PICC to recover CA_PICC and verify
+       *    PK_{Map,PICC}=KA(CA_PICC ,PK_PICC,D_PICC),where PK_PICC is the static public key of the MRTD chip.
+       */
     }
   }
   

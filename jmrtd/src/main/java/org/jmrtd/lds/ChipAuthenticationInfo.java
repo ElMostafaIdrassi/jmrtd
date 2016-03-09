@@ -23,6 +23,7 @@
 package org.jmrtd.lds;
 
 import java.math.BigInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -59,7 +60,9 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  public static final int VERSION_NUM = 1;
+  public static final int
+  VERSION_NUM_1 = 1,
+  VERSION_NUM_2 = 2;
   
   private String oid;
   private int version;
@@ -68,12 +71,9 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   /**
    * Constructs a new object.
    *
-   * @param oid
-   *            a proper EAC identifier
-   * @param version
-   *            has to be 1
-   * @param keyId
-   *            the key identifier
+   * @param oid a proper EAC identifier
+   * @param version has to be 1 or 2
+   * @param keyId the key identifier
    */
   public ChipAuthenticationInfo(String oid, int version, BigInteger keyId) {
     this.oid = oid;
@@ -85,10 +85,8 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   /**
    * Constructs a new object.
    *
-   * @param oid
-   *            a proper EAC identifier
-   * @param version
-   *            has to be 1
+   * @param oid a proper EAC identifier
+   * @param version has to be 1 or 2
    */
   public ChipAuthenticationInfo(String oid, int version) {
     this(oid, version, BigInteger.valueOf(-1));
@@ -126,11 +124,12 @@ public class ChipAuthenticationInfo extends SecurityInfo {
       if (!checkRequiredIdentifier(oid)) {
         throw new IllegalArgumentException("Wrong identifier: "	+ oid);
       }
-      if (version != VERSION_NUM) {
-        throw new IllegalArgumentException("Wrong version");
+      if (version != VERSION_NUM_1 && version != VERSION_NUM_2) {
+        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_NUM_1 + " or " + VERSION_NUM_2
+            + ", found " + version);
       }
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
+      LOGGER.log(Level.SEVERE, "Exception", e);
       throw new IllegalArgumentException("Malformed ChipAuthenticationInfo.");
     }
   }
