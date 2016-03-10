@@ -31,10 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
 import org.jmrtd.PassportService;
 import org.jmrtd.lds.DG2File;
 import org.jmrtd.lds.DataGroup;

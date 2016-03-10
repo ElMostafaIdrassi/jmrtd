@@ -86,6 +86,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
+  /** SignedData related object identifier. */
   public static final String
   RFC_3369_SIGNED_DATA_OID = "1.2.840.113549.1.7.2",    /* id-signedData OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 } */
   RFC_3369_CONTENT_TYPE_OID = "1.2.840.113549.1.9.3",
@@ -432,7 +433,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
     }
   }
   
-  private static byte[] signData(String digestAlgorithm, String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey, String provider) {
+  public static byte[] signData(String digestAlgorithm, String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey, String provider) {
     byte[] encryptedDigest = null;
     try {
       byte[] dataToBeSigned = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo).getEncoded(ASN1Encoding.DER);

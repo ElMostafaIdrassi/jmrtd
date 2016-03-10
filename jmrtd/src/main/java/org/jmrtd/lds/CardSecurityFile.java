@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -64,6 +65,8 @@ public class CardSecurityFile implements Serializable {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
+  private static final String CONTENT_TYPE_OID = "0.4.0.127.0.7.3.2.1"; // FIXME
+  
   private String digestAlgorithm;
   
   private String digestEncryptionAlgorithm;
@@ -76,6 +79,35 @@ public class CardSecurityFile implements Serializable {
   
   /** The embedded document signer certificate. */
   private X509Certificate certificate;
+
+  /**
+   * Constructs a new file from the provided data.
+   *
+   * @param digestAlgorithm the digest algorithm as Java mnemonic
+   * @param digestEncryptionAlgorithm the signature algorithm as Java mnemonic
+   * @param securityInfos a non-empty list of security infos
+   * @param privateKey the private signing key
+   * @param certificate the certificate to embed, which should correspond to the given private key
+   */
+  public CardSecurityFile(String digestAlgorithm, String digestEncryptionAlgorithm, Collection<SecurityInfo> securityInfos, PrivateKey privateKey, X509Certificate certificate) {
+    this(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, privateKey, certificate, null);
+  }
+  
+  /**
+   * Constructs a new file from the provided data.
+   * 
+   * @param digestAlgorithm the digest algorithm as Java mnemonic
+   * @param digestEncryptionAlgorithm the signature algorithm as Java mnemonic
+   * @param securityInfos a non-empty list of security infos
+   * @param privateKey the private signing key
+   * @param certificate the certificate to embed, which should correspond to the given private key
+   * @param provider the security provider to use
+   */
+  public CardSecurityFile(String digestAlgorithm, String digestEncryptionAlgorithm, Collection<SecurityInfo> securityInfos, PrivateKey privateKey, X509Certificate certificate, String provider) {
+    this(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, (byte[])null, certificate);
+    ContentInfo contentInfo = getContentInfo(CONTENT_TYPE_OID, securityInfos);
+    this.encryptedDigest = SignedDataUtil.signData(digestAlgorithm, digestEncryptionAlgorithm, CONTENT_TYPE_OID, contentInfo, privateKey, provider);
+  }
   
   /**
    * Constructs a new file from the provided data.
@@ -90,6 +122,10 @@ public class CardSecurityFile implements Serializable {
     if (securityInfos == null) {
       throw new IllegalArgumentException("Null securityInfos");
     }
+    if (certificate == null) {
+      throw new IllegalArgumentException("Null certificate");
+    }
+    
     this.digestAlgorithm = digestAlgorithm;
     this.digestEncryptionAlgorithm = digestEncryptionAlgorithm;
     this.securityInfos = new HashSet<SecurityInfo>(securityInfos);
@@ -137,20 +173,10 @@ public class CardSecurityFile implements Serializable {
     this.encryptedDigest = SignedDataUtil.getEncryptedDigest(signedData);
   }
   
-  /* FIXME: This should be wrapped in a SignedData. -- MO */
-  /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
   protected void writeContent(OutputStream outputStream) throws IOException {
-    ASN1EncodableVector vector = new ASN1EncodableVector();
-    for (SecurityInfo si : securityInfos) {
-      vector.add(si.getDERObject());
-    }
-    ASN1Set derSet = new DLSet(vector);
-    
-    String contentTypeOID = "0.4.0.127.0.7.3.2.1"; /* FIXME */
-    ContentInfo contentInfo = new ContentInfo(new ASN1ObjectIdentifier(contentTypeOID), new DEROctetString(derSet));
-    
     try {
-      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, certificate);
+      ContentInfo contentInfo = getContentInfo(CONTENT_TYPE_OID, securityInfos);
+      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, CONTENT_TYPE_OID, contentInfo, encryptedDigest, certificate);
       SignedDataUtil.writeData(signedData, outputStream);
     } catch (CertificateException ce) {
       LOGGER.log(Level.SEVERE, "Certificate exception during SignedData creation", ce);
@@ -161,6 +187,11 @@ public class CardSecurityFile implements Serializable {
     }
   }
   
+  /**
+   * Gets the DER encoded file.
+   * 
+   * @return the encoded file
+   */
   public byte[] getEncoded() {
     try {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -203,6 +234,22 @@ public class CardSecurityFile implements Serializable {
    *
    * @return a list of CA public key infos
    */
+  public Collection<ChipAuthenticationInfo> getChipAuthenticationInfos() {
+    List<ChipAuthenticationInfo> chipAuthenticationInfos = new ArrayList<ChipAuthenticationInfo>(securityInfos.size());
+    for (SecurityInfo securityInfo: securityInfos) {
+      if (securityInfo instanceof ChipAuthenticationPublicKeyInfo) {
+        chipAuthenticationInfos.add((ChipAuthenticationInfo)securityInfo);
+      }
+    }
+    return chipAuthenticationInfos;
+  }
+  
+  /**
+   * Gets the CA public key infos embedded in this card access file.
+   * If no infos are present, an empty list is returned.
+   *
+   * @return a list of CA public key infos
+   */
   public Collection<ChipAuthenticationPublicKeyInfo> getChipAuthenticationPublicKeyInfos() {
     List<ChipAuthenticationPublicKeyInfo> chipAuthenticationPublicKeyInfos = new ArrayList<ChipAuthenticationPublicKeyInfo>(securityInfos.size());
     for (SecurityInfo securityInfo: securityInfos) {
@@ -230,11 +277,19 @@ public class CardSecurityFile implements Serializable {
    * @return whether this object equals the other object
    */
   public boolean equals(Object otherObj) {
-    if (otherObj == null) { return false; }
-    if (!(otherObj.getClass().equals(this.getClass()))) { return false; }
+    if (otherObj == null) {
+      return false;
+    }
+    if (!(otherObj.getClass().equals(this.getClass()))) {
+      return false;
+    }
     CardSecurityFile other = (CardSecurityFile)otherObj;
-    if (securityInfos == null) { return  other.securityInfos == null; }
-    if (other.securityInfos == null) { return securityInfos == null; }
+    if (securityInfos == null) {
+      return  other.securityInfos == null;
+    }
+    if (other.securityInfos == null) {
+      return securityInfos == null;
+    }
     return securityInfos.equals(other.securityInfos);
   }
   
@@ -245,6 +300,22 @@ public class CardSecurityFile implements Serializable {
    */
   public int hashCode() {
     return 3 * securityInfos.hashCode() + 63;
+  }
+  
+  /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
+  private static ContentInfo getContentInfo(String contentTypeOID, Collection<SecurityInfo> securityInfos) {
+    try {
+      ASN1EncodableVector vector = new ASN1EncodableVector();
+      for (SecurityInfo si : securityInfos) {
+        vector.add(si.getDERObject());
+      }
+      ASN1Set derSet = new DLSet(vector);
+      
+      return new ContentInfo(new ASN1ObjectIdentifier(contentTypeOID), new DEROctetString(derSet));
+    } catch (IOException ioe) {
+      LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
+      throw new IllegalArgumentException("Error DER encoding the security infos");
+    }
   }
   
   private static Set<SecurityInfo> readSecurityInfos(ASN1Primitive encapsulatedContent) throws IOException {

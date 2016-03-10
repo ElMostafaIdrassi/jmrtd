@@ -60,9 +60,10 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
+  /** Chip Authenticaiton version. */
   public static final int
-  VERSION_NUM_1 = 1,
-  VERSION_NUM_2 = 2;
+  VERSION_1 = 1,
+  VERSION_2 = 2;
   
   private String oid;
   private int version;
@@ -124,8 +125,8 @@ public class ChipAuthenticationInfo extends SecurityInfo {
       if (!checkRequiredIdentifier(oid)) {
         throw new IllegalArgumentException("Wrong identifier: "	+ oid);
       }
-      if (version != VERSION_NUM_1 && version != VERSION_NUM_2) {
-        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_NUM_1 + " or " + VERSION_NUM_2
+      if (version != VERSION_1 && version != VERSION_2) {
+        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2
             + ", found " + version);
       }
     } catch (Exception e) {

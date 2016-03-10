@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.x500.X500Principal;
@@ -185,7 +186,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
           getLDSSecurityObject(digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion),
           privateKey, docSigningCertificate, provider);
     } catch (IOException ioe) {
-      LOGGER.severe("Error creating signedData: " + ioe.getMessage());
+      LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
       throw new IllegalArgumentException(ioe.getMessage());
     }
   }
