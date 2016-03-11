@@ -180,11 +180,13 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
       String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, CertificateException {
     super(EF_SOD_TAG);
     try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      byte[] encryptedDigest = SignedDataUtil.signData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, privateKey, provider);
+      
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,
           digestEncryptionAlgorithm,
-          ICAO_LDS_SOD_OID,
-          getLDSSecurityObject(digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion),
-          privateKey, docSigningCertificate, provider);
+          ICAO_LDS_SOD_OID, contentInfo,
+          encryptedDigest, docSigningCertificate);      
     } catch (IOException ioe) {
       LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
       throw new IllegalArgumentException(ioe.getMessage());
@@ -212,7 +214,7 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,
           digestEncryptionAlgorithm,
           ICAO_LDS_SOD_OID,
-          getLDSSecurityObject(digestAlgorithm, dataGroupHashes, null, null),
+          toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, null, null),
           encryptedDigest,
           docSigningCertificate);
     } catch (IOException ioe) {
@@ -487,6 +489,27 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
   
   /* ONLY PRIVATE METHODS BELOW */
   
+  private static ContentInfo toContentInfo(String contentTypeOID, String digestAlgorithm,
+      Map<Integer, byte[]> dataGroupHashes,
+      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, IOException {
+    DataGroupHash[] dataGroupHashesArray = new DataGroupHash[dataGroupHashes.size()];
+    int i = 0;
+    for (int dataGroupNumber: dataGroupHashes.keySet()) {
+      byte[] hashBytes = dataGroupHashes.get(dataGroupNumber);
+      DataGroupHash hash = new DataGroupHash(dataGroupNumber, new DEROctetString(hashBytes));
+      dataGroupHashesArray[i++] = hash;
+    }
+    AlgorithmIdentifier digestAlgorithmIdentifier = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
+    LDSSecurityObject securityObject = null;
+    if (ldsVersion == null) {
+      securityObject = new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray);
+    } else {
+      securityObject = new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray, new LDSVersionInfo(ldsVersion, unicodeVersion));
+    }
+    
+    return new ContentInfo(new ASN1ObjectIdentifier(contentTypeOID), new DEROctetString(securityObject));
+  }
+  
   /**
    * Reads the security object (containing the hashes
    * of the data groups) found in the SignedData field.
@@ -520,28 +543,5 @@ public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not
     } catch (IOException ioe) {
       throw new IllegalStateException("Could not read security object in signedData");
     }
-  }
-  
-  /* METHODS BELOW ARE FOR CONSTRUCTING SOD STRUCTS */
-  
-  private static ContentInfo getLDSSecurityObject(String digestAlgorithm,
-      Map<Integer, byte[]> dataGroupHashes,
-      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, IOException {
-    DataGroupHash[] dataGroupHashesArray = new DataGroupHash[dataGroupHashes.size()];
-    int i = 0;
-    for (int dataGroupNumber: dataGroupHashes.keySet()) {
-      byte[] hashBytes = dataGroupHashes.get(dataGroupNumber);
-      DataGroupHash hash = new DataGroupHash(dataGroupNumber, new DEROctetString(hashBytes));
-      dataGroupHashesArray[i++] = hash;
-    }
-    AlgorithmIdentifier digestAlgorithmIdentifier = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
-    LDSSecurityObject securityObject = null;
-    if (ldsVersion == null) {
-      securityObject = new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray);
-    } else {
-      securityObject = new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray, new LDSVersionInfo(ldsVersion, unicodeVersion));
-    }
-    
-    return new ContentInfo(new ASN1ObjectIdentifier(ICAO_LDS_SOD_OID), new DEROctetString(securityObject));
   }
 }

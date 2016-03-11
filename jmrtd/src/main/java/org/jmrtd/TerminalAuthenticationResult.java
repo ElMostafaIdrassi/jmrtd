@@ -32,7 +32,7 @@ import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
 
 /**
- * Result of EAC protocols.
+ * Result of EAC Terminal Authentication protocol.
  *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
  * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)

@@ -9,14 +9,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -61,17 +56,9 @@ public class CertificateUtil {
    * @param signatureAlgorithm the signature algorithm to use in Java mnemonic notation
    * 
    * @return the generated certificate
-   * 
-   * @throws CertificateEncodingException on error
-   * @throws InvalidKeyException on error
-   * @throws IllegalStateException on error
-   * @throws NoSuchProviderException on error
-   * @throws NoSuchAlgorithmException on error
-   * @throws SignatureException on error
    */
   public static X509Certificate createCertificate(String issuer, String subject, Date dateOfIssuing, Date dateOfExpiry,
-      PublicKey subjectPublicKey, PrivateKey issuerPrivateKey, String signatureAlgorithm) throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
-    
+      PublicKey subjectPublicKey, PrivateKey issuerPrivateKey, String signatureAlgorithm) {
     try {
       X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(new X500Name(issuer), new BigInteger("1"), dateOfIssuing, dateOfExpiry, new X500Name(subject), SubjectPublicKeyInfo.getInstance(subjectPublicKey.getEncoded()));
       byte[] certBytes = certBuilder.build(new JCESigner(issuerPrivateKey, signatureAlgorithm)).getEncoded();

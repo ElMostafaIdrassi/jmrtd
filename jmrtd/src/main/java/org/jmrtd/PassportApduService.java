@@ -114,17 +114,14 @@ public class PassportApduService extends CardService {
   /**
    * Creates a new passport APDU sending service.
    *
-   * @param service
-   *            another service which will deal with sending the APDUs to the
-   *            card
+   * @param service another service which will deal with sending the APDUs to the card
    *
-   * @throws CardServiceException
-   *             when the available JCE providers cannot provide the necessary
-   *             cryptographic primitives:
-   *             <ul>
-   *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
-   *             	   <li>Mac: "ISO9797Alg3Mac"</li>
-   *             </ul>
+   * @throws CardServiceException when the available JCE providers cannot provide the necessary
+   *                              cryptographic primitives:
+   *                              <ul>
+   *                                <li>Cipher: "DESede/CBC/Nopadding"</li>
+   *             	                  <li>Mac: "ISO9797Alg3Mac"</li>
+   *                              </ul>
    */
   public PassportApduService(CardService service) throws CardServiceException {
     this.service = service;

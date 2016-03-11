@@ -105,7 +105,7 @@ public class CardSecurityFile implements Serializable {
    */
   public CardSecurityFile(String digestAlgorithm, String digestEncryptionAlgorithm, Collection<SecurityInfo> securityInfos, PrivateKey privateKey, X509Certificate certificate, String provider) {
     this(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, (byte[])null, certificate);
-    ContentInfo contentInfo = getContentInfo(CONTENT_TYPE_OID, securityInfos);
+    ContentInfo contentInfo = toContentInfo(CONTENT_TYPE_OID, securityInfos);
     this.encryptedDigest = SignedDataUtil.signData(digestAlgorithm, digestEncryptionAlgorithm, CONTENT_TYPE_OID, contentInfo, privateKey, provider);
   }
   
@@ -168,14 +168,14 @@ public class CardSecurityFile implements Serializable {
       LOGGER.log(Level.SEVERE, "Exceptiong while extracting document signing certificate", ce);
     }
     
-    this.securityInfos = readSecurityInfos(SignedDataUtil.getContent(signedData));
+    this.securityInfos = getSecurityInfos(signedData);
     
     this.encryptedDigest = SignedDataUtil.getEncryptedDigest(signedData);
   }
   
   protected void writeContent(OutputStream outputStream) throws IOException {
     try {
-      ContentInfo contentInfo = getContentInfo(CONTENT_TYPE_OID, securityInfos);
+      ContentInfo contentInfo = toContentInfo(CONTENT_TYPE_OID, securityInfos);
       SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, CONTENT_TYPE_OID, contentInfo, encryptedDigest, certificate);
       SignedDataUtil.writeData(signedData, outputStream);
     } catch (CertificateException ce) {
@@ -303,7 +303,7 @@ public class CardSecurityFile implements Serializable {
   }
   
   /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
-  private static ContentInfo getContentInfo(String contentTypeOID, Collection<SecurityInfo> securityInfos) {
+  private static ContentInfo toContentInfo(String contentTypeOID, Collection<SecurityInfo> securityInfos) {
     try {
       ASN1EncodableVector vector = new ASN1EncodableVector();
       for (SecurityInfo si : securityInfos) {
@@ -318,7 +318,9 @@ public class CardSecurityFile implements Serializable {
     }
   }
   
-  private static Set<SecurityInfo> readSecurityInfos(ASN1Primitive encapsulatedContent) throws IOException {
+  private static Set<SecurityInfo> getSecurityInfos(SignedData signedData) throws IOException {
+    ASN1Primitive encapsulatedContent = SignedDataUtil.getContent(signedData);
+    
     if (!(encapsulatedContent instanceof ASN1Set)) {
       throw new IOException("Was expecting an ASN1Set, found " + encapsulatedContent.getClass());
     }

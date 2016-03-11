@@ -27,7 +27,7 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 
 /**
- * Result of EAC-CA protocol.
+ * Result of EAC Chip Authentication protocol.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -37,6 +37,7 @@ public class ChipAuthenticationResult {
   
   private BigInteger keyId;
   private PublicKey publicKey;
+  private byte[] secret;
   private byte[] keyHash;
   private KeyPair keyPair;
   
@@ -48,7 +49,7 @@ public class ChipAuthenticationResult {
    * @param keyHash the hash of the key
    * @param keyPair the key pair
    */
-  public ChipAuthenticationResult(BigInteger keyId, PublicKey publicKey, byte[] keyHash, KeyPair keyPair) {
+  public ChipAuthenticationResult(BigInteger keyId, PublicKey publicKey, byte[] secret, byte[] keyHash, KeyPair keyPair) {
     this.keyId = keyId;
     this.publicKey = publicKey;
     this.keyHash = keyHash;
@@ -71,6 +72,10 @@ public class ChipAuthenticationResult {
    */
   public PublicKey getPublicKey() {
     return publicKey;
+  }
+  
+  public byte[] getSecret() {
+    return secret;
   }
   
   /**

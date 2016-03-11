@@ -71,7 +71,7 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 
 /**
- * Utility class for helping with SignedData in security object document and
+ * Utility class for helping with CMS SignedData in security object document and
  * card security file.
  * 
  * This hopefully abstracts some of the BC dependencies away.
@@ -361,13 +361,6 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
       /* NOTE: Reconstructing using preferred provider didn't work?!?! */
       return certObject;
     }
-  }
-  
-  public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
-      String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey,
-      X509Certificate docSigningCertificate, String provider) throws NoSuchAlgorithmException, CertificateException, IOException {
-    byte[] encryptedDigest = signData(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, privateKey, provider);
-    return createSignedData(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate);
   }
   
   public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
