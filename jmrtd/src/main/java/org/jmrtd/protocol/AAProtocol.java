@@ -64,13 +64,13 @@ public class AAProtocol {
    *
    * @throws CardServiceException on error
    */
-  public byte[] doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
+  public AAResult doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
     try {
       if (challenge == null || challenge.length != 8) {
         throw new IllegalArgumentException("AA failed: bad challenge");
       }
       byte[] response = service.sendInternalAuthenticate(wrapper, challenge);     
-      return response;
+      return new AAResult(response);
     } catch (IllegalArgumentException iae) {
       LOGGER.severe("Exception: " + iae.getMessage());
       throw new CardServiceException(iae.toString());

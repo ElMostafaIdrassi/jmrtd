@@ -28,11 +28,9 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
@@ -40,10 +38,15 @@ import javax.crypto.SecretKey;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
 import org.jmrtd.protocol.AAProtocol;
+import org.jmrtd.protocol.AAResult;
 import org.jmrtd.protocol.BACProtocol;
+import org.jmrtd.protocol.BACResult;
 import org.jmrtd.protocol.CAProtocol;
+import org.jmrtd.protocol.CAResult;
 import org.jmrtd.protocol.PACEProtocol;
+import org.jmrtd.protocol.PACEResult;
 import org.jmrtd.protocol.TAProtocol;
+import org.jmrtd.protocol.TAResult;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardFileInputStream;
@@ -209,8 +212,6 @@ public class PassportService extends PassportApduService implements Serializable
    */
   protected SecureMessagingWrapper wrapper;
   
-  protected Random random;
-  
   private MRTDFileSystem fs;
   
   /**
@@ -247,7 +248,6 @@ public class PassportService extends PassportApduService implements Serializable
   public PassportService(CardService service, int maxBlockSize) throws CardServiceException {
     super(service);
     this.maxBlockSize = maxBlockSize;
-    random = new SecureRandom(); /* for BAC */
     fs = new MRTDFileSystem(this);
     
     state = SESSION_STOPPED_STATE;
@@ -333,7 +333,8 @@ public class PassportService extends PassportApduService implements Serializable
    * @throws CardServiceException if authentication failed
    */
   public synchronized void doBAC(BACKeySpec bacKey) throws CardServiceException {
-    wrapper = (new BACProtocol(this)).doBAC(bacKey);
+    BACResult bacResult = (new BACProtocol(this)).doBAC(bacKey);
+    wrapper = bacResult.getWrapper();
     state = BAC_AUTHENTICATED_STATE;
   }
   
@@ -343,14 +344,15 @@ public class PassportService extends PassportApduService implements Serializable
    * from the document number, the card holder's date of birth,
    * and the card's date of expiry.
    *
-   * @param kEnc 3DES key required for BAC
-   * @param kMac 3DES key required for BAC
+   * @param kEnc static 3DES key required for BAC
+   * @param kMac static 3DES key required for BAC
    *
    * @throws CardServiceException if authentication failed
    * @throws GeneralSecurityException on security primitives related problems
    */
   public synchronized void doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
-    wrapper = (new BACProtocol(this)).doBAC(kEnc, kMac);
+    BACResult bacResult = (new BACProtocol(this)).doBAC(kEnc, kMac);
+    wrapper = bacResult.getWrapper();
     state = BAC_AUTHENTICATED_STATE;
   }
   
@@ -364,7 +366,8 @@ public class PassportService extends PassportApduService implements Serializable
    * @throws PACEException on error
    */
   public synchronized void doPACE(BACKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
-    wrapper = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
+    PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
+    wrapper = paceResult.getWrapper();
   }
   
   /**
@@ -379,19 +382,11 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public synchronized ChipAuthenticationResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
-    try {
-      ChipAuthenticationResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, publicKey);
-      byte[] secret = caResult.getSecret();
-      
-      SecretKey ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
-      SecretKey ksMac = Util.deriveKey(secret, Util.MAC_MODE);
-      wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L); // FIXME: can be AESSecureMessagingWrapper for EAC 2. -- MO
-      state = CA_AUTHENTICATED_STATE;
-      return caResult;
-    } catch (GeneralSecurityException gse) {
-      throw new CardServiceException(gse.getMessage());
-    }
+  public synchronized CAResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
+    CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, publicKey);
+    wrapper = caResult.getWrapper();
+    state = CA_AUTHENTICATED_STATE;
+    return caResult;
   }
   
   /* From BSI-03110 v1.1, B.2:
@@ -425,9 +420,9 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws CardServiceException on error
    */
-  public synchronized TerminalAuthenticationResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, ChipAuthenticationResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
-    TerminalAuthenticationResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
+  public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
+      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
+    TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
     state = TA_AUTHENTICATED_STATE;
     return taResult;
   }
@@ -445,7 +440,8 @@ public class PassportService extends PassportApduService implements Serializable
    * @throws CardServiceException on error
    */
   public byte[] doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
-    return (new AAProtocol(this, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
+    AAResult aaResult = (new AAProtocol(this, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
+    return aaResult.getResponse();
   }
   
   /**

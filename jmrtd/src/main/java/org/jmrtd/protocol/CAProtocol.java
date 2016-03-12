@@ -32,9 +32,10 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 
-import org.jmrtd.ChipAuthenticationResult;
+import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.PassportApduService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
@@ -73,7 +74,7 @@ public class CAProtocol {
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public ChipAuthenticationResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
+  public CAResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
     if (publicKey == null) { throw new IllegalArgumentException("Public key is null"); }
     try {
       String agreementAlg = Util.inferKeyAgreementAlgorithm(publicKey);
@@ -123,9 +124,12 @@ public class CAProtocol {
         idData = Util.wrapDO((byte)0x84, keyIdBytes);
       }
       service.sendMSEKAT(wrapper, keyData, idData);
-      
 
-      return new ChipAuthenticationResult(keyId, publicKey, secret, keyHash, keyPair);
+      SecretKey ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
+      SecretKey ksMac = Util.deriveKey(secret, Util.MAC_MODE);
+      wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L); // FIXME: can be AESSecureMessagingWrapper for EAC 2. -- MO
+      
+      return new CAResult(keyId, publicKey, wrapper, keyHash, keyPair);
     } catch (GeneralSecurityException e) {
       throw new CardServiceException(e.toString());
     }

@@ -171,7 +171,7 @@ public class Util {
     if ("DESede".equalsIgnoreCase(cipherAlg) || "3DES".equalsIgnoreCase(cipherAlg)) {
       /* TR-SAC 1.01, 4.2.1. */
       switch(keyLength) {
-        case 112:
+        case 112: /* Fall through. */
         case 128:
           keyBytes = new byte[24];
           System.arraycopy(hashResult, 0, keyBytes, 0, 8); /* E  (octets 1 to 8) */

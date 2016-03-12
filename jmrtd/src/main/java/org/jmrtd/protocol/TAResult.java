@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd;
+package org.jmrtd.protocol;
 
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
@@ -39,11 +39,11 @@ import org.jmrtd.cert.CardVerifiableCertificate;
  *
  * @version $Revision$
  */
-public class TerminalAuthenticationResult  {
+public class TAResult  {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  private ChipAuthenticationResult chipAuthenticationResult;
+  private CAResult chipAuthenticationResult;
   private CVCPrincipal caReference;
   private List<CardVerifiableCertificate> terminalCertificates = new ArrayList<CardVerifiableCertificate>();
   private PrivateKey terminalKey;
@@ -53,17 +53,17 @@ public class TerminalAuthenticationResult  {
   /**
    * Constructs a new terminal authentication result.
    *
-   * @param chipAuthenticationResult the chip authentication result
-   * @param caReference the CA
+   * @param caResult the chip authentication result
+   * @param caReference the certificate authority
    * @param terminalCertificates terminal certificates
    * @param terminalKey the terminal's private key
    * @param documentNumber the documentNumber
    * @param cardChallenge the challenge
    */
-  public TerminalAuthenticationResult(ChipAuthenticationResult chipAuthenticationResult, CVCPrincipal caReference,
+  public TAResult(CAResult caResult, CVCPrincipal caReference,
       List<CardVerifiableCertificate> terminalCertificates, PrivateKey terminalKey,
       String documentNumber, byte[] cardChallenge) {
-    this.chipAuthenticationResult = chipAuthenticationResult;
+    this.chipAuthenticationResult = caResult;
     this.caReference = caReference;
     for (CardVerifiableCertificate c : terminalCertificates) {
       this.terminalCertificates.add(c);
@@ -78,7 +78,7 @@ public class TerminalAuthenticationResult  {
    *
    * @return the chip authenticaiton result
    */
-  public ChipAuthenticationResult getChipAuthenticationResult() {
+  public CAResult getChipAuthenticationResult() {
     return chipAuthenticationResult;
   }
   

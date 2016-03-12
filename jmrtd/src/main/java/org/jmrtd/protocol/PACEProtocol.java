@@ -54,7 +54,7 @@ import org.jmrtd.lds.PACEInfo.MappingType;
 import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * PACE implementation.
+ * The Password Authenticated Connection Establishment protocol.
  * 
  * @author The JMRTD team (info@jmrtd.org)
  * 
@@ -91,7 +91,7 @@ public class PACEProtocol {
    *
    * @throws PACEException on error
    */
-  public SecureMessagingWrapper doPACE(BACKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public PACEResult doPACE(BACKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     try {
       return doPACE(deriveStaticPACEKey(keySpec, oid), oid, params);
     } catch (GeneralSecurityException gse) {
@@ -107,7 +107,7 @@ public class PACEProtocol {
    *
    * @throws PACEException on error
    */
-  public SecureMessagingWrapper doPACE(SecretKey staticPACEKey, String oid, AlgorithmParameterSpec params) throws PACEException {
+  public PACEResult doPACE(SecretKey staticPACEKey, String oid, AlgorithmParameterSpec params) throws PACEException {
     PACEInfo.MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
@@ -229,7 +229,7 @@ public class PACEProtocol {
        */
     }
     
-    return wrapper;
+    return new PACEResult(wrapper);
   }
   
   /**
@@ -360,6 +360,7 @@ public class PACEProtocol {
     }
   }
   
+  /* Choose random ephemeral key pair (SK_PCD~, PK_PCD~, D~). */
   public KeyPair doPACEStep3GenerateKeyPair(String agreementAlg, AlgorithmParameterSpec ephemeralParams) throws PACEException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
@@ -374,7 +375,6 @@ public class PACEProtocol {
   /*
    * 3. Perform Key Agreement - 0x83 Ephemeral Public Key - 0x84 Ephemeral Public Key
    *
-   * Choose random ephemeral key pair (SK_PCD~, PK_PCD~, D~).
    * Exchange PK_PCD~ and PK_PICC~ with PICC.
    * Check that PK_PCD~ and PK_PICC~ differ.
    */
@@ -422,7 +422,7 @@ public class PACEProtocol {
    * Exchange authentication token T_PCD and T_PICC with PICC.
    * Check authentication token T_PICC.
    * 
-   * Extract encryptedChipAuthenticationData, if any.
+   * Extracts encryptedChipAuthenticationData, if mapping type id CAM.
    */
   public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
     
@@ -452,7 +452,7 @@ public class PACEProtocol {
    * Derives the static key K_pi.
    * 
    * @param keySpec the key material from the MRZ
-   * @param oid the PACE object identifier
+   * @param oid the PACE object identifier is needed to determine the cipher algorithm and the key length
    */
   public static SecretKey deriveStaticPACEKey(BACKeySpec keySpec, String oid) throws GeneralSecurityException {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */

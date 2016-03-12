@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,11 +20,13 @@
  * $Id: $
  */
 
-package org.jmrtd;
+package org.jmrtd.protocol;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
+
+import org.jmrtd.SecureMessagingWrapper;
 
 /**
  * Result of EAC Chip Authentication protocol.
@@ -33,11 +35,11 @@ import java.security.PublicKey;
  *
  * @version $Revision: $
  */
-public class ChipAuthenticationResult {
+public class CAResult {
   
   private BigInteger keyId;
   private PublicKey publicKey;
-  private byte[] secret;
+  private SecureMessagingWrapper wrapper;
   private byte[] keyHash;
   private KeyPair keyPair;
   
@@ -49,11 +51,12 @@ public class ChipAuthenticationResult {
    * @param keyHash the hash of the key
    * @param keyPair the key pair
    */
-  public ChipAuthenticationResult(BigInteger keyId, PublicKey publicKey, byte[] secret, byte[] keyHash, KeyPair keyPair) {
+  public CAResult(BigInteger keyId, PublicKey publicKey, SecureMessagingWrapper wrapper, byte[] keyHash, KeyPair keyPair) {
     this.keyId = keyId;
     this.publicKey = publicKey;
     this.keyHash = keyHash;
     this.keyPair = keyPair;
+    this.wrapper = wrapper;
   }
   
   /**
@@ -74,8 +77,8 @@ public class ChipAuthenticationResult {
     return publicKey;
   }
   
-  public byte[] getSecret() {
-    return secret;
+  public SecureMessagingWrapper getWrapper() {
+    return wrapper;
   }
   
   /**

@@ -27,12 +27,10 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.util.List;
 
-import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
-import org.jmrtd.ChipAuthenticationResult;
 import org.jmrtd.PassportApduService;
 import org.jmrtd.SecureMessagingWrapper;
-import org.jmrtd.TerminalAuthenticationResult;
 import org.jmrtd.Util;
+import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
 import org.jmrtd.lds.MRZInfo;
@@ -92,8 +90,8 @@ public class TAProtocol {
    *
    * @throws CardServiceException on error
    */
-  public synchronized TerminalAuthenticationResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, ChipAuthenticationResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
+  public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
+      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
     try {
       if (terminalCertificates == null || terminalCertificates.size() < 1) {
         throw new IllegalArgumentException("Need at least 1 certificate to perform TA, found: " + terminalCertificates);
@@ -209,7 +207,7 @@ public class TAProtocol {
         signedData = Util.getRawECDSASignature(signedData, keySize);
       }
       service.sendMutualAuthenticate(wrapper, signedData);
-      return new TerminalAuthenticationResult(chipAuthenticationResult, caReference, terminalCertificates, terminalKey, documentNumber, rPICC);
+      return new TAResult(chipAuthenticationResult, caReference, terminalCertificates, terminalKey, documentNumber, rPICC);
     } catch (CardServiceException cse) {
       throw cse;
     } catch (Exception e) {
