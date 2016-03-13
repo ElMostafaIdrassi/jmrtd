@@ -62,7 +62,13 @@ public class CertificateUtil {
     try {
       X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(new X500Name(issuer), new BigInteger("1"), dateOfIssuing, dateOfExpiry, new X500Name(subject), SubjectPublicKeyInfo.getInstance(subjectPublicKey.getEncoded()));
       byte[] certBytes = certBuilder.build(new JCESigner(issuerPrivateKey, signatureAlgorithm)).getEncoded();
-      CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+      CertificateFactory certificateFactory = null;
+      try {
+        certificateFactory = CertificateFactory.getInstance("X.509");
+      } catch (Exception e) {
+        LOGGER.log(Level.WARNING, "Default security provider could not provider certificate factor for \"X.509\", explicitly trying with BC", e);
+        certificateFactory = CertificateFactory.getInstance("X.509", "BC");
+      }
       return (X509Certificate)certificateFactory.generateCertificate(new ByteArrayInputStream(certBytes));
     } catch (Exception  e) {
       LOGGER.log(Level.SEVERE, "Unexpected exception", e);
@@ -88,7 +94,12 @@ public class CertificateUtil {
       }
       try {
         this.outputStream = new ByteArrayOutputStream();
-        this.signature = Signature.getInstance(signatureAlgorithm);
+        try {
+          this.signature = Signature.getInstance(signatureAlgorithm);
+        } catch (Exception e) {
+          LOGGER.log(Level.WARNING, "Default security provider could not provider signature for \"" + signatureAlgorithm + "\", explicitly trying with BC", e);
+          this.signature = Signature.getInstance(signatureAlgorithm, "BC");
+        }
         this.signature.initSign(privateKey);
       } catch (GeneralSecurityException gse) {
         throw new IllegalArgumentException(gse.getMessage());

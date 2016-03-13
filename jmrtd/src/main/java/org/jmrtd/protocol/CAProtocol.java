@@ -36,7 +36,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 
 import org.jmrtd.DESedeSecureMessagingWrapper;
-import org.jmrtd.PassportApduService;
+import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 
@@ -53,11 +53,11 @@ import net.sf.scuba.smartcards.CardServiceException;
  */
 public class CAProtocol {
   
-  private PassportApduService service;
+  private PassportService service;
   
   private SecureMessagingWrapper wrapper;
   
-  public CAProtocol(PassportApduService service, SecureMessagingWrapper wrapper) {
+  public CAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
   }
@@ -125,10 +125,10 @@ public class CAProtocol {
       }
       service.sendMSEKAT(wrapper, keyData, idData);
 
+      /* Start secure messaging. */
       SecretKey ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
       SecretKey ksMac = Util.deriveKey(secret, Util.MAC_MODE);
       wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L); // FIXME: can be AESSecureMessagingWrapper for EAC 2. -- MO
-      
       return new CAResult(keyId, publicKey, wrapper, keyHash, keyPair);
     } catch (GeneralSecurityException e) {
       throw new CardServiceException(e.toString());

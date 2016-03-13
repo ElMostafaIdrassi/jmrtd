@@ -25,7 +25,7 @@ package org.jmrtd.protocol;
 import java.security.PublicKey;
 import java.util.logging.Logger;
 
-import org.jmrtd.PassportApduService;
+import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 
 import net.sf.scuba.smartcards.CardServiceException;
@@ -43,11 +43,11 @@ public class AAProtocol {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  private PassportApduService service;
+  private PassportService service;
   
   private SecureMessagingWrapper wrapper;
   
-  public AAProtocol(PassportApduService service, SecureMessagingWrapper wrapper) {
+  public AAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
   }

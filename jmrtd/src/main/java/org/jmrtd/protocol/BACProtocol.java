@@ -32,7 +32,7 @@ import javax.crypto.SecretKey;
 
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.DESedeSecureMessagingWrapper;
-import org.jmrtd.PassportApduService;
+import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.CardServiceException;
@@ -50,7 +50,7 @@ public class BACProtocol {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  private PassportApduService service;
+  private PassportService service;
   private Random random;
 
   /**
@@ -58,7 +58,7 @@ public class BACProtocol {
    * 
    * @param service the service to send APDUs
    */
-  public BACProtocol(PassportApduService service) {
+  public BACProtocol(PassportService service) {
     this.service = service;
     this.random = new SecureRandom();
   }

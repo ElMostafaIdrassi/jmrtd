@@ -27,7 +27,7 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.util.List;
 
-import org.jmrtd.PassportApduService;
+import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
@@ -51,10 +51,10 @@ public class TAProtocol {
   
   private final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
   
-  private PassportApduService service;
+  private PassportService service;
   private SecureMessagingWrapper wrapper;
   
-  public TAProtocol(PassportApduService service, SecureMessagingWrapper wrapper) {
+  public TAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
   }

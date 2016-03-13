@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECParameterSpec;
 import java.util.Calendar;
@@ -37,8 +38,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
+import org.jmrtd.Util;
 import org.jmrtd.lds.CardSecurityFile;
 import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.SecurityInfo;
@@ -90,6 +93,8 @@ public class CardSecurityFileTest extends TestCase {
 
   public void testConstructedSample() {
     try {
+      Security.insertProviderAt(new BouncyCastleProvider(), 0);
+      
       CardSecurityFile cardSecurityFile = createConstructedSample();
       assertNotNull(cardSecurityFile);
       
@@ -128,7 +133,7 @@ public class CardSecurityFileTest extends TestCase {
   }
   
   public CardSecurityFile createConstructedSample() {
-    try {      
+    try {
       SecurityInfo caSecurityInfo = new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_AES_CBC_CMAC_256_OID, ChipAuthenticationInfo.VERSION_1);
       SecurityInfo taSecurityInfo = new TerminalAuthenticationInfo();
       
@@ -166,7 +171,7 @@ public class CardSecurityFileTest extends TestCase {
       
       /* Create the card security file. */
       
-      return new CardSecurityFile(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, dsKeyPair.getPrivate(), dsCert);
+      return new CardSecurityFile(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, dsKeyPair.getPrivate(), dsCert, "BC");
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Exception during construction of sample", e);
       fail(e.getMessage());

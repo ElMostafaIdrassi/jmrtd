@@ -46,6 +46,7 @@ import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.PACEException;
 import org.jmrtd.PassportApduService;
+import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
@@ -68,7 +69,7 @@ public class PACEProtocol {
   
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   
-  private PassportApduService service;
+  private PassportService service;
   private SecureMessagingWrapper wrapper;
   
   /**
@@ -77,7 +78,7 @@ public class PACEProtocol {
    * @param service the service for sending APDUs
    * @param wrapper the already established secure messaging channel (or {@code null})
    */
-  public PACEProtocol(PassportApduService service, SecureMessagingWrapper wrapper) {
+  public PACEProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
   }
