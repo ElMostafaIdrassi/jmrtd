@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.jmrtd.JMRTDSecurityProvider;
 
 /**
  * Certificate utilities for testing.
@@ -59,20 +60,18 @@ public class CertificateUtil {
    */
   public static X509Certificate createCertificate(String issuer, String subject, Date dateOfIssuing, Date dateOfExpiry,
       PublicKey subjectPublicKey, PrivateKey issuerPrivateKey, String signatureAlgorithm) {
+    int n = JMRTDSecurityProvider.beginPreferBouncyCastleProvider();
     try {
       X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(new X500Name(issuer), new BigInteger("1"), dateOfIssuing, dateOfExpiry, new X500Name(subject), SubjectPublicKeyInfo.getInstance(subjectPublicKey.getEncoded()));
       byte[] certBytes = certBuilder.build(new JCESigner(issuerPrivateKey, signatureAlgorithm)).getEncoded();
       CertificateFactory certificateFactory = null;
-      try {
-        certificateFactory = CertificateFactory.getInstance("X.509");
-      } catch (Exception e) {
-        LOGGER.log(Level.WARNING, "Default security provider could not provider certificate factor for \"X.509\", explicitly trying with BC", e);
-        certificateFactory = CertificateFactory.getInstance("X.509", "BC");
-      }
+      certificateFactory = CertificateFactory.getInstance("X.509");
       return (X509Certificate)certificateFactory.generateCertificate(new ByteArrayInputStream(certBytes));
     } catch (Exception  e) {
       LOGGER.log(Level.SEVERE, "Unexpected exception", e);
       throw new IllegalStateException(e.getMessage());
+    } finally {
+      JMRTDSecurityProvider.endPreferBouncyCastleProvider(n);
     }
   }
   
@@ -92,17 +91,15 @@ public class CertificateUtil {
       if (!SUPPORTED_ALGORITHMS.contains(signatureAlgorithm)) {
         throw new IllegalArgumentException("Signature algorithm \"" + signatureAlgorithm + "\" not yet supported");
       }
+      int n = JMRTDSecurityProvider.beginPreferBouncyCastleProvider();
       try {
         this.outputStream = new ByteArrayOutputStream();
-        try {
-          this.signature = Signature.getInstance(signatureAlgorithm);
-        } catch (Exception e) {
-          LOGGER.log(Level.WARNING, "Default security provider could not provider signature for \"" + signatureAlgorithm + "\", explicitly trying with BC", e);
-          this.signature = Signature.getInstance(signatureAlgorithm, "BC");
-        }
+        this.signature = Signature.getInstance(signatureAlgorithm);
         this.signature.initSign(privateKey);
       } catch (GeneralSecurityException gse) {
         throw new IllegalArgumentException(gse.getMessage());
+      } finally {
+        JMRTDSecurityProvider.endPreferBouncyCastleProvider(n);
       }
     }
     
