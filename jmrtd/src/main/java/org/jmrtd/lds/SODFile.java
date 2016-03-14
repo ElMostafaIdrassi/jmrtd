@@ -71,7 +71,7 @@ import org.jmrtd.JMRTDSecurityProvider;
  *
  * @version $Revision$
  */
-public class SODFile extends DataGroup { /* FIXME: strictly speaking this is not a DataGroup, consider changing the name of the DataGroup class. */
+public class SODFile extends AbstractTaggedLDSFile {
   
   private static final long serialVersionUID = -1081347374739311111L;
   

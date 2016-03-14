@@ -44,7 +44,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
  *
  * @version $Revision$
  */
-public class COMFile extends DataGroup { /* FIXME: strictly speaking this is not a DataGroup, consider changing the name of the DataGroup class. */
+public class COMFile extends AbstractTaggedLDSFile {
   
   private static final long serialVersionUID = 2002455279067170063L;
   
