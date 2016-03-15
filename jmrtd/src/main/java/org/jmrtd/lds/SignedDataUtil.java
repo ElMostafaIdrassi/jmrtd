@@ -27,15 +27,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.Signature;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,12 +58,10 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BERTaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DLSequence;
 import org.bouncycastle.asn1.DLSet;
-import org.bouncycastle.asn1.DLTaggedObject;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -69,6 +73,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.jmrtd.JMRTDSecurityProvider;
 
 /**
  * Utility class for helping with CMS SignedData in security object document and
@@ -85,6 +90,8 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 /* package-visible */ class SignedDataUtil {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   
   /** SignedData related object identifier. */
   public static final String
@@ -174,44 +181,30 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
     return null;
   }
   
+  /**
+   * Removes the tag from a tagged object.
+   * 
+   * @param asn1Encodable the encoded tagged object
+   * 
+   * @return the object
+   * 
+   * @throws IOException if the input is not a tagged object or the tagNo is not 0
+   */
   public static ASN1Primitive getObjectFromTaggedObject(ASN1Encodable asn1Encodable) throws IOException {
-    /* The second object is a tagged object containing the signed data. We will remove the tag. */
-    ASN1Primitive content = null;
-    int tagNo = -1;
-    
-    /*
-     * Most EU passports have DERTaggedObject,
-     * New Zealand has BERTaggedObject,
-     * cast problems between BER and DER since (at least) BC 1.47...
-     * Thanks to Nick von Dadelszen for helping out with debugging.
-     */
-    /* FIXME: Looks like these are all ASN1TaggedObject children. */
-    if (asn1Encodable instanceof DERTaggedObject) {
-      DERTaggedObject derTaggedObject = (DERTaggedObject)asn1Encodable;
-      tagNo = derTaggedObject.getTagNo();
-      content = derTaggedObject.getObject();
-    } else if (asn1Encodable instanceof BERTaggedObject) {
-      BERTaggedObject berTaggedObject = (BERTaggedObject)asn1Encodable;
-      tagNo = berTaggedObject.getTagNo();
-      content = berTaggedObject.getObject();
-    } else if (asn1Encodable instanceof DLTaggedObject) {
-      DLTaggedObject dlTaggedObject = (DLTaggedObject)asn1Encodable;
-      tagNo = dlTaggedObject.getTagNo();
-      content = dlTaggedObject.getObject();     
-    } else if (asn1Encodable instanceof ASN1TaggedObject) {
-      ASN1TaggedObject asn1TaggedObject = (ASN1TaggedObject)asn1Encodable;
-      tagNo = asn1TaggedObject.getTagNo();
-      content = asn1TaggedObject.getObject();     
-    } else {
+    if (!(asn1Encodable instanceof ASN1TaggedObject)) {
       throw new IOException("Was expecting an ASN1TaggedObject, found " + asn1Encodable.getClass().getCanonicalName());
     }
+    
+    ASN1TaggedObject asn1TaggedObject = (ASN1TaggedObject)asn1Encodable;
+    
+    int tagNo = asn1TaggedObject.getTagNo();
     if (tagNo != 0) {
       throw new IOException("Was expecting tag 0, found " + Integer.toHexString(tagNo));
     }   
     
-    return content;
+    return asn1TaggedObject.getObject();     
   }
-
+  
   public static String getSignerInfoDigestAlgorithm(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
@@ -234,7 +227,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
       return null; // throw new IllegalStateException(nsae.toString());
     }
   }
-
+  
   /**
    * Gets the contents of the signed data over which the
    * signature is to be computed.
@@ -261,45 +254,72 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
     if (signedAttributesSet.size() == 0) {
       /* Signed attributes absent, return content to be signed... */
       return contentBytes;
-    } else {
-      /* Signed attributes present (i.e. a structure containing a hash of the content), return that structure to be signed... */
-      /* This option is taken by ICAO passports. */
-      byte[] attributesBytes = null;
-      String digAlg = signerInfo.getDigestAlgorithm().getAlgorithm().getId();
-      try {
-        attributesBytes = signedAttributesSet.getEncoded(ASN1Encoding.DER);
-        
-        /* We'd better check that the content actually digests to the hash value contained! ;) */
-        Enumeration<?> attributes = signedAttributesSet.getObjects();
-        byte[] storedDigestedContent = null;
-        while (attributes.hasMoreElements()) {
-          Attribute attribute = Attribute.getInstance((ASN1Sequence)attributes.nextElement());
-          ASN1ObjectIdentifier attrType = attribute.getAttrType();
-          if (SignedDataUtil.RFC_3369_MESSAGE_DIGEST_OID.equals(attrType.getId())) {
-            ASN1Set attrValuesSet = attribute.getAttrValues();
-            if (attrValuesSet.size() != 1) {
-              LOGGER.warning("Expected only one attribute value in signedAttribute message digest in eContent!");
-            }
-            storedDigestedContent = ((DEROctetString)attrValuesSet.getObjectAt(0)).getOctets();
-          }
-        }
-        if (storedDigestedContent == null) {
-          LOGGER.warning("Error extracting signedAttribute message digest in eContent!");
-        } 
-        MessageDigest dig = MessageDigest.getInstance(digAlg);
-        byte[] computedDigestedContent = dig.digest(contentBytes);
-        if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
-          LOGGER.warning("Error checking signedAttribute message digest in eContent!");
-        }
-      } catch (NoSuchAlgorithmException nsae) {
-        LOGGER.warning("Error checking signedAttributes in eContent! No such algorithm: \"" + digAlg + "\": " + nsae.getMessage());
-      } catch (IOException ioe) {
-        LOGGER.severe("Error getting signedAttributes: " + ioe.getMessage());
-      }
-      return attributesBytes;
     }
+    
+    /* Signed attributes present (i.e. a structure containing a hash of the content), return that structure to be signed... */
+    /* This option is taken by ICAO passports. */
+    byte[] attributesBytes = null;
+    String digAlg = signerInfo.getDigestAlgorithm().getAlgorithm().getId();
+    
+    try {
+      attributesBytes = signedAttributesSet.getEncoded(ASN1Encoding.DER);
+      
+      checkEContent(getAttributes(signedAttributesSet), digAlg, contentBytes);
+      
+    } catch (NoSuchAlgorithmException nsae) {
+      LOGGER.warning("Error checking signedAttributes in eContent! No such algorithm: \"" + digAlg + "\": " + nsae.getMessage());
+    } catch (IOException ioe) {
+      LOGGER.severe("Error getting signedAttributes: " + ioe.getMessage());
+    }
+    
+    return attributesBytes;
   }
-
+  
+  /* FIXME: Move this from lds package to verifier. -- MO */
+  /* FIXME: This only warns on logger. */
+  /**
+   * Checks that the content actually digests to the hash value contained in the message digest attribute.
+   * 
+   * @param attributes the attributes, this should contain an attribute of type {@link #RFC_3369_MESSAGE_DIGEST_OID}
+   * @param digAlg the digest algorithm
+   * @param contentBytes the contents
+   * 
+   * @throws NoSuchAlgorithmException if the digest algorithm is unsupported
+   */
+  private static void checkEContent(Collection<Attribute> attributes, String digAlg, byte[] contentBytes) throws NoSuchAlgorithmException {
+    for (Attribute attribute: attributes) {
+      if (!RFC_3369_MESSAGE_DIGEST_OID.equals(attribute.getAttrType().getId())) {
+        continue;
+      }
+      
+      ASN1Set attrValuesSet = attribute.getAttrValues();
+      if (attrValuesSet.size() != 1) {
+        LOGGER.warning("Expected only one attribute value in signedAttribute message digest in eContent!");
+      }
+      byte[] storedDigestedContent = ((DEROctetString)attrValuesSet.getObjectAt(0)).getOctets();
+      
+      if (storedDigestedContent == null) {
+        LOGGER.warning("Error extracting signedAttribute message digest in eContent!");
+      } 
+      
+      MessageDigest dig = MessageDigest.getInstance(digAlg);
+      byte[] computedDigestedContent = dig.digest(contentBytes);
+      if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
+        LOGGER.warning("Error checking signedAttribute message digest in eContent!");
+      }
+    }    
+  }
+  
+  private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
+    List<ASN1Sequence> attributeObjects = Collections.list(signedAttributesSet.getObjects());
+    List<Attribute> attributes = new ArrayList(attributeObjects.size());
+    for (ASN1Sequence attributeObject: attributeObjects) {
+      Attribute attribute = Attribute.getInstance(attributeObject);
+      attributes.add(attribute);
+    }
+    return attributes;
+  }
+  
   /**
    * Gets the stored signature of the security object.
    *
@@ -320,7 +340,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
     BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
     return new IssuerAndSerialNumber(issuer, serialNumber);
   }
-
+  
   private static SignerInfo getSignerInfo(SignedData signedData)  {
     ASN1Set signerInfos = signedData.getSignerInfos();
     if (signerInfos.size() > 1) {

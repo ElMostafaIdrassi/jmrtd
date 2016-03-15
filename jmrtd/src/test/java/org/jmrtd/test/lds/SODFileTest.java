@@ -84,21 +84,6 @@ public class SODFileTest extends TestCase {
     }
   }
   
-  public void testSignature() {
-    testSignature(createTestObject());
-  }
-  
-  public void testSignature(SODFile sodFile) {
-    try {
-      X509Certificate certificate = sodFile.getDocSigningCertificate();
-      assertNotNull(certificate);
-      assertTrue(sodFile.checkDocSignature(certificate));
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
-    }
-  }
-  
   private static KeyPair createTestKeyPair() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(1024);
@@ -147,14 +132,14 @@ public class SODFileTest extends TestCase {
       
       X500Principal issuer = sodFile.getIssuerX500Principal();
       
-      //			LOGGER.info("DEBUG: issuer = " + issuer);
+//      LOGGER.info("DEBUG: issuer = " + issuer);
       
       String issuerName = issuer.getName(X500Principal.RFC2253);
       assertNotNull(issuerName);
       
       if (issuer != null && certificate != null) {
         X500Principal certIssuer = certificate.getIssuerX500Principal();
-        //				LOGGER.info("DEBUG: certIssuer = " + certIssuer);
+//        LOGGER.info("DEBUG: certIssuer = " + certIssuer);
         String certIssuerName = certIssuer.getName(X500Principal.RFC2253);
         assertNotNull(certIssuerName);
         //				assertTrue("issuerName = \"" + issuerName + "\", certIssuerName = \"" + certIssuerName + "\"",
@@ -172,6 +157,10 @@ public class SODFileTest extends TestCase {
     }
   }
   
+  public void testMustermann() {
+    testFile(createMustermannSampleInputStream());
+  }
+  
   public void testFile(InputStream in) {
     try {
       SODFile sodFile = new SODFile(in);
@@ -181,10 +170,6 @@ public class SODFileTest extends TestCase {
       e.printStackTrace();
       fail(e.toString());
     }
-  }
-  
-  public void testMustermann() {
-    testFile(createMustermannSampleInputStream());
   }
   
   public static SODFile createTestObject() {

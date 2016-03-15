@@ -112,8 +112,10 @@ public class PACEProtocol {
     PACEInfo.MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
+    String digestAlg = PACEInfo.toDigestAlgorithm(oid); /* Either SHA-1 or SHA-256. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
     
+    /* Check consistency of input parameters. */
     if (agreementAlg == null) {
       throw new IllegalArgumentException("Unknown agreement algorithm");
     }
@@ -230,11 +232,10 @@ public class PACEProtocol {
        */
     }
     
-    return new PACEResult(mappingType, agreementAlg, cipherAlg, keyLength,
-        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes,
-        wrapper);
+    return new PACEResult(mappingType, agreementAlg, cipherAlg, digestAlg, keyLength,
+        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes, wrapper);
   }
-  
+    
   /**
    * The first step in the PACE protocol receives an encrypted nonce from the PICC
    * and decrypts it.
@@ -303,59 +304,34 @@ public class PACEProtocol {
    * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
    */
   public AlgorithmParameterSpec doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
-    KeyAgreement mappingAgreement = null;
-    PublicKey pcdMappingPublicKey = null;
-    PrivateKey pcdMappingPrivateKey = null;
-    AlgorithmParameterSpec ephemeralParams = null;
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(params);
       KeyPair kp = keyPairGenerator.generateKeyPair();
-      pcdMappingPublicKey = kp.getPublic();
-      pcdMappingPrivateKey = kp.getPrivate();
-      mappingAgreement = KeyAgreement.getInstance(agreementAlg);
+      PublicKey pcdMappingPublicKey = kp.getPublic();
+      PrivateKey pcdMappingPrivateKey = kp.getPrivate();
+      KeyAgreement mappingAgreement = KeyAgreement.getInstance(agreementAlg);
       mappingAgreement.init(pcdMappingPrivateKey);
       
-      byte[] mappingSharedSecretBytes = null;
-      byte[] step2Data = null;
       switch(mappingType) {
         case CAM:
           /* NOTE: Fall through. */
         case GM:
-          /* Encode our public key. */
-          byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);
-          step2Data = pcdMappingEncodedPublicKey;
-          break;
-        case IM:
-          /* TODO: Generate nonce T, send it as step2Data. */
-          throw new IllegalStateException("IM not yet implemented"); // FIXME
-      }
-      
-      step2Data = Util.wrapDO((byte)0x81, step2Data);
-      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
-      
-      switch(mappingType) {
-        case CAM:
-          /* NOTE: Fall through. */
-        case GM:
+          byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);            
+          byte[] step2Data = Util.wrapDO((byte)0x81, pcdMappingEncodedPublicKey);
+          byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
           byte[] piccMappingEncodedPublicKey = Util.unwrapDO((byte)0x82, step2Response);
-          try {
-            PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
-            mappingAgreement.doPhase(piccMappingPublicKey, true);
-            mappingSharedSecretBytes = mappingAgreement.generateSecret();
-          } catch (GeneralSecurityException gse) {
-            LOGGER.severe("Exception: " + gse.getMessage());
-            throw new PACEException("Error during mapping" + gse.getMessage());
-          }
+          PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
+          mappingAgreement.doPhase(piccMappingPublicKey, true);
+          byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
           
-          ephemeralParams = Util.mapNonceGM(piccNonce, mappingSharedSecretBytes, params);
-          break;
+          return Util.mapNonceGM(piccNonce, mappingSharedSecretBytes, params);
         case IM:
           /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */
-          throw new IllegalStateException("DEBUG: IM not yet implemented"); // FIXME
+          throw new PACEException("Integrated Mapping not yet implemented"); // FIXME
+        default:
+          throw new PACEException("Unsupported mapping type " + mappingType);
       }
-      
-      return ephemeralParams;
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {

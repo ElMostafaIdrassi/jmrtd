@@ -133,7 +133,7 @@ public class Util {
    * @param keySeed the key seed.
    * @param cipherAlgName either AES or DESede
    * @param keyLength key length in bits
-   * @param mode either <code>ENC_MODE</code> or <code>MAC_MODE</code>
+   * @param mode either {@code ENC_MODE}, {@code MAC_MODE}, or {@code PACE_MODE}
    *
    * @return the key.
    *

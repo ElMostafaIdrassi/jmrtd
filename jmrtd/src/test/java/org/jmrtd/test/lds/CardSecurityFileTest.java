@@ -169,7 +169,6 @@ public class CardSecurityFileTest extends TestCase {
       X509Certificate dsCert = CertificateUtil.createCertificate(issuer, subject, dateOfIssuing, dateOfDSExpiry, dsKeyPair.getPublic(), cscaKeyPair.getPrivate(), digestEncryptionAlgorithm);
       
       /* Create the card security file. */
-      
       return new CardSecurityFile(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, dsKeyPair.getPrivate(), dsCert, "BC");
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Exception during construction of sample", e);

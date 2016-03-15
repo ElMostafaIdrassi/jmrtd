@@ -33,6 +33,7 @@ import javax.crypto.SecretKey;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.PassportService;
+import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.CardServiceException;
@@ -52,7 +53,7 @@ public class BACProtocol {
   
   private PassportService service;
   private Random random;
-
+  
   /**
    * Constructs a BAC protocol instance.
    * 
@@ -78,7 +79,7 @@ public class BACProtocol {
       SecretKey kEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
       SecretKey kMac = Util.deriveKey(keySeed, Util.MAC_MODE);
       
-      return doBAC(kEnc, kMac);
+      return new BACResult(bacKey, doBACStep(kEnc, kMac));
     } catch (CardServiceException cse) {
       LOGGER.log(Level.WARNING, "BAC failed", cse);
       throw cse;
@@ -103,6 +104,10 @@ public class BACProtocol {
    * @throws GeneralSecurityException on security primitives related problems
    */
   public BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
+    return new BACResult(doBACStep(kEnc, kMac));
+  }
+  
+  private SecureMessagingWrapper doBACStep(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
     byte[] rndICC = service.sendGetChallenge();
     byte[] rndIFD = new byte[8];
     random.nextBytes(rndIFD);
@@ -118,7 +123,8 @@ public class BACProtocol {
     SecretKey ksEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
     SecretKey ksMac = Util.deriveKey(keySeed, Util.MAC_MODE);
     long ssc = Util.computeSendSequenceCounter(rndICC, rndIFD);
-    return new BACResult(new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc));
+    
+    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc);
   }
   
   private static byte[] computeKeySeedForBAC(BACKeySpec bacKey) throws GeneralSecurityException {

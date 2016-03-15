@@ -22,14 +22,25 @@
 
 package org.jmrtd.protocol;
 
+import org.jmrtd.BACKeySpec;
 import org.jmrtd.SecureMessagingWrapper;
 
 public class BACResult {
   
+  private BACKeySpec bacKey;
   private SecureMessagingWrapper wrapper;
   
   public BACResult(SecureMessagingWrapper wrapper) {
+    this(null, wrapper);
+  }
+
+  public BACResult(BACKeySpec bacKey, SecureMessagingWrapper wrapper) {
+    this.bacKey = bacKey;
     this.wrapper = wrapper;
+  }
+  
+  public BACKeySpec getBACKey() {
+    return bacKey;
   }
   
   public SecureMessagingWrapper getWrapper() {

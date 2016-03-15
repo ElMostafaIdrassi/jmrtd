@@ -28,11 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -57,7 +54,6 @@ import org.bouncycastle.asn1.icao.LDSSecurityObject;
 import org.bouncycastle.asn1.icao.LDSVersionInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.jmrtd.JMRTDSecurityProvider;
 
 /**
  * File structure for the EF_SOD file (the Document Security Object).
@@ -66,8 +62,7 @@ import org.jmrtd.JMRTDSecurityProvider;
  * Basically the Document Security Object is a SignedData type as specified in
  * <a href="http://www.ietf.org/rfc/rfc3369.txt">RFC 3369</a>.
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
@@ -113,11 +108,20 @@ public class SODFile extends AbstractTaggedLDSFile {
    */
   private static final String SDU_LDS_SOD_OID = "1.2.528.1.1006.1.20.1";
   
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-  
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  private SignedData signedData;
+  private Map<Integer, byte[]> dataGroupHashes;
+  private String ldsVersion;
+  private String unicodeVersion;
+  
+  private String digestAlgorithm;
+  private String digestEncryptionAlgorithm;
+  
+  /** The signature bytes. */
+  private byte[] encryptedDigest;
+  
+  /** The embedded document signer certificate (or null). */
+  private X509Certificate certificate;
   
   /**
    * Constructs a Security Object data structure.
@@ -176,21 +180,11 @@ public class SODFile extends AbstractTaggedLDSFile {
   public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
       Map<Integer, byte[]> dataGroupHashes,
       PrivateKey privateKey,
-      X509Certificate docSigningCertificate, String provider,
-      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, CertificateException {
-    super(EF_SOD_TAG);
-    try {
-      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
-      byte[] encryptedDigest = SignedDataUtil.signData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, privateKey, provider);
-      
-      signedData = SignedDataUtil.createSignedData(digestAlgorithm,
-          digestEncryptionAlgorithm,
-          ICAO_LDS_SOD_OID, contentInfo,
-          encryptedDigest, docSigningCertificate);      
-    } catch (IOException ioe) {
-      LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
-      throw new IllegalArgumentException(ioe.getMessage());
-    }
+      X509Certificate docSigningCertificate,
+      String ldsVersion, String unicodeVersion, String provider) throws NoSuchAlgorithmException, CertificateException {
+    this(digestAlgorithm, digestEncryptionAlgorithm, dataGroupHashes, (byte[])null, docSigningCertificate, ldsVersion, unicodeVersion);
+    ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+    this.encryptedDigest = SignedDataUtil.signData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, privateKey, provider);    
   }
   
   /**
@@ -209,18 +203,34 @@ public class SODFile extends AbstractTaggedLDSFile {
       Map<Integer, byte[]> dataGroupHashes,
       byte[] encryptedDigest,
       X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException {
+    this(digestAlgorithm, digestEncryptionAlgorithm, dataGroupHashes, encryptedDigest, docSigningCertificate, null, null);
+  }
+  
+  /**
+   * Constructs a Security Object data structure.
+   *
+   * @param digestAlgorithm a digest algorithm, such as "SHA-1" or "SHA-256"
+   * @param digestEncryptionAlgorithm a digest encryption algorithm, such as "SHA256withRSA"
+   * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
+   * @param encryptedDigest externally signed contents
+   * @param docSigningCertificate the document signing certificate
+   *
+   * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
+   * @throws CertificateException if the document signing certificate cannot be used
+   */
+  public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
+      Map<Integer, byte[]> dataGroupHashes,
+      byte[] encryptedDigest,
+      X509Certificate docSigningCertificate,
+      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, CertificateException {
     super(EF_SOD_TAG);
-    try {      
-      signedData = SignedDataUtil.createSignedData(digestAlgorithm,
-          digestEncryptionAlgorithm,
-          ICAO_LDS_SOD_OID,
-          toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, null, null),
-          encryptedDigest,
-          docSigningCertificate);
-    } catch (IOException ioe) {
-      LOGGER.severe("Error creating signedData: " + ioe.getMessage());
-      throw new IllegalArgumentException(ioe.getMessage());
-    }
+    this.digestAlgorithm = digestAlgorithm;
+    this.digestEncryptionAlgorithm  = digestEncryptionAlgorithm;
+    this.dataGroupHashes = dataGroupHashes;
+    this.encryptedDigest = encryptedDigest;
+    this.ldsVersion = ldsVersion;
+    this.certificate = docSigningCertificate;
+    this.unicodeVersion = unicodeVersion; 
   }
   
   /**
@@ -235,11 +245,33 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
   
   protected void readContent(InputStream inputStream) throws IOException {
-    this.signedData = SignedDataUtil.readSignedData(inputStream);
+    SignedData signedData = SignedDataUtil.readSignedData(inputStream);
+    
+    this.digestAlgorithm = SignedDataUtil.getSignerInfoDigestAlgorithm(signedData);
+    this.digestEncryptionAlgorithm = SignedDataUtil.getDigestEncryptionAlgorithm(signedData);
+    this.dataGroupHashes = getDataGroupHashes(getLDSSecurityObject(signedData));
+    
+    this.encryptedDigest = SignedDataUtil.getEncryptedDigest(signedData);
+    
+    try {
+      this.certificate = SignedDataUtil.getDocSigningCertificate(signedData);
+    } catch (CertificateException ce) {
+      LOGGER.log(Level.SEVERE, "Exceptiong while extracting document signing certificate", ce);
+    }
   }
   
   protected void writeContent(OutputStream outputStream) throws IOException {
-    SignedDataUtil.writeData(this.signedData, outputStream);
+    try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, encryptedDigest, certificate);
+      SignedDataUtil.writeData(signedData, outputStream);
+    } catch (CertificateException ce) {
+      LOGGER.log(Level.SEVERE, "Certificate exception during SignedData creation", ce);
+      throw new IOException(ce.getMessage());
+    } catch (NoSuchAlgorithmException nsae) {
+      LOGGER.log(Level.SEVERE, "Unsupported algorithm", nsae);
+      throw new IOException(nsae.getMessage());
+    }
   }
   
   /**
@@ -248,15 +280,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return data group hashes indexed by data group numbers (1 to 16)
    */
   public Map<Integer, byte[]> getDataGroupHashes() {
-    DataGroupHash[] hashObjects = getLDSSecurityObject(signedData).getDatagroupHash();
-    Map<Integer, byte[]> hashMap = new TreeMap<Integer, byte[]>(); /* HashMap... get it? :D (not funny anymore, now that it's a TreeMap.) */
-    for (int i = 0; i < hashObjects.length; i++) {
-      DataGroupHash hashObject = hashObjects[i];
-      int number = hashObject.getDataGroupNumber();
-      byte[] hashValue = hashObject.getDataGroupHashValue().getOctets();
-      hashMap.put(number, hashValue);
-    }
-    return hashMap;
+    return dataGroupHashes;
   }
   
   /**
@@ -265,7 +289,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return the encrypted digest
    */
   public byte[] getEncryptedDigest() {
-    return SignedDataUtil.getEncryptedDigest(signedData);
+    return encryptedDigest;
   }
   
   /**
@@ -274,7 +298,15 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return the e-content
    */
   public byte[] getEContent() {
-    return SignedDataUtil.getEContent(signedData);
+    try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, encryptedDigest, certificate);
+      
+      return SignedDataUtil.getEContent(signedData);
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Unexpected exception", e);
+      throw new IllegalStateException("Could not get EContent from signed data");
+    }
   }
   
   /**
@@ -283,17 +315,9 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return an algorithm string such as "SHA-1" or "SHA-256"
    */
   public String getDigestAlgorithm() {
-    return getDigestAlgorithm(getLDSSecurityObject(signedData));
+    return digestAlgorithm;
   }
   
-  private static String getDigestAlgorithm(LDSSecurityObject ldsSecurityObject) {
-    try {
-      return SignedDataUtil.lookupMnemonicByOID(ldsSecurityObject.getDigestAlgorithmIdentifier().getAlgorithm().getId());
-    } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.severe("Exception: " + nsae.getMessage());
-      return null; // throw new IllegalStateException(nsae.toString());
-    }
-  }
   
   /**
    * Gets the name of the digest algorithm used in the signature.
@@ -301,7 +325,15 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return an algorithm string such as "SHA-1" or "SHA-256"
    */
   public String getSignerInfoDigestAlgorithm() {
-    return SignedDataUtil.getSignerInfoDigestAlgorithm(signedData);
+    try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, encryptedDigest, certificate);
+      
+      return SignedDataUtil.getSignerInfoDigestAlgorithm(signedData);
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Unexpected exception", e);
+      throw new IllegalStateException("Could not get SignedInfo from signed data");
+    }
   }
   
   /**
@@ -310,7 +342,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return an algorithm string such as "SHA256withRSA"
    */
   public String getDigestEncryptionAlgorithm() {
-    return SignedDataUtil.getDigestEncryptionAlgorithm(signedData);
+    return digestEncryptionAlgorithm;
   }
   
   /**
@@ -321,12 +353,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @since LDS V1.8
    */
   public String getLDSVersion() {
-    LDSVersionInfo ldsVersionInfo = getLDSSecurityObject(signedData).getVersionInfo();
-    if (ldsVersionInfo == null) {
-      return null;
-    } else {
-      return ldsVersionInfo.getLdsVersion();
-    }
+    return ldsVersion;
   }
   
   /**
@@ -337,12 +364,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @since LDS V1.8
    */
   public String getUnicodeVersion() {
-    LDSVersionInfo ldsVersionInfo = getLDSSecurityObject(signedData).getVersionInfo();
-    if (ldsVersionInfo == null) {
-      return null;
-    } else {
-      return ldsVersionInfo.getUnicodeVersion();
-    }
+    return unicodeVersion;
   }
   
   /**
@@ -356,83 +378,9 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @throws CertificateException when certificate not be constructed from this SOd
    */
   public X509Certificate getDocSigningCertificate() throws CertificateException {
-    return SignedDataUtil.getDocSigningCertificate(signedData);
+    return certificate;
   }
-  
-  /**
-   * Verifies the signature over the contents of the security object.
-   * Clients can also use the accessors of this class and check the
-   * validity of the signature for themselves.
-   *
-   * See RFC 3369, Cryptographic Message Syntax, August 2002,
-   * Section 5.4 for details.
-   *
-   * @param docSigningCert the certificate to use
-   *        (should be X509 certificate)
-   *
-   * @return status of the verification
-   *
-   * @throws GeneralSecurityException if something goes wrong
-   * 
-   * @deprecated this method will be moved, LDS data objects should not be responsible for verification
-   */
-  /* FIXME: move this out of lds package. */
-  public boolean checkDocSignature(Certificate docSigningCert) throws GeneralSecurityException {
-    byte[] eContent = getEContent();
-    byte[] signature = getEncryptedDigest();
     
-    String digestEncryptionAlgorithm = null;
-    try {
-      digestEncryptionAlgorithm = getDigestEncryptionAlgorithm();
-    } catch (Exception e) {
-      digestEncryptionAlgorithm = null;
-    }
-    
-    /*
-     * For the cases where the signature is simply a digest (haven't seen a passport like this,
-     * thus this is guessing)
-     */
-    if (digestEncryptionAlgorithm == null) {
-      String digestAlg = getSignerInfoDigestAlgorithm();
-      MessageDigest digest = null;
-      try {
-        digest = MessageDigest.getInstance(digestAlg);
-      } catch (Exception e) {
-        digest = MessageDigest.getInstance(digestAlg, BC_PROVIDER);
-      }
-      digest.update(eContent);
-      byte[] digestBytes = digest.digest();
-      return Arrays.equals(digestBytes, signature);
-    }
-    
-    /* For RSA_SA_PSS
-     *    1. the default hash is SHA1,
-     *    2. The hash id is not encoded in OID
-     * So it has to be specified "manually".
-     */
-    if ("SSAwithRSA/PSS".equals(digestEncryptionAlgorithm)) {
-      String digestAlg = getSignerInfoDigestAlgorithm();
-      digestEncryptionAlgorithm = digestAlg.replace("-", "") + "withRSA/PSS";
-    }
-    
-    if ("RSA".equals(digestEncryptionAlgorithm)) {
-      String digestJavaString = getSignerInfoDigestAlgorithm();
-      digestEncryptionAlgorithm = digestJavaString.replace("-", "") + "withRSA";
-    }
-    
-    LOGGER.info("digestEncryptionAlgorithm = " + digestEncryptionAlgorithm);
-    
-    Signature sig = null;
-    try {
-      sig = Signature.getInstance(digestEncryptionAlgorithm);
-    } catch (Exception e) {
-      sig = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER);
-    }
-    sig.initVerify(docSigningCert);
-    sig.update(eContent);
-    return sig.verify(signature);
-  }
-  
   /**
    * Gets the issuer of the document signing certificate.
    *
@@ -440,14 +388,24 @@ public class SODFile extends AbstractTaggedLDSFile {
    */
   public X500Principal getIssuerX500Principal() {
     try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, encryptedDigest, certificate);
+      
       IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
       X500Name name = issuerAndSerialNumber.getName();
-      X500Principal x500Principal = new X500Principal(name.getEncoded(ASN1Encoding.DER));		
-      return x500Principal;
-    } catch (IOException ioe) {
-      LOGGER.severe("Could not get issuer: " + ioe.getMessage());
-      return null;
+      
+      if (name != null) {
+        return new X500Principal(name.getEncoded(ASN1Encoding.DER));
+      }
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Could not get issuer", e);
     }
+    
+    if (certificate != null) {
+      return certificate.getIssuerX500Principal();
+    }
+    
+    return null;
   }
   
   /**
@@ -456,9 +414,25 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return a certificate serial number
    */
   public BigInteger getSerialNumber() {
-    IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
-    BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
-    return serialNumber;
+    try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, ICAO_LDS_SOD_OID, contentInfo, encryptedDigest, certificate);
+      
+      IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
+      BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
+      
+      if (serialNumber != null) {
+        return serialNumber;
+      }
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Could not get serial number", e);
+    }
+    
+    if (certificate != null) {
+      return certificate.getSerialNumber();
+    }
+    
+    return null;
   }
   
   /**
@@ -491,7 +465,17 @@ public class SODFile extends AbstractTaggedLDSFile {
   
   private static ContentInfo toContentInfo(String contentTypeOID, String digestAlgorithm,
       Map<Integer, byte[]> dataGroupHashes,
-      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, IOException {
+      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException {
+    try {
+      LDSSecurityObject securityObject = toLDSSecurityobject(digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      return new ContentInfo(new ASN1ObjectIdentifier(contentTypeOID), new DEROctetString(securityObject));
+    } catch (IOException ioe) {
+      LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
+      throw new IllegalArgumentException("Error DER encoding the security infos");
+    }
+  }
+  
+  private static LDSSecurityObject toLDSSecurityobject(String digestAlgorithm, Map<Integer, byte[]> dataGroupHashes, String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException {
     DataGroupHash[] dataGroupHashesArray = new DataGroupHash[dataGroupHashes.size()];
     int i = 0;
     for (int dataGroupNumber: dataGroupHashes.keySet()) {
@@ -500,16 +484,14 @@ public class SODFile extends AbstractTaggedLDSFile {
       dataGroupHashesArray[i++] = hash;
     }
     AlgorithmIdentifier digestAlgorithmIdentifier = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
-    LDSSecurityObject securityObject = null;
     if (ldsVersion == null) {
-      securityObject = new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray);
+      return new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray);
     } else {
-      securityObject = new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray, new LDSVersionInfo(ldsVersion, unicodeVersion));
+      return new LDSSecurityObject(digestAlgorithmIdentifier, dataGroupHashesArray, new LDSVersionInfo(ldsVersion, unicodeVersion));
     }
-    
-    return new ContentInfo(new ASN1ObjectIdentifier(contentTypeOID), new DEROctetString(securityObject));
+
   }
-  
+
   /**
    * Reads the security object (containing the hashes
    * of the data groups) found in the SignedData field.
@@ -518,11 +500,24 @@ public class SODFile extends AbstractTaggedLDSFile {
    *
    * @throws IOException
    */
+  private static Map<Integer, byte[]> getDataGroupHashes(LDSSecurityObject sod) {
+    DataGroupHash[] hashObjects = sod.getDatagroupHash();
+    Map<Integer, byte[]> hashMap = new TreeMap<Integer, byte[]>(); /* HashMap... get it? :D (not funny anymore, now that it's a TreeMap.) */
+    for (int i = 0; i < hashObjects.length; i++) {
+      DataGroupHash hashObject = hashObjects[i];
+      int number = hashObject.getDataGroupNumber();
+      byte[] hashValue = hashObject.getDataGroupHashValue().getOctets();
+      hashMap.put(number, hashValue);
+    }
+    return hashMap;
+  }
+  
   private static LDSSecurityObject getLDSSecurityObject(SignedData signedData) {
     try {
       ContentInfo encapContentInfo = signedData.getEncapContentInfo();
       String contentType = encapContentInfo.getContentType().getId();
       DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();
+      
       if (!(ICAO_LDS_SOD_OID.equals(contentType)
           || SDU_LDS_SOD_OID.equals(contentType)
           || ICAO_LDS_SOD_ALT_OID.equals(contentType))) {
@@ -530,16 +525,21 @@ public class SODFile extends AbstractTaggedLDSFile {
       }
       ASN1InputStream inputStream = new ASN1InputStream(new ByteArrayInputStream(eContent.getOctets()));
       
-      Object firstObject = inputStream.readObject();
-      if (!(firstObject instanceof ASN1Sequence)) {
-        throw new IllegalStateException("Expected ASN1Sequence, found " + firstObject.getClass().getSimpleName());
+      try {
+        Object firstObject = inputStream.readObject();
+        if (!(firstObject instanceof ASN1Sequence)) {
+          throw new IllegalStateException("Expected ASN1Sequence, found " + firstObject.getClass().getSimpleName());
+        }
+        LDSSecurityObject sod = LDSSecurityObject.getInstance(firstObject);
+        Object nextObject = inputStream.readObject();
+        if (nextObject != null) {
+          LOGGER.warning("Ignoring extra object found after LDSSecurityObject...");
+        }
+        
+        return sod;
+      } finally {
+        inputStream.close();
       }
-      LDSSecurityObject sod = LDSSecurityObject.getInstance(firstObject);
-      Object nextObject = inputStream.readObject();
-      if (nextObject != null) {
-        LOGGER.warning("Ignoring extra object found after LDSSecurityObject...");
-      }
-      return sod;
     } catch (IOException ioe) {
       throw new IllegalStateException("Could not read security object in signedData");
     }
