@@ -30,7 +30,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
-import org.jmrtd.protocol.PACEProtocol;
 
 import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;

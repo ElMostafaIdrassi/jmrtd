@@ -230,7 +230,9 @@ public class PACEProtocol {
        */
     }
     
-    return new PACEResult(wrapper);
+    return new PACEResult(mappingType, agreementAlg, cipherAlg, keyLength,
+        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes,
+        wrapper);
   }
   
   /**

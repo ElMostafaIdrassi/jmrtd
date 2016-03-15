@@ -70,7 +70,7 @@ public class AAProtocol {
         throw new IllegalArgumentException("AA failed: bad challenge");
       }
       byte[] response = service.sendInternalAuthenticate(wrapper, challenge);     
-      return new AAResult(response);
+      return new AAResult(publicKey, digestAlgorithm, signatureAlgorithm, challenge, response);
     } catch (IllegalArgumentException iae) {
       LOGGER.severe("Exception: " + iae.getMessage());
       throw new CardServiceException(iae.toString());

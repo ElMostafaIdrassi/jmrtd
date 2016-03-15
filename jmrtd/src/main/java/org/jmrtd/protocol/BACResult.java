@@ -25,9 +25,9 @@ package org.jmrtd.protocol;
 import org.jmrtd.SecureMessagingWrapper;
 
 public class BACResult {
-
+  
   private SecureMessagingWrapper wrapper;
-
+  
   public BACResult(SecureMessagingWrapper wrapper) {
     this.wrapper = wrapper;
   }

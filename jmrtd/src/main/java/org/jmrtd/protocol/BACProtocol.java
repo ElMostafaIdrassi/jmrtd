@@ -94,8 +94,8 @@ public class BACProtocol {
    * from the document number, the card holder's date of birth,
    * and the card's date of expiry.
    *
-   * @param kEnc 3DES key required for BAC
-   * @param kMac 3DES key required for BAC
+   * @param kEnc static 3DES key required for BAC
+   * @param kMac static 3DES key required for BAC
    *
    * @return the new secure messaging wrapper
    *

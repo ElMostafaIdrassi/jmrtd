@@ -41,7 +41,6 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
-import org.jmrtd.Util;
 import org.jmrtd.lds.CardSecurityFile;
 import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.SecurityInfo;

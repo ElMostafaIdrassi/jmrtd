@@ -237,7 +237,7 @@ public class CardSecurityFile implements Serializable {
   public Collection<ChipAuthenticationInfo> getChipAuthenticationInfos() {
     List<ChipAuthenticationInfo> chipAuthenticationInfos = new ArrayList<ChipAuthenticationInfo>(securityInfos.size());
     for (SecurityInfo securityInfo: securityInfos) {
-      if (securityInfo instanceof ChipAuthenticationPublicKeyInfo) {
+      if (securityInfo instanceof ChipAuthenticationInfo) {
         chipAuthenticationInfos.add((ChipAuthenticationInfo)securityInfo);
       }
     }

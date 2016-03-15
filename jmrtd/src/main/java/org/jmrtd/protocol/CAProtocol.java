@@ -129,7 +129,7 @@ public class CAProtocol {
       SecretKey ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
       SecretKey ksMac = Util.deriveKey(secret, Util.MAC_MODE);
       wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L); // FIXME: can be AESSecureMessagingWrapper for EAC 2. -- MO
-      return new CAResult(keyId, publicKey, wrapper, keyHash, keyPair);
+      return new CAResult(keyId, publicKey, keyHash, keyPair, wrapper);
     } catch (GeneralSecurityException e) {
       throw new CardServiceException(e.toString());
     }

@@ -22,15 +22,41 @@
 
 package org.jmrtd.protocol;
 
+import java.security.PublicKey;
+
 public class AAResult {
 
+  private PublicKey publicKey;
+  private String digestAlgorithm;
+  private String signatureAlgorithm;
+  private byte[] challenge;
   private byte[] response;
 
-  public AAResult(byte[] response) {
+  public AAResult(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge, byte[] response) {
+    this.publicKey = publicKey;
+    this.digestAlgorithm = digestAlgorithm;
+    this.signatureAlgorithm = signatureAlgorithm;
+    this.challenge = challenge;
     this.response = response;
+  }
+
+  public byte[] getChallenge() {
+    return challenge;
   }
   
   public byte[] getResponse() {
     return response;
+  }
+
+  public PublicKey getPublicKey() {
+    return publicKey;
+  }
+
+  public String getDigestAlgorithm() {
+    return digestAlgorithm;
+  }
+
+  public String getSignatureAlgorithm() {
+    return signatureAlgorithm;
   }
 }

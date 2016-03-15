@@ -51,7 +51,7 @@ public class CAResult {
    * @param keyHash the hash of the key
    * @param keyPair the key pair
    */
-  public CAResult(BigInteger keyId, PublicKey publicKey, SecureMessagingWrapper wrapper, byte[] keyHash, KeyPair keyPair) {
+  public CAResult(BigInteger keyId, PublicKey publicKey, byte[] keyHash, KeyPair keyPair, SecureMessagingWrapper wrapper) {
     this.keyId = keyId;
     this.publicKey = publicKey;
     this.keyHash = keyHash;
