@@ -22,7 +22,9 @@
 package org.jmrtd.test.lds;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -34,10 +36,12 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.x500.X500Principal;
@@ -69,6 +73,34 @@ public class SODFileTest extends TestCase {
   
   public void testReflexive() {
     testReflexive(createTestObject());
+  }
+  
+  private byte[] readBytes(InputStream inputStream) throws IOException {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    int nRead;
+    byte[] data = new byte[16384];
+    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+      buffer.write(data, 0, nRead);
+    }
+    buffer.flush();
+    return buffer.toByteArray();
+  }
+  
+  public void testDecodeEncode() {
+    testDecodeEncode(createMustermannSampleInputStream());
+  }
+  
+  public void testDecodeEncode(InputStream inputStream) {
+    try {
+      byte[] bytes = readBytes(inputStream);
+      SODFile sodFile = new SODFile(new ByteArrayInputStream(bytes));
+      byte[] encoded = sodFile.getEncoded();
+      
+      assertTrue(Arrays.equals(bytes, encoded));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Failed", e);
+      fail(e.getMessage());
+    }
   }
   
   public void testReflexive(SODFile sodFile) {
@@ -132,14 +164,14 @@ public class SODFileTest extends TestCase {
       
       X500Principal issuer = sodFile.getIssuerX500Principal();
       
-//      LOGGER.info("DEBUG: issuer = " + issuer);
+      //      LOGGER.info("DEBUG: issuer = " + issuer);
       
       String issuerName = issuer.getName(X500Principal.RFC2253);
       assertNotNull(issuerName);
       
       if (issuer != null && certificate != null) {
         X500Principal certIssuer = certificate.getIssuerX500Principal();
-//        LOGGER.info("DEBUG: certIssuer = " + certIssuer);
+        //        LOGGER.info("DEBUG: certIssuer = " + certIssuer);
         String certIssuerName = certIssuer.getName(X500Principal.RFC2253);
         assertNotNull(certIssuerName);
         //				assertTrue("issuerName = \"" + issuerName + "\", certIssuerName = \"" + certIssuerName + "\"",
