@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
+
+import org.jmrtd.lds.AbstractLDSInfo;
 
 import net.sf.scuba.data.Gender;
 

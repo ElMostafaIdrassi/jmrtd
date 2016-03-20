@@ -115,7 +115,8 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     this(ID_TA_OID, VERSION_NUM_1, constructEFCVCA(fileId, shortFileId));
   }
   
-  ASN1Primitive getDERObject() {
+  @Deprecated
+  public ASN1Primitive getDERObject() {
     ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(new ASN1ObjectIdentifier(oid));
     v.add(new ASN1Integer(version));

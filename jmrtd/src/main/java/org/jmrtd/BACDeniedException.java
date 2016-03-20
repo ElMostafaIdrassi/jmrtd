@@ -22,8 +22,6 @@
 
 package org.jmrtd;
 
-import java.util.List;
-
 import net.sf.scuba.smartcards.CardServiceException;
 
 /**
@@ -39,7 +37,7 @@ public class BACDeniedException extends CardServiceException {
   
   private static final long serialVersionUID = -7094953658210693249L;
   
-  private List<BACKeySpec> triedBACEntries;
+  private BACKeySpec bacKey;
   
   /**
    * Creates an exception.
@@ -48,9 +46,9 @@ public class BACDeniedException extends CardServiceException {
    * @param triedBACEntries the BAC entries that were tried before BAC failed
    * @param sw status word or <code>-1</code>
    */
-  public BACDeniedException(String msg, List<BACKeySpec> triedBACEntries, int sw) {
+  public BACDeniedException(String msg, BACKeySpec bacKey, int sw) {
     super(msg, sw);
-    this.triedBACEntries = triedBACEntries;
+    this.bacKey = bacKey;
   }
   
   /**
@@ -58,7 +56,7 @@ public class BACDeniedException extends CardServiceException {
    * 
    * @return a list
    */
-  public List<BACKeySpec> getTriedEntries() {
-    return triedBACEntries;
+  public BACKeySpec getBACKey() {
+    return bacKey;
   }
 }

@@ -31,8 +31,8 @@ import java.util.Set;
 import org.jmrtd.cbeff.CBEFFInfo;
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
-import org.jmrtd.lds.FingerImageInfo;
-import org.jmrtd.lds.FingerInfo;
+import org.jmrtd.lds.iso19794.FingerImageInfo;
+import org.jmrtd.lds.iso19794.FingerInfo;
 
 import junit.framework.TestCase;
 

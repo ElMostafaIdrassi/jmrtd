@@ -32,6 +32,9 @@ import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.ISO781611;
+import org.jmrtd.lds.icao.DG2File;
+import org.jmrtd.lds.icao.DG3File;
+import org.jmrtd.lds.icao.DG4File;
 
 import net.sf.scuba.tlv.TLVOutputStream;
 
@@ -47,7 +50,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
  *
  * @version $Revision$
  */
-abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
+public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
   
   private static final long serialVersionUID = 2702959939408371946L;
   
@@ -58,7 +61,7 @@ abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
   /** Records in the BIT group. Each record represents a single BIT. */
   private List<R> subRecords;
   
-  CBEFFDataGroup(int dataGroupTag, List<R> subRecords) {
+  protected CBEFFDataGroup(int dataGroupTag, List<R> subRecords) {
     super(dataGroupTag);
     addAll(subRecords);
     this.random = new Random();
@@ -71,27 +74,27 @@ abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
    * @param dataGroupTag the datagroup tag to use
    * @param biometricDataGroupTag the biometric data block tag to use (either <code>5F2E</code> or <code>7F2E</code>).
    */
-  CBEFFDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
+  protected CBEFFDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
     super(dataGroupTag, inputStream);
     this.random = new Random();
   }
   
-  void add(R record) {
+  public void add(R record) {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     subRecords.add(record);
   }
   
-  void addAll(List<R> records) {
+  public void addAll(List<R> records) {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     subRecords.addAll(records);
   }
   
-  void remove(int index) {
+  public void remove(int index) {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     subRecords.remove(index);		
   }
   
-  List<R> getSubRecords() {
+  public List<R> getSubRecords() {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     return new ArrayList<R>(subRecords);
   }

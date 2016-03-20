@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +42,12 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DLSet;
+import org.jmrtd.lds.ActiveAuthenticationInfo;
+import org.jmrtd.lds.ChipAuthenticationInfo;
+import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
+import org.jmrtd.lds.DataGroup;
+import org.jmrtd.lds.SecurityInfo;
+import org.jmrtd.lds.TerminalAuthenticationInfo;
 
 /**
  * Data Group 14 stores a set of SecurityInfos for EAC and PACE, see

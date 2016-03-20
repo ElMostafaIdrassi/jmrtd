@@ -78,9 +78,9 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
-import org.jmrtd.lds.MRZInfo;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
+import org.jmrtd.lds.icao.MRZInfo;
 
 import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;

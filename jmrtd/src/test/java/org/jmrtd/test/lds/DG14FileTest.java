@@ -52,10 +52,10 @@ import javax.crypto.spec.DHParameterSpec;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
-import org.jmrtd.lds.DG14File;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.TerminalAuthenticationInfo;
+import org.jmrtd.lds.icao.DG14File;
 import org.jmrtd.test.ResourceUtil;
 
 import junit.framework.TestCase;

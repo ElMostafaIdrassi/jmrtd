@@ -144,8 +144,9 @@ public class PACEInfo extends SecurityInfo {
     return parameterId;
   }
   
+  @Deprecated
   @Override
-  ASN1Primitive getDERObject() {
+  public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     
     /* Protocol */

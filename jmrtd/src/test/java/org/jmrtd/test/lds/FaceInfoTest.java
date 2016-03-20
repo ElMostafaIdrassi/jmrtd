@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
-import org.jmrtd.lds.FaceImageInfo;
-import org.jmrtd.lds.FaceInfo;
+import org.jmrtd.lds.iso19794.FaceImageInfo;
+import org.jmrtd.lds.iso19794.FaceInfo;
 
 import junit.framework.TestCase;
 

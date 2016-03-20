@@ -29,6 +29,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.KeySpec;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Logger;
@@ -365,7 +366,7 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws PACEException on error
    */
-  public synchronized void doPACE(BACKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public synchronized void doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
   }

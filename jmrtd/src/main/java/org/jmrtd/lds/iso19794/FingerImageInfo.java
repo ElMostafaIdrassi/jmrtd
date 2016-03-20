@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.iso19794;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.jmrtd.cbeff.CBEFFInfo;
+import org.jmrtd.lds.AbstractImageInfo;
 
 /**
  * Data structure for storing view of a single finger

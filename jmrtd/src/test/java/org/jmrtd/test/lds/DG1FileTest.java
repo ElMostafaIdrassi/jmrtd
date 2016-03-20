@@ -29,8 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.DG1File;
-import org.jmrtd.lds.MRZInfo;
+import org.jmrtd.lds.icao.DG1File;
+import org.jmrtd.lds.icao.MRZInfo;
 
 import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;

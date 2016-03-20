@@ -30,9 +30,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.DG3File;
-import org.jmrtd.lds.FingerImageInfo;
-import org.jmrtd.lds.FingerInfo;
+import org.jmrtd.lds.icao.DG3File;
+import org.jmrtd.lds.iso19794.FingerImageInfo;
+import org.jmrtd.lds.iso19794.FingerInfo;
 import org.jmrtd.test.ResourceUtil;
 
 import junit.framework.TestCase;

@@ -137,7 +137,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
    *
    * @deprecated Remove this method from visible interface (because of dependency on BC API)
    */
-  abstract ASN1Primitive getDERObject();
+  public abstract ASN1Primitive getDERObject();
   
   /**
    * Writes this SecurityInfo to output stream.
@@ -168,7 +168,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
    *
    * @return a concrete security info object
    */
-  static SecurityInfo getInstance(ASN1Primitive obj) {
+  public static SecurityInfo getInstance(ASN1Primitive obj) {
     try {
       ASN1Sequence sequence = (ASN1Sequence)obj;
       String oid = ((ASN1ObjectIdentifier)sequence.getObjectAt(0)).getId();

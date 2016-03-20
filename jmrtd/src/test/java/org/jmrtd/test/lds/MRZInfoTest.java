@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import org.jmrtd.lds.ICAOCountry;
-import org.jmrtd.lds.MRZInfo;
+import org.jmrtd.lds.icao.ICAOCountry;
+import org.jmrtd.lds.icao.MRZInfo;
 
 import junit.framework.TestCase;
 import net.sf.scuba.data.Country;

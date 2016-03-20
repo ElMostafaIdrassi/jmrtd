@@ -38,28 +38,28 @@ import java.util.List;
  *
  * @param <R> the type of the elements
  */
-abstract class AbstractListInfo<R> extends AbstractLDSInfo {
+public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
   
   private static final long serialVersionUID = 2970076896364365191L;
   
   private List<R> subRecords;
   
-  List<R> getSubRecords() {
+  protected List<R> getSubRecords() {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     return new ArrayList<R>(this.subRecords);
   }
   
-  void add(R subRecord) {
+  protected void add(R subRecord) {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     this.subRecords.add(subRecord);
   }
   
-  void addAll(List<R> subRecords) {
+  protected void addAll(List<R> subRecords) {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     this.subRecords.addAll(subRecords);
   }
   
-  void remove(int index) {
+  protected void remove(int index) {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     this.subRecords.remove(index);
   }

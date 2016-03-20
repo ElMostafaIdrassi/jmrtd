@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.iso19794;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -31,6 +31,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.jmrtd.lds.AbstractImageInfo;
 
 import net.sf.scuba.data.Gender;
 

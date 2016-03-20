@@ -40,7 +40,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
  *
  * @version $Revision: 1601 $
  */
-abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
+public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   
   private static final long serialVersionUID = -4761360877353069639L;
   
@@ -55,7 +55,7 @@ abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
    *
    * @param dataGroupTag data group tag
    */
-  AbstractTaggedLDSFile(int dataGroupTag) {
+  protected AbstractTaggedLDSFile(int dataGroupTag) {
     this.tag = dataGroupTag;
   }
   
@@ -88,8 +88,7 @@ abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
       throw new IllegalArgumentException("Was expecting tag " + Integer.toHexString(tag) + ", found " + Integer.toHexString(inputTag));
     }
     length = tlvIn.readLength();
-    inputStream = new SplittableInputStream(inputStream, length);
-    readContent(inputStream);
+    readContent(new SplittableInputStream(inputStream, length));
   }
   
   protected void writeObject(OutputStream outputStream) throws IOException {

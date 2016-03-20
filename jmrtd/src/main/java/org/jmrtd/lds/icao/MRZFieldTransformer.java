@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 /**
  * Interface for MRZ field transformers, for instance for abbreviating long names and

@@ -32,9 +32,9 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import org.jmrtd.lds.DG7File;
 import org.jmrtd.lds.DisplayedImageInfo;
 import org.jmrtd.lds.ImageInfo;
+import org.jmrtd.lds.icao.DG7File;
 
 import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;

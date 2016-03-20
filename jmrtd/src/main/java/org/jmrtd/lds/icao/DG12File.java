@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.jmrtd.lds.DataGroup;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;

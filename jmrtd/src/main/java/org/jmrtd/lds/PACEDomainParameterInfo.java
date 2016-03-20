@@ -97,8 +97,9 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     return domainParameter.getParameters();
   }
   
+  @Deprecated
   @Override
-  ASN1Primitive getDERObject() {
+  public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     
     /* Protocol */

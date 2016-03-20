@@ -3,9 +3,9 @@ package org.jmrtd.test.lds;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jmrtd.lds.IrisBiometricSubtypeInfo;
-import org.jmrtd.lds.IrisImageInfo;
-import org.jmrtd.lds.IrisInfo;
+import org.jmrtd.lds.iso19794.IrisBiometricSubtypeInfo;
+import org.jmrtd.lds.iso19794.IrisImageInfo;
+import org.jmrtd.lds.iso19794.IrisInfo;
 
 import junit.framework.TestCase;
 

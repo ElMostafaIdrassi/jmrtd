@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -33,6 +33,8 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.logging.Logger;
+
+import org.jmrtd.lds.DataGroup;
 
 /**
  * File structure for the EF_DG15 file.

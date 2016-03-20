@@ -34,7 +34,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 
 import org.jmrtd.JMRTDSecurityProvider;
-import org.jmrtd.lds.DG15File;
+import org.jmrtd.lds.icao.DG15File;
 
 import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;

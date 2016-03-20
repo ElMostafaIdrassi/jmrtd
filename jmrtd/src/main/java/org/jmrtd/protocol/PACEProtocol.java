@@ -31,6 +31,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
@@ -97,7 +98,7 @@ public class PACEProtocol {
    *
    * @throws PACEException on error
    */
-  public PACEResult doPACE(BACKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public PACEResult doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     try {
       return doPACE(deriveStaticPACEKey(keySpec, oid), oid, params);
     } catch (GeneralSecurityException gse) {
@@ -474,14 +475,19 @@ public class PACEProtocol {
    * @param keySpec the key material from the MRZ
    * @param oid the PACE object identifier is needed to determine the cipher algorithm and the key length
    */
-  public static SecretKey deriveStaticPACEKey(BACKeySpec keySpec, String oid) throws GeneralSecurityException {
+  public static SecretKey deriveStaticPACEKey(KeySpec keySpec, String oid) throws GeneralSecurityException {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
     byte[] keySeed = computeKeySeedForPACE(keySpec);
     return Util.deriveKey(keySeed, cipherAlg, keyLength, Util.PACE_MODE);
   }
   
-  public static byte[] computeKeySeedForPACE(BACKeySpec bacKey) throws GeneralSecurityException {
+  public static byte[] computeKeySeedForPACE(KeySpec keySpec) throws GeneralSecurityException {
+    if (!(keySpec instanceof BACKeySpec)) {
+      throw new IllegalArgumentException("Unsupported key spec, was expecting BAC key spec");
+    }
+    
+    BACKeySpec bacKey = (BACKeySpec)keySpec;
     String documentNumber = bacKey.getDocumentNumber();
     String dateOfBirth = bacKey.getDateOfBirth();
     String dateOfExpiry = bacKey.getDateOfExpiry();

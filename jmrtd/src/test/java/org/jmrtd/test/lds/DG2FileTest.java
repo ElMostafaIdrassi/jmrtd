@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
-import org.jmrtd.lds.DG2File;
 import org.jmrtd.lds.DataGroup;
-import org.jmrtd.lds.FaceImageInfo;
-import org.jmrtd.lds.FaceInfo;
-import org.jmrtd.lds.LDS;
+import org.jmrtd.lds.icao.DG2File;
+import org.jmrtd.lds.icao.LDS;
+import org.jmrtd.lds.iso19794.FaceImageInfo;
+import org.jmrtd.lds.iso19794.FaceInfo;
 import org.jmrtd.test.ResourceUtil;
 
 import junit.framework.TestCase;

@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.DG12File;
+import org.jmrtd.lds.icao.DG12File;
 
 import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;

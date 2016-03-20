@@ -39,7 +39,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
  *
  * @version $Revision$
  */
-abstract class DisplayedImageDataGroup extends DataGroup {
+public abstract class DisplayedImageDataGroup extends DataGroup {
   
   private static final long serialVersionUID = 5994136177872308962L;
   

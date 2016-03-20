@@ -31,9 +31,9 @@ import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
+import org.jmrtd.lds.icao.MRZInfo;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
-import org.jmrtd.lds.MRZInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVOutputStream;

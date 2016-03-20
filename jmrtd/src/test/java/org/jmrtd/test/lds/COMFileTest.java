@@ -24,8 +24,8 @@ package org.jmrtd.test.lds;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.jmrtd.lds.COMFile;
 import org.jmrtd.lds.LDSFile;
+import org.jmrtd.lds.icao.COMFile;
 
 import junit.framework.TestCase;
 

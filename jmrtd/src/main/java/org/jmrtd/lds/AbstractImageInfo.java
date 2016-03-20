@@ -40,7 +40,7 @@ import org.jmrtd.io.SplittableInputStream;
  * 
  * @version $Revision$
  */
-abstract class AbstractImageInfo implements ImageInfo {
+public abstract class AbstractImageInfo implements ImageInfo {
   
   private static final long serialVersionUID = 2870092217269116309L;
   
@@ -61,11 +61,11 @@ abstract class AbstractImageInfo implements ImageInfo {
   AbstractImageInfo() {
   }
   
-  AbstractImageInfo(int type) {
+  protected AbstractImageInfo(int type) {
     this.type = type;
   }
   
-  AbstractImageInfo(int type, String mimeType) {
+  protected AbstractImageInfo(int type, String mimeType) {
     this(type);
     this.mimeType = mimeType;
   }

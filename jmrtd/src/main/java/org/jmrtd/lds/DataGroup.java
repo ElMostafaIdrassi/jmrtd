@@ -45,7 +45,7 @@ public abstract class DataGroup extends AbstractTaggedLDSFile {
    *
    * @param dataGroupTag data group tag
    */
-  DataGroup(int dataGroupTag) {
+  protected DataGroup(int dataGroupTag) {
     super(dataGroupTag);
   }
   

@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.iso19794;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import org.jmrtd.lds.AbstractListInfo;
 
 /**
  * Iris biometric subtype data block (containing iris image data blocks)

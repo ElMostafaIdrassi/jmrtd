@@ -42,9 +42,9 @@ public class DisplayedImageInfo extends AbstractImageInfo {
   
   private static final long serialVersionUID = 3801320585294302721L;
   
-  protected static final int
-  DISPLAYED_PORTRAIT_TAG = 0x5F40,
-  DISPLAYED_SIGNATURE_OR_MARK_TAG = 0x5F43;
+  public static final int DISPLAYED_PORTRAIT_TAG = 0x5F40;
+
+  public static final int DISPLAYED_SIGNATURE_OR_MARK_TAG = 0x5F43;
   
   private int displayedImageTag;
   

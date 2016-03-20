@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.iso19794;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,6 +36,7 @@ import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.CBEFFInfo;
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
+import org.jmrtd.lds.AbstractListInfo;
 
 /**
  * Fingerprint general record header and finger image data blocks

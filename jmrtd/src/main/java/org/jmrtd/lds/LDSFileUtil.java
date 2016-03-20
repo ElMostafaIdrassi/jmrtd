@@ -27,6 +27,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.jmrtd.PassportService;
+import org.jmrtd.lds.icao.COMFile;
+import org.jmrtd.lds.icao.DG11File;
+import org.jmrtd.lds.icao.DG12File;
+import org.jmrtd.lds.icao.DG14File;
+import org.jmrtd.lds.icao.DG15File;
+import org.jmrtd.lds.icao.DG1File;
+import org.jmrtd.lds.icao.DG2File;
+import org.jmrtd.lds.icao.DG3File;
+import org.jmrtd.lds.icao.DG4File;
+import org.jmrtd.lds.icao.DG5File;
+import org.jmrtd.lds.icao.DG6File;
+import org.jmrtd.lds.icao.DG7File;
 
 /**
  * Static LDS file methods.

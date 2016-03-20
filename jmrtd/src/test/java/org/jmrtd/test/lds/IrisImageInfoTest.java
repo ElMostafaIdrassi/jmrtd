@@ -7,8 +7,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.jmrtd.lds.IrisImageInfo;
-import org.jmrtd.lds.IrisInfo;
+import org.jmrtd.lds.iso19794.IrisImageInfo;
+import org.jmrtd.lds.iso19794.IrisInfo;
 
 import junit.framework.TestCase;
 

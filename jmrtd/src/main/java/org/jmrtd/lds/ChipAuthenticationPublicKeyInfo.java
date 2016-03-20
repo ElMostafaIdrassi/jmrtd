@@ -112,7 +112,8 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     this(publicKey, BigInteger.valueOf(-1));
   }
   
-  ASN1Primitive getDERObject() {
+  @Deprecated
+  public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new ASN1ObjectIdentifier(oid));
     vector.add((ASN1Sequence)subjectPublicKeyInfo.toASN1Primitive());

@@ -2,7 +2,7 @@ package org.jmrtd.test.lds;
 
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.ICAOCountry;
+import org.jmrtd.lds.icao.ICAOCountry;
 
 import junit.framework.TestCase;
 import net.sf.scuba.data.Country;

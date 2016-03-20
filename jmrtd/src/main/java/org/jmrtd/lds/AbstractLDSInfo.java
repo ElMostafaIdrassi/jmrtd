@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @version $Revision$
  */
-abstract class AbstractLDSInfo implements LDSElement {
+public abstract class AbstractLDSInfo implements LDSElement {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
@@ -52,5 +52,5 @@ abstract class AbstractLDSInfo implements LDSElement {
     }
   }
   
-  abstract void writeObject(OutputStream outputStream) throws IOException;
+  public abstract void writeObject(OutputStream outputStream) throws IOException;
 }

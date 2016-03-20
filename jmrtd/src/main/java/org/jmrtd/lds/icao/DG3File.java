@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +37,8 @@ import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
 import org.jmrtd.cbeff.SimpleCBEFFInfo;
 import org.jmrtd.cbeff.StandardBiometricHeader;
+import org.jmrtd.lds.CBEFFDataGroup;
+import org.jmrtd.lds.iso19794.FingerInfo;
 
 /**
  * File structure for the EF_DG3 file.

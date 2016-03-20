@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +30,9 @@ import java.util.Collections;
 import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.jmrtd.lds.AbstractTaggedLDSFile;
+import org.jmrtd.lds.LDSFileUtil;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;

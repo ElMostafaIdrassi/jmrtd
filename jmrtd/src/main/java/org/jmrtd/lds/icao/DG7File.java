@@ -20,11 +20,14 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
+import org.jmrtd.lds.DisplayedImageDataGroup;
+import org.jmrtd.lds.DisplayedImageInfo;
 
 /**
  * File structure for the EF_DG7 file.

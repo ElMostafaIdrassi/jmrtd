@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.lds;
+package org.jmrtd.lds.icao;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,6 +38,12 @@ import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.io.SplittableInputStream;
+import org.jmrtd.lds.CVCAFile;
+import org.jmrtd.lds.CardAccessFile;
+import org.jmrtd.lds.DataGroup;
+import org.jmrtd.lds.LDSFile;
+import org.jmrtd.lds.LDSFileUtil;
+import org.jmrtd.lds.SODFile;
 
 /**
  * The ICAO logical data structure version 1.7.
