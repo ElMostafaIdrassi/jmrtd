@@ -32,7 +32,7 @@ import org.jmrtd.lds.DisplayedImageInfo;
 /**
  * File structure for the EF_DG7 file.
  * 
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  * 
  * @version $Revision$
  */
