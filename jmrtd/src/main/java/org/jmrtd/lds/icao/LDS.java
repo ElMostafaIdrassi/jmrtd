@@ -69,20 +69,20 @@ public class LDS {
     this.fetchers = new TreeMap<Short, SplittableInputStream>();
   }
   
-  public synchronized boolean isSameDocument(LDS other) throws IOException {
-    if (other == null) { return false; }
-    try {
-      DG1File dg1 = getDG1File();
-      DG1File otherDG1 = other.getDG1File();
-      if (dg1 == null || otherDG1 == null) { return false; }
-      MRZInfo mrzInfo = dg1.getMRZInfo();
-      MRZInfo otherMRZInfo = otherDG1.getMRZInfo();
-      if (mrzInfo == null || otherMRZInfo == null) { return false; }
-      return mrzInfo.equals(otherMRZInfo);
-    } catch (Exception e) {
-      return false;
-    }
-  }
+//  public synchronized boolean isSameDocument(LDS other) throws IOException {
+//    if (other == null) { return false; }
+//    try {
+//      DG1File dg1 = getDG1File();
+//      DG1File otherDG1 = other.getDG1File();
+//      if (dg1 == null || otherDG1 == null) { return false; }
+//      MRZInfo mrzInfo = dg1.getMRZInfo();
+//      MRZInfo otherMRZInfo = otherDG1.getMRZInfo();
+//      if (mrzInfo == null || otherMRZInfo == null) { return false; }
+//      return mrzInfo.equals(otherMRZInfo);
+//    } catch (Exception e) {
+//      return false;
+//    }
+//  }
   
   /* FIXME: check consistency within buffers? */
   public synchronized void updateFrom(LDS other) {
@@ -272,7 +272,7 @@ public class LDS {
   public DG14File getDG14File() throws IOException { return (DG14File)getFile(PassportService.EF_DG14); }
   public DG15File getDG15File() throws IOException { return (DG15File)getFile(PassportService.EF_DG15); }
   
-  /* FIXME: Both CVCA and CardAccess appear to use FID 0x011C. */
+  /* NOTE: Both CVCA and CardAccess appear to use FID 0x011C, CVCA is in ICAO app, CardAcces in root MF. */
   
   public CardAccessFile getCardAccessFile() throws IOException {
     return (CardAccessFile)getFile(PassportService.EF_CARD_ACCESS);
