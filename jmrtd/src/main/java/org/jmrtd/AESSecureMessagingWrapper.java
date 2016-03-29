@@ -147,6 +147,16 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
   
   @Override
+  public SecretKey getEncryptionKey() {
+    return ksEnc;
+  }
+  
+  @Override
+  public SecretKey getMACKey() {
+    return ksMac;
+  }
+  
+  @Override
   public String toString() {
     return "AESSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
   }
@@ -155,7 +165,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
    *
-   * @param capdu buffer containing the APDU data. It must be large enough to receive the wrapped apdu
+   * @param capdu buffer containing the APDU data. It must be large enough to receive the wrapped APDU
    * @param len length of the APDU data
    *
    * @return a byte array containing the wrapped apdu buffer

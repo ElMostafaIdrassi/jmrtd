@@ -30,6 +30,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
+import org.jmrtd.protocol.PACEProtocol;
 
 import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
@@ -313,8 +314,8 @@ public class PACEProtocolTest extends TestCase {
       byte[] expectedPCDAuthenticationToken = Hex.hexStringToBytes("C2B0BD78 D94BA866");
       byte[] expectedPICCAuthenticationToken = Hex.hexStringToBytes("3ABB9674 BCE93C08");
       
-      byte[] pcdToken = Util.generateAuthenticationToken(oid, macKey, piccPublicKey);
-      byte[] piccToken =  Util.generateAuthenticationToken(oid, macKey, pcdPublicKey);
+      byte[] pcdToken = PACEProtocol.generateAuthenticationToken(oid, macKey, piccPublicKey);
+      byte[] piccToken =  PACEProtocol.generateAuthenticationToken(oid, macKey, pcdPublicKey);
       
       assertTrue(Arrays.equals(expectedPCDAuthenticationToken, pcdToken));
       assertTrue(Arrays.equals(expectedPICCAuthenticationToken, piccToken));
@@ -503,8 +504,8 @@ public class PACEProtocolTest extends TestCase {
       byte[] expectedPCDAuthenticationToken = Hex.hexStringToBytes("B46DD9BD 4D98381F");
       byte[] expectedPICCAuthenticationToken = Hex.hexStringToBytes("917F37B5 C0E6D8D1");
       
-      byte[] pcdAuthenticationToken = Util.generateAuthenticationToken(oid, macKey, piccPublicKey);
-      byte[] piccAuthenticationToken =  Util.generateAuthenticationToken(oid, macKey, pcdPublicKey);
+      byte[] pcdAuthenticationToken = PACEProtocol.generateAuthenticationToken(oid, macKey, piccPublicKey);
+      byte[] piccAuthenticationToken =  PACEProtocol.generateAuthenticationToken(oid, macKey, pcdPublicKey);
       
       assertTrue(Arrays.equals(expectedPCDAuthenticationToken, pcdAuthenticationToken));
       assertTrue(Arrays.equals(expectedPICCAuthenticationToken, piccAuthenticationToken));

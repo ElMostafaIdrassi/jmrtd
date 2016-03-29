@@ -84,7 +84,7 @@ public class PassportService extends PassportApduService implements Serializable
   private static final long serialVersionUID = 1751933705552226972L;
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+    
   /** Data group 1 contains the MRZ. */
   public static final short EF_DG1 = 0x0101;
   
@@ -146,9 +146,9 @@ public class PassportService extends PassportApduService implements Serializable
   public static final short EF_COM = 0x011E;
   
   /**
-   * File with the EAC CVCA references. Note: this can be overridden by a file
-   * identifier in the DG14 file (TerminalAuthenticationInfo). So check that
-   * one first. Also, this file does not have a header tag, like the others.
+   * Contains EAC CVA references. Note: this can be overridden by a file
+   * identifier in the DG14 file (in a TerminalAuthenticationInfo). Check DG14
+   * first. Also, this file does not have a header tag, like the others.
    */
   public static final short EF_CVCA = 0x011C;
   
@@ -182,23 +182,6 @@ public class PassportService extends PassportApduService implements Serializable
   
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   
-  private static final int SESSION_STOPPED_STATE = 0;
-  
-  private static final int SESSION_STARTED_STATE = 1;
-  
-  /*
-   * TODO: this should be bit masks, e.g. AA and EAC should be settable both at the same time
-   * Better yet, distinguish between access control (BAC, PACE, TA) and verification (AA, CA)
-   * should probably not be part of this state machine at all.
-   */
-  private static final int BAC_AUTHENTICATED_STATE = 2;
-  
-  //	private static final int AA_AUTHENTICATED_STATE = 3;
-  
-  private static final int CA_AUTHENTICATED_STATE = 4;
-  
-  private static final int TA_AUTHENTICATED_STATE = 5;
-  
   /**
    * The file read block size, some passports cannot handle large values
    *
@@ -206,7 +189,18 @@ public class PassportService extends PassportApduService implements Serializable
    */
   public int maxBlockSize;
   
-  private int state;
+  enum State {
+    SESSION_STOPPED_STATE,  
+    SESSION_STARTED_STATE,
+    BAC_AUTHENTICATED_STATE,
+    PACE_AUTHENTICATED_STATE,
+    AA_EXECUTED_STATE,
+    CA_EXECUTED_STATE,
+    TA_AUTHENTICATED_STATE
+  }
+  
+  /* FIXME: We should keep track of a stack of these states instead. -- MO */
+  private State state;
   
   /**
    * @deprecated visibility will be set to private
@@ -251,7 +245,7 @@ public class PassportService extends PassportApduService implements Serializable
     this.maxBlockSize = maxBlockSize;
     fs = new MRTDFileSystem(this);
     
-    state = SESSION_STOPPED_STATE;
+    state = State.SESSION_STOPPED_STATE;
     LOGGER.info("DEBUG: isExtendedAPDULengthSupported: " + isExtendedAPDULengthSupported());
   }
   
@@ -267,7 +261,7 @@ public class PassportService extends PassportApduService implements Serializable
     }
     synchronized(this) {
       super.open();
-      state = SESSION_STARTED_STATE;
+      state = State.SESSION_STARTED_STATE;
     }
   }
   
@@ -297,7 +291,7 @@ public class PassportService extends PassportApduService implements Serializable
    * @return a boolean
    */
   public boolean isOpen() {
-    return (state != SESSION_STOPPED_STATE);
+    return (state != State.SESSION_STOPPED_STATE);
   }
   
   /**
@@ -336,7 +330,7 @@ public class PassportService extends PassportApduService implements Serializable
   public synchronized void doBAC(BACKeySpec bacKey) throws CardServiceException {
     BACResult bacResult = (new BACProtocol(this)).doBAC(bacKey);
     wrapper = bacResult.getWrapper();
-    state = BAC_AUTHENTICATED_STATE;
+    state = State.BAC_AUTHENTICATED_STATE;
   }
   
   /**
@@ -344,37 +338,48 @@ public class PassportService extends PassportApduService implements Serializable
    * It does BAC using kEnc and kMac keys, usually calculated
    * from the document number, the card holder's date of birth,
    * and the card's date of expiry.
+   * 
+   * A secure messaging channel is set up as a result.
    *
    * @param kEnc static 3DES key required for BAC
    * @param kMac static 3DES key required for BAC
+   * 
+   * @return the result
    *
    * @throws CardServiceException if authentication failed
    * @throws GeneralSecurityException on security primitives related problems
    */
-  public synchronized void doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
+  public synchronized BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
     BACResult bacResult = (new BACProtocol(this)).doBAC(kEnc, kMac);
     wrapper = bacResult.getWrapper();
-    state = BAC_AUTHENTICATED_STATE;
+    state = State.BAC_AUTHENTICATED_STATE;
+    return bacResult;
   }
   
   /**
    * Performs the PACE 2.0 / SAC protocol.
+   * A secure messaging channel is set up as a result.
    *
    * @param keySpec the MRZ
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
+   * 
+   * @return the result
    *
    * @throws PACEException on error
    */
-  public synchronized void doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public synchronized PACEResult doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
+    state = State.PACE_AUTHENTICATED_STATE;
+    return paceResult;
   }
   
   /**
    * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
    * ver. 1.11. In short, we authenticate the chip with (EC)DH key agreement
    * protocol and create new secure messaging keys.
+   * A new secure messaging channel is set up as a result.
    *
    * @param keyId passport's public key id (stored in DG14), -1 if none
    * @param publicKey passport's public key (stored in DG14)
@@ -386,7 +391,7 @@ public class PassportService extends PassportApduService implements Serializable
   public synchronized CAResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
     CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, publicKey);
     wrapper = caResult.getWrapper();
-    state = CA_AUTHENTICATED_STATE;
+    state = State.CA_EXECUTED_STATE;
     return caResult;
   }
   
@@ -404,11 +409,12 @@ public class PassportService extends PassportApduService implements Serializable
    * </pre>
    */
   /**
-   * Perform TA (Terminal Authentication) part of EAC (version 1). For details see
-   * TR-03110 ver. 1.11. In short, we feed the sequence of terminal
-   * certificates to the card for verification, get a challenge from the
-   * card, sign it with terminal private key, and send back to the card
-   * for verification.
+   * Performs <i>Terminal Authentication</i> (TA) part of EAC (version 1). For details see
+   * TR-03110 ver. 1.11.
+   * 
+   * In short, we feed the sequence of terminal certificates to the card for verification,
+   * get a challenge from the card, sign it with the terminal private key, and send the result
+   * back to the card for verification.
    *
    * @param caReference reference issuer
    * @param terminalCertificates terminal certificate chain
@@ -424,7 +430,7 @@ public class PassportService extends PassportApduService implements Serializable
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
     TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
-    state = TA_AUTHENTICATED_STATE;
+    state = State.TA_AUTHENTICATED_STATE;
     return taResult;
   }
   
@@ -440,9 +446,10 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws CardServiceException on error
    */
-  public byte[] doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
+  public AAResult doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
     AAResult aaResult = (new AAProtocol(this, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
-    return aaResult.getResponse();
+    state = State.AA_EXECUTED_STATE;
+    return aaResult;
   }
   
   /**
@@ -453,7 +460,7 @@ public class PassportService extends PassportApduService implements Serializable
       wrapper = null;
       super.close();
     } finally {
-      state = SESSION_STOPPED_STATE;
+      state = State.SESSION_STOPPED_STATE;
     }
   }
   

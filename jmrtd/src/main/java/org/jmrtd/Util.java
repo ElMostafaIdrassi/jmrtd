@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -54,7 +53,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
@@ -78,12 +76,13 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
-import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.icao.MRZInfo;
 
 import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;
+
+/* FIXME: Move some of these to specific protocol classes. */
 
 /**
  * Some static helper functions. Mostly dealing with low-level crypto.
@@ -204,39 +203,6 @@ public class Util {
   }
   
   /**
-   * Computes the static key seed to be used in BAC KDF, based on information from the MRZ.
-   *
-   * @param documentNumber a string containing the document number
-   * @param dateOfBirth a string containing the date of birth (YYMMDD)
-   * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
-   *
-   * @return a byte array of length 16 containing the key seed
-   *
-   * @throws GeneralSecurityException on security error
-   */
-  public static byte[] computeKeySeedForBAC(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
-    return computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", true);
-  }
-  
-  /**
-   * Computes the static key seed to be used in PACE KDF, based on information from the MRZ.
-   *
-   * @param documentNumber a string containing the document number
-   * @param dateOfBirth a string containing the date of birth (YYMMDD)
-   * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
-   *
-   * @return a byte array of length 16 containing the key seed
-   *
-   * @throws GeneralSecurityException on security error
-   */
-  public static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
-    return computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
-  }
-  
-  /*
-   * NOTE: since 0.4.9, this method no longer checks input validity. Client is responsible now.
-   */
-  /**
    * Computes the static key seed, based on information from the MRZ.
    *
    * @param documentNumber a string containing the document number
@@ -331,52 +297,6 @@ public class Util {
     }
     return ssc;
   }
-  
-  // DEBUG: USE EITHER padMRZ or padCAN as in Dorian's code.
-  
-  //	/**
-  //	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
-  //	 *
-  //	 * @param in input
-  //	 *
-  //	 * @return padded output
-  //	 */
-  //	public static byte[] pad(/*@ non_null */ byte[] in) {
-  //		return pad(in, 0, in.length);
-  //	}
-  //
-  //	/**
-  //	 * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
-  //	 *
-  //	 * @param in input
-  //	 * @param blockSize block size
-  //	 *
-  //	 * @return padded output
-  //	 */
-  //	public static byte[] pad(/*@ non_null */ byte[] in, int blockSize) {
-  //		return pad(in, 0, in.length, blockSize);
-  //	}
-  //	
-  //	/*@ requires 0 <= offset && offset < length;
-  //	  @ requires 0 <= length && length <= in.length;
-  //	 */
-  //	public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length) {
-  //		return pad(in, offset, length, 64);
-  //	}
-  //
-  //	/*@ requires 0 <= offset && offset < length;
-  //	  @ requires 0 <= length && length <= in.length;
-  //	 */
-  //	public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
-  //		int blockSizeInBytes = blockSize / 8;
-  //		ByteArrayOutputStream out = new ByteArrayOutputStream();
-  //		out.write(in, offset, length);
-  //		out.write((byte)0x80);
-  //		while (out.size() % blockSizeInBytes != 0) {
-  //			out.write((byte)0x00);
-  //		}
-  //		return out.toByteArray();
-  //	}
   
   public static byte[] unpad(byte[] in) throws BadPaddingException {
     int i = in.length - 1;
@@ -934,7 +854,9 @@ public class Util {
           tlvOut.writeTag(0x81); tlvOut.writeValue(i2os(p)); /* Prime modulus */
           tlvOut.writeTag(0x82); tlvOut.writeValue(i2os(a)); /* First coefficient */
           tlvOut.writeTag(0x83); tlvOut.writeValue(i2os(b)); /* Second coefficient */
-          tlvOut.writeTag(0x84); tlvOut.write(i2os(generator.getAffineX())); tlvOut.write(i2os(generator.getAffineY())); tlvOut.writeValueEnd(); /* Base point, FIXME: correct encoding? */
+          BigInteger affineX = generator.getAffineX();
+          BigInteger affineY = generator.getAffineY();
+          tlvOut.writeTag(0x84); tlvOut.write(i2os(affineX)); tlvOut.write(i2os(affineY)); tlvOut.writeValueEnd(); /* Base point, FIXME: correct encoding? */
           tlvOut.writeTag(0x85); tlvOut.writeValue(i2os(order)); /* Order of the base point */
         }
         tlvOut.writeTag(0x86); tlvOut.writeValue(publicKeyECPointToOS(publicPoint)); /* Public point */				
@@ -1033,51 +955,6 @@ public class Util {
       LOGGER.severe("Exception: " + gse.getMessage());
       throw new IllegalArgumentException(gse.getMessage());
     }
-  }
-  
-  public static String inferMacAlgorithmFromCipherAlgorithm(String cipherAlg) throws InvalidAlgorithmParameterException {
-    if (cipherAlg == null) { throw new IllegalArgumentException("Cannot infer MAC algorithm from cipher algoruthm null"); }
-    /*
-     * NOTE: AESCMAC will generate 128 bit (16 byte) results, not 64 bit (8 byte),
-     * both authentication token generation and secure messaging,
-     * where the Mac is applied, will copy only the first 8 bytes. -- MO
-     */
-    if (cipherAlg.startsWith("DESede")) {
-      /* FIXME: Is macAlg = "ISO9797Alg3Mac" equivalent to macAlg = "DESedeMac"??? - MO */
-      return "ISO9797Alg3Mac";
-    } else if (cipherAlg.startsWith("AES")) {
-      return "AESCMAC";
-    } else {
-      throw new InvalidAlgorithmParameterException("Cannot infer MAC algorithm from cipher algorithm \"" + cipherAlg + "\"");
-    }
-  }
-  
-  /**
-   * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
-   * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
-   * received ephemeral public key (i.e. excluding the domain parameters, cf. Section 4.5.3)
-   * using an authentication code and the key KS MAC derived from the key agreement.
-   *
-   * @param oid the object identifier as indicated in MSE Set AT
-   * @param macKey the KS MAC key derived from the key agreement
-   * @param publicKey the received public key
-   *
-   * @return the authentication code
-   *
-   * @throws GeneralSecurityException on error while performing the MAC operation
-   */
-  public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
-    String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
-    String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
-    Mac mac = Mac.getInstance(macAlg, BC_PROVIDER);
-    byte[] encodedPublicKeyDataObject = encodePublicKeyDataObject(oid, publicKey);
-    mac.init(macKey);
-    byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
-    
-    /* Output length needs to be 64 bits, copy first 8 bytes. */
-    byte[] authenticationToken = new byte[8];
-    System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
-    return authenticationToken;
   }
   
   /**

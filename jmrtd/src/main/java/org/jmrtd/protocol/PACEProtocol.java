@@ -23,12 +23,14 @@
 package org.jmrtd.protocol;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.KeySpec;
@@ -39,6 +41,7 @@ import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
@@ -56,6 +59,7 @@ import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.smartcards.CardServiceException;
+import net.sf.scuba.util.Hex;
 
 /**
  * The Password Authenticated Connection Establishment protocol.
@@ -115,7 +119,7 @@ public class PACEProtocol {
    * @throws PACEException on error
    */
   public PACEResult doPACE(SecretKey staticPACEKey, String oid, AlgorithmParameterSpec params) throws PACEException {
-    PACEInfo.MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
+    MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     String digestAlg = PACEInfo.toDigestAlgorithm(oid); /* Either SHA-1 or SHA-256. */
@@ -153,7 +157,7 @@ public class PACEProtocol {
     
     /*
      * PCD and PICC exchange a chain of general authenticate commands.
-     * Steps 1 to 4 below correspond with steps in table in 3.3 of
+     * Steps 1 to 4 below correspond with steps in table 3.3 of
      * ICAO TR-SAC 1.01.
      */
     
@@ -176,10 +180,10 @@ public class PACEProtocol {
      * Exchange PK_PCD~ and PK_PICC~ with PICC.
      * Check that PK_PCD~ and PK_PICC~ differ.
      */
-    PublicKey piccPublicKey = doPACEStep3ExchangePublicKeys(agreementAlg,  cipherAlg,  keyLength, pcdKeyPair, ephemeralParams);
+    PublicKey piccPublicKey = doPACEStep3ExchangePublicKeys(pcdKeyPair.getPublic(), ephemeralParams);
     
     /* Key agreement K = KA(SK_PCD~, PK_PICC~, D~). */
-    byte[] sharedSecretBytes = doPACEStep3KeyAgreement(agreementAlg, pcdKeyPair, piccPublicKey);
+    byte[] sharedSecretBytes = doPACEStep3KeyAgreement(agreementAlg, pcdKeyPair.getPrivate(), piccPublicKey);
     
     /* Derive secure messaging keys. */
     /* Compute session keys K_mac = KDF_mac(K), K_enc = KDF_enc(K). */    
@@ -189,7 +193,7 @@ public class PACEProtocol {
       encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
       macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
+      LOGGER.log(Level.SEVERE, "Security exception during secure messaging key derivation", gse);
       throw new PACEException("Security exception during secure messaging key derivation: " + gse.getMessage());
     }
     
@@ -310,16 +314,16 @@ public class PACEProtocol {
    * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
    */
   public AlgorithmParameterSpec doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
-      switch(mappingType) {
-        case CAM:
-          /* NOTE: Fall through. */
-        case GM:
-          return doPACEStep2GM(agreementAlg, params, piccNonce);
-        case IM:
-          return doPACEStep2IM(agreementAlg, params, piccNonce);
-        default:
-          throw new PACEException("Unsupported mapping type " + mappingType);
-      }
+    switch(mappingType) {
+      case CAM:
+        /* NOTE: Fall through. */
+      case GM:
+        return doPACEStep2GM(agreementAlg, params, piccNonce);
+      case IM:
+        return doPACEStep2IM(agreementAlg, params, piccNonce);
+      default:
+        throw new PACEException("Unsupported mapping type " + mappingType);
+    }
   }
   
   public AlgorithmParameterSpec doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
@@ -399,19 +403,17 @@ public class PACEProtocol {
    * Exchange PK_PCD~ and PK_PICC~ with PICC.
    * Check that PK_PCD~ and PK_PICC~ differ.
    */
-  public PublicKey doPACEStep3ExchangePublicKeys(String agreementAlg, String cipherAlg, int keyLength,
-      KeyPair pcdKeyPair,
-      AlgorithmParameterSpec ephemeralParams)  throws PACEException {    
+  public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {    
     try {
-      PublicKey pcdPublicKey = pcdKeyPair.getPublic();
       byte[] pcdEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdPublicKey);
       byte[] step3Data = Util.wrapDO((byte)0x83, pcdEncodedPublicKey);
       byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, false);
       byte[] piccEncodedPublicKey = Util.unwrapDO((byte)0x84, step3Response);
       PublicKey piccPublicKey = Util.decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
-      //      ECPoint piccPublicKeyECPoint = ((ECPublicKey)piccPublicKey).getW();
-      //      BigInteger p = Util.getPrime(ephemeralParams);
-      if (pcdPublicKey.equals(piccPublicKey)) { throw new PACEException("PCD's public key and PICC's public key are the same in key agreement step!"); }
+            
+      if (pcdPublicKey.equals(piccPublicKey)) {
+        throw new PACEException("PCD's public key and PICC's public key are the same in key agreement step!");
+      }
       
       return piccPublicKey;
     } catch (IllegalStateException ise) {
@@ -422,12 +424,12 @@ public class PACEProtocol {
       throw new PACEException("PICC side exception in key agreement step", cse.getSW());
     }
   }
-  
+
   /* Key agreement K = KA(SK_PCD~, PK_PICC~, D~). */
-  public byte[] doPACEStep3KeyAgreement(String agreementAlg, KeyPair pcdKeyPair, PublicKey piccPublicKey) throws PACEException {
+  public byte[] doPACEStep3KeyAgreement(String agreementAlg, PrivateKey pcdPrivateKey, PublicKey piccPublicKey) throws PACEException {
     try {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
-      keyAgreement.init(pcdKeyPair.getPrivate());
+      keyAgreement.init(pcdPrivateKey);
       keyAgreement.doPhase(piccPublicKey, true);
       return keyAgreement.generateSecret();
     } catch (GeneralSecurityException gse) {
@@ -446,13 +448,12 @@ public class PACEProtocol {
    * Extracts encryptedChipAuthenticationData, if mapping type id CAM.
    */
   public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
-    
     try {
-      byte[] pcdToken = Util.generateAuthenticationToken(oid, macKey, piccPublicKey);
+      byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] step4Data = Util.wrapDO((byte)0x85, pcdToken);
       byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, true);
       byte[] piccToken = Util.unwrapDO((byte)0x86, step4Response);
-      byte[] expectedPICCToken = Util.generateAuthenticationToken(oid, macKey, pcdKeyPair.getPublic());
+      byte[] expectedPICCToken = generateAuthenticationToken(oid, macKey, pcdKeyPair.getPublic());
       if (!Arrays.equals(expectedPICCToken, piccToken)) {
         throw new GeneralSecurityException("PICC authentication token mismatch");
       }
@@ -504,9 +505,24 @@ public class PACEProtocol {
     
     documentNumber = fixDocumentNumber(documentNumber);
     
-    byte[] keySeed = Util.computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
+    byte[] keySeed = computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
     
     return keySeed;
+  }
+  
+  /**
+   * Computes the static key seed to be used in PACE KDF, based on information from the MRZ.
+   *
+   * @param documentNumber a string containing the document number
+   * @param dateOfBirth a string containing the date of birth (YYMMDD)
+   * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
+   *
+   * @return a byte array of length 16 containing the key seed
+   *
+   * @throws GeneralSecurityException on security error
+   */
+  private static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
+    return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
   }
   
   private static String fixDocumentNumber(String documentNumber) {
@@ -519,5 +535,53 @@ public class PACEProtocol {
       maxDocumentNumber += "<";
     }
     return maxDocumentNumber;
+  }
+  
+  /**
+   * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
+   * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
+   * received ephemeral public key (i.e. excluding the domain parameters, cf. Section 4.5.3)
+   * using an authentication code and the key KS MAC derived from the key agreement.
+   *
+   * @param oid the object identifier as indicated in MSE Set AT
+   * @param macKey the KS MAC key derived from the key agreement
+   * @param publicKey the received public key
+   *
+   * @return the authentication code
+   *
+   * @throws GeneralSecurityException on error while performing the MAC operation
+   */
+  public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
+    String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
+    String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
+    Mac mac = Mac.getInstance(macAlg, BC_PROVIDER);
+    byte[] encodedPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, publicKey);
+    mac.init(macKey);
+    byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
+    
+    /* Output length needs to be 64 bits, copy first 8 bytes. */
+    byte[] authenticationToken = new byte[8];
+    System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
+    return authenticationToken;
+  }
+  
+  private static String inferMacAlgorithmFromCipherAlgorithm(String cipherAlg) throws InvalidAlgorithmParameterException {
+    if (cipherAlg == null) {
+      throw new IllegalArgumentException("Cannot infer MAC algorithm from cipher algorithm null");
+    }
+    
+    /*
+     * NOTE: AESCMAC will generate 128 bit (16 byte) results, not 64 bit (8 byte),
+     * both authentication token generation and secure messaging,
+     * where the Mac is applied, will copy only the first 8 bytes. -- MO
+     */
+    if (cipherAlg.startsWith("DESede")) {
+      /* FIXME: Is macAlg = "ISO9797Alg3Mac" equivalent to macAlg = "DESedeMac"??? - MO */
+      return "ISO9797Alg3Mac";
+    } else if (cipherAlg.startsWith("AES")) {
+      return "AESCMAC";
+    } else {
+      throw new InvalidAlgorithmParameterException("Cannot infer MAC algorithm from cipher algorithm \"" + cipherAlg + "\"");
+    }
   }
 }

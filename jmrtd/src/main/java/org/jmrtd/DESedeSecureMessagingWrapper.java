@@ -200,6 +200,14 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     }
   }
   
+  public SecretKey getEncryptionKey() {
+    return ksEnc;
+  }
+  
+  public SecretKey getMACKey() {
+    return ksMac;
+  }
+  
   /**
    * Gets the current value of the send sequence counter.
    *

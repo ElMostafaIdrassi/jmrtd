@@ -22,10 +22,12 @@
 
 package org.jmrtd;
 
+import javax.crypto.SecretKey;
+
 import net.sf.scuba.smartcards.APDUWrapper;
 
 /**
- * Secure messaging wrapper.
+ * Secure messaging wrapper base class.
  *
  * @author The JMRTD team
  *
@@ -39,4 +41,18 @@ public abstract class SecureMessagingWrapper implements APDUWrapper {
    * @return the send sequence counter
    */
   public abstract long getSendSequenceCounter();
+  
+  /**
+   * Gets the shared key for encrypting APDU payloads.
+   * 
+   * @return the encryption key
+   */
+  public abstract SecretKey getEncryptionKey();
+
+  /**
+   * Get the shared key for computing message authentication codes over APDU payloads.
+   * 
+   * @return the MAC key
+   */
+  public abstract SecretKey getMACKey();
 }

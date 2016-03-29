@@ -144,9 +144,24 @@ public class BACProtocol {
     
     documentNumber = fixDocumentNumber(documentNumber);
     
-    byte[] keySeed = Util.computeKeySeedForBAC(documentNumber, dateOfBirth, dateOfExpiry);
+    byte[] keySeed = computeKeySeedForBAC(documentNumber, dateOfBirth, dateOfExpiry);
     
     return keySeed;
+  }
+  
+  /**
+   * Computes the static key seed to be used in BAC KDF, based on information from the MRZ.
+   *
+   * @param documentNumber a string containing the document number
+   * @param dateOfBirth a string containing the date of birth (YYMMDD)
+   * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
+   *
+   * @return a byte array of length 16 containing the key seed
+   *
+   * @throws GeneralSecurityException on security error
+   */
+  private static byte[] computeKeySeedForBAC(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
+    return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", true);
   }
   
   private static String fixDocumentNumber(String documentNumber) {
