@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
@@ -166,10 +167,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     try {
       return wrapCommandAPDU(commandAPDU);
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
+      LOGGER.log(Level.SEVERE, "Exception", gse);
       throw new IllegalStateException(gse.toString());
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.SEVERE, "Exception", ioe);
       throw new IllegalStateException(ioe.toString());
     }
   }
@@ -191,10 +192,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       }
       return new ResponseAPDU(unwrapResponseAPDU(rapdu));
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
+      LOGGER.log(Level.SEVERE, "Exception", gse);
       throw new IllegalStateException(gse.toString());
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.SEVERE, "Exception", ioe);
       throw new IllegalStateException(ioe.toString());
     }
   }
@@ -207,6 +208,11 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   @Override
   public long getSendSequenceCounter() {
     return ssc;
+  }
+
+  @Override
+  public String toString() {
+    return "DESedeSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
   }
   
   /**
@@ -450,5 +456,5 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     } catch (IOException ioe) {
       return false;
     }
-  }	
+  }
 }

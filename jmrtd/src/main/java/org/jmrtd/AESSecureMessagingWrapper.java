@@ -146,6 +146,11 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     }
   }
   
+  @Override
+  public String toString() {
+    return "AESSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
+  }
+  
   /**
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
