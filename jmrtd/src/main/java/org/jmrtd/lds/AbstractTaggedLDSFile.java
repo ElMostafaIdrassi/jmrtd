@@ -61,10 +61,9 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   
   /**
    * Constructs a data group from the DER encoded data in the
-   * given input stream. Tag and length are read, so the input stream
-   * is positioned just before the value.
+   * given input stream.
    *
-   * @param dataGroupTag data group tag
+   * @param tag the tag
    * @param inputStream an input stream
    *
    * @throws IOException on error reading input stream

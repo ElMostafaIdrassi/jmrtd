@@ -70,9 +70,10 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   /**
    * Constructs an instance.
    *
-   * @param inputStream an input stream
    * @param dataGroupTag the datagroup tag to use
-   * @param biometricDataGroupTag the biometric data block tag to use (either <code>5F2E</code> or <code>7F2E</code>).
+   * @param inputStream an input stream
+   * 
+   * @throws IOException on error
    */
   protected CBEFFDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
     super(dataGroupTag, inputStream);

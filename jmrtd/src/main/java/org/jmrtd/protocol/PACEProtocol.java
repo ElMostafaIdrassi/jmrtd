@@ -99,10 +99,12 @@ public class PACEProtocol {
    * @param keySpec the MRZ
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
+   * 
+   * @return a PACE result
    *
    * @throws PACEException on error
    */
-  public PACEResult doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public PACEResult doPACE(KeySpec keySpec, String oid, AlgorithmParameterSpec params) throws PACEException {
     try {
       return doPACE(deriveStaticPACEKey(keySpec, oid), oid, params);
     } catch (GeneralSecurityException gse) {
@@ -112,9 +114,11 @@ public class PACEProtocol {
   /**
    * Performs the PACE 2.0 / SAC protocol.
    *
-   * @param keySpec the MRZ
+   * @param staticPACEKey the password key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
+   * 
+   * @return a PACE result
    *
    * @throws PACEException on error
    */
@@ -475,6 +479,10 @@ public class PACEProtocol {
    * 
    * @param keySpec the key material from the MRZ
    * @param oid the PACE object identifier is needed to determine the cipher algorithm and the key length
+   * 
+   * @return the derived key
+   * 
+   * @throws GeneralSecurityException on error
    */
   public static SecretKey deriveStaticPACEKey(KeySpec keySpec, String oid) throws GeneralSecurityException {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */

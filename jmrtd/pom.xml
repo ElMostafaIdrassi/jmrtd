@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.5.6-SNAPSHOT</version>
+  <version>0.5.6</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -30,7 +30,7 @@
 
   <properties>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-     <local.repo.url>/home/martijno/software</local.repo.url>
+     <local.repo.url>/Users/martijno/software</local.repo.url>
   </properties>
 
   <dependencies>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>net.sf.scuba</groupId>
       <artifactId>scuba-smartcards</artifactId>
-      <version>0.0.9-SNAPSHOT</version>
+      <version>0.0.9</version>
     </dependency>
 
     <dependency>
@@ -53,7 +53,7 @@
       <version>1.4.0</version>
       <exclusions>
         <exclusion>
-          <groupId>org.bouncycastle</groupId>
+          <groupId>bouncycastle</groupId>
           <artifactId>bcprov-jdk15on</artifactId>
         </exclusion>
       </exclusions>
@@ -72,7 +72,6 @@
       <version>1.54</version>
       <scope>test</scope>
     </dependency>
-
 
   </dependencies>
 

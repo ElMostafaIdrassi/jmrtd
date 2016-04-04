@@ -50,6 +50,7 @@ public class CAResult {
    * @param publicKey the ICC's public key
    * @param keyHash the hash of the key
    * @param keyPair the key pair
+   * @param wrapper secure messaging wrapper
    */
   public CAResult(BigInteger keyId, PublicKey publicKey, byte[] keyHash, KeyPair keyPair, SecureMessagingWrapper wrapper) {
     this.keyId = keyId;

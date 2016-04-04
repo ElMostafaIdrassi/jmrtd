@@ -71,6 +71,8 @@ public class BACProtocol {
    *               the card holder's birth date,
    *               and the document's expiry date
    *
+   * @return the BAC result
+   *
    * @throws CardServiceException if authentication failed
    */
   public BACResult doBAC(BACKeySpec bacKey) throws CardServiceException {

@@ -43,7 +43,7 @@ public class BACDeniedException extends CardServiceException {
    * Creates an exception.
    * 
    * @param msg the message
-   * @param triedBACEntries the BAC entries that were tried before BAC failed
+   * @param bacKey the BAC entry that was tried
    * @param sw status word or <code>-1</code>
    */
   public BACDeniedException(String msg, BACKeySpec bacKey, int sw) {

@@ -67,16 +67,18 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
    * Constructs a displayed image data group from binary representation.
    *
    * @param dataGroupTag a tag indicating DG5, DG6, or DG7
-   * @param in an input stream
+   * @param inputStream an input stream
+   * 
+   * @throws IOException on error reading the input stream
    */
-  public DisplayedImageDataGroup(int dataGroupTag, InputStream in) throws IOException {
-    super(dataGroupTag, in);
+  public DisplayedImageDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
+    super(dataGroupTag, inputStream);
     if (this.imageInfos == null) { this.imageInfos = new ArrayList<DisplayedImageInfo>(); }
     checkTypesConsistentWithTag();
   }
   
-  protected void readContent(InputStream in) throws IOException {
-    TLVInputStream tlvIn = in instanceof TLVInputStream ? (TLVInputStream)in : new TLVInputStream(in);
+  protected void readContent(InputStream inputStream) throws IOException {
+    TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int countTag = tlvIn.readTag();
     if (countTag != DISPLAYED_IMAGE_COUNT_TAG) { /* 02 */
       throw new IllegalArgumentException("Expected tag 0x02 in displayed image structure, found " + Integer.toHexString(countTag));
@@ -97,8 +99,8 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     }
   }
   
-  protected void writeContent(OutputStream out) throws IOException {
-    TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
+  protected void writeContent(OutputStream outputStream) throws IOException {
+    TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(DISPLAYED_IMAGE_COUNT_TAG);
     tlvOut.writeValue(new byte[] { (byte)imageInfos.size() });
     for (DisplayedImageInfo imageInfo: imageInfos) {
