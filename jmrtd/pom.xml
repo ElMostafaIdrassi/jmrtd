@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.5.6</version>
+  <version>0.5.7-SNAPSHOT</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -11,8 +12,8 @@
 
   <licenses>
     <license>
-        <name>GNU Library or Lesser General Public License (LGPL)</name>
-        <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <name>GNU Library or Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
     </license>
   </licenses>
 
@@ -29,8 +30,8 @@
   </developers>
 
   <properties>
-     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-     <local.repo.url>/Users/martijno/software</local.repo.url>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <local.repo.url>/Users/martijno/software</local.repo.url>
   </properties>
 
   <dependencies>
@@ -50,7 +51,7 @@
     <dependency>
       <groupId>org.ejbca.cvc</groupId>
       <artifactId>cert-cvc</artifactId>
-      <version>1.4.0</version>
+      <version>1.4.4</version>
       <exclusions>
         <exclusion>
           <groupId>bouncycastle</groupId>
@@ -78,7 +79,7 @@
   <repositories>
     <repository>
       <id>cert-cvc-repo</id>
-      <url>file:${local.repo.url}/cert-cvc-1.4.0/</url>
+      <url>file:${local.repo.url}/cert-cvc-1.4.4/</url>
     </repository>
   </repositories>
 
@@ -120,7 +121,7 @@
               <execution>
                 <id>attach-sources</id>
                 <goals>
-                <goal>jar-no-fork</goal>
+                  <goal>jar-no-fork</goal>
                 </goals>
               </execution>
             </executions>
@@ -148,7 +149,7 @@
             <version>1.5</version>
             <executions>
               <execution>
-              <id>sign-artifacts</id>
+                <id>sign-artifacts</id>
                 <phase>verify</phase>
                 <goals>
                   <goal>sign</goal>
