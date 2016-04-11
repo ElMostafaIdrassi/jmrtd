@@ -17,8 +17,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="var" path="CERT_CVC_LIB"/>
-	<classpathentry exported="true" kind="var" path="BC_PROV" sourcepath="/BC_PROV_SRC"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
