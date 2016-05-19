@@ -71,20 +71,6 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   private SubjectPublicKeyInfo subjectPublicKeyInfo; // TODO: just store a public key here, instead of BC object
   private BigInteger keyId; /* Optional, use null if implicit. */
   
-  /**
-   * Constructs a new object.
-   *
-   * @param oid a proper public key identifier
-   * @param publicKeyInfo appropriate SubjectPublicKeyInfo structure
-   * @param keyId the key identifier or -1 if not present
-   */
-  ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo, BigInteger keyId) {
-    this.oid = oid;
-    this.subjectPublicKeyInfo = publicKeyInfo;
-    this.keyId = keyId;
-    checkFields();
-  }
-  
   ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo) {
     this(oid, publicKeyInfo, null);
   }
@@ -106,6 +92,20 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
    */
   public ChipAuthenticationPublicKeyInfo(PublicKey publicKey) {
     this(publicKey, null);
+  }
+  
+  /**
+   * Constructs a new object.
+   *
+   * @param oid a proper public key identifier
+   * @param publicKeyInfo appropriate SubjectPublicKeyInfo structure
+   * @param keyId the key identifier or -1 if not present
+   */
+  ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo, BigInteger keyId) {
+    this.oid = oid;
+    this.subjectPublicKeyInfo = publicKeyInfo;
+    this.keyId = keyId;
+    checkFields();
   }
   
   @Deprecated

@@ -146,7 +146,7 @@ public class DG14File extends DataGroup {
       if (securityInfo instanceof ChipAuthenticationInfo) {
         ChipAuthenticationInfo chipAuthNInfo = (ChipAuthenticationInfo)securityInfo;
         map.add(chipAuthNInfo);
-        if (chipAuthNInfo.getKeyId().compareTo(BigInteger.ZERO) < 0) {
+        if (chipAuthNInfo.getKeyId() == null) {
           return map;
         }
       }

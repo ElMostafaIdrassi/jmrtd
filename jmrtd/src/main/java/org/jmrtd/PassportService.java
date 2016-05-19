@@ -379,6 +379,7 @@ public class PassportService extends PassportApduService implements Serializable
    * A new secure messaging channel is set up as a result.
    *
    * @param keyId passport's public key id (stored in DG14), -1 if none
+   * @param oid the object identifier indicating the Chip Authentication protocol
    * @param publicKey passport's public key (stored in DG14)
    *
    * @return the chip authentication result

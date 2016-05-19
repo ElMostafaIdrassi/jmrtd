@@ -87,6 +87,7 @@ public class CAProtocol {
    * the result.
    *
    * @param keyId passport's public key id (stored in DG14), -1 if none
+   * @param oid the object identifier indicating the Chip Authentication protocol
    * @param piccPublicKey PICC's public key (stored in DG14)
    *
    * @return the chip authentication result
@@ -162,7 +163,7 @@ public class CAProtocol {
         keyHash = Util.alignKeyDataToSize(t, ecPublicKey.getParameters().getCurve().getFieldSize() / 8);
       }
       
-      if (keyId.compareTo(BigInteger.ZERO) >= 0) {
+      if (keyId != null) {
         byte[] keyIdBytes = keyId.toByteArray();
         idData = Util.wrapDO((byte)0x84, keyIdBytes);
       }

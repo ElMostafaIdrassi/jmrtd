@@ -115,7 +115,7 @@ public class PACEProtocolTest extends TestCase {
       assertEquals("0.4.0.127.0.7.2.2.4.2.2", oid);
       assertEquals(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128, oid);
       
-      assertEquals(13, paramId);
+      assertEquals(BigInteger.valueOf(13), paramId);
       assertEquals(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, paramId.intValue());
       
       AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paramId);

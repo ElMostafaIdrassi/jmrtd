@@ -74,13 +74,9 @@ public class ChipAuthenticationInfo extends SecurityInfo {
    *
    * @param oid a proper EAC identifier
    * @param version has to be 1 or 2
-   * @param keyId the key identifier
    */
-  public ChipAuthenticationInfo(String oid, int version, BigInteger keyId) {
-    this.oid = oid;
-    this.version = version;
-    this.keyId = keyId;
-    checkFields();
+  public ChipAuthenticationInfo(String oid, int version) {
+    this(oid, version, null);
   }
   
   /**
@@ -88,9 +84,13 @@ public class ChipAuthenticationInfo extends SecurityInfo {
    *
    * @param oid a proper EAC identifier
    * @param version has to be 1 or 2
+   * @param keyId the key identifier
    */
-  public ChipAuthenticationInfo(String oid, int version) {
-    this(oid, version, BigInteger.valueOf(-1));
+  public ChipAuthenticationInfo(String oid, int version, BigInteger keyId) {
+    this.oid = oid;
+    this.version = version;
+    this.keyId = keyId;
+    checkFields();
   }
   
   @Deprecated
