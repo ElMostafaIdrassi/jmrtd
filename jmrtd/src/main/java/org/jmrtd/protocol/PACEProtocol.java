@@ -30,8 +30,11 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Random;
@@ -45,6 +48,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.jmrtd.AESSecureMessagingWrapper;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.DESedeSecureMessagingWrapper;
@@ -58,6 +62,7 @@ import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.smartcards.CardServiceException;
+import net.sf.scuba.util.Hex;
 
 /**
  * The Password Authenticated Connection Establishment protocol.
@@ -73,6 +78,22 @@ public class PACEProtocol {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  
+  /**
+   * Used in the last step of PACE-CAM.
+   * 
+   * From 9303-11:
+   * 
+   * AES [19] SHALL be used in CBC-mode according to [ISO/IEC 10116]
+   * with IV=E(KSEnc,-1), where -1 is the bit string of length 128
+   * with all bits set to 1.
+   */
+  private static final byte[] IV_FOR_PACE_CAM_DECRYPTION = {
+      (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+      (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+      (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+      (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+  };
   
   private PassportService service;
   private SecureMessagingWrapper wrapper;
@@ -127,6 +148,13 @@ public class PACEProtocol {
     String digestAlg = PACEInfo.toDigestAlgorithm(oid); /* Either SHA-1 or SHA-256. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
     
+    LOGGER.info("DEBUG: PACE: oid = " + oid
+        + " -> mappingType = " + mappingType
+        + ", agreementAlg = " + agreementAlg
+        + ", cipherAlg = " + cipherAlg
+        + ", digestAlg = " + digestAlg
+        + ", keyLength = " + keyLength);
+    
     /* Check consistency of input parameters. */
     if (agreementAlg == null) {
       throw new IllegalArgumentException("Unknown agreement algorithm");
@@ -148,6 +176,7 @@ public class PACEProtocol {
     }
     
     try {
+      
       /* FIXME: multiple domain params feature not implemented here, for now. */
       byte[] referencePrivateKeyOrForComputingSessionKey = null;
       
@@ -207,6 +236,7 @@ public class PACEProtocol {
      * Extract encryptedChipAuthenticationData, if mapping is CAM.
      */
     byte[] encryptedChipAuthenticationData = doPACEStep4(oid, mappingType, pcdKeyPair, piccPublicKey, macKey);
+    byte[] chipAuthenticationData = null;
     
     /*
      * Start secure messaging.
@@ -224,28 +254,34 @@ public class PACEProtocol {
         long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
         wrapper = new AESSecureMessagingWrapper(encKey, macKey, ssc);
       }
-      LOGGER.info("DEBUG: Starting secure messaging based on PACE");
     } catch (GeneralSecurityException gse) {
       LOGGER.severe("Exception: " + gse.getMessage());
       throw new IllegalStateException("Security exception in secure messaging establishment: " + gse.getMessage());
     }
     
     if (MappingType.CAM.equals(mappingType)) {
-      LOGGER.info("DEBUG: Inspecting EF.CardSecurity for Chip Authentication Mapping");
-      /*
-       * TODO:
-       *    - read and verify CardSecurity
-       *    - use the Public Key from CardSecurity together with the Mapping Data and
-       *      the Chip Authentication Data received as part of PACE-CAM to authenticate
-       *      the chip (section 3.4.4.2).
-       *      
-       *    The terminal SHALL decrypt A_PICC to recover CA_PICC and verify
-       *    PK_{Map,PICC}=KA(CA_PICC, PK_PICC,D_PICC),where PK_PICC is the static public key of the MRTD chip.
-       */
+      
+      if (encryptedChipAuthenticationData == null) {
+        LOGGER.severe("Encrypted Chip Authentication data is null");
+      }
+            
+      /* Decrypt A_PICC to recover CA_PICC. */
+      try {
+        SecretKey secretKey = encKey; // new SecretKeySpec(sharedSecretBytes, "AES");
+        Cipher decryptCipher = Cipher.getInstance("AES/CBC/NoPadding");
+        decryptCipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(IV_FOR_PACE_CAM_DECRYPTION));
+        chipAuthenticationData = Util.unpad(decryptCipher.doFinal(encryptedChipAuthenticationData));
+        
+        LOGGER.info("DEBUG: Including Chip Authentication data in PACE result");
+        
+      } catch (GeneralSecurityException gse) {
+        LOGGER.log(Level.SEVERE, "Could not decrypt Chip Authentication data", gse);
+      }
     }
     
     return new PACEResult(mappingType, agreementAlg, cipherAlg, digestAlg, keyLength,
-        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes, wrapper);
+        params,
+        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes, encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
   }
   
   /**
@@ -318,7 +354,7 @@ public class PACEProtocol {
   public AlgorithmParameterSpec doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
     switch(mappingType) {
       case CAM:
-        /* NOTE: Fall through. */
+        /* NOTE: Fall through to GM case. */
       case GM:
         return doPACEStep2GM(agreementAlg, params, piccNonce);
       case IM:
@@ -328,6 +364,19 @@ public class PACEProtocol {
     }
   }
   
+  /**
+   * The second step in the PACE protocol computes ephemeral domain parameters
+   * by performing a key agreement protocol with the PICC nonce as
+   * input.
+   * 
+   * @param agreementAlg the agreement algorithm, either DH or ECDH
+   * @param params the static domain parameters
+   * @param piccNonce the received nonce from the PICC
+   * 
+   * @return the computed ephemeral domain parameters
+   * 
+   * @throws PACEException on error
+   */
   public AlgorithmParameterSpec doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
@@ -338,15 +387,39 @@ public class PACEProtocol {
       KeyAgreement mappingAgreement = KeyAgreement.getInstance(agreementAlg);
       mappingAgreement.init(pcdMappingPrivateKey);
       
+      /* DEBUG */
+      MyECDHKeyAgreement myECDHKeyAgreement = null;
+      if ("ECDH".equals(agreementAlg)) {
+        myECDHKeyAgreement = new MyECDHKeyAgreement();
+        myECDHKeyAgreement.init((ECPrivateKey)pcdMappingPrivateKey);
+      }
+      /* END DEBUG */
+      
       byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);            
       byte[] step2Data = Util.wrapDO((byte)0x81, pcdMappingEncodedPublicKey);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
       byte[] piccMappingEncodedPublicKey = Util.unwrapDO((byte)0x82, step2Response);
       PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
       mappingAgreement.doPhase(piccMappingPublicKey, true);
+      
       byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
       
-      return Util.mapNonceGM(piccNonce, mappingSharedSecretBytes, params);
+      LOGGER.info("DEBUG: mappingSharedSecretBytes = " + Hex.bytesToHexString(mappingSharedSecretBytes));
+      
+      if ("ECDH".equals(agreementAlg) && myECDHKeyAgreement != null) {
+        /* DEBUG */
+        /* Treat shared secret as an ECPoint. */
+        ECPoint sharedSecretPointH = myECDHKeyAgreement.doPhase((ECPublicKey)piccMappingPublicKey);
+        LOGGER.info("DEBUG: calling mapNonceGMWithECDH directly");
+        LOGGER.info("DEBUG: Affine X = " + sharedSecretPointH.getAffineX());
+        LOGGER.info("DEBUG: Affine Y = " + sharedSecretPointH.getAffineY());
+        return Util.mapNonceGMWithECDH(Util.os2i(piccNonce), sharedSecretPointH, (ECParameterSpec)params);
+        /* END DEBUG */
+      } else if ("DH".equals(agreementAlg)) {
+        return Util.mapNonceGMWithDH(Util.os2i(piccNonce), Util.os2i(mappingSharedSecretBytes), (DHParameterSpec)params);
+      } else {
+        throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
+      }
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {
@@ -354,6 +427,19 @@ public class PACEProtocol {
     }
   }
   
+  /**
+   * The second step in the PACE protocol computes ephemeral domain parameters
+   * by performing a key agreement protocol with the PICC nonce as
+   * input.
+   * 
+   * @param agreementAlg the agreement algorithm, either DH or ECDH
+   * @param params the static domain parameters
+   * @param piccNonce the received nonce from the PICC
+   * 
+   * @return the computed ephemeral domain parameters
+   * 
+   * @throws PACEException on error
+   */
   public AlgorithmParameterSpec doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
@@ -371,16 +457,12 @@ public class PACEProtocol {
       /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */
       
       throw new PACEException("Integrated Mapping not yet implemented"); // FIXME
-      
-      
-      
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side exception in mapping nonce step", cse.getSW());
     }
   }
-  
   
   private void pseudoRandomFunction(byte[] piccNonce, byte[] pcdNonce, Cipher cipher) {
     // TODO Auto-generated method stub
@@ -412,7 +494,7 @@ public class PACEProtocol {
       byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, false);
       byte[] piccEncodedPublicKey = Util.unwrapDO((byte)0x84, step3Response);
       PublicKey piccPublicKey = Util.decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
-            
+      
       if (pcdPublicKey.equals(piccPublicKey)) {
         throw new PACEException("PCD's public key and PICC's public key are the same in key agreement step!");
       }
@@ -426,7 +508,7 @@ public class PACEProtocol {
       throw new PACEException("PICC side exception in key agreement step", cse.getSW());
     }
   }
-
+  
   /* Key agreement K = KA(SK_PCD~, PK_PICC~, D~). */
   public byte[] doPACEStep3KeyAgreement(String agreementAlg, PrivateKey pcdPrivateKey, PublicKey piccPublicKey) throws PACEException {
     try {
@@ -588,6 +670,25 @@ public class PACEProtocol {
       return "AESCMAC";
     } else {
       throw new InvalidAlgorithmParameterException("Cannot infer MAC algorithm from cipher algorithm \"" + cipherAlg + "\"");
+    }
+  }
+  
+  public class MyECDHKeyAgreement {
+    
+    private ECPrivateKey privateKey;
+    
+    public void init(ECPrivateKey privateKey) {
+      this.privateKey = privateKey;
+    }
+    
+    public ECPoint doPhase(ECPublicKey publicKey) {
+      ECPublicKeyParameters pub = Util.toBouncyECPublicKeyParameters(publicKey);
+      
+      org.bouncycastle.math.ec.ECPoint p = pub.getQ().multiply(Util.toBouncyECPrivateKeyParameters(privateKey).getD()).normalize();
+      if (p.isInfinity()) {
+        throw new IllegalStateException("Infinity");
+      }
+      return Util.fromBouncyCastleECPoint(p);
     }
   }
 }

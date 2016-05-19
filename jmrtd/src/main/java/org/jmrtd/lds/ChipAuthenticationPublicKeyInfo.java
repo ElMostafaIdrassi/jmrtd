@@ -23,7 +23,6 @@
 package org.jmrtd.lds;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.util.logging.Logger;
@@ -69,18 +68,15 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   
   private String oid;
-  private SubjectPublicKeyInfo subjectPublicKeyInfo;
-  private BigInteger keyId;
+  private SubjectPublicKeyInfo subjectPublicKeyInfo; // TODO: just store a public key here, instead of BC object
+  private BigInteger keyId; /* Optional, use null if implicit. */
   
   /**
    * Constructs a new object.
    *
-   * @param oid
-   *            a proper EAC identifier
-   * @param publicKeyInfo
-   *            appropriate SubjectPublicKeyInfo structure
-   * @param keyId
-   *            the key identifier or -1 if not present
+   * @param oid a proper public key identifier
+   * @param publicKeyInfo appropriate SubjectPublicKeyInfo structure
+   * @param keyId the key identifier or -1 if not present
    */
   ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo, BigInteger keyId) {
     this.oid = oid;
@@ -90,7 +86,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   }
   
   ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo) {
-    this(oid, publicKeyInfo, BigInteger.valueOf(-1));
+    this(oid, publicKeyInfo, null);
   }
   
   /**
@@ -109,7 +105,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
    * @param publicKey Either a DH public key or an EC public key
    */
   public ChipAuthenticationPublicKeyInfo(PublicKey publicKey) {
-    this(publicKey, BigInteger.valueOf(-1));
+    this(publicKey, null);
   }
   
   @Deprecated
@@ -117,7 +113,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new ASN1ObjectIdentifier(oid));
     vector.add((ASN1Sequence)subjectPublicKeyInfo.toASN1Primitive());
-    if (keyId.compareTo(BigInteger.ZERO) >= 0) {
+    if (keyId != null) {
       vector.add(new ASN1Integer(keyId));
     }
     return new DLSequence(vector);
@@ -129,10 +125,9 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   
   /**
    * Returns a key identifier stored in this ChipAuthenticationPublicKeyInfo
-   * structure, null if not present
+   * structure, {@code null} if not present.
    *
-   * @return key identifier stored in this ChipAuthenticationPublicKeyInfo
-   *         structure
+   * @return key identifier stored in this ChipAuthenticationPublicKeyInfo structure
    */
   public BigInteger getKeyId() {
     return keyId;
@@ -173,26 +168,19 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
    * @return true if the match is positive
    */
   public static boolean checkRequiredIdentifier(String oid) {
-    return ID_PK_DH_OID.equals(oid) || ID_PK_ECDH_OID.equals(oid);
+    return ID_PK_DH.equals(oid) || ID_PK_ECDH.equals(oid);
   }
   
   public String toString() {
-    String protocol = oid;
-    try {
-      protocol = lookupMnemonicByOID(oid);
-    } catch (NoSuchAlgorithmException nsae) {
-      /* NOTE: we'll stick with oid */
-    }
-    
     return "ChipAuthenticationPublicKeyInfo ["
-    + "protocol = " + protocol + ", "
-    + "chipAuthenticationPublicKey = " + getSubjectPublicKey().toString() + ", "
-    + "keyId = " + getKeyId().toString() +
-    "]";
+        + "protocol: " + toProtocolOIDString(oid) + ", "
+        + "chipAuthenticationPublicKey: " + Util.getDetailedPublicKeyAlgorithm(getSubjectPublicKey()) + ", "
+        + "keyId: " + (keyId == null ? "-" : keyId.toString())
+        + "]";
   }
   
   public int hashCode() {
-    return 	123 + 1337 * (oid.hashCode() + keyId.hashCode() + subjectPublicKeyInfo.hashCode());
+    return 	123 + 1337 * (oid.hashCode() + (keyId == null ? 111 : keyId.hashCode()) + (subjectPublicKeyInfo == null ? 111 : subjectPublicKeyInfo.hashCode()));
   }
   
   public boolean equals(Object other) {
@@ -201,7 +189,13 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     if (!ChipAuthenticationPublicKeyInfo.class.equals(other.getClass())) { return false; }
     ChipAuthenticationPublicKeyInfo otherInfo = (ChipAuthenticationPublicKeyInfo)other;
     return oid.equals(otherInfo.oid)
-        && keyId.equals(otherInfo.keyId)
+        && (keyId == null && otherInfo.keyId == null || keyId != null && keyId.equals(otherInfo.keyId))
         && subjectPublicKeyInfo.equals(otherInfo.subjectPublicKeyInfo);
+  }
+  
+  private static String toProtocolOIDString(String oid) {
+    if (ID_PK_DH.equals(oid)) { return "id-PK-DH"; }
+    if (ID_PK_ECDH.equals(oid)) { return "id-PK-ECDH"; }
+    return oid;
   }
 }

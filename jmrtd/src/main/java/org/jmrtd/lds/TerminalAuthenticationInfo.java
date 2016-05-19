@@ -58,22 +58,19 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  public static final int VERSION_NUM_1 = 1;
-  private static final int VERSION_NUM_2 = 2;
+  public static final int VERSION_1 = 1;
+  private static final int VERSION_2 = 2;
   
   private String oid;
   private int version;
-  private ASN1Sequence efCVCA; /* FIXME: this contains just a file identifier, and possibly a short file identifier? Why not byte (or short?) instead of ASN1Sequence? -- MO */
+  private ASN1Sequence efCVCA; /* FIXME: this contains just a file identifier, and possibly a short file identifier? Why not short instead of ASN1Sequence? -- MO */
   
   /**
    * Constructs a new object.
    *
-   * @param oid
-   *            the id_TA identifier
-   * @param version
-   *            has to be 1
-   * @param efCVCA
-   *            the file ID information of the efCVCA file
+   * @param oid the id_TA identifier
+   * @param version has to be 1 or 2
+   * @param efCVCA the file ID information of the efCVCA file
    */
   TerminalAuthenticationInfo(String oid, int version, ASN1Sequence efCVCA) {
     this.oid = oid;
@@ -85,34 +82,40 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   /**
    * Constructs a new object.
    *
-   * @param identifier
-   *            the id_TA identifier
-   * @param version
-   *            has to be 1
+   * @param identifier the id_TA identifier
+   * @param version has to be 1 or 2
    */
   TerminalAuthenticationInfo(String identifier, int version) {
     this(identifier, version, null);
   }
   
   /**
-   * Constructs a terminal authentication info using id_TA identifier {@link #ID_TA_OID}
-   * and version {@value #VERSION_NUM_1}.
+   * Constructs a terminal authentication info using id_TA identifier {@link #ID_TA}
+   * and version {@value #VERSION_1}.
    */
   public TerminalAuthenticationInfo() {
-    this(ID_TA_OID, VERSION_NUM_1);
+    this(ID_TA, VERSION_1);
   }
   
   /**
-   * Constructs a new object with the required object identifier and version
-   * number and file identifier and short file identifier (possibly -1).
+   * Constructs a new Terminal Authentication info with the required
+   * object identifier and version number 1, and file identifier and
+   * short file identifier (possibly -1).
    *
-   * @param fileId
-   *            a file identifier reference to the efCVCA file
-   * @param shortFileId
-   *            short file id for the above file, -1 if none
+   * @param fileId a file identifier reference to the efCVCA file
+   * @param shortFileId short file id for the above file, -1 if none
    */
   public TerminalAuthenticationInfo(short fileId, byte shortFileId) {
-    this(ID_TA_OID, VERSION_NUM_1, constructEFCVCA(fileId, shortFileId));
+    this(ID_TA, VERSION_1, constructEFCVCA(fileId, shortFileId));
+  }
+  
+  /**
+   * Gets the version. This will be 1 or 2.
+   * 
+   * @return the version
+   */
+  public int getVersion() {
+    return version;
   }
   
   @Deprecated
@@ -127,7 +130,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
   
   /**
-   * Gets the object identifier of this TA security info.
+   * Gets the object identifier of this Terminal Authentication info.
    *
    * @return an object identifier
    */
@@ -156,9 +159,14 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   
   public String toString() {
     StringBuffer result = new StringBuffer();
-    result.append("TerminalAuthenticationInfo");
-    result.append("[");
-    result.append("fileID = " + getFileId());
+    result.append("TerminalAuthenticationInfo [");
+    result.append("protocol: " + toProtocolOIDString(oid));
+    result.append(", ");
+    result.append("version: " + version);
+    result.append(", ");
+    result.append("fileID: " + getFileId());
+    result.append(", ");
+    result.append("shortFileID: " + getShortFileId());
     result.append("]");
     return result.toString();
   }
@@ -191,7 +199,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
    * @return true if the match is positive
    */
   static boolean checkRequiredIdentifier(String id) {
-    return ID_TA_OID.equals(id);
+    return ID_TA.equals(id);
   }
   
   /**
@@ -202,8 +210,8 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
       if (!checkRequiredIdentifier(oid)) {
         throw new IllegalArgumentException("Wrong identifier: " + oid);
       }
-      if (version != VERSION_NUM_1 && version != VERSION_NUM_2) {
-        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_NUM_1 + " or " + VERSION_NUM_2
+      if (version != VERSION_1 && version != VERSION_2) {
+        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2
             + ", found " + version);
       }
       if (efCVCA != null) {
@@ -245,5 +253,19 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     if (efCVCA == null) { return -1; }
     if (efCVCA.size() != 2) { return -1; }
     return ((DEROctetString)efCVCA.getObjectAt(1)).getOctets()[0];
+  }
+  
+  private String toProtocolOIDString(String oid) {
+    if (ID_TA.equals(oid)) { return "id-TA"; }
+    if (ID_TA_RSA.equals(oid)) { return "id-TA-RSA"; }
+    if (ID_TA_RSA_V1_5_SHA_1.equals(oid)) { return "id-TA-RSA-v1-5-SHA-1"; }
+    if (ID_TA_RSA_V1_5_SHA_256.equals(oid)) { return "id-TA-RSA-v1-5-SHA-256"; }
+    if (ID_TA_RSA_PSS_SHA_1.equals(oid)) { return "id-TA-RSA-PSS-SHA-1"; }
+    if (ID_TA_RSA_PSS_SHA_256.equals(oid)) { return "id-TA-RSA-PSS-SHA-256"; }
+    if (ID_TA_ECDSA.equals(oid)) { return "id-TA-ECDSA"; }
+    if (ID_TA_ECDSA_SHA_1.equals(oid)) { return "id-TA-ECDSA-SHA-1"; }
+    if (ID_TA_ECDSA_SHA_224.equals(oid)) { return "id-TA-ECDSA-SHA-224"; }
+    if (ID_TA_ECDSA_SHA_256.equals(oid)) { return "id-TA-ECDSA-SHA-256"; }
+    return oid;
   }
 }

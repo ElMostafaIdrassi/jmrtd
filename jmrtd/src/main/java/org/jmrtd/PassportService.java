@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
@@ -84,60 +83,60 @@ public class PassportService extends PassportApduService implements Serializable
   private static final long serialVersionUID = 1751933705552226972L;
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-    
-  /** Data group 1 contains the MRZ. */
-  public static final short EF_DG1 = 0x0101;
-  
-  /** Data group 2 contains face image data. */
-  public static final short EF_DG2 = 0x0102;
-  
-  /** Data group 3 contains finger print data. */
-  public static final short EF_DG3 = 0x0103;
-  
-  /** Data group 4 contains iris data. */
-  public static final short EF_DG4 = 0x0104;
-  
-  /** Data group 5 contains displayed portrait. */
-  public static final short EF_DG5 = 0x0105;
-  
-  /** Data group 6 is RFU. */
-  public static final short EF_DG6 = 0x0106;
-  
-  /** Data group 7 contains displayed signature. */
-  public static final short EF_DG7 = 0x0107;
-  
-  /** Data group 8 contains data features. */
-  public static final short EF_DG8 = 0x0108;
-  
-  /** Data group 9 contains structure features. */
-  public static final short EF_DG9 = 0x0109;
-  
-  /** Data group 10 contains substance features. */
-  public static final short EF_DG10 = 0x010A;
-  
-  /** Data group 11 contains additional personal details. */
-  public static final short EF_DG11 = 0x010B;
-  
-  /** Data group 12 contains additional document details. */
-  public static final short EF_DG12 = 0x010C;
-  
-  /** Data group 13 contains optional details. */
-  public static final short EF_DG13 = 0x010D;
-  
-  /** Data group 14 contains security infos. */
-  public static final short EF_DG14 = 0x010E;
-  
-  /** Data group 15 contains the public key used for Active Authentication. */
-  public static final short EF_DG15 = 0x010F;
-  
-  /** Data group 16 contains person(s) to notify. */
-  public static final short EF_DG16 = 0x0110;
-  
+
   /** Card Access. */
   public static final short EF_CARD_ACCESS = 0x011C;
   
   /** Card Security. */
   public static final short EF_CARD_SECURITY = 0x011D;
+  
+  /** File identifier for data group 1. Data group 1 contains the MRZ. */
+  public static final short EF_DG1 = 0x0101;
+  
+  /** File identifier for data group 2. Data group 2 contains face image data. */
+  public static final short EF_DG2 = 0x0102;
+  
+  /** File identifier for data group 3. Data group 3 contains finger print data. */
+  public static final short EF_DG3 = 0x0103;
+  
+  /** File identifier for data group 4. Data group 4 contains iris data. */
+  public static final short EF_DG4 = 0x0104;
+  
+  /** File identifier for data group 5. Data group 5 contains displayed portrait. */
+  public static final short EF_DG5 = 0x0105;
+  
+  /** File identifier for data group 6. Data group 6 is RFU. */
+  public static final short EF_DG6 = 0x0106;
+  
+  /** File identifier for data group 7. Data group 7 contains displayed signature. */
+  public static final short EF_DG7 = 0x0107;
+  
+  /** File identifier for data group 8. Data group 8 contains data features. */
+  public static final short EF_DG8 = 0x0108;
+  
+  /** File identifier for data group 9. Data group 9 contains structure features. */
+  public static final short EF_DG9 = 0x0109;
+  
+  /** File identifier for data group 10. Data group 10 contains substance features. */
+  public static final short EF_DG10 = 0x010A;
+  
+  /** File identifier for data group 11. Data group 11 contains additional personal details. */
+  public static final short EF_DG11 = 0x010B;
+  
+  /** File identifier for data group 12. Data group 12 contains additional document details. */
+  public static final short EF_DG12 = 0x010C;
+  
+  /** File identifier for data group 13. Data group 13 contains optional details. */
+  public static final short EF_DG13 = 0x010D;
+  
+  /** File identifier for data group 14. Data group 14 contains security infos. */
+  public static final short EF_DG14 = 0x010E;
+  
+  /** File identifier for data group 15. Data group 15 contains the public key used for Active Authentication. */
+  public static final short EF_DG15 = 0x010F;
+  
+  /** File identifier for data group 16. Data group 16 contains person(s) to notify. */
+  public static final short EF_DG16 = 0x0110;
   
   /** The security document. */
   public static final short EF_SOD = 0x011D;
@@ -152,7 +151,7 @@ public class PassportService extends PassportApduService implements Serializable
    */
   public static final short EF_CVCA = 0x011C;
   
-  /** Short file identifiers for the DGs */
+  /** Short file identifier for file. */
   public static final byte
   SF_DG1 = 0x01,
   SF_DG2 = 0x02,
@@ -173,14 +172,12 @@ public class PassportService extends PassportApduService implements Serializable
   SF_COM = 0x1E,
   SF_SOD = 0x1D,
   SF_CVCA = 0x1C;
-  
+
   /** YYMMDD format. */
   public static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
-  
+
   /** The default maximal blocksize used for unencrypted APDUs. */
   public static final int DEFAULT_MAX_BLOCKSIZE = 224;
-  
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   
   /**
    * The file read block size, some passports cannot handle large values
@@ -267,7 +264,7 @@ public class PassportService extends PassportApduService implements Serializable
   
   /**
    * Selects the MRTD card side applet. If PACE has been executed successfully previously, then the card has authenticated
-   * us and a secure messaging channel has been established. If not, then the caller should request BAC execution as a next
+   * us and a secure messaging channel has already been established. If not, then the caller should request BAC execution as a next
    * step.
    *
    * @param hasPACESucceeded indicates whether PACE has been executed successfully (in which case a secure messaging channel has been established)
@@ -277,7 +274,6 @@ public class PassportService extends PassportApduService implements Serializable
   public void sendSelectApplet(boolean hasPACESucceeded) throws CardServiceException {
     if (hasPACESucceeded) {
       /* Use SM as set up by doPACE() */
-      LOGGER.info("DEBUG: wrapper = " + wrapper);
       sendSelectApplet(wrapper, APPLET_AID);
     } else {
       /* Use plain messaging to select the applet, caller will have to do doBAC. */
@@ -286,16 +282,16 @@ public class PassportService extends PassportApduService implements Serializable
   }
   
   /**
-   * Whether this service is open.
+   * Gets whether this service is open.
    *
-   * @return a boolean
+   * @return a boolean that indicates whether this service is open
    */
   public boolean isOpen() {
     return (state != State.SESSION_STOPPED_STATE);
   }
   
   /**
-   * Selects a file.
+   * Selects a file within the MRTD application.
    *
    * @param fid a file identifier
    */
@@ -370,6 +366,7 @@ public class PassportService extends PassportApduService implements Serializable
    */
   public synchronized PACEResult doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
+    LOGGER.info("DEBUG: Starting secure messaging based on PACE");
     wrapper = paceResult.getWrapper();
     state = State.PACE_AUTHENTICATED_STATE;
     return paceResult;
@@ -388,8 +385,9 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public synchronized CAResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
-    CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, publicKey);
+  public synchronized CAResult doCA(BigInteger keyId, String oid, PublicKey publicKey) throws CardServiceException {
+    CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, oid, publicKey);
+    LOGGER.info("DEBUG: Starting secure messaging based on Chip Authentication");
     wrapper = caResult.getWrapper();
     state = State.CA_EXECUTED_STATE;
     return caResult;

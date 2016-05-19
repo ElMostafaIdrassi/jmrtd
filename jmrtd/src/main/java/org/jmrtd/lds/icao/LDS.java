@@ -44,6 +44,7 @@ import org.jmrtd.lds.DataGroup;
 import org.jmrtd.lds.LDSFile;
 import org.jmrtd.lds.LDSFileUtil;
 import org.jmrtd.lds.SODFile;
+import org.jmrtd.lds.TerminalAuthenticationInfo;
 
 /**
  * The ICAO logical data structure version 1.7.
@@ -124,10 +125,11 @@ public class LDS {
     if (fileSet.contains(PassportService.EF_DG14)) {
       try {
         DG14File dg14 = getDG14File();
-        if (dg14 != null) {
-          List<Short> cvcaFIDs = dg14.getCVCAFileIds();
-          fileSet.addAll(cvcaFIDs);
-        }
+        /* FIXME */
+//        if (dg14 != null) {
+//          List<Short> cvcaFIDs = dg14.getCVCAFileIds();
+//          fileSet.addAll(cvcaFIDs);
+//        }
       } catch (IOException ioe) {
         LOGGER.severe("Could not read EF.DG14");
       }
@@ -283,7 +285,7 @@ public class LDS {
     short cvcaFID = PassportService.EF_CVCA;
     DG14File dg14 = getDG14File();
     if (dg14 == null) { throw new IOException("EF.DF14 not available in LDS"); }
-    List<Short> cvcaFIDs = dg14.getCVCAFileIds();
+    List<Short> cvcaFIDs = getCVCAFileIds(dg14);
     LOGGER.warning("DEBUG: cvcaFIDs = " + cvcaFIDs);
     if (cvcaFIDs != null && cvcaFIDs.size() != 0) {
       if (cvcaFIDs.size() > 1) { LOGGER.warning("More than one CVCA file id present in DG14."); }
@@ -293,6 +295,19 @@ public class LDS {
     return cvca;
   }
   
+  /* For TA version 1. */
+  private List<Short> getCVCAFileIds(DG14File dg14) {
+    List<TerminalAuthenticationInfo> terminalAuthenticationInfos = dg14.getTerminalAuthenticationInfos();
+    List<Short> fileIds = new ArrayList<Short>(terminalAuthenticationInfos.size());
+    for (TerminalAuthenticationInfo terminalAuthenticationInfo: terminalAuthenticationInfos) {
+      int fileId = terminalAuthenticationInfo.getFileId();
+      if (fileId != -1) {
+        fileIds.add((short)fileId);
+      }
+    }
+    return fileIds;
+  }
+
   private void put(short fid, LDSFile file) {
     this.files.put(fid, file);
     byte[] bytes = file.getEncoded();

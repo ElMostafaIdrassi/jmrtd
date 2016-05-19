@@ -62,7 +62,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   
   private static final long serialVersionUID = 6830847342039845308L;
   
-  public static final int VERSION_NUM = 1;
+  public static final int VERSION_1 = 1;
   
   /** Specified in BSI TR 03111 Section 5.2.1. */
   public static final String
@@ -98,7 +98,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    * @param signatureAlgorithmOID the signature algorithm OID
    */
   public ActiveAuthenticationInfo(String signatureAlgorithmOID) {
-    this(ID_AA_OID, VERSION_NUM, signatureAlgorithmOID);
+    this(ID_AA, VERSION_1, signatureAlgorithmOID);
   }
   
   @Deprecated
@@ -136,14 +136,18 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    * @return a textual representation of this object
    */
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("ActiveAuthenticationInfo");
-    result.append("[");
-    result.append("signatureAlgorithmOID = " + getSignatureAlgorithmOID());
+    result.append(" [");
+    result.append("protocol: " + toProtocolOIDString(oid));
+    result.append(", ");
+    result.append("version: " + version);
+    result.append(", ");
+    result.append("signatureAlgorithmOID: " + toSignatureAlgorithmOIDString(getSignatureAlgorithmOID()));
     result.append("]");
     return result.toString();
   }
-  
+
   /**
    * Tests equality with respect to another object.
    *
@@ -152,9 +156,15 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    * @return whether this object equals the other object
    */
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!ActiveAuthenticationInfo.class.equals(other.getClass())) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!ActiveAuthenticationInfo.class.equals(other.getClass())) {
+      return false;
+    }
     ActiveAuthenticationInfo otherActiveAuthenticationInfo = (ActiveAuthenticationInfo)other;
     return getDERObject().equals(otherActiveAuthenticationInfo.getDERObject());
   }
@@ -201,7 +211,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    * @return true if the match is positive
    */
   static boolean checkRequiredIdentifier(String id) {
-    return ID_AA_OID.equals(id);
+    return ID_AA.equals(id);
   }
   
   /**
@@ -210,7 +220,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   private void checkFields() {
     try {
       if (!checkRequiredIdentifier(oid)) { throw new IllegalArgumentException("Wrong identifier: " + oid); }
-      if (version != VERSION_NUM) { throw new IllegalArgumentException("Wrong version: " + version); }
+      if (version != VERSION_1) { throw new IllegalArgumentException("Wrong version: " + version); }
       /* FIXME check to see if signatureAlgorithmOID is valid. */
       
       if (!ECDSA_PLAIN_SHA1_OID.equals(signatureAlgorithmOID)
@@ -225,5 +235,20 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
       LOGGER.severe("Exception: " + e.getMessage());
       throw new IllegalArgumentException("Malformed ActiveAuthenticationInfo.");
     }
+  }
+  
+  private String toProtocolOIDString(String oid) {
+    if (ID_AA.equals(oid)) { return "id-AA"; }
+    return oid;
+  }
+  
+  private String toSignatureAlgorithmOIDString(String oid) {
+    if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }    
+    if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }
+    if (ECDSA_PLAIN_SHA256_OID.equals(oid)) { return "ecdsa-plain-SHA256"; }
+    if (ECDSA_PLAIN_SHA384_OID.equals(oid)) { return "ecdsa-plain-SHA384"; }
+    if (ECDSA_PLAIN_SHA512_OID.equals(oid)) { return "ecdsa-plain-SHA512"; }
+    if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) { return "ecdsa-plain-RIPEMD160"; }
+    return oid;
   }
 }

@@ -60,7 +60,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  /** Chip Authenticaiton version. */
+  /** Chip Authentication version. */
   public static final int
   VERSION_1 = 1,
   VERSION_2 = 2;
@@ -98,19 +98,24 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(new ASN1ObjectIdentifier(oid));
     v.add(new ASN1Integer(version));
-    if (keyId.compareTo(BigInteger.ZERO) >= 0) {
+    if (keyId != null) {
       v.add(new ASN1Integer(keyId));
     }
     return new DLSequence(v);
   }
   
+  /**
+   * Gets the protocol object identifier.
+   * 
+   * @return the {@code ID_CA_} object identifier indicating the Chip Authentication protocol
+   */
   public String getObjectIdentifier() {
     return oid;
   }
   
   /**
-   * Returns a key identifier stored in this ChipAuthenticationInfo structure, null
-   * if not present
+   * Returns a key identifier stored in this ChipAuthenticationInfo structure,
+   * {@code null} if not present.
    *
    * @return key identifier stored in this ChipAuthenticationInfo structure
    */
@@ -127,8 +132,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong identifier: "	+ oid);
       }
       if (version != VERSION_1 && version != VERSION_2) {
-        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2
-            + ", found " + version);
+        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2 + ", found " + version);
       }
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Exception", e);
@@ -147,22 +151,25 @@ public class ChipAuthenticationInfo extends SecurityInfo {
    * @return true if the match is positive
    */
   static boolean checkRequiredIdentifier(String oid) {
-    return ID_CA_DH_3DES_CBC_CBC_OID.equals(oid)
-        || ID_CA_ECDH_3DES_CBC_CBC_OID.equals(oid)
-        || ID_CA_DH_AES_CBC_CMAC_128_OID.equals(oid)
-        || ID_CA_DH_AES_CBC_CMAC_192_OID.equals(oid)
-        || ID_CA_DH_AES_CBC_CMAC_256_OID.equals(oid)
-        || ID_CA_ECDH_AES_CBC_CMAC_128_OID.equals(oid)
-        || ID_CA_ECDH_AES_CBC_CMAC_192_OID.equals(oid)
-        || ID_CA_ECDH_AES_CBC_CMAC_256_OID.equals(oid);
+    return ID_CA_DH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_256.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid);
   }
   
   public String toString() {
-    return  "ChipAuthenticationInfo [oid = " + oid + ", version = " + version + ", keyId = " + keyId + "]";
+    return "ChipAuthenticationInfo ["
+        + "protocol: " + toProtocolOIDString(oid)
+        + ", version: " + version
+        + ", keyId: " + (keyId == null ? "-" : keyId) + "]";
   }
   
   public int hashCode() {
-    return 3 + 11 * (oid == null ? 0 : oid.hashCode()) + 61 * version + 1991 * keyId.hashCode();
+    return 3 + 11 * (oid == null ? 0 : oid.hashCode()) + 61 * version + 1991 * (keyId == null ? 111 : keyId.hashCode());
   }
   
   public boolean equals(Object other) {
@@ -172,6 +179,84 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     ChipAuthenticationInfo otherChipAuthenticationInfo = (ChipAuthenticationInfo)other;
     return oid.equals(otherChipAuthenticationInfo.oid)
         && version == otherChipAuthenticationInfo.version
-        && keyId.equals(otherChipAuthenticationInfo.keyId);
+        && (keyId == null && otherChipAuthenticationInfo.keyId == null || keyId != null && keyId.equals(otherChipAuthenticationInfo.keyId));
+  }
+  
+  public static String toKeyAgreementAlgorithm(String oid) {
+    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_256.equals(oid)) {
+      return "DH";
+    } else if (ID_CA_ECDH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
+      return "ECDH";
+    }
+    //    return null;
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
+  }
+  
+  public static String toCipherAlgorithm(String oid) {
+    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)) {
+      return "DESede";
+    } else if (ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_256.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
+      return "AES";
+    }
+    //      return null;
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
+  }
+  
+  public static String toDigestAlgorithm(String oid) {
+    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)) {
+      return "SHA-1";
+    } else if (ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_256.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
+      return "SHA-256";
+    }
+    //      return null;
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
+  }
+  
+  public static int toKeyLength(String oid) {
+    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)
+        || ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)) {
+      return 128;
+    } else if (ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)) {
+      return 192;
+    } else if (ID_CA_DH_AES_CBC_CMAC_256.equals(oid)
+        || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
+      return 256;
+    } else {
+      // return -1;
+      throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
+    }
+  }
+  
+  private static String toProtocolOIDString(String oid) {
+    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)) { return "id-CA-DH-3DES-CBC-CBC"; }
+    if (ID_CA_DH_AES_CBC_CMAC_128.equals(oid)) { return "id-CA-DH-AES-CBC-CMAC-128"; }
+    if (ID_CA_DH_AES_CBC_CMAC_192.equals(oid)) { return "id-CA-DH-AES-CBC-CMAC-192"; }
+    if (ID_CA_DH_AES_CBC_CMAC_256.equals(oid)) { return "id-CA-DH-AES-CBC-CMAC-256"; }
+    if (ID_CA_ECDH_3DES_CBC_CBC.equals(oid)) { return "id-CA-ECDH-3DES-CBC-CBC"; }
+    if (ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)) { return "id-CA-ECDH-AES-CBC-CMAC-128"; }
+    if (ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)) { return "id-CA-ECDH-AES-CBC-CMAC-192"; }
+    if (ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) { return "id-CA-ECDH-AES-CBC-CMAC-256"; }
+    return oid;
   }
 }

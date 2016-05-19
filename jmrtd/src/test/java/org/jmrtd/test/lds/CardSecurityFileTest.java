@@ -133,7 +133,7 @@ public class CardSecurityFileTest extends TestCase {
   
   public CardSecurityFile createConstructedSample() {
     try {
-      SecurityInfo caSecurityInfo = new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_AES_CBC_CMAC_256_OID, ChipAuthenticationInfo.VERSION_1);
+      SecurityInfo caSecurityInfo = new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_AES_CBC_CMAC_256, ChipAuthenticationInfo.VERSION_1);
       SecurityInfo taSecurityInfo = new TerminalAuthenticationInfo();
       
       Set<SecurityInfo> securityInfos = new HashSet<SecurityInfo>(2);

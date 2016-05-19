@@ -27,18 +27,26 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.jmrtd.AESSecureMessagingWrapper;
 import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
+import org.jmrtd.lds.ChipAuthenticationInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
@@ -53,10 +61,18 @@ import net.sf.scuba.smartcards.CardServiceException;
  */
 public class CAProtocol {
   
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   private PassportService service;
   
   private SecureMessagingWrapper wrapper;
   
+  /**
+   * Constructs a protocol instance.
+   * 
+   * @param service the card service
+   * @param wrapper the existing secure messaging wrapper
+   */
   public CAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
@@ -64,74 +80,150 @@ public class CAProtocol {
   
   /**
    * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
-   * ver. 1.11. In short, we authenticate the chip with (EC)DH key agreement
+   * ver. 1.11. In short, we authenticate the chip with DH or ECDH key agreement
    * protocol and create new secure messaging keys.
+   * 
+   * The newly established secure messaging wrapper is made available to the caller in
+   * the result.
    *
    * @param keyId passport's public key id (stored in DG14), -1 if none
-   * @param publicKey passport's public key (stored in DG14)
+   * @param piccPublicKey PICC's public key (stored in DG14)
    *
    * @return the chip authentication result
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public CAResult doCA(BigInteger keyId, PublicKey publicKey) throws CardServiceException {
-    if (publicKey == null) { throw new IllegalArgumentException("Public key is null"); }
-    try {
-      String agreementAlg = Util.inferKeyAgreementAlgorithm(publicKey);
+  public CAResult doCA(BigInteger keyId, String oid, PublicKey piccPublicKey) throws CardServiceException {
+    if (piccPublicKey == null) {
+      throw new IllegalArgumentException("Public key is null");
+    }
+    
+    String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
+    String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
+    String digestAlg = ChipAuthenticationInfo.toDigestAlgorithm(oid);
+    int keyLength = ChipAuthenticationInfo.toKeyLength(oid);
+    
+    LOGGER.info("DEBUG: CA: oid = " + oid
+        + " -> agreementAlg = " + agreementAlg
+        + ", cipherAlg = " + cipherAlg
+        + ", digestAlg = " + digestAlg
+        + ", keyLength = " + keyLength);
+    
+    /* Check consistency of input parameters. */
+    if (agreementAlg == null) {
+      throw new IllegalArgumentException("Unknown agreement algorithm");
+    }
+    if (!("ECDH".equals(agreementAlg) || "DH".equals(agreementAlg))) {
+      throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);  
+    }
+    
+    try {      
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
       AlgorithmParameterSpec params = null;
       if ("DH".equals(agreementAlg)) {
-        DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+        DHPublicKey dhPublicKey = (DHPublicKey)piccPublicKey;
         params = dhPublicKey.getParams();
+        LOGGER.info("DEBUG: Chip Authentication with DH");
       } else if ("ECDH".equals(agreementAlg)) {
-        ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
+        ECPublicKey ecPublicKey = (ECPublicKey)piccPublicKey;
         params = ecPublicKey.getParams();
+        LOGGER.info("DEBUG: Chip Authentication with ECDH uses curve " + Util.getCurveName((ECParameterSpec)params));
       } else {
         throw new IllegalStateException("Unsupported algorithm \"" + agreementAlg + "\"");
       }
       keyPairGenerator.initialize(params);
-      KeyPair keyPair = keyPairGenerator.generateKeyPair();
+      KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey pcdPublicKey = pcdKeyPair.getPublic();
+      PrivateKey pcdPrivateKey = pcdKeyPair.getPrivate();
       
       KeyAgreement agreement = KeyAgreement.getInstance(agreementAlg);
-      agreement.init(keyPair.getPrivate());
-      agreement.doPhase(publicKey, true);
-      
-      byte[] secret = agreement.generateSecret();
+      agreement.init(pcdPrivateKey);
+      agreement.doPhase(piccPublicKey, true);
+      byte[] sharedSecret = agreement.generateSecret();
       
       // TODO: this SHA1ing may have to be removed?
-      // TODO: this hashing is needed for our Java Card passport applet implementation
+      // TODO: this hashing is needed for JMRTD's Java Card passport applet implementation
       // byte[] secret = md.digest(secret);
       
       byte[] keyData = null;
       byte[] idData = null;
       byte[] keyHash = new byte[0];
       if ("DH".equals(agreementAlg)) {
-        DHPublicKey dhPublicKey = (DHPublicKey)keyPair.getPublic();
+        DHPublicKey dhPublicKey = (DHPublicKey)pcdPublicKey;
         keyData = dhPublicKey.getY().toByteArray();
         // TODO: this is probably wrong, what should be hashed?
         MessageDigest md = MessageDigest.getInstance("SHA1");
         md = MessageDigest.getInstance("SHA1");
         keyHash = md.digest(keyData);
       } else if ("ECDH".equals(agreementAlg)) {
-        org.bouncycastle.jce.interfaces.ECPublicKey ecPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)keyPair.getPublic();
+        org.bouncycastle.jce.interfaces.ECPublicKey ecPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
         keyData = ecPublicKey.getQ().getEncoded();
         byte[] t = Util.i2os(ecPublicKey.getQ().getX().toBigInteger());
         keyHash = Util.alignKeyDataToSize(t, ecPublicKey.getParameters().getCurve().getFieldSize() / 8);
       }
-      keyData = Util.wrapDO((byte)0x91, keyData);
+      
       if (keyId.compareTo(BigInteger.ZERO) >= 0) {
         byte[] keyIdBytes = keyId.toByteArray();
         idData = Util.wrapDO((byte)0x84, keyIdBytes);
       }
-      service.sendMSEKAT(wrapper, keyData, idData);
-
+      
+      if (cipherAlg.startsWith("DESede")) {
+        service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData);
+      } else if (cipherAlg.startsWith("AES")) {
+        service.sendMSESetATIntAuth(wrapper, oid, keyId);        
+        service.sendGeneralAuthenticate(wrapper, Util.wrapDO((byte)0x80, keyData), true);
+      } else {
+        throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
+      }
+      
       /* Start secure messaging. */
-      SecretKey ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
-      SecretKey ksMac = Util.deriveKey(secret, Util.MAC_MODE);
-      wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L); // FIXME: can be AESSecureMessagingWrapper for EAC 2. -- MO
-      return new CAResult(keyId, publicKey, keyHash, keyPair, wrapper);
+      SecretKey ksEnc = null;
+      SecretKey ksMac = null;
+      //     ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
+      //     ksMac = Util.deriveKey(secret, Util.MAC_MODE);
+      
+      ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE);
+      ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE);
+      
+      if (cipherAlg.startsWith("DESede")) {
+        wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L);
+      } else if (cipherAlg.startsWith("AES")) {
+        long ssc = 0L; // wrapper == null ? 0L : wrapper.getSendSequenceCounter();
+        LOGGER.info("DEBUG: Chip Authentication initial SSC = " + ssc);
+        wrapper = new AESSecureMessagingWrapper(ksEnc, ksMac, ssc);
+      }
+      
+      return new CAResult(keyId, piccPublicKey, keyHash, pcdKeyPair, wrapper);
     } catch (GeneralSecurityException e) {
       throw new CardServiceException(e.toString());
+    }
+  }
+  
+  /**
+   * Gets the secure messaging wrapper currently in use.
+   * 
+   * @return a secure messaging wrapper
+   */
+  public SecureMessagingWrapper getWrapper() {
+    return wrapper;
+  }
+  
+  public class MyECDHKeyAgreement {
+    
+    private ECPrivateKey privateKey;
+    
+    public void init(ECPrivateKey privateKey) {
+      this.privateKey = privateKey;
+    }
+    
+    public ECPoint doPhase(ECPublicKey publicKey) {
+      ECPublicKeyParameters pub = Util.toBouncyECPublicKeyParameters(publicKey);
+      
+      org.bouncycastle.math.ec.ECPoint p = pub.getQ().multiply(Util.toBouncyECPrivateKeyParameters(privateKey).getD()).normalize();
+      if (p.isInfinity()) {
+        throw new IllegalStateException("Infinity");
+      }
+      return Util.fromBouncyCastleECPoint(p);
     }
   }
 }

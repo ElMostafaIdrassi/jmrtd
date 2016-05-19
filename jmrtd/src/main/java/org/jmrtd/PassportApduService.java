@@ -25,6 +25,7 @@ package org.jmrtd;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public class PassportApduService extends CardService {
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   
   /** The applet we select when we start a session. */
-  protected static final byte[] APPLET_AID = { (byte) 0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
+  protected static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
   
   /** Initialization vector used by the cipher below. */
   private static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
@@ -609,8 +610,7 @@ public class PassportApduService extends CardService {
    * @throws CardServiceException on error
    */
   public synchronized void sendMSEKAT(APDUWrapper wrapper, byte[] keyData, byte[] idData) throws CardServiceException {
-    byte[] data = new byte[keyData.length
-                           + ((idData != null) ? idData.length : 0)];
+    byte[] data = new byte[keyData.length + ((idData != null) ? idData.length : 0)];
     System.arraycopy(keyData, 0, data, 0, keyData.length);
     if (idData != null) {
       System.arraycopy(idData, 0, data, keyData.length, idData.length);
@@ -662,9 +662,37 @@ public class PassportApduService extends CardService {
   }
   
   /*
-   * FIXME: Make prefixing 0x8x tags responsibilities consistent between ext auth and mutual auth
+   * FIXME: Make prefixing 0x8x tags responsibilities consistent between ext auth and int auth and mutual auth
    * Now: above method makes caller responsible, below method callee is responsible. -- MO
    */
+  
+  /* For Chip Authentication. We prefix 0x80 for OID and 0x84 for keyId. */
+  public synchronized void sendMSESetATIntAuth(APDUWrapper wrapper, String oid, BigInteger keyId) throws CardServiceException {
+    ResponseAPDU rapdu = null;
+    if (keyId == null || keyId.compareTo(BigInteger.ZERO) < 0) {
+      LOGGER.info("DEBUG: implicit case, keyId == " + keyId);
+      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA4, toOIDBytes(oid));
+      rapdu = transmit(wrapper, capdu);
+    } else {
+      LOGGER.info("DEBUG: explicit case, keyId == " + keyId);
+      byte[] oidBytes = toOIDBytes(oid);
+      byte[] keyIdBytes = Util.wrapDO((byte)0x84, Util.i2os(keyId));
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      try {
+        bos.write(oidBytes);
+        bos.write(keyIdBytes);
+        bos.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.WARNING, "Exception", ioe);
+      }
+      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA4, bos.toByteArray());
+      rapdu = transmit(wrapper, capdu);
+    }
+    short sw = rapdu == null ? -1 : (short)rapdu.getSW();
+    if (sw != ISO7816.SW_NO_ERROR) {
+      throw new CardServiceException("Sending MSE AT failed", sw);
+    }
+  }
   
   /**
    * The MSE AT APDU for PACE, see ICAO TR-SAC-1.01, Section 3.2.1, BSI TR 03110 v2.03 B11.1.
@@ -682,22 +710,7 @@ public class PassportApduService extends CardService {
     
     if (oid == null) { throw new IllegalArgumentException("OID cannot be null"); }
     
-    /*
-     * 0x80 Cryptographic mechanism reference
-     * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
-     */
-    byte[] oidBytes = null;
-    try {
-      TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
-      oidTLVIn.readTag(); /* Should be 0x06 */
-      oidTLVIn.readLength();
-      oidBytes = oidTLVIn.readValue();
-      oidTLVIn.close();
-      oidBytes = Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
-    } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Unexpected exception interpreting OID \"" + oid + "\"", ioe);
-      throw new IllegalArgumentException("Illegal OID: \"" + oid + "\" (" + ioe.getMessage() + ")");
-    }
+    byte[] oidBytes = toOIDBytes(oid);
     
     /*
      * 0x83 Reference of a public key / secret key.
@@ -747,6 +760,26 @@ public class PassportApduService extends CardService {
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
       throw new CardServiceException("Sending MSE AT failed", sw);
+    }
+  }
+  
+  
+  /*
+   * 0x80 Cryptographic mechanism reference
+   * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
+   */
+  private byte[] toOIDBytes(String oid) {
+    byte[] oidBytes = null;
+    try {
+      TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
+      oidTLVIn.readTag(); /* Should be 0x06 */
+      oidTLVIn.readLength();
+      oidBytes = oidTLVIn.readValue();
+      oidTLVIn.close();
+      return Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Unexpected exception interpreting OID \"" + oid + "\"", ioe);
+      throw new IllegalArgumentException("Illegal OID: \"" + oid + "\" (" + ioe.getMessage() + ")");
     }
   }
   

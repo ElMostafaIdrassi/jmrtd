@@ -22,6 +22,7 @@
 
 package org.jmrtd.lds;
 
+import java.math.BigInteger;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
 
@@ -92,7 +93,11 @@ public class PACEInfo extends SecurityInfo {
   
   private String protocolOID;
   private int version;
-  private int parameterId;
+  private BigInteger parameterId;
+  
+  public PACEInfo(String oid, int version, int parameterId) {
+    this(oid, version, BigInteger.valueOf(parameterId));
+  }
   
   /**
    * Creates a PACEInfo instance.
@@ -101,7 +106,7 @@ public class PACEInfo extends SecurityInfo {
    * @param version should be 2
    * @param parameterId either a standardized domain parameter id from table 6 or a proprietary domain parameter
    */
-  public PACEInfo(String oid, int version, int parameterId) {
+  public PACEInfo(String oid, int version, BigInteger parameterId) {
     if (!checkRequiredIdentifier(oid)) { throw new IllegalArgumentException("Invalid OID"); }
     if (version != 2) { throw new IllegalArgumentException("Invalid version, must be 2"); }
     this.protocolOID = oid;
@@ -123,9 +128,9 @@ public class PACEInfo extends SecurityInfo {
     }
     
     int version = ((ASN1Integer)requiredData).getValue().intValue();
-    int parameterId = -1;
+    BigInteger parameterId = null;
     if (optionalData != null) {
-      parameterId = ((ASN1Integer)optionalData).getValue().intValue();
+      parameterId = ((ASN1Integer)optionalData).getValue();
     }
     
     return new PACEInfo(oid, version, parameterId);
@@ -140,7 +145,7 @@ public class PACEInfo extends SecurityInfo {
     return version;
   }
   
-  public int getParameterId() {
+  public BigInteger getParameterId() {
     return parameterId;
   }
   
@@ -156,7 +161,7 @@ public class PACEInfo extends SecurityInfo {
     vector.add(new ASN1Integer(version));
     
     /* Optional data */
-    if (parameterId >= 0) {
+    if (parameterId != null) {
       vector.add(new ASN1Integer(parameterId));
     }
     return new DLSequence(vector);
@@ -164,11 +169,10 @@ public class PACEInfo extends SecurityInfo {
   
   public String toString() {
     StringBuffer result = new StringBuffer();
-    result.append("PaceInfo");
-    result.append("[");
+    result.append("PaceInfo [");
     result.append("protocol: " + toProtocolOIDString(protocolOID));
     result.append(", version: " + version);
-    if (parameterId >= 0) {
+    if (parameterId != null) {
       result.append(", parameterId: " + toStandardizedParamIdString(parameterId));
     }
     result.append("]");
@@ -179,7 +183,7 @@ public class PACEInfo extends SecurityInfo {
     return 1234567891
         + 7 * protocolOID.hashCode()
         + 5 * version
-        + 3 * parameterId;
+        + 3 * (parameterId == null ? 1991 : parameterId.hashCode());
   }
   
   public boolean equals(Object other) {
@@ -191,7 +195,25 @@ public class PACEInfo extends SecurityInfo {
   }
   
   public static boolean checkRequiredIdentifier(String oid) {
-    return toMappingType(oid) != null;
+    return ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
+        || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_DH_GM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_DH_GM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
+        || ID_PACE_DH_IM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_DH_IM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_DH_IM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_GM_3DES_CBC_CBC.equals(oid)
+        || ID_PACE_ECDH_GM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_GM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_IM_3DES_CBC_CBC.equals(oid)
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
+        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid);
   }
   
   /*
@@ -338,6 +360,10 @@ public class PACEInfo extends SecurityInfo {
     }
   }
   
+  public static AlgorithmParameterSpec toParameterSpec(BigInteger stdDomainParam) {
+    return toParameterSpec(stdDomainParam.intValue());
+  }
+  
   public static AlgorithmParameterSpec toParameterSpec(int stdDomainParam) {
     switch (stdDomainParam) {
       case PARAM_ID_GFP_1024_160: return PARAMS_GFP_1024_160;
@@ -358,8 +384,11 @@ public class PACEInfo extends SecurityInfo {
     }
   }
   
-  private String toStandardizedParamIdString(int stdDomainParam) {
-    switch (stdDomainParam) {
+  private String toStandardizedParamIdString(BigInteger stdDomainParam) {
+    if (stdDomainParam == null) {
+      return "null";
+    }
+    switch (stdDomainParam.intValue()) {
       case PARAM_ID_GFP_1024_160: /* 0 */ return "1024-bit MODP Group with 160-bit Prime Order Subgroup";
       case PARAM_ID_GFP_2048_224: /* 1 */ return "2048-bit MODP Group with 224-bit Prime Order Subgroup";
       case PARAM_ID_GFP_2048_256: /* 2 */ return "2048-bit MODP Group with 256-bit Prime Order Subgroup";
@@ -376,7 +405,7 @@ public class PACEInfo extends SecurityInfo {
       case PARAM_ID_ECP_BRAINPOOL_P512_R1: /* 17 */ return "BrainpoolP512r1";
       case PARAM_ID_ECP_NIST_P521_R1: /* 18 */ return "NIST P-521 (secp521r1)";
       /* 19-31 RFU */
-      default: return Integer.toString(stdDomainParam);
+      default: return stdDomainParam.toString();
     }
   }
   
@@ -389,7 +418,7 @@ public class PACEInfo extends SecurityInfo {
     if (ID_PACE_DH_IM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-DH-IM-AES-CBC-CMAC-128"; }
     if (ID_PACE_DH_IM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-DH-IM-AES-CBC-CMAC-192"; }
     if (ID_PACE_DH_IM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE_DH-IM-AES-CBC-CMAC-256"; }
-    if (ID_PACE_ECDH_GM_3DES_CBC_CBC.equals(oid)) { return "id-PACE_ECDH-GM-3DES-CBC-CBC"; }
+    if (ID_PACE_ECDH_GM_3DES_CBC_CBC.equals(oid)) { return "id-PACE-ECDH-GM-3DES-CBC-CBC"; }
     if (ID_PACE_ECDH_GM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-ECDH-GM-AES-CBC-CMAC-128"; }
     if (ID_PACE_ECDH_GM_AES_CBC_CMAC_192.equals(oid)) { return "id-PACE-ECDH-GM-AES-CBC-CMAC-192"; }
     if (ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)) { return "id-PACE-ECDH-GM-AES-CBC-CMAC-256"; }

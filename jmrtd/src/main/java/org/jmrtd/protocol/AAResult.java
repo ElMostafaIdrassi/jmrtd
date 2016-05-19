@@ -22,9 +22,12 @@
 
 package org.jmrtd.protocol;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 
-public class AAResult {
+public class AAResult implements Serializable {
+
+  private static final long serialVersionUID = 8800803919646625713L;
 
   private PublicKey publicKey;
   private String digestAlgorithm;

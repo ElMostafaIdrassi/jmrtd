@@ -93,7 +93,7 @@ public class TAProtocol {
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
     try {
-      if (terminalCertificates == null || terminalCertificates.size() < 1) {
+      if (terminalCertificates == null || terminalCertificates.isEmpty()) {
         throw new IllegalArgumentException("Need at least 1 certificate to perform TA, found: " + terminalCertificates);
       }
       

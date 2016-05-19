@@ -70,7 +70,8 @@ public class PACEProtocolTest extends TestCase {
     try {
       byte[] paceInfoBytes = Hex.hexStringToBytes("3012060A 04007F00 07020204 02020201 0202010D");
       PACEInfo paceInfo = PACEInfo.createPACEInfo(paceInfoBytes);
-      int paramId = paceInfo.getParameterId();
+      BigInteger paramId = paceInfo.getParameterId();
+      assertNotNull(paramId);
       String oid = paceInfo.getObjectIdentifier();
       AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paramId);
       paceInfo.getObjectIdentifier();
@@ -108,14 +109,14 @@ public class PACEProtocolTest extends TestCase {
       
       PACEInfo paceInfo = PACEInfo.createPACEInfo(paceInfoBytes);
       assertNotNull(paceInfo);
-      int paramId = paceInfo.getParameterId();
+      BigInteger paramId = paceInfo.getParameterId();
       String oid = paceInfo.getObjectIdentifier();
       
       assertEquals("0.4.0.127.0.7.2.2.4.2.2", oid);
       assertEquals(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128, oid);
       
       assertEquals(13, paramId);
-      assertEquals(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, paramId);
+      assertEquals(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, paramId.intValue());
       
       AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paramId);
       assertTrue(params instanceof ECParameterSpec);

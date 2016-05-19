@@ -260,7 +260,7 @@ public class LDSFileUtil {
    * 
    * @return a data group number
    */
-  public static short lookupDataGroupNumberByFID(short fid) {
+  public static int lookupDataGroupNumberByFID(short fid) {
     switch(fid) {
       case PassportService.EF_DG1: return 1;
       case PassportService.EF_DG2: return 2;

@@ -25,7 +25,7 @@ package org.jmrtd.lds;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encoding;
@@ -60,23 +60,40 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
    * Used in ECDSA based Active Authentication.
    * <code>{joint-iso-itu-t(2) international-organizations(23) 136 mrtd(1) security(1) aaProtocolObject(5)}</code>.
    */
-  public static final String ID_AA_OID = "2.23.136.1.1.5";
+  public static final String ID_AA = "2.23.136.1.1.5";
   
   public static final String
-  ID_PK_DH_OID = EACObjectIdentifiers.id_PK_DH.getId(),
-  ID_PK_ECDH_OID = EACObjectIdentifiers.id_PK_ECDH.getId(),
-  ID_TA_OID = EACObjectIdentifiers.id_TA.getId(),
-  ID_CA_DH_3DES_CBC_CBC_OID = EACObjectIdentifiers.id_CA_DH_3DES_CBC_CBC.getId(),
-  ID_CA_ECDH_3DES_CBC_CBC_OID = EACObjectIdentifiers.id_CA_ECDH_3DES_CBC_CBC.getId();
-  
+  ID_PK_DH = EACObjectIdentifiers.id_PK_DH.getId(),
+  ID_PK_ECDH = EACObjectIdentifiers.id_PK_ECDH.getId();
+
+  /**
+   * Used in Chip Authentication 1 and 2.
+   */
   public static final String
-  ID_CA_DH_AES_CBC_CMAC_128_OID = "0.4.0.127.0.7.2.2.3.1.2",
-  ID_CA_DH_AES_CBC_CMAC_192_OID = "0.4.0.127.0.7.2.2.3.1.3",
-  ID_CA_DH_AES_CBC_CMAC_256_OID = "0.4.0.127.0.7.2.2.3.1.4",
-  ID_CA_ECDH_AES_CBC_CMAC_128_OID = "0.4.0.127.0.7.2.2.3.2.2",
-  ID_CA_ECDH_AES_CBC_CMAC_192_OID = "0.4.0.127.0.7.2.2.3.2.3",
-  ID_CA_ECDH_AES_CBC_CMAC_256_OID = "0.4.0.127.0.7.2.2.3.2.4";
-  
+  ID_CA_DH_3DES_CBC_CBC = EACObjectIdentifiers.id_CA_DH_3DES_CBC_CBC.getId(),
+  ID_CA_ECDH_3DES_CBC_CBC = EACObjectIdentifiers.id_CA_ECDH_3DES_CBC_CBC.getId(),
+  ID_CA_DH_AES_CBC_CMAC_128 = "0.4.0.127.0.7.2.2.3.1.2",
+  ID_CA_DH_AES_CBC_CMAC_192 = "0.4.0.127.0.7.2.2.3.1.3",
+  ID_CA_DH_AES_CBC_CMAC_256 = "0.4.0.127.0.7.2.2.3.1.4",
+  ID_CA_ECDH_AES_CBC_CMAC_128 = "0.4.0.127.0.7.2.2.3.2.2",
+  ID_CA_ECDH_AES_CBC_CMAC_192 = "0.4.0.127.0.7.2.2.3.2.3",
+  ID_CA_ECDH_AES_CBC_CMAC_256 = "0.4.0.127.0.7.2.2.3.2.4";
+
+  /**
+   * Used in Terminal Authentication 1 and 2.
+   */
+  public static final String
+  ID_TA = EACObjectIdentifiers.id_TA.getId(),
+  ID_TA_RSA = EACObjectIdentifiers.id_TA_RSA.getId(),
+  ID_TA_RSA_V1_5_SHA_1 = EACObjectIdentifiers.id_TA_RSA_v1_5_SHA_1.getId(),
+  ID_TA_RSA_V1_5_SHA_256 = EACObjectIdentifiers.id_TA_RSA_v1_5_SHA_256.getId(),
+  ID_TA_RSA_PSS_SHA_1 = EACObjectIdentifiers.id_TA_RSA_PSS_SHA_1.getId(),
+  ID_TA_RSA_PSS_SHA_256 = EACObjectIdentifiers.id_TA_RSA_PSS_SHA_256.getId(),
+  ID_TA_ECDSA = EACObjectIdentifiers.id_TA_ECDSA.getId(),
+  ID_TA_ECDSA_SHA_1 = EACObjectIdentifiers.id_TA_ECDSA_SHA_1.getId(),
+  ID_TA_ECDSA_SHA_224 = EACObjectIdentifiers.id_TA_ECDSA_SHA_224.getId(),
+  ID_TA_ECDSA_SHA_256 = EACObjectIdentifiers.id_TA_ECDSA_SHA_256.getId();
+    
   public static final String
   ID_EC_PUBLIC_KEY_TYPE = X9ObjectIdentifiers.id_publicKeyType.getId(),
   ID_EC_PUBLIC_KEY = X9ObjectIdentifiers.id_ecPublicKey.getId();
@@ -85,47 +102,37 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   
   /* protocols (2), smartcard (2), PACE (4) */
   public static final String ID_PACE = ID_BSI + ".2.2.4";
-  
-  public static final String
-  ID_PACE_DH_GM = ID_PACE + ".1";
-  
-  public static final String
-  ID_PACE_ECDH_GM = ID_PACE + ".2";
-  
-  public static final String
-  ID_PACE_DH_IM = ID_PACE + ".3";
-  
-  public static final String
-  ID_PACE_ECDH_IM = ID_PACE + ".4";
-  
-  public static final String
-  ID_PACE_ECDH_CAM = ID_PACE + ".6";
     
   public static final String
+  ID_PACE_DH_GM = ID_PACE + ".1",
   ID_PACE_DH_GM_3DES_CBC_CBC = ID_PACE_DH_GM + ".1", /* 0.4.0.127.0.7.2.2.4.1.1, id-PACE-DH-GM-3DES-CBC-CBC */
   ID_PACE_DH_GM_AES_CBC_CMAC_128 = ID_PACE_DH_GM + ".2", /* 0.4.0.127.0.7.2.2.4.1.2, id-PACE-DH-GM-AES-CBC-CMAC-128 */
   ID_PACE_DH_GM_AES_CBC_CMAC_192 = ID_PACE_DH_GM + ".3", /* 0.4.0.127.0.7.2.2.4.1.3, id-PACE-DH-GM-AES-CBC-CMAC-192 */
   ID_PACE_DH_GM_AES_CBC_CMAC_256 = ID_PACE_DH_GM + ".4"; /* 0.4.0.127.0.7.2.2.4.1.4, id-PACE-DH-GM-AES-CBC-CMAC-256 */
   
   public static final String
+  ID_PACE_ECDH_GM = ID_PACE + ".2",
   ID_PACE_ECDH_GM_3DES_CBC_CBC = ID_PACE_ECDH_GM + ".1", /* 0.4.0.127.0.7.2.2.4.2.1, id-PACE-ECDH-GM-3DES-CBC-CBC */
   ID_PACE_ECDH_GM_AES_CBC_CMAC_128 = ID_PACE_ECDH_GM + ".2", /* 0.4.0.127.0.7.2.2.4.2.2, id-PACE-ECDH-GM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_GM_AES_CBC_CMAC_192 = ID_PACE_ECDH_GM + ".3", /* 0.4.0.127.0.7.2.2.4.2.3, id-PACE-ECDH-GM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_GM_AES_CBC_CMAC_256 = ID_PACE_ECDH_GM + ".4"; /* 0.4.0.127.0.7.2.2.4.2.4, id-PACE-ECDH-GM-AES-CBC-CMAC-256 */
   
   public static final String
+  ID_PACE_DH_IM = ID_PACE + ".3",
   ID_PACE_DH_IM_3DES_CBC_CBC = ID_PACE_DH_IM + ".1", /* 0.4.0.127.0.7.2.2.4.3.1, id-PACE-DH-IM-3DES-CBC-CBC */
   ID_PACE_DH_IM_AES_CBC_CMAC_128 = ID_PACE_DH_IM + ".2", /* 0.4.0.127.0.7.2.2.4.3.2, id-PACE-DH-IM-AES-CBC-CMAC-128 */
   ID_PACE_DH_IM_AES_CBC_CMAC_192 = ID_PACE_DH_IM + ".3", /* 0.4.0.127.0.7.2.2.4.3.3, id-PACE-DH-IM-AES-CBC-CMAC-192 */
   ID_PACE_DH_IM_AES_CBC_CMAC_256 = ID_PACE_DH_IM + ".4"; /* 0.4.0.127.0.7.2.2.4.3.4, id-PACE-DH-IM-AES-CBC-CMAC-256 */
   
   public static final String
+  ID_PACE_ECDH_IM = ID_PACE + ".4",
   ID_PACE_ECDH_IM_3DES_CBC_CBC = ID_PACE_ECDH_IM + ".1", /* 0.4.0.127.0.7.2.2.4.4.1, id-PACE-ECDH-IM-3DES-CBC-CBC */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_128 = ID_PACE_ECDH_IM + ".2", /* 0.4.0.127.0.7.2.2.4.4.2, id-PACE-ECDH-IM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_192 = ID_PACE_ECDH_IM + ".3", /* 0.4.0.127.0.7.2.2.4.4.3, id-PACE-ECDH-IM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_256 = ID_PACE_ECDH_IM + ".4"; /* 0.4.0.127.0.7.2.2.4.4.4, id-PACE-ECDH-IM-AES-CBC-CMAC-256 */
   
   public static final String
+  ID_PACE_ECDH_CAM = ID_PACE + ".6",
   ID_PACE_ECDH_CAM_AES_CBC_CMAC_128 = ID_PACE_ECDH_CAM + ".2", /* 0.4.0.127.0.7.2.2.4.6.2, id-PACE-ECDH-CAM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_CAM_AES_CBC_CMAC_192 = ID_PACE_ECDH_CAM + ".3", /* 0.4.0.127.0.7.2.2.4.6.3, id-PACE-ECDH-CAM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_CAM_AES_CBC_CMAC_256 = ID_PACE_ECDH_CAM + ".4"; /* 0.4.0.127.0.7.2.2.4.6.4, id-PACE-ECDH-CAM-AES-CBC-CMAC-256 */
@@ -148,9 +155,15 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
    */
   public void writeObject(OutputStream outputStream) throws IOException {
     ASN1Primitive derEncoded = getDERObject();
-    if (derEncoded == null) { throw new IOException("Could not decode from DER."); }
+    if (derEncoded == null) {
+      throw new IOException("Could not decode from DER.");
+    }
+    
     byte[] derEncodedBytes = derEncoded.getEncoded(ASN1Encoding.DER);
-    if (derEncodedBytes == null) { throw new IOException("Could not decode from DER."); }
+    if (derEncodedBytes == null) {
+      throw new IOException("Could not decode from DER.");
+    }
+    
     outputStream.write(derEncodedBytes);
   }
   
@@ -222,7 +235,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
       } else if (PACEDomainParameterInfo.checkRequiredIdentifier(oid)) {
         AlgorithmIdentifier domainParameters = AlgorithmIdentifier.getInstance(requiredData);
         if (optionalData != null) {
-          int parameterId = ((ASN1Integer)optionalData).getValue().intValue();
+          BigInteger parameterId = ((ASN1Integer)optionalData).getValue();
           return new PACEDomainParameterInfo(oid, domainParameters, parameterId);
         }
         return new PACEDomainParameterInfo(oid, domainParameters);
@@ -231,15 +244,8 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
       LOGGER.warning("Unsupported SecurityInfo, oid = " + oid);
       return null;
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
+      LOGGER.log(Level.SEVERE, "Exception", e);
       throw new IllegalArgumentException("Malformed input stream.");
     }
-  }
-  
-  protected static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {
-    if (ID_PK_DH_OID.equals(oid)) { return "id-PK-DH"; }
-    if (ID_PK_ECDH_OID.equals(oid)) { return "id-PK-ECDH"; }
-    if (ID_TA_OID.equals(oid)) { return "id-TA"; }
-    throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 }

@@ -22,11 +22,15 @@
 
 package org.jmrtd.protocol;
 
+import java.io.Serializable;
+
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.SecureMessagingWrapper;
 
-public class BACResult {
+public class BACResult implements Serializable {
   
+  private static final long serialVersionUID = -7114911372181772099L;
+
   private BACKeySpec bacKey;
   private SecureMessagingWrapper wrapper;
   

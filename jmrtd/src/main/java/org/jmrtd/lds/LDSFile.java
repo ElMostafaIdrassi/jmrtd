@@ -32,8 +32,8 @@ package org.jmrtd.lds;
 public interface LDSFile extends LDSElement {
   
   /**
-   * ICAO specific datagroup tag.
-   * In EAC documents there is also the CVCA file that has no tag!
+   * ICAO specific data group tag.
+   * Note that in EAC 1.11 documents there is also the CVCA file that has no tag.
    */
   public static final int
   EF_COM_TAG = 0x60,
@@ -55,5 +55,14 @@ public interface LDSFile extends LDSElement {
   EF_DG16_TAG = 0x70,
   EF_SOD_TAG = 0x77;
   
+  /**
+   * Gets the length of this file.
+   * 
+   * @return the length of this file
+   */
+  /* 
+   * FIXME: Note that this is not necessarily the total length of the file:
+   * For TLV files this gives the length of the value. -- MO
+   */
   int getLength();
 }

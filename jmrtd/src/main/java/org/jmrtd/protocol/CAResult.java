@@ -22,6 +22,7 @@
 
 package org.jmrtd.protocol;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -35,8 +36,10 @@ import org.jmrtd.SecureMessagingWrapper;
  *
  * @version $Revision: $
  */
-public class CAResult {
+public class CAResult implements Serializable {
   
+  private static final long serialVersionUID = 4431711176589761513L;
+
   private BigInteger keyId;
   private PublicKey publicKey;
   private SecureMessagingWrapper wrapper;

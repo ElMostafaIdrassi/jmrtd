@@ -1,5 +1,6 @@
 package org.jmrtd.test.lds;
 
+import java.math.BigInteger;
 import java.security.Provider;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
@@ -59,7 +60,7 @@ public class PACEInfoTest extends TestCase {
   }	
   
   public void testToParameterSpecNotNull(int stdDomainParams) {
-    AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(stdDomainParams);
+    AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(BigInteger.valueOf(stdDomainParams));
     assertNotNull(paramSpec);
   }
   
@@ -87,7 +88,7 @@ public class PACEInfoTest extends TestCase {
   }	
   
   public void testGetParameterSpecDHParameterSpecOrECParameterSpec(int stdDomainParams) {
-    AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(stdDomainParams);
+    AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(BigInteger.valueOf(stdDomainParams));
     assertTrue(paramSpec instanceof DHParameterSpec || paramSpec instanceof ECParameterSpec);		
   }
   

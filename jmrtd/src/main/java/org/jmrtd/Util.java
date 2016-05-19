@@ -34,6 +34,7 @@ import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.Provider;
 import java.security.PublicKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -72,6 +74,9 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.params.DHParameters;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
@@ -492,29 +497,6 @@ public class Util {
     return Util.os2i(bytes).mod(p);
   }
   
-  /**
-   * Encode an EC public key point.
-   * Prefixes a <code>0x04</code> (without a length).
-   *
-   * @param point public key point
-   *
-   * @return an octet string
-   */
-  public static byte[] publicKeyECPointToOS(ECPoint point) {
-    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-    BigInteger x = point.getAffineX();
-    BigInteger y = point.getAffineY();
-    try {
-      bOut.write(0x04);
-      bOut.write(i2os(x));
-      bOut.write(i2os(y));
-      bOut.close();
-    } catch (IOException ioe) {
-      throw new IllegalStateException(ioe.getMessage());
-    }
-    return bOut.toByteArray();
-  }
-  
   /* Best effort. FIXME: test and improve. -- MO */
   /**
    * Infers a digest algorithm mnemonic from a signature algorithm mnemonic.
@@ -859,7 +841,7 @@ public class Util {
           tlvOut.writeTag(0x84); tlvOut.write(i2os(affineX)); tlvOut.write(i2os(affineY)); tlvOut.writeValueEnd(); /* Base point, FIXME: correct encoding? */
           tlvOut.writeTag(0x85); tlvOut.writeValue(i2os(order)); /* Order of the base point */
         }
-        tlvOut.writeTag(0x86); tlvOut.writeValue(publicKeyECPointToOS(publicPoint)); /* Public point */				
+        tlvOut.writeTag(0x86); tlvOut.writeValue(ecPoint2OS(publicPoint)); /* Public point */				
         if (!isContextKnown) {
           tlvOut.writeTag(0x87); tlvOut.writeValue(i2os(BigInteger.valueOf(coFactor))); /* Cofactor */			
         }
@@ -896,7 +878,7 @@ public class Util {
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
       try {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        bOut.write(Util.publicKeyECPointToOS(ecPublicKey.getW()));
+        bOut.write(Util.ecPoint2OS(ecPublicKey.getW()));
         byte[] encodedPublicKey = bOut.toByteArray();
         bOut.close();
         return encodedPublicKey;
@@ -912,28 +894,61 @@ public class Util {
     }
   }
   
+  public static ECPoint os2ECPoint(byte[] encodedECPoint) {
+    try {
+      DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedECPoint));
+      int b = dataIn.read();
+      if (b != 0x04) {
+        throw new IllegalArgumentException("Expected encoded ECPoint to start with 0x04");
+      }
+      int length = (encodedECPoint.length - 1) / 2;
+      byte[] xCoordBytes = new byte[length];
+      byte[] yCoordBytes = new byte[length];
+      dataIn.readFully(xCoordBytes);
+      dataIn.readFully(yCoordBytes);
+      dataIn.close();
+      BigInteger x = Util.os2i(xCoordBytes);
+      BigInteger y = Util.os2i(yCoordBytes);
+      return new ECPoint(x, y);
+    } catch (IOException ioe) {
+      LOGGER.log(Level.SEVERE, "Exception", ioe);
+      throw new IllegalArgumentException(ioe.getMessage());
+    }
+  }
+  
+  /**
+   * Encode an EC point (for use as public key value).
+   * Prefixes a {@code 0x04} (without a length).
+   *
+   * @param point an EC Point
+   *
+   * @return an octet string
+   */
+  public static byte[] ecPoint2OS(ECPoint point) {
+    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+    BigInteger x = point.getAffineX();
+    BigInteger y = point.getAffineY();
+    try {
+      bOut.write(0x04);
+      bOut.write(i2os(x));
+      bOut.write(i2os(y));
+      bOut.close();
+    } catch (IOException ioe) {
+      throw new IllegalStateException(ioe.getMessage());
+    }
+    return bOut.toByteArray();
+  }
+  
   public static PublicKey decodePublicKeyFromSmartCard(byte[] encodedPublicKey, AlgorithmParameterSpec params) {
     if (params == null) { throw new IllegalArgumentException("Params cannot be null"); }
     try {
-      DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
       if (params instanceof ECParameterSpec) {
-        int b = dataIn.read();
-        if (b != 0x04) { throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); }
-        int length = (encodedPublicKey.length - 1) / 2;
-        byte[] xCoordBytes = new byte[length];
-        byte[] yCoordBytes = new byte[length];
-        dataIn.readFully(xCoordBytes);
-        dataIn.readFully(yCoordBytes);
-        dataIn.close();
-        
-        BigInteger x = Util.os2i(xCoordBytes);
-        BigInteger y = Util.os2i(yCoordBytes);
-        ECPoint w = new ECPoint(x, y);
-        
+        ECPoint w = os2ECPoint(encodedPublicKey);
         ECParameterSpec ecParams = (ECParameterSpec)params;
         KeyFactory kf = KeyFactory.getInstance("EC");
         return kf.generatePublic(new ECPublicKeySpec(w, ecParams));
       } else if (params instanceof DHParameterSpec) {
+        DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
         int b = dataIn.read();
         if (b != 0x04) { throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); }
         int length = encodedPublicKey.length - 1;
@@ -967,20 +982,33 @@ public class Util {
   public static String inferProtocolIdentifier(PublicKey publicKey) {
     String algorithm = publicKey.getAlgorithm();
     if ("EC".equals(algorithm) || "ECDH".equals(algorithm)) {
-      return SecurityInfo.ID_PK_ECDH_OID;
+      return SecurityInfo.ID_PK_ECDH;
     } else if ("DH".equals(algorithm)) {
-      return SecurityInfo.ID_PK_DH_OID;
+      return SecurityInfo.ID_PK_DH;
     } else {
       throw new IllegalArgumentException("Wrong key type. Was expecting ECDH or DH public key.");
     }
   }
   
+  /**
+   * Maps nonce for generic mapping case.
+   * 
+   * @param nonceS the nonce
+   * @param sharedSecretH the shared secret as opaque byte array
+   * @param params the key agreement algorithm parameter specification
+   * 
+   * @return the new algorithm parameters
+   * 
+   * @deprecated Looks like computing Y coord in ECDH case is buggy. Use DH or ECDH variant directly.
+   */
   public static AlgorithmParameterSpec mapNonceGM(byte[] nonceS, byte[] sharedSecretH, AlgorithmParameterSpec params) {
     if (params == null) { throw new IllegalArgumentException("Unsupported parameters for mapping nonce"); }
     if (params instanceof ECParameterSpec) {
       ECParameterSpec ecParams = (ECParameterSpec)params;
+      
       BigInteger affineX = os2i(sharedSecretH);
-      BigInteger affineY = computeAffineY(affineX, ecParams);
+      BigInteger affineY = computeAffineY(affineX, ecParams); /* FIXME: Y coord is wrong about 50% of the time (when tested against Morpho applet). */
+      
       ECPoint sharedSecretPointH = new ECPoint(affineX, affineY);
       return mapNonceGMWithECDH(os2i(nonceS), sharedSecretPointH, ecParams);
     } else if (params instanceof DHParameterSpec) {
@@ -996,7 +1024,7 @@ public class Util {
     return null;
   }
   
-  private static ECParameterSpec mapNonceGMWithECDH(BigInteger nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
+  public static ECParameterSpec mapNonceGMWithECDH(BigInteger nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
     /*
      * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
      */
@@ -1015,7 +1043,7 @@ public class Util {
     return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
   }
   
-  private static DHParameterSpec mapNonceGMWithDH(BigInteger nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
+  public static DHParameterSpec mapNonceGMWithDH(BigInteger nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
     // g~ = g^s * h
     BigInteger p = params.getP();
     BigInteger generator = params.getG();
@@ -1048,13 +1076,18 @@ public class Util {
   }
   
   public static BigInteger getPrime(AlgorithmParameterSpec params) {
-    if (params == null) { throw new IllegalArgumentException("Parameters null"); }
+    if (params == null) {
+      throw new IllegalArgumentException("Parameters null");
+    }
+    
     if (params instanceof DHParameterSpec) {
       return ((DHParameterSpec)params).getP();
     } else if (params instanceof ECParameterSpec) {
       EllipticCurve curve = ((ECParameterSpec)params).getCurve();
       ECField field = curve.getField();
-      if (!(field instanceof ECFieldFp)) { throw new IllegalStateException("Was expecting prime field of type ECFieldFp, found " + field.getClass().getCanonicalName()); }
+      if (!(field instanceof ECFieldFp)) {
+        throw new IllegalStateException("Was expecting prime field of type ECFieldFp, found " + field.getClass().getCanonicalName());
+      }
       return ((ECFieldFp)field).getP();
     } else {
       throw new IllegalArgumentException("Unsupported agreement algorithm, was expecting DHParameterSpec or ECParameterSpec, found " + params.getClass().getCanonicalName());
@@ -1062,7 +1095,9 @@ public class Util {
   }
   
   public static byte[] wrapDO(byte tag, byte[] data) {
-    if (data == null) { throw new IllegalArgumentException("Data to wrap is null"); }
+    if (data == null) {
+      throw new IllegalArgumentException("Data to wrap is null");
+    }
     byte[] result = new byte[data.length + 2];
     result[0] = tag;
     result[1] = (byte)data.length;
@@ -1071,9 +1106,13 @@ public class Util {
   }
   
   public static byte[] unwrapDO(byte expectedTag, byte[] wrappedData) {
-    if (wrappedData == null || wrappedData.length < 2)  { throw new IllegalArgumentException("Wrapped data is null or length < 2"); }
+    if (wrappedData == null || wrappedData.length < 2)  {
+      throw new IllegalArgumentException("Wrapped data is null or length < 2");
+    }
     byte actualTag = wrappedData[0];
-    if (actualTag != expectedTag) { throw new IllegalArgumentException("Expected tag " + Integer.toHexString(expectedTag) + ", found tag " + Integer.toHexString(actualTag)); }
+    if (actualTag != expectedTag) {
+      throw new IllegalArgumentException("Expected tag " + Integer.toHexString(expectedTag) + ", found tag " + Integer.toHexString(actualTag));
+    }
     byte[] result = new byte[wrappedData.length - 2];
     System.arraycopy(wrappedData, 2, result, 0, result.length);
     return result;
@@ -1100,8 +1139,11 @@ public class Util {
     ECCurve bcCurve = toBouncyCastleECCurve(params);
     ECFieldElement a = bcCurve.getA();
     ECFieldElement b = bcCurve.getB();
-    ECFieldElement x = bcCurve.fromBigInteger(affineX);		
+    ECFieldElement x = bcCurve.fromBigInteger(affineX);
+    LOGGER.info("DEBUG: x.bitLength = " + x.bitLength());
     ECFieldElement y = x.multiply(x).add(a).multiply(x).add(b).sqrt();
+    LOGGER.info("DEBUG: y.bitLength = " + y.bitLength());
+    
     return y.toBigInteger();
   }
   
@@ -1111,7 +1153,7 @@ public class Util {
     // return new org.bouncycastle.math.ec.ECPoint.Fp(bcCurve, bcCurve.fromBigInteger(point.getAffineX()), bcCurve.fromBigInteger(point.getAffineY()));
   }
   
-  private static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
+  public static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
     point = point.normalize();
     if (!point.isValid()) { LOGGER.warning("point not valid"); }
     return new ECPoint(point.getAffineXCoord().toBigInteger(), point.getAffineYCoord().toBigInteger());
@@ -1131,12 +1173,35 @@ public class Util {
   private static ECCurve toBouncyCastleECCurve(ECParameterSpec params) {
     EllipticCurve curve = params.getCurve();
     ECField field = curve.getField();
-    if (!(field instanceof ECFieldFp)) { throw new IllegalArgumentException("Only prime field supported (for now), found " + field.getClass().getCanonicalName()); }
+    if (!(field instanceof ECFieldFp)) {
+      throw new IllegalArgumentException("Only prime field supported (for now), found " + field.getClass().getCanonicalName());
+    }
     int coFactor = params.getCofactor();
     BigInteger order = params.getOrder();
     BigInteger a = curve.getA();
     BigInteger b = curve.getB();
     BigInteger p = getPrime(params);
     return new ECCurve.Fp(p, a, b, order, BigInteger.valueOf(coFactor));
+  }
+
+  public static ECPublicKeyParameters toBouncyECPublicKeyParameters(ECPublicKey publicKey) {
+    ECParameterSpec ecParams = publicKey.getParams();
+    org.bouncycastle.math.ec.ECPoint q = toBouncyCastleECPoint(publicKey.getW(), ecParams);
+    return new ECPublicKeyParameters(q, toBouncyECDomainParameters(ecParams));
+  }
+  
+  public static ECPrivateKeyParameters toBouncyECPrivateKeyParameters(ECPrivateKey privateKey) {
+    BigInteger d = privateKey.getS();
+    ECDomainParameters ecParams = toBouncyECDomainParameters(privateKey.getParams());
+    return new ECPrivateKeyParameters(d, ecParams);
+  }
+
+  public static ECDomainParameters toBouncyECDomainParameters(ECParameterSpec params) {
+    ECCurve curve = toBouncyCastleECCurve(params);
+    org.bouncycastle.math.ec.ECPoint g = toBouncyCastleECPoint(params.getGenerator(), params);
+    BigInteger n = params.getOrder();
+    BigInteger h = BigInteger.valueOf(params.getCofactor());
+    byte[] seed = params.getCurve().getSeed();
+    return new ECDomainParameters(curve, g, n, h, seed);
   }
 }

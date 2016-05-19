@@ -22,6 +22,7 @@
 
 package org.jmrtd.protocol;
 
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -39,8 +40,10 @@ import org.jmrtd.cert.CardVerifiableCertificate;
  *
  * @version $Revision$
  */
-public class TAResult  {
+public class TAResult implements Serializable {
   
+  private static final long serialVersionUID = -2926063872890928748L;
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
   private CAResult chipAuthenticationResult;

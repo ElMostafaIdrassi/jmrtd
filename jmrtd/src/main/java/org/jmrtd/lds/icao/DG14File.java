@@ -26,14 +26,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -97,12 +95,16 @@ public class DG14File extends DataGroup {
     ASN1Set set = (ASN1Set)asn1In.readObject();
     for (int i = 0; i < set.size(); i++) {
       ASN1Primitive object = set.getObjectAt(i).toASN1Primitive();
-      SecurityInfo securityInfo = SecurityInfo.getInstance(object);
-      if (securityInfo == null) {
-        LOGGER.warning("Skipping this unsupported SecurityInfo");
-        continue;
+      try {
+        SecurityInfo securityInfo = SecurityInfo.getInstance(object);
+        if (securityInfo == null) {
+          LOGGER.warning("Skipping this unsupported SecurityInfo");
+          continue;
+        }
+        securityInfos.add(securityInfo);
+      } catch (Exception e) {
+        LOGGER.log(Level.WARNING, "Skipping Security Info", e);
       }
-      securityInfos.add(securityInfo);
     }
   }
   
@@ -118,61 +120,54 @@ public class DG14File extends DataGroup {
   }
   
   /**
-   * Gets the list of file identifier references to efCVCA files, possibly
-   * empty.
+   * Gets Terminal Authentication infos.
    *
-   * @return the list of file identifier references
+   * @return the Terminal Authentication infos.
    */
-  public List<Short> getCVCAFileIds() {
-    List<Short> cvcaFiles = new ArrayList<Short>();
-    for (SecurityInfo si : securityInfos) {
-      if (si instanceof TerminalAuthenticationInfo) {
-        int i = ((TerminalAuthenticationInfo) si).getFileId();
-        if (i != -1) {
-          cvcaFiles.add((short)i);
-        }
+  public List<TerminalAuthenticationInfo> getTerminalAuthenticationInfos() {
+    List<TerminalAuthenticationInfo> terminalAuthenticationInfos = new ArrayList<TerminalAuthenticationInfo>();
+    for (SecurityInfo securityInfo : securityInfos) {
+      if (securityInfo instanceof TerminalAuthenticationInfo) {
+        terminalAuthenticationInfos.add((TerminalAuthenticationInfo)securityInfo);
       }
     }
-    return cvcaFiles;
+    return terminalAuthenticationInfos;
   }
   
-  /**
-   * Gets a corresponding short file ID.
-   *
-   * @param fileId the file ID
-   *
-   * @return an SFI for the given file ID, -1 if not present
-   */
-  public byte getCVCAShortFileId(int fileId) {
-    for (SecurityInfo si : securityInfos) {
-      if (si instanceof TerminalAuthenticationInfo) {
-        if (((TerminalAuthenticationInfo) si).getFileId() == fileId) {
-          return ((TerminalAuthenticationInfo) si).getShortFileId();
-        }
-      }
-    }
-    return -1;
-  }
   
   /**
-   * Gets the mapping of key identifiers to EAC protocol identifiers
-   * contained in this file. The key identifier may be -1 if there is only one
-   * protocol identifier.
+   * Gets the Chip Authentication infos.
    *
-   * @return the mapping of key identifiers to EAC protocol identifiers
+   * @return the Chip Authentication infos
    */
-  public Map<BigInteger, String> getChipAuthenticationInfos() {
-    Map<BigInteger, String> map = new TreeMap<BigInteger, String>();
+  public List<ChipAuthenticationInfo> getChipAuthenticationInfos() {
+    List<ChipAuthenticationInfo> map = new ArrayList<ChipAuthenticationInfo>();
     for (SecurityInfo securityInfo : securityInfos) {
       if (securityInfo instanceof ChipAuthenticationInfo) {
         ChipAuthenticationInfo chipAuthNInfo = (ChipAuthenticationInfo)securityInfo;
-        map.put(chipAuthNInfo.getKeyId(), chipAuthNInfo.getObjectIdentifier());
+        map.add(chipAuthNInfo);
         if (chipAuthNInfo.getKeyId().compareTo(BigInteger.ZERO) < 0) {
           return map;
         }
       }
     }
     return map;
+  }
+  
+  /**
+   * Gets the mapping of key identifiers to public keys. The key identifier
+   * may be -1 if there is only one key.
+   *
+   * @return the mapping of key identifiers to public keys
+   */
+  public List<ChipAuthenticationPublicKeyInfo> getChipAuthenticationPublicKeyInfos() {
+    List<ChipAuthenticationPublicKeyInfo> publicKeys = new ArrayList<ChipAuthenticationPublicKeyInfo>();
+    for (SecurityInfo securityInfo: securityInfos) {
+      if (securityInfo instanceof ChipAuthenticationPublicKeyInfo) {
+        publicKeys.add((ChipAuthenticationPublicKeyInfo)securityInfo);
+      }
+    }
+    return publicKeys;
   }
   
   public List<ActiveAuthenticationInfo> getActiveAuthenticationInfos() {
@@ -184,26 +179,6 @@ public class DG14File extends DataGroup {
       }
     }
     return resultList;
-  }
-  
-  /**
-   * Gets the mapping of key identifiers to public keys. The key identifier
-   * may be -1 if there is only one key.
-   *
-   * @return the mapping of key identifiers to public keys
-   */
-  public Map<BigInteger, PublicKey> getChipAuthenticationPublicKeyInfos() {
-    Map<BigInteger, PublicKey> publicKeys = new TreeMap<BigInteger, PublicKey>();
-    boolean foundOne = false;
-    for (SecurityInfo securityInfo: securityInfos) {
-      if (securityInfo instanceof ChipAuthenticationPublicKeyInfo) {
-        ChipAuthenticationPublicKeyInfo info = (ChipAuthenticationPublicKeyInfo)securityInfo;
-        publicKeys.put(info.getKeyId(), info.getSubjectPublicKey());
-        foundOne = true;
-      }
-    }
-    if (!foundOne) { throw new IllegalStateException("No keys?"); }
-    return publicKeys;
   }
   
   /**
@@ -220,11 +195,21 @@ public class DG14File extends DataGroup {
   }
   
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (!(obj.getClass().equals(this.getClass()))) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj.getClass().equals(this.getClass()))) {
+      return false;
+    }
+    
     DG14File other = (DG14File)obj;
-    if (securityInfos == null) { return  other.securityInfos == null; }
-    if (other.securityInfos == null) { return securityInfos == null; }
+    if (securityInfos == null) {
+      return  other.securityInfos == null;  
+    }
+    if (other.securityInfos == null) {
+      return securityInfos == null;
+    }
+    
     return securityInfos.equals(other.securityInfos);
   }
   

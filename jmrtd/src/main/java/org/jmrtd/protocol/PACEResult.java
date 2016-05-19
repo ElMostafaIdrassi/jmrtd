@@ -22,6 +22,7 @@
 
 package org.jmrtd.protocol;
 
+import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -29,35 +30,47 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
-public class PACEResult {
+public class PACEResult implements Serializable {
   
+  private static final long serialVersionUID = -6819675856205885052L;
+
   private MappingType mappingType;
   private String agreementAlg;
   private String cipherAlg;
   private String digestAlg;
   private int keyLength;
   
+  private AlgorithmParameterSpec staticParams;
+  
   private byte[] piccNonce;
   private AlgorithmParameterSpec ephemeralParams;
   private KeyPair pcdKeyPair;
   private PublicKey piccPublicKey;
   private byte[] sharedSecretBytes;
+
+  /* Only used for PACE-CAM. */
+  private byte[] encryptedChipAuthenticationData;
+  private byte[] chipAuthenticationData;
   
   private SecureMessagingWrapper wrapper;
   
   public PACEResult(MappingType mappingType, String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
+      AlgorithmParameterSpec staticParams,
       byte[] piccNonce, AlgorithmParameterSpec ephemeralParams, KeyPair pcdKeyPair, PublicKey piccPublicKey,
-      byte[] sharedSecretBytes, SecureMessagingWrapper wrapper) {
+      byte[] sharedSecretBytes, byte[] encryptedChipAuthenticationData, byte[] chipAuthenticationData, SecureMessagingWrapper wrapper) {
     this.mappingType = mappingType;
     this.agreementAlg = agreementAlg;
     this.cipherAlg = cipherAlg;
     this.digestAlg = digestAlg;
     this.keyLength = keyLength;
+    this.staticParams = staticParams;
     this.piccNonce = piccNonce;
     this.ephemeralParams = ephemeralParams;
     this.pcdKeyPair = pcdKeyPair;
     this.piccPublicKey = piccPublicKey;
     this.sharedSecretBytes = sharedSecretBytes;
+    this.encryptedChipAuthenticationData = encryptedChipAuthenticationData;
+    this.chipAuthenticationData = chipAuthenticationData;
     this.wrapper = wrapper;
   }
   
@@ -88,6 +101,10 @@ public class PACEResult {
   public int getKeyLength() {
     return keyLength;
   }
+  
+  public AlgorithmParameterSpec getStaticParams() {
+    return staticParams;
+  }
 
   public byte[] getPICCNonce() {
     return piccNonce;
@@ -108,4 +125,13 @@ public class PACEResult {
   public byte[] getSharedSecretBytes() {
     return sharedSecretBytes;
   }
+  
+  public byte[] getEncryptedChipAuthenticationData() {
+    return encryptedChipAuthenticationData;
+  }
+  
+  public byte[] getChipAuthenticationData() {
+    return chipAuthenticationData;
+  }
+
 }

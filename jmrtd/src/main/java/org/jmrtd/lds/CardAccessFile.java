@@ -25,6 +25,7 @@ package org.jmrtd.lds;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,7 +51,7 @@ import org.bouncycastle.asn1.DLSet;
  *
  * @since 0.5.1
  */
-public class CardAccessFile {
+public class CardAccessFile implements Serializable {
   
   private static final long serialVersionUID = -3536507558193769951L;
   
