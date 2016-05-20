@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import org.jmrtd.lds.AbstractImageInfo;
 
@@ -260,13 +261,19 @@ public class FaceImageInfo extends AbstractImageInfo {
     readObject(inputStream);
   }
   
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = (inputStream instanceof DataInputStream) ? (DataInputStream)inputStream : new DataInputStream(inputStream);
     
     /* Facial Information Block (20), see ISO 19794-5 5.5 */
     recordLength = dataIn.readInt() & 0xFFFFFFFFL; /* 4 */
     int featurePointCount = dataIn.readUnsignedShort(); /* +2 = 6 */
-    gender = Gender.getInstance(dataIn.readUnsignedByte()); /* +1 = 7 */
+    int genderCode = dataIn.readUnsignedByte();
+    gender = Gender.getInstance(genderCode); /* +1 = 7 */
+    
+    LOGGER.info("DEBUG: gender code == " + genderCode);
+    
     eyeColor = EyeColor.toEyeColor(dataIn.readUnsignedByte()); /* +1 = 8 */
     hairColor = dataIn.readUnsignedByte(); /* +1 = 9 */
     featureMask = dataIn.readUnsignedByte(); /* +1 = 10 */
