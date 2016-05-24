@@ -30,14 +30,14 @@ import org.jmrtd.SecureMessagingWrapper;
 public class BACResult implements Serializable {
   
   private static final long serialVersionUID = -7114911372181772099L;
-
+  
   private BACKeySpec bacKey;
   private SecureMessagingWrapper wrapper;
   
   public BACResult(SecureMessagingWrapper wrapper) {
     this(null, wrapper);
   }
-
+  
   public BACResult(BACKeySpec bacKey, SecureMessagingWrapper wrapper) {
     this.bacKey = bacKey;
     this.wrapper = wrapper;
@@ -49,5 +49,54 @@ public class BACResult implements Serializable {
   
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
+  }
+  
+  @Override
+  public String toString() {
+    return (new StringBuilder())
+        .append("BACResult [bacKey: " + bacKey)
+        .append(", wrapper: " + wrapper)
+        .append("]")
+        .toString();
+  }
+  
+  @Override
+  public int hashCode() {
+    final int prime = 1234567891;
+    int result = 1991;
+    result = prime * result + ((bacKey == null) ? 0 : bacKey.hashCode());
+    result = prime * result + ((wrapper == null) ? 0 : wrapper.hashCode());
+    return result;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    
+    BACResult other = (BACResult) obj;
+    if (bacKey == null) {
+      if (other.bacKey != null) {
+        return false;
+      }
+    } else if (!bacKey.equals(other.bacKey)) {
+      return false;
+    }
+    if (wrapper == null) {
+      if (other.wrapper != null) {
+        return false;
+      }
+    } else if (!wrapper.equals(other.wrapper)) {
+      return false;
+    }
+    
+    return true;
   }
 }

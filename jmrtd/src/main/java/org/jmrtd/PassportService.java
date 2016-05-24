@@ -72,9 +72,7 @@ import net.sf.scuba.smartcards.CardServiceException;
  *        close()
  * </pre>
  *
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
- * @author Wojciech Mostowski (woj@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision:352 $
  */

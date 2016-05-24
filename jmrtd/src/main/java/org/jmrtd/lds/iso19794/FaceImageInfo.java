@@ -72,7 +72,7 @@ public class FaceImageInfo extends AbstractImageInfo {
           return c;
         }
       }
-      return null;
+      return UNKNOWN;
     }
   }
   
@@ -269,11 +269,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     /* Facial Information Block (20), see ISO 19794-5 5.5 */
     recordLength = dataIn.readInt() & 0xFFFFFFFFL; /* 4 */
     int featurePointCount = dataIn.readUnsignedShort(); /* +2 = 6 */
-    int genderCode = dataIn.readUnsignedByte();
-    gender = Gender.getInstance(genderCode); /* +1 = 7 */
-    
-    LOGGER.info("DEBUG: gender code == " + genderCode);
-    
+    gender = Gender.getInstance(dataIn.readUnsignedByte()); /* +1 = 7 */
     eyeColor = EyeColor.toEyeColor(dataIn.readUnsignedByte()); /* +1 = 8 */
     hairColor = dataIn.readUnsignedByte(); /* +1 = 9 */
     featureMask = dataIn.readUnsignedByte(); /* +1 = 10 */

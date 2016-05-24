@@ -29,21 +29,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.jmrtd.Util;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
+
+import net.sf.scuba.util.Hex;
 
 /**
  * Result of EAC Terminal Authentication protocol.
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
 public class TAResult implements Serializable {
   
   private static final long serialVersionUID = -2926063872890928748L;
-
+  
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
   private CAResult chipAuthenticationResult;
@@ -138,28 +140,43 @@ public class TAResult implements Serializable {
    * @return a textual representation of this terminal authentication result
    */
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("EACEvent [chipAuthenticationResult = " + chipAuthenticationResult + ", ");
+    StringBuilder result = new StringBuilder();
+    result.append("TAResult [chipAuthenticationResult: " + chipAuthenticationResult + ", ");
     //    	result.append("cardKey = " + cardKey + ", ");
     //    	result.append("keyPair = " + keyPair + ", ");
-    result.append("caReference = " + caReference + ", ");
+    result.append("caReference: " + caReference + ", ");
+    result.append("terminalCertificates: [");
+    boolean isFirst = true;
     for (CardVerifiableCertificate cert: terminalCertificates) {
-      try {
-        CVCPrincipal reference = cert.getHolderReference();
-        if (!caReference.equals(reference)) {
-          result.append("holderReference = " + reference + ", ");
-        }
-      } catch (CertificateException ce) {
-        result.append("holderReference = ???, ");
-        LOGGER.severe("Exception: " + ce.getMessage());
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        result.append(", ");
       }
-      
+      result.append(toString(cert));
     }
-    //        result.append("terminalCertificates = " + terminalCertificates + ", ");
-    //        result.append("terminalKey = " + terminalKey + ", ");
-    //        result.append("documentNumber = " + documentNumber + ", ");
-    //        result.append("cardChallenge = " + cardChallenge + ", ");
+    result.append("terminalKey = " + Util.getDetailedPrivateKeyAlgorithm(terminalKey) + ", ");
+    result.append("documentNumber = " + documentNumber + ", ");
+    result.append("cardChallenge = " + Hex.bytesToHexString(cardChallenge) + ", ");
     result.append("]");
+    return result.toString();
+  }
+  
+  private Object toString(CardVerifiableCertificate cert) {
+    StringBuilder result = new StringBuilder();
+    result.append("CardVerifiableCertificate [");
+    try {
+      CVCPrincipal reference = cert.getHolderReference();
+      if (!caReference.equals(reference)) {
+        result.append("holderReference: " + reference);
+      }
+    } catch (CertificateException ce) {
+      result.append("holderReference = ???");
+      LOGGER.severe("Exception: " + ce.getMessage());
+    }
+
+    result.append("]");
+    
     return result.toString();
   }
 }

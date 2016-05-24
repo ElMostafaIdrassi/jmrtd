@@ -26,8 +26,12 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 import org.jmrtd.SecureMessagingWrapper;
+import org.jmrtd.Util;
+
+import net.sf.scuba.util.Hex;
 
 /**
  * Result of EAC Chip Authentication protocol.
@@ -39,7 +43,7 @@ import org.jmrtd.SecureMessagingWrapper;
 public class CAResult implements Serializable {
   
   private static final long serialVersionUID = 4431711176589761513L;
-
+  
   private BigInteger keyId;
   private PublicKey publicKey;
   private SecureMessagingWrapper wrapper;
@@ -83,6 +87,77 @@ public class CAResult implements Serializable {
   
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
+  }
+  
+  @Override
+  public String toString() {
+    return (new StringBuilder())
+        .append("CAResult [keyId: ").append(keyId)
+        .append(", publicKey: ").append(publicKey)
+        .append(", wrapper: ").append(wrapper)
+        .append(", keyHash: ").append(Hex.bytesToHexString(keyHash))
+        .append(", keyPair: ")
+        .append(Util.getDetailedPublicKeyAlgorithm(keyPair.getPublic()))
+        .append("]").toString();
+  }
+  
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(keyHash);
+    result = prime * result + ((keyId == null) ? 0 : keyId.hashCode());
+    result = prime * result + ((keyPair == null) ? 0 : keyPair.hashCode());
+    result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
+    result = prime * result + ((wrapper == null) ? 0 : wrapper.hashCode());
+    return result;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    CAResult other = (CAResult) obj;
+    if (!Arrays.equals(keyHash, other.keyHash)) {
+      return false;
+    }
+    if (keyId == null) {
+      if (other.keyId != null) {
+        return false;
+      }
+    } else if (!keyId.equals(other.keyId)) {
+      return false;
+    }
+    if (keyPair == null) {
+      if (other.keyPair != null) {
+        return false;
+      }
+    } else if (!keyPair.equals(other.keyPair)) {
+      return false;
+    }
+    if (publicKey == null) {
+      if (other.publicKey != null) {
+        return false;
+      }
+    } else if (!publicKey.equals(other.publicKey)) {
+      return false;
+    }
+    if (wrapper == null) {
+      if (other.wrapper != null) {
+        return false;
+      }
+    } else if (!wrapper.equals(other.wrapper)) {
+      return false;
+    }
+    
+    return true;
   }
   
   /**

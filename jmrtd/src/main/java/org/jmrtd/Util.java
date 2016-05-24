@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,10 +32,12 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECField;
@@ -94,11 +96,7 @@ import net.sf.scuba.util.Hex;
  *
  * @deprecated The visibility of this class will be changed to package.
  *
- * @author Wojciech Mostowski
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
- * @author Engelbert Hubbers (hubbers@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@innovalor.com)
- * @author Ronny Wichers Schreur (ronny@cs.ru.nl)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
@@ -544,20 +542,37 @@ public class Util {
    * @return the algorithm
    */
   public static String getDetailedPublicKeyAlgorithm(PublicKey publicKey) {
-    String publicKeyAlgorithm = publicKey.getAlgorithm();
+    String algorithm = publicKey.getAlgorithm();
     if (publicKey instanceof RSAPublicKey) {
       RSAPublicKey rsaPublicKey = (RSAPublicKey)publicKey;
-      int publicKeyBitLength = rsaPublicKey.getModulus().bitLength();
-      publicKeyAlgorithm += " [" + publicKeyBitLength + " bit]";
+      int bitLength = rsaPublicKey.getModulus().bitLength();
+      algorithm += " [" + bitLength + " bit]";
     } else if (publicKey instanceof ECPublicKey) {
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
       ECParameterSpec ecParams = ecPublicKey.getParams();
       String name = getCurveName(ecParams);
       if (name != null) {
-        publicKeyAlgorithm += " [" + name + "]";
+        algorithm += " [" + name + "]";
       }
     }
-    return publicKeyAlgorithm;
+    return algorithm;
+  }
+  
+  public static String getDetailedPrivateKeyAlgorithm(PrivateKey privateKey) {
+    String algorithm = privateKey.getAlgorithm();
+    if (privateKey instanceof RSAPrivateKey) {
+      RSAPrivateKey rsaPrivateKey = (RSAPrivateKey)privateKey;
+      int bitLength = rsaPrivateKey.getModulus().bitLength();
+      algorithm += " [" + bitLength + " bit]";
+    } else if (privateKey instanceof ECPrivateKey) {
+      ECPrivateKey ecPrivateKey = (ECPrivateKey)privateKey;
+      ECParameterSpec ecParams = ecPrivateKey.getParams();
+      String name = getCurveName(ecParams);
+      if (name != null) {
+        algorithm += " [" + name + "]";
+      }
+    }
+    return algorithm;
   }
   
   /**

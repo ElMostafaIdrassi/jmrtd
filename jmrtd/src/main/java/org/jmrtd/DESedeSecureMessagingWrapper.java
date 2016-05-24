@@ -53,8 +53,7 @@ import net.sf.scuba.tlv.TLVUtil;
  * Secure messaging wrapper for APDUs.
  * Initially based on Section E.3 of ICAO-TR-PKI.
  *
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision: 1559 $
  */

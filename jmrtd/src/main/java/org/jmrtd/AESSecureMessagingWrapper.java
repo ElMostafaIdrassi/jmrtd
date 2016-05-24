@@ -47,7 +47,7 @@ import net.sf.scuba.tlv.TLVUtil;
 /**
  * An AES secure messaging wrapper for APDUs. Based on TR-SAC.
  *
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  * 	
  * @version $Revision: $
  */
