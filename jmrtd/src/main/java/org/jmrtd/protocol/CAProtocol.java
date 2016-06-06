@@ -29,18 +29,15 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.jmrtd.AESSecureMessagingWrapper;
 import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.PassportService;
@@ -190,7 +187,6 @@ public class CAProtocol {
         wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L);
       } else if (cipherAlg.startsWith("AES")) {
         long ssc = 0L; // wrapper == null ? 0L : wrapper.getSendSequenceCounter();
-        LOGGER.info("DEBUG: Chip Authentication initial SSC = " + ssc);
         wrapper = new AESSecureMessagingWrapper(ksEnc, ksMac, ssc);
       }
       
@@ -207,24 +203,5 @@ public class CAProtocol {
    */
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
-  }
-  
-  public class MyECDHKeyAgreement {
-    
-    private ECPrivateKey privateKey;
-    
-    public void init(ECPrivateKey privateKey) {
-      this.privateKey = privateKey;
-    }
-    
-    public ECPoint doPhase(ECPublicKey publicKey) {
-      ECPublicKeyParameters pub = Util.toBouncyECPublicKeyParameters(publicKey);
-      
-      org.bouncycastle.math.ec.ECPoint p = pub.getQ().multiply(Util.toBouncyECPrivateKeyParameters(privateKey).getD()).normalize();
-      if (p.isInfinity()) {
-        throw new IllegalStateException("Infinity");
-      }
-      return Util.fromBouncyCastleECPoint(p);
-    }
   }
 }
