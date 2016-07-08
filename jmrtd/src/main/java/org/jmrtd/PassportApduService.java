@@ -533,8 +533,8 @@ public class PassportApduService extends CardService {
         throw new IllegalStateException("MAC wrong length");
       }
       
-      byte p1 = (byte) 0x00;
-      byte p2 = (byte) 0x00;
+      byte p1 = (byte)0x00;
+      byte p2 = (byte)0x00;
       
       byte[] data = new byte[32 + 8];
       System.arraycopy(ciphertext, 0, data, 0, 32);
@@ -665,11 +665,23 @@ public class PassportApduService extends CardService {
    */
   
   /* For Chip Authentication. We prefix 0x80 for OID and 0x84 for keyId. */
+  /**
+   * The  MSE Set AT for chip authentication.
+   * 
+   * @param wrapper secure messaging wrapper
+   * @param oid the OID
+   * @param keyId the keyId or {@code null}
+   * 
+   * @throws CardServiceException on error
+   */
   public synchronized void sendMSESetATIntAuth(APDUWrapper wrapper, String oid, BigInteger keyId) throws CardServiceException {
+    int p1 = 0x41;
+    int p2 = 0xA4;
+//  int p2 = 0xA6;
     ResponseAPDU rapdu = null;
     if (keyId == null || keyId.compareTo(BigInteger.ZERO) < 0) {
       LOGGER.info("DEBUG: implicit case, keyId == " + keyId);
-      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA4, toOIDBytes(oid));
+      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, p1, p2, toOIDBytes(oid));
       rapdu = transmit(wrapper, capdu);
     } else {
       LOGGER.info("DEBUG: explicit case, keyId == " + keyId);
@@ -683,7 +695,7 @@ public class PassportApduService extends CardService {
       } catch (IOException ioe) {
         LOGGER.log(Level.WARNING, "Exception", ioe);
       }
-      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA4, bos.toByteArray());
+      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, p1, p2, bos.toByteArray());
       rapdu = transmit(wrapper, capdu);
     }
     short sw = rapdu == null ? -1 : (short)rapdu.getSW();
@@ -706,7 +718,9 @@ public class PassportApduService extends CardService {
   public synchronized void sendMSESetATMutualAuth(APDUWrapper wrapper, String oid,
       int refPublicKeyOrSecretKey, byte[] refPrivateKeyOrForComputingSessionKey) throws CardServiceException {
     
-    if (oid == null) { throw new IllegalArgumentException("OID cannot be null"); }
+    if (oid == null) {
+      throw new IllegalArgumentException("OID cannot be null");
+    }
     
     byte[] oidBytes = toOIDBytes(oid);
     

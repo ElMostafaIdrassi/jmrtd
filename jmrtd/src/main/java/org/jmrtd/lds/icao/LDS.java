@@ -274,14 +274,22 @@ public class LDS {
   public DG14File getDG14File() throws IOException { return (DG14File)getFile(PassportService.EF_DG14); }
   public DG15File getDG15File() throws IOException { return (DG15File)getFile(PassportService.EF_DG15); }
   
-  /* NOTE: Both CVCA and CardAccess appear to use FID 0x011C, CVCA is in ICAO app, CardAcces in root MF. */
+  /*
+   * NOTE: Both EF.CVCA and EF.CardAccess appear to use FID 0x011C, CVCA is in DF.ICAO app, CardAcces in root MF.
+   * Some ICCs will serve EF.CardAccess on successful PACE, even if an EF.CVCA is available after BAC.
+   */
   
   public CardAccessFile getCardAccessFile() throws IOException {
-    return (CardAccessFile)getFile(PassportService.EF_CARD_ACCESS);
+    // return (CardAccessFile)getFile(PassportService.EF_CARD_ACCESS);
+    
+    /*
+     * Suggested change by Pham Ngoc Hai. Not tested by me. -- MO
+     */
+    return new CardAccessFile(getInputStream(PassportService.EF_CARD_ACCESS));
   }
   
   public CVCAFile getCVCAFile() throws IOException {
-    /* Check DG14 for available CVCA file ids. */
+    /* Check DG14 for available CVCA file identifiers. */
     short cvcaFID = PassportService.EF_CVCA;
     DG14File dg14 = getDG14File();
     if (dg14 == null) { throw new IOException("EF.DF14 not available in LDS"); }

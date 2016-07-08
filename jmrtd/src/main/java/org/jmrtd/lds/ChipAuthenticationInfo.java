@@ -195,7 +195,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
       return "ECDH";
     }
     //    return null;
-    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
+    throw new NumberFormatException("Unknown OID: " + oid == null ? "null" : "\"" + oid + "\"");
   }
   
   public static String toCipherAlgorithm(String oid) {

@@ -317,17 +317,15 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @param bacKey the key based on the document number,
    *               the card holder's birth date,
-   *               and the document's expiry date
+   *               and the document's expiration date
    *
-   * @return the result
-   * 
    * @throws CardServiceException if authentication failed
    */
-  public synchronized BACResult doBAC(BACKeySpec bacKey) throws CardServiceException {
+  public synchronized void doBAC(BACKeySpec bacKey) throws CardServiceException {
     BACResult bacResult = (new BACProtocol(this)).doBAC(bacKey);
     wrapper = bacResult.getWrapper();
     state = State.BAC_AUTHENTICATED_STATE;
-    return bacResult;
+//    return bacResult;
   }
   
   /**
@@ -381,14 +379,15 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @param keyId passport's public key id (stored in DG14), -1 if none
    * @param oid the object identifier indicating the Chip Authentication protocol
+   * @param publicKeyOID the object identifier indicating the public key algorithm used
    * @param publicKey passport's public key (stored in DG14)
    *
    * @return the chip authentication result
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public synchronized CAResult doCA(BigInteger keyId, String oid, PublicKey publicKey) throws CardServiceException {
-    CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, oid, publicKey);
+  public synchronized CAResult doCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
+    CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, oid, publicKeyOID, publicKey);
     LOGGER.info("DEBUG: Starting secure messaging based on Chip Authentication");
     wrapper = caResult.getWrapper();
     state = State.CA_EXECUTED_STATE;

@@ -43,6 +43,7 @@ import javax.crypto.spec.IvParameterSpec;
 import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
+import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVUtil;
 
 /*
@@ -72,7 +73,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   
   private long ssc;
   
-  private boolean doCheckMAC;
+  private boolean shouldCheckMAC;
   
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
@@ -147,7 +148,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
-    this.doCheckMAC = doCheckMAC;
+    this.shouldCheckMAC = doCheckMAC;
     this.ssc = ssc;
     cipher = Cipher.getInstance(cipherAlg);
     mac = Mac.getInstance(macAlg);
@@ -163,8 +164,9 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @return length of the command apdu after wrapping
    */
   public CommandAPDU wrap(CommandAPDU commandAPDU) {
+    ssc++;
     try {
-      return wrapCommandAPDU(commandAPDU);
+      return wrapCommandAPDU(commandAPDU, ssc);
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.SEVERE, "Exception", gse);
       throw new IllegalStateException(gse.toString());
@@ -182,14 +184,15 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @return a new byte array containing the unwrapped buffer
    */
   public ResponseAPDU unwrap(ResponseAPDU responseAPDU) {
+    ssc++;
     try {
-      byte[] rapdu = responseAPDU.getBytes();
-      if (rapdu.length == 2) {
+      byte[] data = responseAPDU.getData();
+      if (data == null || data.length <= 0) {        
         // no sense in unwrapping - card indicates some kind of error
         throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
         /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
       }
-      return new ResponseAPDU(unwrapResponseAPDU(rapdu));
+      return unwrapResponseAPDU(responseAPDU, ssc);
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.SEVERE, "Exception", gse);
       throw new IllegalStateException(gse.toString());
@@ -216,22 +219,22 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public long getSendSequenceCounter() {
     return ssc;
   }
-
+  
   @Override
   public String toString() {
     return "DESedeSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
   }
   
   /**
-   * Does the actual encoding of a command apdu.
+   * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
    *
-   * @param capdu buffer containing the apdu data. It must be large enough to receive the wrapped apdu
-   * @param len length of the apdu data
+   * @param capdu the command APDU
+   * @param ssc the send sequence counter which, is assumed, has already been increased
    *
    * @return a byte array containing the wrapped apdu buffer
    */
-  private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU) throws GeneralSecurityException, IOException {
+  private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU, long ssc) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();
     int le = commandAPDU.getNe();
     
@@ -253,7 +256,6 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       do97 = bOut.toByteArray();
     }
     
-    ssc++;
     cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
     
     if (lc > 0) {
@@ -270,16 +272,12 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     }
     
     bOut.reset();
-    bOut.write(paddedMaskedHeader);
-    bOut.write(do8587);
-    bOut.write(do97);
-    
-    byte[] m = bOut.toByteArray();
-    
-    bOut.reset();
     DataOutputStream dataOut = new DataOutputStream(bOut);
     dataOut.writeLong(ssc);
-    dataOut.write(m);
+    dataOut.write(paddedMaskedHeader);
+    dataOut.write(do8587);
+    dataOut.write(do97);
+    
     dataOut.flush();
     byte[] n = Util.padWithMRZ(bOut.toByteArray());
     
@@ -297,79 +295,67 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     bOut.write(cc, 0, ccLength);
     byte[] do8E = bOut.toByteArray();
     
-    /* Construct protected apdu... */
+    /* Construct protected APDU... */
     bOut.reset();
     bOut.write(do8587);
     bOut.write(do97);
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
     
-    CommandAPDU wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
+    CommandAPDU wrappedCommandAPDU = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
     
     /* FIXME: If extended length APDUs are supported (they must for EAC, that 256 should be 65536). See bug #26 in SF bugtracker. -- MO */
     //		wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
     
-    return wc;
+    return wrappedCommandAPDU;
   }
   
   /**
-   * Does the actual decoding of a response APDU. Based on Section E.3 of
-   * TR-PKI, especially the examples.
+   * Unwraps a response APDU sent by the ICC.
+   * Based on Section E.3 of TR-PKI, especially the examples.
    *
-   * @param rapdu buffer containing the APDU data
+   * @param responseAPDU the response APDU
+   * @param ssc the send sequence counter which, it is assumed, has already been incremented by the caller
    *
    * @return a byte array containing the unwrapped APDU buffer
    */
-  private byte[] unwrapResponseAPDU(byte[] rapdu) throws GeneralSecurityException, IOException {
-    long oldssc = ssc;
-    try {
-      if (rapdu == null || rapdu.length < 2) {
-        throw new IllegalArgumentException("Invalid response APDU");
-      }
-      ssc++;
-      cipher.init(Cipher.DECRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
-      DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
-      byte[] data = new byte[0];
-      short sw = 0;
-      boolean finished = false;
-      byte[] cc = null;
-      while (!finished) {
-        int tag = inputStream.readByte();
-        switch (tag) {
-          case (byte) 0x87:
-            data = readDO87(inputStream, false);
-          break;
-          case (byte) 0x85:
-            data = readDO87(inputStream, true);
-          break;
-          case (byte) 0x99:
-            sw = readDO99(inputStream);
-          break;
-          case (byte) 0x8E:
-            cc = readDO8E(inputStream);
-          finished = true;
-          break;
-        }
-      }
-      if (doCheckMAC && !checkMac(rapdu, cc)) {
-        throw new IllegalStateException("Invalid MAC");
-      }
-      ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-      bOut.write(data, 0, data.length);
-      bOut.write((sw & 0xFF00) >> 8);
-      bOut.write(sw & 0x00FF);
-      return bOut.toByteArray();
-    } finally {
-      /*
-       * If we fail to unwrap, at least make sure we have the same counter
-       * as the ICC, so that we can continue to communicate using secure
-       * messaging...
-       */
-      if (ssc == oldssc) {
-        ssc++;
+  private ResponseAPDU unwrapResponseAPDU(ResponseAPDU responseAPDU, long ssc) throws GeneralSecurityException, IOException {
+    byte[] rapdu = responseAPDU.getBytes();
+    if (rapdu == null || rapdu.length < 2) {
+      throw new IllegalArgumentException("Invalid response APDU");
+    }
+    cipher.init(Cipher.DECRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
+    DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
+    byte[] data = new byte[0];
+    short sw = 0;
+    boolean finished = false;
+    byte[] cc = null;
+    while (!finished) {
+      int tag = inputStream.readByte();
+      switch (tag) {
+        case (byte)0x87: data = readDO87(inputStream, false); break;
+        case (byte)0x85: data = readDO87(inputStream, true); break;
+        case (byte)0x99: sw = readDO99(inputStream); break;
+        case (byte)0x8E: cc = readDO8E(inputStream); finished = true; break;
       }
     }
+    if (shouldCheckMAC && !checkMac(rapdu, cc, ssc)) {
+      throw new IllegalStateException("Invalid MAC");
+    }
+    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+    bOut.write(data, 0, data.length);
+    bOut.write((sw & 0xFF00) >> 8);
+    bOut.write(sw & 0x00FF);
+    return new ResponseAPDU(bOut.toByteArray());
   }
+  
+  /*
+   *
+   * The SM Data Objects (see [ISO/IEC 7816-4]) MUST be used in the following order:
+   *   - Command APDU: [DO‘85’ or DO‘87’] [DO‘97’] DO‘8E’.
+   *   - Response APDU: [DO‘85’ or DO‘87’] [DO‘99’] DO‘8E’.
+   * 
+   */
   
   /**
    * The <code>0x87</code> tag has already been read.
@@ -383,28 +369,23 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     if ((buf & 0x00000080) != 0x00000080) {
       /* Short form */
       length = buf;
-      if(!do85) {
-        buf = inputStream.readUnsignedByte(); /* should be 0x01... */
-        if (buf != 0x01) {
-          throw new IllegalStateException("DO'87 expected 0x01 marker, found " + Integer.toHexString(buf & 0xFF));
-        }
-      }
     } else {
       /* Long form */
       int lengthBytesCount = buf & 0x0000007F;
       for (int i = 0; i < lengthBytesCount; i++) {
         length = (length << 8) | inputStream.readUnsignedByte();
       }
-      if(!do85) {
-        buf = inputStream.readUnsignedByte(); /* should be 0x01... */
-        if (buf != 0x01) {
-          throw new IllegalStateException("DO'87 expected 0x01 marker");
-        }
-      }
     }
-    if(!do85) {
+    
+    if (!do85) {
+      buf = inputStream.readUnsignedByte(); /* should be 0x01... */
+      if (buf != 0x01) {
+        throw new IllegalStateException("DO'87 expected 0x01 marker, found " + Integer.toHexString(buf & 0xFF));
+      }
+      
       length--; /* takes care of the extra 0x01 marker... */
     }
+    
     /* Read, decrypt, unpad the data... */
     byte[] ciphertext = new byte[length];
     inputStream.readFully(ciphertext);
@@ -443,7 +424,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     return cc1;
   }
   
-  private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
+  private boolean checkMac(byte[] rapdu, byte[] cc1, long ssc) throws GeneralSecurityException {
     try {
       ByteArrayOutputStream bOut = new ByteArrayOutputStream();
       DataOutputStream dataOut = new DataOutputStream(bOut);

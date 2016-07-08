@@ -81,7 +81,8 @@ public class BACProtocol {
       SecretKey kEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
       SecretKey kMac = Util.deriveKey(keySeed, Util.MAC_MODE);
       
-      return new BACResult(bacKey, doBACStep(kEnc, kMac));
+      SecureMessagingWrapper wrapper = doBACStep(kEnc, kMac);
+      return new BACResult(bacKey, wrapper);
     } catch (CardServiceException cse) {
       LOGGER.log(Level.WARNING, "BAC failed", cse);
       throw cse;
@@ -129,7 +130,7 @@ public class BACProtocol {
     return new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc);
   }
   
-  private static byte[] computeKeySeedForBAC(BACKeySpec bacKey) throws GeneralSecurityException {
+  public static byte[] computeKeySeedForBAC(BACKeySpec bacKey) throws GeneralSecurityException {
     String documentNumber = bacKey.getDocumentNumber();
     String dateOfBirth = bacKey.getDateOfBirth();
     String dateOfExpiry = bacKey.getDateOfExpiry();

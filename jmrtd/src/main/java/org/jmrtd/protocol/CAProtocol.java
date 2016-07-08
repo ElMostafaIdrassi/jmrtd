@@ -44,6 +44,7 @@ import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.lds.ChipAuthenticationInfo;
+import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
@@ -83,17 +84,38 @@ public class CAProtocol {
    * The newly established secure messaging wrapper is made available to the caller in
    * the result.
    *
-   * @param keyId passport's public key id (stored in DG14), -1 if none
+   * @param keyId passport's public key id (stored in DG14), {@code null} if none
    * @param oid the object identifier indicating the Chip Authentication protocol
+   * @param publicKeyOID the OID indicating the type of public key
    * @param piccPublicKey PICC's public key (stored in DG14)
    *
    * @return the chip authentication result
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public CAResult doCA(BigInteger keyId, String oid, PublicKey piccPublicKey) throws CardServiceException {
+  public CAResult doCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey piccPublicKey) throws CardServiceException {
     if (piccPublicKey == null) {
       throw new IllegalArgumentException("Public key is null");
+    }
+    
+    if (oid == null) {
+      LOGGER.info("DEBUG: OID is null, publicKeyOID = " + publicKeyOID + ", piccPublicKey.getAlgorithm() = " + piccPublicKey.getAlgorithm());
+      if (ChipAuthenticationPublicKeyInfo.ID_PK_ECDH.equals(publicKeyOID)) {
+        /*
+         * This seems to work for French passports (generation 2013, 2014),
+         * but it is best effort.
+         */
+        LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-ECDH-3DES-CBC-CBC");
+        oid = ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC;
+      } else if (ChipAuthenticationPublicKeyInfo.ID_PK_DH.equals(publicKeyOID)) {
+        /*
+         * Not tested. Best effort.
+         */
+        LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-DH-3DES-CBC-CBC");
+        oid = ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC;
+      } else {
+        LOGGER.severe("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
+      }
     }
     
     String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);

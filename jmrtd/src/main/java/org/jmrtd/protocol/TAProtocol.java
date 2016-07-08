@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.SecureMessagingWrapper;
@@ -49,7 +50,9 @@ import net.sf.scuba.tlv.TLVOutputStream;
  */
 public class TAProtocol {
   
-  private final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
   
   private PassportService service;
   private SecureMessagingWrapper wrapper;
@@ -111,7 +114,7 @@ public class TAProtocol {
       if (Role.CVCA.equals(firstCertRole)) {
         CVCPrincipal firstCertHolderReference = firstCert.getHolderReference();
         if (caReference != null && !caReference.equals(firstCertHolderReference)) {
-          throw new CardServiceException("First certificate holds wrong authority, found " + firstCertHolderReference.getName() + ", expected " + caReference.getName());
+          throw new CardServiceException("First certificate holds wrong authority, found \"" + firstCertHolderReference.getName() + "\", expected \"" + caReference.getName() + "\"");
         }
         if (caReference == null) {
           caReference = firstCertHolderReference;
