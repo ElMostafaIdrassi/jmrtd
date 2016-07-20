@@ -321,11 +321,11 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws CardServiceException if authentication failed
    */
-  public synchronized void doBAC(BACKeySpec bacKey) throws CardServiceException {
+  public synchronized BACResult doBAC(BACKeySpec bacKey) throws CardServiceException {
     BACResult bacResult = (new BACProtocol(this)).doBAC(bacKey);
     wrapper = bacResult.getWrapper();
     state = State.BAC_AUTHENTICATED_STATE;
-//    return bacResult;
+    return bacResult;
   }
   
   /**
