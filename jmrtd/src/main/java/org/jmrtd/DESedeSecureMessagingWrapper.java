@@ -169,10 +169,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       return wrapCommandAPDU(commandAPDU, ssc);
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.SEVERE, "Exception", gse);
-      throw new IllegalStateException(gse.toString());
+      throw new IllegalStateException(gse.getMessage());
     } catch (IOException ioe) {
       LOGGER.log(Level.SEVERE, "Exception", ioe);
-      throw new IllegalStateException(ioe.toString());
+      throw new IllegalStateException(ioe.getMessage());
     }
   }
   
@@ -195,10 +195,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       return unwrapResponseAPDU(responseAPDU, ssc);
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.SEVERE, "Exception", gse);
-      throw new IllegalStateException(gse.toString());
+      throw new IllegalStateException(gse.getMessage());
     } catch (IOException ioe) {
       LOGGER.log(Level.SEVERE, "Exception", ioe);
-      throw new IllegalStateException(ioe.toString());
+      throw new IllegalStateException(ioe.getMessage());
     }
   }
   
@@ -229,7 +229,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
    *
-   * @param capdu the command APDU
+   * @param commandAPDU the command APDU
    * @param ssc the send sequence counter which, is assumed, has already been increased
    *
    * @return a byte array containing the wrapped apdu buffer
@@ -328,15 +328,15 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
     byte[] data = new byte[0];
     short sw = 0;
-    boolean finished = false;
+    boolean isFinished = false;
     byte[] cc = null;
-    while (!finished) {
+    while (!isFinished) {
       int tag = inputStream.readByte();
       switch (tag) {
         case (byte)0x87: data = readDO87(inputStream, false); break;
         case (byte)0x85: data = readDO87(inputStream, true); break;
         case (byte)0x99: sw = readDO99(inputStream); break;
-        case (byte)0x8E: cc = readDO8E(inputStream); finished = true; break;
+        case (byte)0x8E: cc = readDO8E(inputStream); isFinished = true; break;
       }
     }
     if (shouldCheckMAC && !checkMac(rapdu, cc, ssc)) {
