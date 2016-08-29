@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: SecureMessagingWrapper.java 1559 2014-11-14 12:46:26Z martijno $
+ * $Id: $
  */
 
 package org.jmrtd;
@@ -424,6 +424,16 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     return cc1;
   }
   
+  /**
+   * Check the MAC.
+   * 
+   * @param rapdu the bytes of the response APDU, including the {@code 0x8E} tag, the length of the MAC, the MAC itself, and the status word
+   * @param cc1 the MAC sent by the other party
+   * @param ssc the send sequence counter
+   * @return whether the computed MAC is identical
+   * 
+   * @throws GeneralSecurityException on security related error
+   */
   private boolean checkMac(byte[] rapdu, byte[] cc1, long ssc) throws GeneralSecurityException {
     try {
       ByteArrayOutputStream bOut = new ByteArrayOutputStream();
