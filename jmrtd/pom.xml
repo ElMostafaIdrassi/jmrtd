@@ -31,7 +31,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <local.repo.url>/Users/martijno/software</local.repo.url>
   </properties>
 
   <dependencies>
@@ -51,7 +50,7 @@
     <dependency>
       <groupId>org.ejbca.cvc</groupId>
       <artifactId>cert-cvc</artifactId>
-      <version>1.4.4</version>
+      <version>1.4.3</version>
       <exclusions>
         <exclusion>
           <groupId>bouncycastle</groupId>
@@ -75,13 +74,6 @@
     </dependency>
 
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>cert-cvc-repo</id>
-      <url>file:${local.repo.url}/cert-cvc-1.4.4/</url>
-    </repository>
-  </repositories>
 
   <distributionManagement>
     <snapshotRepository>

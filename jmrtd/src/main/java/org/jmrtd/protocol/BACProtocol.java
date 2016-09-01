@@ -125,7 +125,7 @@ public class BACProtocol {
     }
     SecretKey ksEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
     SecretKey ksMac = Util.deriveKey(keySeed, Util.MAC_MODE);
-    long ssc = Util.computeSendSequenceCounter(rndICC, rndIFD);
+    long ssc = computeSendSequenceCounter(rndICC, rndIFD);
     
     return new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc);
   }
@@ -150,6 +150,23 @@ public class BACProtocol {
     byte[] keySeed = computeKeySeedForBAC(documentNumber, dateOfBirth, dateOfExpiry);
     
     return keySeed;
+  }
+  
+  public static long computeSendSequenceCounter(byte[] rndICC, byte[] rndIFD) {
+    if (rndICC == null || rndICC.length != 8
+        || rndIFD == null || rndIFD.length != 8) {
+      throw new IllegalStateException("Wrong length input");
+    }
+    long ssc = 0;
+    for (int i = 4; i < 8; i++) {
+      ssc <<= 8;
+      ssc += (long)(rndICC[i] & 0x000000FF);
+    }
+    for (int i = 4; i < 8; i++) {
+      ssc <<= 8;
+      ssc += (long)(rndIFD[i] & 0x000000FF);
+    }
+    return ssc;
   }
   
   /**

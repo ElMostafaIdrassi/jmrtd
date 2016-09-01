@@ -284,23 +284,6 @@ public class Util {
     return out.toByteArray();
   }
   
-  public static long computeSendSequenceCounter(byte[] rndICC, byte[] rndIFD) {
-    if (rndICC == null || rndICC.length != 8
-        || rndIFD == null || rndIFD.length != 8) {
-      throw new IllegalStateException("Wrong length input");
-    }
-    long ssc = 0;
-    for (int i = 4; i < 8; i++) {
-      ssc <<= 8;
-      ssc += (long)(rndICC[i] & 0x000000FF);
-    }
-    for (int i = 4; i < 8; i++) {
-      ssc <<= 8;
-      ssc += (long)(rndIFD[i] & 0x000000FF);
-    }
-    return ssc;
-  }
-  
   public static byte[] unpad(byte[] in) throws BadPaddingException {
     int i = in.length - 1;
     while (i >= 0 && in[i] == 0x00) {
