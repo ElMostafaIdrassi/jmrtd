@@ -119,6 +119,8 @@ public class BACProtocol {
     byte[] response = service.sendMutualAuth(rndIFD, rndICC, kIFD, kEnc, kMac);
     byte[] kICC = new byte[16];
     System.arraycopy(response, 16, kICC, 0, 16);
+    /* FIXME: We're not checking the other 16 bytes?!? -- MO */
+    
     byte[] keySeed = new byte[16];
     for (int i = 0; i < 16; i++) {
       keySeed[i] = (byte) ((kIFD[i] & 0xFF) ^ (kICC[i] & 0xFF));

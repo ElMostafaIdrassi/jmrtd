@@ -296,7 +296,7 @@ public class Util {
     System.arraycopy(in, 0, out, 0, i);
     return out;
   }
-  
+    
   /**
    * Recovers the M1 part of the message sent back by the AA protocol
    * (INTERNAL AUTHENTICATE command). The algorithm is described in
@@ -315,23 +315,35 @@ public class Util {
     if (plaintext == null || plaintext.length < 1) {
       throw new IllegalArgumentException("Plaintext too short to recover message");
     }
+    
+    /* Header. */
     if (((plaintext[0] & 0xC0) ^ 0x40) != 0) {
-      // 0xC0 = 1100 0000, 0x40 = 0100 0000
+      /*
+       * First two bits (working from left to right) should be '01'.
+       * NOTE: 0xC0 = 1100 0000, 0x40 = 0100 0000.
+       */
       throw new NumberFormatException("Could not get M1");
     }
+    if ((plaintext[0] & 0x20) == 0) {
+      /* Third bit (working from left to right) should be '1' for partial recovery. */
+      throw new NumberFormatException("Could not get M1");
+    }
+        
+    /* Trailer. */
     if (((plaintext[plaintext.length - 1] & 0xF) ^ 0xC) != 0) {
-      // 0xF = 0000 1111, 0xC = 0000 1100
-      throw new NumberFormatException("Could not get M1");
-    }
-    int delta = 0;
-    if (((plaintext[plaintext.length - 1] & 0xFF) ^ 0xBC) == 0) {
-      delta = 1;
-    } else {
-      // 0xBC = 1011 1100
+      /* 
+       * Trailer.
+       * NOTE: 0xF = 0000 1111, 0xC = 0000 1100.
+       */
       throw new NumberFormatException("Could not get M1");
     }
     
-    /* find out how much padding we've got */
+    if (((plaintext[plaintext.length - 1] & 0xFF) ^ 0xBC) != 0) {
+      /* NOTE: 0xBC = 1011 1100. */
+      throw new NumberFormatException("Could not get M1");
+    }
+    
+    /* Padding to the left of M1, find out how long. */
     int paddingLength = 0;
     for (; paddingLength < plaintext.length; paddingLength++) {
       // 0x0A = 0000 1010
@@ -341,22 +353,19 @@ public class Util {
     }
     int messageOffset = paddingLength + 1;
     
-    int paddedMessageLength = plaintext.length - delta - digestLength;
-    int messageLength = paddedMessageLength - messageOffset;
+    int paddedMessageLength = plaintext.length - 1 - digestLength;
+    int messageLength = paddedMessageLength - messageOffset;    
     
-    /* there must be at least one byte of message string */
+    /* There must be at least one byte of message string. */
     if (messageLength <= 0) {
       throw new NumberFormatException("Could not get M1");
     }
     
-    /* TODO: if we contain the whole message as well, check the hash of that. */
-    if ((plaintext[0] & 0x20) == 0) {
-      throw new NumberFormatException("Could not get M1");
-    } else {
-      byte[] recoveredMessage = new byte[messageLength];
-      System.arraycopy(plaintext, messageOffset, recoveredMessage, 0, messageLength);
-      return recoveredMessage;
-    }
+    /* TODO: If we contain the whole message as well, check the hash of that. */
+    
+    byte[] recoveredMessage = new byte[messageLength];
+    System.arraycopy(plaintext, messageOffset, recoveredMessage, 0, messageLength);
+    return recoveredMessage;
   }
   
   /**
@@ -1181,7 +1190,7 @@ public class Util {
     BigInteger p = getPrime(params);
     return new ECCurve.Fp(p, a, b, order, BigInteger.valueOf(coFactor));
   }
-
+  
   public static ECPublicKeyParameters toBouncyECPublicKeyParameters(ECPublicKey publicKey) {
     ECParameterSpec ecParams = publicKey.getParams();
     org.bouncycastle.math.ec.ECPoint q = toBouncyCastleECPoint(publicKey.getW(), ecParams);
@@ -1193,7 +1202,7 @@ public class Util {
     ECDomainParameters ecParams = toBouncyECDomainParameters(privateKey.getParams());
     return new ECPrivateKeyParameters(d, ecParams);
   }
-
+  
   public static ECDomainParameters toBouncyECDomainParameters(ECParameterSpec params) {
     ECCurve curve = toBouncyCastleECCurve(params);
     org.bouncycastle.math.ec.ECPoint g = toBouncyCastleECPoint(params.getGenerator(), params);

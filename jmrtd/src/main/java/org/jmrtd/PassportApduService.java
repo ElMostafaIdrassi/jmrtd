@@ -543,10 +543,14 @@ public class PassportApduService extends CardService {
       CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
       ResponseAPDU rapdu = transmit(capdu);
       
+      if (rapdu == null) {
+        throw new CardServiceException("Mutual authentication failed, received null response APDU");
+      }
+      
       byte[] rapduBytes = rapdu.getBytes();
       short sw = (short)rapdu.getSW();
       if (rapduBytes == null) {
-        throw new CardServiceException("Mutual authentication failed", sw);
+        throw new CardServiceException("Mutual authentication failed, received empty data in response APDU", sw);
       }
       
       /* Some MRTDs apparently don't support 40 here, try again with 0. See R2-p1_v2_sIII_0035 (and other issues). */

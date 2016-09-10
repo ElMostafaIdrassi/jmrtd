@@ -59,17 +59,6 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  /*
-   * Meaning of Data Object tags (ISO 7816-4)
-   * <table>
-   *   <tr> <td>0x85</td> <td>Data object for confidentiality, BER-TLV encoded, but not SM-related data objects</td> <td>5.6.4</td> </tr>
-   *   <tr> <td>0x87</td> <td>Data object for confidentiality, padding indicator byte followed by cryptogram (plain not coded in BER-TLV)</td> <td>5.6.4</td> </tr>
-   *   <tr> <td>0x8E</td> <td>Cryptographic checksum (at least 4 bytes)</td> <td>5.6.3</td> </tr>
-   *   <tr> <td>0x97</td> <td>Not specified?</td> <td> </td> </tr>
-   *   <tr> <td>0x99</td> <td>SM status information (e.g. SW1-SW2)</td> <td>5.6.2</td> </tr>
-   * </table>
-   */
-  
   /** Initialization vector consisting of 8 zero bytes. */
   public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
   
@@ -182,21 +171,20 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
         int tag = tlvInputStream.readTag();
         int length = tlvInputStream.readLength();
         switch (tag) {
-          /* FIXME: Names for constants. */
-          case 0x97:
+          case ISO7816.TAG_SM_EXPECTED_LENGTH:
             byte[] leBytes = tlvInputStream.readValue();
             le = 0;
             for (int i = 0; i < leBytes.length; i++) {
               le = (le << 8) | (leBytes[i] & 0xFF);
             }
             break;
-          case 0x85:
+          case ISO7816.TAG_SM_ENCRYPTED_DATA:
             cipher.init(Cipher.DECRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
             byte[] cipherText = tlvInputStream.readValue();
             data = cipher.doFinal(cipherText);
             data = Util.unpad(data);
             break;
-          case 0x87:
+          case ISO7816.TAG_SM_ENCRYPTED_DATA_WITH_PADDING_INDICATOR:
             cipher.init(Cipher.DECRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
             byte[] cipherTextPrefixedWithOne = tlvInputStream.readValue();
             byte[] cipherTextWithoutPrefixed = new byte[length - 1];
@@ -204,7 +192,7 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
             data = cipher.doFinal(cipherTextWithoutPrefixed);
             data = Util.unpad(data);
             break;
-          case 0x8E:
+          case ISO7816.TAG_SM_CRYPTOGRAPHIC_CHECKSUM:
             cc = tlvInputStream.readValue();
             isFinished = true;
             break;
@@ -241,46 +229,51 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
      *  case (byte)0x8E: cc = readDO8E(inputStream); isFinished = true; break;
      */
     /* ??? */
+    
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
     
-    /* Data. */
-    tlvOutputStream.writeTag(0x87);
-    tlvOutputStream.writeLength(1 + cipherText.length);
-    tlvOutputStream.write(0x01);
-    tlvOutputStream.write(cipherText);
-    tlvOutputStream.writeValueEnd(); /* 0x87 */
-    
-    /* Status word. */
-    tlvOutputStream.writeTag(0x99);
-    tlvOutputStream.writeLength(2);
-    tlvOutputStream.write(responseAPDU.getSW1());
-    tlvOutputStream.write(responseAPDU.getSW2());
-    tlvOutputStream.writeValueEnd(); /* 0x99 */
-    
-    /* The data and the status word, with added padding. */
-    byte[] paddedData = Util.padWithMRZ(byteArrayOutputStream.toByteArray());
-    
-    /* Compute Mac over padded data. */
-    mac.init(ksMac);    
-    ByteArrayOutputStream dataToBeMaccedByteArrayOutputStream = new ByteArrayOutputStream();
-    DataOutputStream dataToBeMaccedDataOutputStream = new DataOutputStream(dataToBeMaccedByteArrayOutputStream);
     try {
-      dataToBeMaccedDataOutputStream.writeLong(ssc);
-      dataToBeMaccedDataOutputStream.write(paddedData, 0, paddedData.length);
-      byte[] cc = mac.doFinal(dataToBeMaccedByteArrayOutputStream.toByteArray());
-      /* NOTE: Length should be 8. */
       
-      tlvOutputStream.writeTag(0x8E);
-      tlvOutputStream.writeValue(cc);
-      LOGGER.info("DEBUG: cc = " + Hex.bytesToHexString(cc));
+      /* Data. */
+      tlvOutputStream.writeTag(ISO7816.TAG_SM_ENCRYPTED_DATA_WITH_PADDING_INDICATOR);
+      tlvOutputStream.writeLength(1 + cipherText.length);
+      tlvOutputStream.write(0x01);
+      tlvOutputStream.write(cipherText);
+      tlvOutputStream.writeValueEnd(); /* 0x87 */
+      
+      /* Status word. */
+      tlvOutputStream.writeTag(ISO7816.TAG_SM_STATUS_WORD);
+      tlvOutputStream.writeLength(2);
+      tlvOutputStream.write(responseAPDU.getSW1());
+      tlvOutputStream.write(responseAPDU.getSW2());
+      tlvOutputStream.writeValueEnd(); /* 0x99 */
+      
+      /* The data and the status word, with added padding. */
+      byte[] paddedData = Util.padWithMRZ(byteArrayOutputStream.toByteArray());
+      
+      /* Compute Mac over padded data. */
+      mac.init(ksMac);    
+      ByteArrayOutputStream dataToBeMaccedByteArrayOutputStream = new ByteArrayOutputStream();
+      DataOutputStream dataToBeMaccedDataOutputStream = new DataOutputStream(dataToBeMaccedByteArrayOutputStream);
+      try {
+        dataToBeMaccedDataOutputStream.writeLong(ssc);
+        dataToBeMaccedDataOutputStream.write(paddedData, 0, paddedData.length);
+        byte[] cc = mac.doFinal(dataToBeMaccedByteArrayOutputStream.toByteArray());
+        /* NOTE: Length should be 8. */
+        
+        tlvOutputStream.writeTag(ISO7816.TAG_SM_CRYPTOGRAPHIC_CHECKSUM);
+        tlvOutputStream.writeValue(cc);
+      } finally {
+        dataToBeMaccedDataOutputStream.close();
+      }
+      
+      writeStatusWord(ISO7816.SW_NO_ERROR, byteArrayOutputStream);
+      
+      return new ResponseAPDU(byteArrayOutputStream.toByteArray());
     } finally {
-      dataToBeMaccedDataOutputStream.close();
+      tlvOutputStream.close();
     }
-    
-    writeStatusWord(ISO7816.SW_NO_ERROR, byteArrayOutputStream);
-    
-    return new ResponseAPDU(byteArrayOutputStream.toByteArray());
   }
   
   private void writeStatusWord(short sw, OutputStream outputStream) throws IOException {
