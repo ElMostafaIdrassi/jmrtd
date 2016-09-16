@@ -24,17 +24,21 @@ package org.jmrtd.protocol;
 
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
+import java.security.spec.ECPublicKeySpec;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Random;
@@ -514,7 +518,7 @@ public class PACEProtocol {
     try {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
       keyAgreement.init(pcdPrivateKey);
-      keyAgreement.doPhase(piccPublicKey, true);
+      keyAgreement.doPhase(updateParameterSpec(piccPublicKey, pcdPrivateKey), true);
       return keyAgreement.generateSecret();
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.SEVERE, "PCD side error during key agreement", gse);
@@ -596,6 +600,26 @@ public class PACEProtocol {
     byte[] keySeed = computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
     
     return keySeed;
+  }
+  
+  /**
+   * Updates the parameters of the given public key to match the parameters of the given private key.
+   * 
+   * @param publicKey the public key, should be an EC public key
+   * @param privateKey the private key, should be an EC private key
+   * 
+   * @return a new public key that uses the parameters of the private key
+   * 
+   * @throws GeneralSecurityException on security error, or when keys are not EC
+   */
+  public static PublicKey updateParameterSpec(PublicKey publicKey, PrivateKey privateKey) throws GeneralSecurityException {
+    if (!(publicKey instanceof ECPublicKey) || !(privateKey instanceof ECPrivateKey)) {
+      throw new NoSuchAlgorithmException("Unsupported key type");
+    }
+
+    KeyFactory keyFactory = KeyFactory.getInstance("EC");    
+    KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
+    return keyFactory.generatePublic(keySpec);
   }
   
   /**

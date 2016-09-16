@@ -9,11 +9,18 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECField;
+import java.security.spec.ECFieldF2m;
+import java.security.spec.ECFieldFp;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
+import java.security.spec.EllipticCurve;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +63,7 @@ public class PACEProtocolTest extends TestCase {
   //	PARAM_ID_ECP_BRAINPOOL_P384_R1 = 16,
   //	PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   //	PARAM_ID_ECP_NIST_P512_R1 = 18;
-    
+  
   public void testMacs() {
     try {
       Mac macDESede = Mac.getInstance("DESedeMac", BC_PROVIDER);
@@ -90,7 +97,6 @@ public class PACEProtocolTest extends TestCase {
     } catch(Exception e) {
       fail(e.getMessage());
     }
-    
   }
   
   /**
@@ -202,7 +208,10 @@ public class PACEProtocolTest extends TestCase {
       pcdPrivateKey = kp.getPrivate();
       keyAgreement = KeyAgreement.getInstance("ECDHC");
       keyAgreement.init(pcdPrivateKey);
-      keyAgreement.doPhase(piccMappingPublicKey, true);
+            
+      //      keyAgreement.doPhase(piccMappingPublicKey, true);
+      keyAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdPrivateKey), true);
+      
       byte[] generatedSharedSecretBytesH = keyAgreement.generateSecret();
       
       /* Given in example. */
@@ -324,6 +333,60 @@ public class PACEProtocolTest extends TestCase {
       e.printStackTrace();
       fail(e.getMessage());
     }
+  }
+  
+  private boolean equals(ECParameterSpec ecParams1, ECParameterSpec ecParams2) {
+    
+    if (ecParams1.getCofactor() != ecParams2.getCofactor()) {
+      return false;
+    }
+    
+    if (!curveToString(ecParams1).equals(curveToString(ecParams2))) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  private String toString(ECParameterSpec params) {
+    StringBuilder result = new StringBuilder();
+    result.append("ECParameterSpec[");
+    result.append("Generator: " + toString(params.getGenerator()));
+    result.append(", Co-factor: " + params.getCofactor());
+    result.append(", Curve: " + curveToString(params));
+    result.append("]");
+    return result.toString();
+  }
+  
+  private String toString(ECPoint ecPoint) {
+    return "(" + ecPoint.getAffineX() + ", " + ecPoint.getAffineY() + ")";
+  }
+  
+  private String curveToString(ECParameterSpec params) {
+    String curveName = Util.getCurveName(params);
+    
+    if (curveName != null) {
+      return "EllipticCurve [" + curveName + "]";
+    }
+    
+    EllipticCurve curve = params.getCurve();
+    
+    StringBuilder result = new StringBuilder();
+    
+    ECField field = curve.getField();
+    if (field instanceof ECFieldFp) {
+      ECFieldFp fieldFp = (ECFieldFp)field;
+      result.append("Prime field with prime " + fieldFp.getP());
+    } else if (field instanceof ECFieldF2m) {
+      ECFieldF2m fieldF2m = (ECFieldF2m)field;      
+      return "Binary field with exponent " + fieldF2m.getM();
+    } else {
+      result.append("Unknown field of size " + field.getFieldSize());
+    }    
+    result.append(", A: " + curve.getA());
+    result.append(", B: " + curve.getB());
+    result.append("]");
+    return result.toString();
   }
   
   public void testMultiplicationWithEphemeralParams(ECParameterSpec params) {
@@ -556,7 +619,9 @@ public class PACEProtocolTest extends TestCase {
       KeyAgreement mappingAgreement = KeyAgreement.getInstance("ECDHC");
       mappingAgreement.init(pcdMappingPrivateKey);
       
-      mappingAgreement.doPhase(piccMappingPublicKey, true);
+//      mappingAgreement.doPhase(piccMappingPublicKey, true);
+      mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey), true);
+
       byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
       
       LOGGER.info("DEBUG: mappingSharedSecretBytes = " + Hex.bytesToHexString(mappingSharedSecretBytes));

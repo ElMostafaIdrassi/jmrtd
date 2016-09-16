@@ -568,7 +568,7 @@ public class Util {
   }
   
   /**
-   * Gets the curve name if known (or null).
+   * Gets the curve name if known (or {@code null}).
    *
    * @param params an specification of the curve
    *
