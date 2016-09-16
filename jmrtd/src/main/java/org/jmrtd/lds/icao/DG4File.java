@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import org.jmrtd.lds.iso19794.IrisInfo;
  * File structure for the EF_DG4 file.
  * Based on ISO/IEC 19794-6.
  * 
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  * 
  * @version $Revision$
  */

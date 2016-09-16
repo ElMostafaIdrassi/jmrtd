@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import org.jmrtd.io.FragmentBuffer.Fragment;
  * NOTE: the original inputstream should no longer be read from, clients should only read bytes
  * from the sub-inputstreams.
  * 
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  */
 public class InputStreamBuffer {
   

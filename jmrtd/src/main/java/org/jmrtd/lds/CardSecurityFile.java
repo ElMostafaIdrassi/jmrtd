@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: $
+ * $Id$
  */
 
 package org.jmrtd.lds;
@@ -55,7 +55,7 @@ import org.bouncycastle.asn1.cms.SignedData;
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
- * @version $Revision: 1602 $
+ * @version $Revision$
  *
  * @since 0.5.6
  */

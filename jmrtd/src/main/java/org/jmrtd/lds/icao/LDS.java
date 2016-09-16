@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,7 +57,10 @@ import org.jmrtd.lds.TerminalAuthenticationInfo;
  * @version $Revision$
  * 
  * @since 0.4.8
+ *
+ * @deprecated This class will be removed in a future release of JMRTD.
  */
+@Deprecated
 public class LDS {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");

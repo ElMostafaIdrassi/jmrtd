@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: SecureMessagingWrapper.java 1559 2014-11-14 12:46:26Z martijno $
+ * $Id$
  */
 
 package org.jmrtd;
@@ -33,7 +33,7 @@ import net.sf.scuba.smartcards.APDUWrapper;
  *
  * @author The JMRTD team
  *
- * @version $Revision: $
+ * @version $Revision$
  */
 public abstract class SecureMessagingWrapper implements Serializable, APDUWrapper {
   

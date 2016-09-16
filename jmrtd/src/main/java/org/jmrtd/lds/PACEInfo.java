@@ -1,5 +1,5 @@
 /*
-{ * JMRTD - A Java API for accessing machine readable travel documents.
+ * JMRTD - A Java API for accessing machine readable travel documents.
  *
  * Copyright (C) 2006 - 2016  The JMRTD team
  *

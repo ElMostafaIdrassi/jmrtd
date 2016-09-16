@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  */
 
 package org.jmrtd.test;
@@ -33,7 +33,7 @@ import org.jmrtd.JMRTDSecurityProvider;
  * 
  * @author The JMRTD team (info@jmrtd.org)
  * 
- * @version $Revision: $
+ * @version $Revision$
  */
 public class CertificateUtil {
   

@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import org.jmrtd.lds.AbstractListInfo;
  * Fingerprint general record header and finger image data blocks
  * based on Section 7 and Table 2 of ISO/IEC FCD 19794-4 aka Annex F.
  * 
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */

@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
+/**
+ * A stream that decorates an existing stream and keeps track of the current position.
+ *
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ */
 public class PositionInputStream extends InputStream {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");

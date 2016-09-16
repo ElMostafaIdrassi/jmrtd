@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,8 +45,7 @@ import org.jmrtd.lds.iso19794.FaceInfo;
  * Datagroup 2 contains the facial features of the document holder.
  * See A 13.3 in MRTD's LDS document (or equivalent in Doc 9303).
  *
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */

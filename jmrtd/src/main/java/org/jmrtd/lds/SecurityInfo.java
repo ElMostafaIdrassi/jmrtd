@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,8 +45,7 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
  * See the BSI EAC 1.11 specification.
  * See the ICAO TR - SAC v1.1 specification.
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  * 
  * @version $Revision$
  */

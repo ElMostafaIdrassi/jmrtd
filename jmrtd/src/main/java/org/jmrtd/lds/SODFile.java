@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2015  The JMRTD team
+ * Copyright (C) 2006 - 2016  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -67,8 +67,7 @@ import org.jmrtd.JMRTDSecurityProvider;
  * Basically the Document Security Object is a SignedData type as specified in
  * <a href="http://www.ietf.org/rfc/rfc3369.txt">RFC 3369</a>.
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
- * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
