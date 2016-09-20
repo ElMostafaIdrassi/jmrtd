@@ -49,7 +49,7 @@ import net.sf.scuba.util.Hex;
  *
  * @version $Revision$
  */
-public class DESedeWrapperTests extends TestCase {
+public class DESedeWrapperTest extends TestCase {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   

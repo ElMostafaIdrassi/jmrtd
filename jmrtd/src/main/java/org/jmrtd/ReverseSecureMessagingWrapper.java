@@ -37,14 +37,16 @@ import net.sf.scuba.smartcards.ReverseAPDUWrapper;
  * 
  * @since 0.5.10
  */
-public interface ReverseSecureMessagingWrapper extends ReverseAPDUWrapper {
+public abstract class ReverseSecureMessagingWrapper implements ReverseAPDUWrapper {
+
+  private static final long serialVersionUID = 5005702227790003353L;
 
   /**
    * Gets the current value of the Send Sequence Counter.
    * 
    * @return the send sequence counter
    */
-  long getSendSequenceCounter();
+  public abstract long getSendSequenceCounter();
 
   /**
    * Unwraps a Command APDU received from the terminal.
@@ -53,7 +55,7 @@ public interface ReverseSecureMessagingWrapper extends ReverseAPDUWrapper {
    * 
    * @return the unwrapped Command APDU
    */
-  CommandAPDU unwrap(CommandAPDU wrappedCommandAPDU);
+  public abstract CommandAPDU unwrap(CommandAPDU wrappedCommandAPDU);
 
   /**
    * Wraps a Response APDU to be sent back to the terminal.
@@ -62,5 +64,5 @@ public interface ReverseSecureMessagingWrapper extends ReverseAPDUWrapper {
    * 
    * @return a wrapped Response APDU
    */
-  ResponseAPDU wrap(ResponseAPDU responseAPDU);
+  public abstract ResponseAPDU wrap(ResponseAPDU responseAPDU);
 }

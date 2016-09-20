@@ -266,8 +266,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
         throw new IllegalArgumentException("Invalid response APDU");
       }
       ssc++;
-      byte[] sscBytes = getSSCAsBytes(ssc);
-      cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(sscBytes));
+      cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
       DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
       byte[] data = new byte[0];
       short sw = 0;
@@ -376,6 +375,20 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   
   private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
     return true; // FIXME: Note this will be a 16 byte Mac?
+  }
+  
+  /**
+   * Gets the IV by encrypting the SSC.
+   *
+   * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
+   *
+   * @param ssc the SSC
+   */
+  private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    byte[] sscBytes = getSSCAsBytes(ssc);
+    byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
+    IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
+    return ivParams;
   }
   
   /**

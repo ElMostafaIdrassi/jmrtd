@@ -53,7 +53,7 @@ import net.sf.scuba.util.Hex;
  * 
  * @since 0.5.10
  */
-public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
+public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
   
   private static final long serialVersionUID = -1427994718980505261L;
   
@@ -121,10 +121,11 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
    * 
    * @param wrappedCommandAPDU a wrapped Command APDU
    */
+  @Override
   public CommandAPDU unwrap(CommandAPDU wrappedCommandAPDU) {
     ssc++;
     try {
-      return unwrapCommandAPDU(wrappedCommandAPDU, ksEnc, ksMac, ssc);
+      return unwrapCommandAPDU(wrappedCommandAPDU, ksEnc, ksMac);
     } catch (IOException ioe) {
       throw new IllegalStateException(ioe.getMessage());
     } catch (GeneralSecurityException gse) {
@@ -137,10 +138,11 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
    * 
    * @param responseAPDU a Response APDU
    */
+  @Override
   public ResponseAPDU wrap(ResponseAPDU responseAPDU) {
     ssc++;
     try {
-      return wrapResponseAPDU(responseAPDU, ksEnc, ksMac, ssc);
+      return wrapResponseAPDU(responseAPDU, ksEnc, ksMac);
     } catch (IOException ioe) {
       throw new IllegalStateException(ioe.getMessage());
     } catch (GeneralSecurityException gse) {
@@ -150,7 +152,7 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
   
   /* PRIVATE */
   
-  private CommandAPDU unwrapCommandAPDU(CommandAPDU wrappedCommandAPDU, SecretKey ksEnc, SecretKey ksMac, long ssc) throws IOException, GeneralSecurityException {
+  private CommandAPDU unwrapCommandAPDU(CommandAPDU wrappedCommandAPDU, SecretKey ksEnc, SecretKey ksMac) throws IOException, GeneralSecurityException {
     int cla = wrappedCommandAPDU.getCLA();
     int ins = wrappedCommandAPDU.getINS();
     int p1 = wrappedCommandAPDU.getP1();
@@ -199,6 +201,7 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
           default:
             LOGGER.warning("Skipping unsupported tag " + Integer.toHexString(tag));
             tlvInputStream.skip(length);
+            break;
         }
       }    
       
@@ -216,20 +219,12 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
     }
   }
   
-  private ResponseAPDU wrapResponseAPDU(ResponseAPDU responseAPDU, SecretKey ksEnc, SecretKey ksMac, long ssc) throws IOException, GeneralSecurityException {
+  private ResponseAPDU wrapResponseAPDU(ResponseAPDU responseAPDU, SecretKey ksEnc, SecretKey ksMac) throws IOException, GeneralSecurityException {
     byte[] data = Util.padWithMRZ(responseAPDU.getData());
     
     cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
     byte[] cipherText = cipher.doFinal(data);
-    
-    /*
-     *  case (byte)0x87: data = readDO87(inputStream, false); break;
-     *  case (byte)0x85: data = readDO87(inputStream, true); break;
-     *  case (byte)0x99: sw = readDO99(inputStream); break;
-     *  case (byte)0x8E: cc = readDO8E(inputStream); isFinished = true; break;
-     */
-    /* ??? */
-    
+
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
     
@@ -257,7 +252,7 @@ public class ReverseDESedeWrapper implements ReverseSecureMessagingWrapper {
       ByteArrayOutputStream dataToBeMaccedByteArrayOutputStream = new ByteArrayOutputStream();
       DataOutputStream dataToBeMaccedDataOutputStream = new DataOutputStream(dataToBeMaccedByteArrayOutputStream);
       try {
-        dataToBeMaccedDataOutputStream.writeLong(ssc);
+        dataToBeMaccedDataOutputStream.writeLong(getSendSequenceCounter());
         dataToBeMaccedDataOutputStream.write(paddedData, 0, paddedData.length);
         byte[] cc = mac.doFinal(dataToBeMaccedByteArrayOutputStream.toByteArray());
         /* NOTE: Length should be 8. */
