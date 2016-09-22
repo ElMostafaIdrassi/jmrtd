@@ -177,7 +177,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
     
     byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
-    byte[] paddedMaskedHeader = Util.padWithCAN(maskedHeader, 16); // 128 bits is 16 bytes
+    byte[] paddedMaskedHeader = Util.pad(maskedHeader, 16); // 128 bits is 16 bytes
     
     boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
     
@@ -197,7 +197,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     
     if (lc > 0) {
       /* If we have command data, encrypt it. */
-      byte[] data = Util.padWithCAN(commandAPDU.getData(), 16);
+      byte[] data = Util.pad(commandAPDU.getData(), 16);
       
       /* Re-initialize cipher, this time with IV based on SSC. */
       cipher.init(Cipher.ENCRYPT_MODE, ksEnc, getIV(sscBytes));
@@ -223,7 +223,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     bOut.write(sscBytes);
     bOut.write(m);
     bOut.flush();
-    byte[] n = Util.padWithCAN(bOut.toByteArray(), 16);
+    byte[] n = Util.pad(bOut.toByteArray(), 16);
     
     /* Compute cryptographic checksum... */
     mac.init(ksMac);

@@ -159,7 +159,7 @@ public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
     int p2 = wrappedCommandAPDU.getP2();
     
     byte[] maskedHeader = new byte[] { (byte)cla, (byte)ins, (byte)p1, (byte)p2 };
-    byte[] paddedMaskedHeader = Util.padWithMRZ(maskedHeader);
+    byte[] paddedMaskedHeader = Util.pad(maskedHeader, 8);
     
     byte[] wrappedData = wrappedCommandAPDU.getData();
     TLVInputStream tlvInputStream = new TLVInputStream(new ByteArrayInputStream(wrappedData));
@@ -220,7 +220,7 @@ public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
   }
   
   private ResponseAPDU wrapResponseAPDU(ResponseAPDU responseAPDU, SecretKey ksEnc, SecretKey ksMac) throws IOException, GeneralSecurityException {
-    byte[] data = Util.padWithMRZ(responseAPDU.getData());
+    byte[] data = Util.pad(responseAPDU.getData(), 8);
     
     cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
     byte[] cipherText = cipher.doFinal(data);
@@ -245,7 +245,7 @@ public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
       tlvOutputStream.writeValueEnd(); /* 0x99 */
       
       /* The data and the status word, with added padding. */
-      byte[] paddedData = Util.padWithMRZ(byteArrayOutputStream.toByteArray());
+      byte[] paddedData = Util.pad(byteArrayOutputStream.toByteArray(), 8);
       
       /* Compute Mac over padded data. */
       mac.init(ksMac);    

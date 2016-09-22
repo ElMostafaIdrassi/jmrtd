@@ -245,36 +245,32 @@ public class Util {
       return hash;
     }
   }
-  
+
   /**
-   * Pads the input <code>in</code> according to ISO9797-1 padding method 2.
+   * Pads the input <code>in</code> according to ISO9797-1 padding method 2,
+   * using the given block size.
    *
    * @param in input
+   * @param blockSize the block size
    *
-   * @return padded output
+   * @return padded bytes
    */
-  public static byte[] padWithMRZ(/*@ non_null */ byte[] in) {
-    return padWithMRZ(in, 0, in.length);
+  public static byte[] pad(/*@ non_null */ byte[] in, int blockSize) {
+    return pad(in, 0, in.length, blockSize);
   }
   
-  public static byte[] padWithCAN(/*@ non_null */ byte[] in, int blockSize) {
-    return padWithCAN(in, 0, in.length, blockSize);
-  }
-  
-  /*@ requires 0 <= offset && offset < length;
-	  @ requires 0 <= length && length <= in.length;
+  /**
+   * Pads the input {@code in} indicated by {@code offset} and {@code length}
+   * according to ISO9797-1 padding method 2, using the given block size in {@code blockSize}.
+   *
+   * @param in input
+   * @param offset the offset
+   * @param length the length
+   * @param blockSize the block size
+   *
+   * @return padded bytes
    */
-  public static byte[] padWithMRZ(/*@ non_null */ byte[] in, int offset, int length) {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    out.write(in, offset, length);
-    out.write((byte)0x80);
-    while (out.size() % 8 != 0) {
-      out.write((byte)0x00);
-    }
-    return out.toByteArray();
-  }
-  
-  public static byte[] padWithCAN(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
+  public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     out.write(in, offset, length);
     out.write((byte)0x80);
@@ -284,6 +280,13 @@ public class Util {
     return out.toByteArray();
   }
   
+  /**
+   * Unpads the input {@code in} according to ISO9797-1 padding method 2.
+   * 
+   * @param in the input
+   * 
+   * @return the unpadded bytes
+   */
   public static byte[] unpad(byte[] in) throws BadPaddingException {
     int i = in.length - 1;
     while (i >= 0 && in[i] == 0x00) {
