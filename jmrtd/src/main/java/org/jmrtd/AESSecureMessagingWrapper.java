@@ -355,7 +355,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     }
     byte sw1 = in.readByte();
     byte sw2 = in.readByte();
-    return (short) (((sw1 & 0x000000FF) << 8) | (sw2 & 0x000000FF));
+    return (short)(((sw1 & 0x000000FF) << 8) | (sw2 & 0x000000FF));
   }
   
   /**
@@ -366,7 +366,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   private byte[] readDO8E(DataInputStream inputStream) throws IOException, GeneralSecurityException {
     int length = inputStream.readUnsignedByte();
     if (length != 8) {
-      throw new IllegalStateException("DO'8E wrong length");
+      throw new IllegalStateException("DO'8E wrong length " + length);
     }
     byte[] cc1 = new byte[8];
     inputStream.readFully(cc1);

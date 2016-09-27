@@ -34,7 +34,7 @@ import javax.crypto.spec.DESedeKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.DESedeSecureMessagingWrapper;
-import org.jmrtd.ReverseDESedeWrapper;
+import org.jmrtd.ReverseDESedeSecureMessagingWrapper;
 import org.jmrtd.SecureMessagingWrapper;
 
 import junit.framework.TestCase;
@@ -49,7 +49,7 @@ import net.sf.scuba.util.Hex;
  *
  * @version $Revision$
  */
-public class DESedeWrapperTest extends TestCase {
+public class DESedeSecureMessagingWrapperTest extends TestCase {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
@@ -153,7 +153,7 @@ public class DESedeWrapperTest extends TestCase {
   
   public void testWrapResponseAPDU(SecretKey ksEnc, SecretKey ksMac, ResponseAPDU responseAPDU) {
     try {
-      ReverseDESedeWrapper reverseWrapper = new ReverseDESedeWrapper(ksEnc, ksMac);
+      ReverseDESedeSecureMessagingWrapper reverseWrapper = new ReverseDESedeSecureMessagingWrapper(ksEnc, ksMac);
       ResponseAPDU wrappedResponseAPDU = reverseWrapper.wrap(responseAPDU);
       assertNotNull(wrappedResponseAPDU);
 
@@ -196,7 +196,7 @@ public class DESedeWrapperTest extends TestCase {
       CommandAPDU wrappedCommandAPDU = wrapper.wrap(commandAPDU);
       assertNotNull(wrappedCommandAPDU);
       
-      ReverseDESedeWrapper reverseWrapper = new ReverseDESedeWrapper(ksEnc, ksMac);
+      ReverseDESedeSecureMessagingWrapper reverseWrapper = new ReverseDESedeSecureMessagingWrapper(ksEnc, ksMac);
       CommandAPDU unwrappedWrappedCommandAPDU = reverseWrapper.unwrap(wrappedCommandAPDU);
       
       assertEquals(commandAPDU, unwrappedWrappedCommandAPDU);

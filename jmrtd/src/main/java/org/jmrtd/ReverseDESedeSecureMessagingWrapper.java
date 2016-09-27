@@ -53,7 +53,7 @@ import net.sf.scuba.util.Hex;
  * 
  * @since 0.5.10
  */
-public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
+public class ReverseDESedeSecureMessagingWrapper extends ReverseSecureMessagingWrapper {
   
   private static final long serialVersionUID = -1427994718980505261L;
   
@@ -80,7 +80,7 @@ public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
    * 
    * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
    */
-  public ReverseDESedeWrapper(SecretKey ksEnc, SecretKey ksMac) throws GeneralSecurityException {
+  public ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac) throws GeneralSecurityException {
     this(ksEnc, ksMac, 0L);
   }
   
@@ -94,11 +94,11 @@ public class ReverseDESedeWrapper extends ReverseSecureMessagingWrapper {
    * 
    * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
    */
-  public ReverseDESedeWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
+  public ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", ssc);
   }
   
-  private ReverseDESedeWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, long ssc) throws GeneralSecurityException {
+  private ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, long ssc) throws GeneralSecurityException {
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
     this.ssc = ssc;
