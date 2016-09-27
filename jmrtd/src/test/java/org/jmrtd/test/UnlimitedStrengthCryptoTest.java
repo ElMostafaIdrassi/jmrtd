@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: $
+ * $Id$
  */
 
 package org.jmrtd.test;
@@ -34,7 +34,7 @@ import junit.framework.TestCase;
  * 
  * @author The JMRTD team
  * 
- * @version $Revision: $
+ * @version $Revision$
  */
 public class UnlimitedStrengthCryptoTest extends TestCase {
   
