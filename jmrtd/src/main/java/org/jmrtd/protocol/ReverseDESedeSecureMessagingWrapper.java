@@ -22,29 +22,11 @@
 
 package org.jmrtd.protocol;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
 import java.util.logging.Logger;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-
-import org.jmrtd.Util;
-
-import net.sf.scuba.smartcards.CommandAPDU;
-import net.sf.scuba.smartcards.ISO7816;
-import net.sf.scuba.smartcards.ResponseAPDU;
-import net.sf.scuba.tlv.TLVInputStream;
-import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * A card side secure messaging wrapper that uses triple DES.
@@ -65,15 +47,6 @@ public class ReverseDESedeSecureMessagingWrapper extends ReverseSecureMessagingW
   
   /** Initialization vector consisting of 8 zero bytes. */
   public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
-  
-  private Cipher cipher;
-  private Mac mac;
-  
-  private SecretKey ksEnc;
-  private SecretKey ksMac;
-  
-  /** The Send Sequence Counter. */
-  private long ssc;
   
   /**
    * Creates a secure messaging wrapper.
@@ -99,188 +72,10 @@ public class ReverseDESedeSecureMessagingWrapper extends ReverseSecureMessagingW
    * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
    */
   public ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
-    this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", ssc);
+    super(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", ssc);
   }
   
-  private ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, long ssc) throws GeneralSecurityException {
-    this.ksEnc = ksEnc;
-    this.ksMac = ksMac;
-    this.ssc = ssc;
-    cipher = Cipher.getInstance(cipherAlg);
-    mac = Mac.getInstance(macAlg);
-  }
-  
-  /**
-   * Gets the send sequence counter.
-   * 
-   * @return the current value of the send sequence counter
-   */
-  @Override
-  public long getSendSequenceCounter() {
-    return ssc;
-  }
-  
-  /**
-   * Unwraps a Command APDU received from the terminal.
-   * 
-   * @param wrappedCommandAPDU a wrapped Command APDU
-   */
-  @Override
-  public CommandAPDU unwrap(CommandAPDU wrappedCommandAPDU) {
-    ssc++;
-    try {
-      return unwrapCommandAPDU(wrappedCommandAPDU, ksEnc, ksMac);
-    } catch (IOException ioe) {
-      throw new IllegalStateException(ioe.getMessage());
-    } catch (GeneralSecurityException gse) {
-      throw new IllegalStateException(gse.getMessage());      
-    }
-  }
-  
-  /**
-   * Wraps a Response APDU to be sent back to the terminal.
-   * 
-   * @param responseAPDU a Response APDU
-   */
-  @Override
-  public ResponseAPDU wrap(ResponseAPDU responseAPDU) {
-    ssc++;
-    try {
-      return wrapResponseAPDU(responseAPDU, ksEnc, ksMac);
-    } catch (IOException ioe) {
-      throw new IllegalStateException(ioe.getMessage());
-    } catch (GeneralSecurityException gse) {
-      throw new IllegalStateException(gse.getMessage());
-    }
-  }
-  
-  /* PRIVATE */
-  
-  private CommandAPDU unwrapCommandAPDU(CommandAPDU wrappedCommandAPDU, SecretKey ksEnc, SecretKey ksMac) throws IOException, GeneralSecurityException {
-    int cla = wrappedCommandAPDU.getCLA();
-    int ins = wrappedCommandAPDU.getINS();
-    int p1 = wrappedCommandAPDU.getP1();
-    int p2 = wrappedCommandAPDU.getP2();
-    
-    byte[] maskedHeader = new byte[] { (byte)cla, (byte)ins, (byte)p1, (byte)p2 };
-    byte[] paddedMaskedHeader = Util.pad(maskedHeader, 8);
-    
-    byte[] wrappedData = wrappedCommandAPDU.getData();
-    TLVInputStream tlvInputStream = new TLVInputStream(new ByteArrayInputStream(wrappedData));
-    
-    try {
-      boolean isFinished = false;
-      int le = -1;
-      byte[] data = null;
-      byte[] cc = null;
-      while (!isFinished) {
-        int tag = tlvInputStream.readTag();
-        int length = tlvInputStream.readLength();
-        switch (tag) {
-          case ISO7816.TAG_SM_EXPECTED_LENGTH:
-            byte[] leBytes = tlvInputStream.readValue();
-            le = 0;
-            for (int i = 0; i < leBytes.length; i++) {
-              le = (le << 8) | (leBytes[i] & 0xFF);
-            }
-            break;
-          case ISO7816.TAG_SM_ENCRYPTED_DATA:
-            cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
-            byte[] cipherText = tlvInputStream.readValue();
-            data = cipher.doFinal(cipherText);
-            data = Util.unpad(data);
-            break;
-          case ISO7816.TAG_SM_ENCRYPTED_DATA_WITH_PADDING_INDICATOR:
-            cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
-            byte[] cipherTextPrefixedWithOne = tlvInputStream.readValue();
-            byte[] cipherTextWithoutPrefixed = new byte[length - 1];
-            System.arraycopy(cipherTextPrefixedWithOne, 1, cipherTextWithoutPrefixed, 0, length - 1);
-            data = cipher.doFinal(cipherTextWithoutPrefixed);
-            data = Util.unpad(data);
-            break;
-          case ISO7816.TAG_SM_CRYPTOGRAPHIC_CHECKSUM:
-            cc = tlvInputStream.readValue();
-            isFinished = true;
-            break;
-          default:
-            LOGGER.warning("Skipping unsupported tag " + Integer.toHexString(tag));
-            tlvInputStream.skip(length);
-            break;
-        }
-      }    
-      
-      /* TODO: Compute checksum and compare to cc. */
-      
-      CommandAPDU commandAPDU = null;
-      if (le < 0) {
-        commandAPDU = new CommandAPDU(cla ^ 0x0C, ins, p1, p2, data);
-      } else {
-        commandAPDU = new CommandAPDU(cla ^ 0x0C, ins, p1, p2, data, le);
-      }
-      return commandAPDU;
-    } finally {
-      tlvInputStream.close();
-    }
-  }
-  
-  private ResponseAPDU wrapResponseAPDU(ResponseAPDU responseAPDU, SecretKey ksEnc, SecretKey ksMac) throws IOException, GeneralSecurityException {
-    byte[] data = Util.pad(responseAPDU.getData(), 8);
-    
-    cipher.init(Cipher.ENCRYPT_MODE, ksEnc, getIV(ssc));
-    byte[] cipherText = cipher.doFinal(data);
-
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
-    
-    try {
-      
-      /* Data. */
-      tlvOutputStream.writeTag(ISO7816.TAG_SM_ENCRYPTED_DATA_WITH_PADDING_INDICATOR);
-      tlvOutputStream.writeLength(1 + cipherText.length);
-      tlvOutputStream.write(0x01);
-      tlvOutputStream.write(cipherText);
-      tlvOutputStream.writeValueEnd(); /* 0x87 */
-      
-      /* Status word. */
-      tlvOutputStream.writeTag(ISO7816.TAG_SM_STATUS_WORD);
-      tlvOutputStream.writeLength(2);
-      tlvOutputStream.write(responseAPDU.getSW1());
-      tlvOutputStream.write(responseAPDU.getSW2());
-      tlvOutputStream.writeValueEnd(); /* 0x99 */
-      
-      /* The data and the status word, with added padding. */
-      byte[] paddedData = Util.pad(byteArrayOutputStream.toByteArray(), 8);
-      
-      /* Compute Mac over padded data. */
-      mac.init(ksMac);    
-      ByteArrayOutputStream dataToBeMaccedByteArrayOutputStream = new ByteArrayOutputStream();
-      DataOutputStream dataToBeMaccedDataOutputStream = new DataOutputStream(dataToBeMaccedByteArrayOutputStream);
-      try {
-        dataToBeMaccedDataOutputStream.writeLong(getSendSequenceCounter());
-        dataToBeMaccedDataOutputStream.write(paddedData, 0, paddedData.length);
-        byte[] cc = mac.doFinal(dataToBeMaccedByteArrayOutputStream.toByteArray());
-        /* NOTE: Length should be 8. */
-        
-        tlvOutputStream.writeTag(ISO7816.TAG_SM_CRYPTOGRAPHIC_CHECKSUM);
-        tlvOutputStream.writeValue(cc);
-      } finally {
-        dataToBeMaccedDataOutputStream.close();
-      }
-      
-      writeStatusWord(ISO7816.SW_NO_ERROR, byteArrayOutputStream);
-      
-      return new ResponseAPDU(byteArrayOutputStream.toByteArray());
-    } finally {
-      tlvOutputStream.close();
-    }
-  }
-  
-  private void writeStatusWord(short sw, OutputStream outputStream) throws IOException {
-    outputStream.write((sw & 0xFF00) >> 8);
-    outputStream.write(sw & 0xFF);
-  }
-  
-  private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+  protected IvParameterSpec getIV() {
     return ZERO_IV_PARAM_SPEC;
   }
 }
