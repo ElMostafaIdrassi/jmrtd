@@ -53,14 +53,11 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
-import org.jmrtd.AESSecureMessagingWrapper;
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.PACEException;
 import org.jmrtd.PassportApduService;
 import org.jmrtd.PassportService;
-import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.MappingType;

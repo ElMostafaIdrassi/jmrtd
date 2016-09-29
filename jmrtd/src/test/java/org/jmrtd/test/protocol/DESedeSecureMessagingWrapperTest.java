@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd.test;
+package org.jmrtd.test.protocol;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
@@ -29,12 +29,13 @@ import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESedeKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jmrtd.AESSecureMessagingWrapper;
-import org.jmrtd.ReverseAESSecureMessagingWrapper;
-import org.jmrtd.SecureMessagingWrapper;
+import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
+import org.jmrtd.protocol.ReverseDESedeSecureMessagingWrapper;
+import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import junit.framework.TestCase;
 import net.sf.scuba.smartcards.CommandAPDU;
@@ -42,19 +43,22 @@ import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.util.Hex;
 
 /**
- * Tests for AES secure messaging wrapper (with the help of reverse wrapper).
+ * Tests for DESede wrapper (with the help of reverse wrapper).
  * 
  * @author The JMRTD team
  *
  * @version $Revision$
  */
-public class AESSecureMessagingWrapperTest extends TestCase {
+public class DESedeSecureMessagingWrapperTest extends TestCase {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
   /** For generating random keys. */
   private static final KeyGenerator KEY_GENERATOR; // NOTE: Instantiated during static initialization.
-    
+  
+  /** For constructing keys from key specifications. */
+  private static final SecretKeyFactory KEY_FACTORY; // NOTE: Instantiated during static initialization.
+
   /* STATIC INITIALIZATION */
   
   static {
@@ -62,23 +66,28 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     
     KeyGenerator keyGenerator = null;
     try {
-      keyGenerator = KeyGenerator.getInstance("AES");
-//      keyGenerator.init(192);
-      keyGenerator.init(128);
+      keyGenerator = KeyGenerator.getInstance("DESede");
     } catch (NoSuchAlgorithmException nsae) {
       keyGenerator = null;
-      LOGGER.log(Level.SEVERE, "Could not instantiate key generator for AES", nsae);
+      LOGGER.log(Level.SEVERE, "Could not instantiate key generator for DESede", nsae);
     }
     KEY_GENERATOR = keyGenerator;
     
+    SecretKeyFactory keyFactory = null;
+    try {
+      keyFactory = SecretKeyFactory.getInstance("DESede");
+    } catch (NoSuchAlgorithmException nsae) {
+      LOGGER.log(Level.SEVERE, "Could not instantiate key generator for DESede", nsae);
+    }
+    KEY_FACTORY = keyFactory;
   }
   
   /* TESTS */
   
   public void testWrapResponseAPDU() {
     try {
-      SecretKey ksEnc = new SecretKeySpec(Hex.hexStringToBytes("B18F124C36C97075C18E787984CF187D26A04A708AE15C07"), "AES");
-      SecretKey ksMac = new SecretKeySpec(Hex.hexStringToBytes("F2C4B468739FB6D74F9BCA1B467DD2535B4D7C6D72D95DBF"), "AES");
+      SecretKey ksEnc = KEY_FACTORY.generateSecret(new DESedeKeySpec(Hex.hexStringToBytes("F84CCE37CDC829767568E62385293BECD9897C31B940235D")));
+      SecretKey ksMac = KEY_FACTORY.generateSecret(new DESedeKeySpec(Hex.hexStringToBytes("7F2C26FD16C48086AD7373860E64DC8075FE79A18368CB20")));
       testWrapResponseAPDU(ksEnc, ksMac);
     } catch (Exception e) {
       e.printStackTrace();
@@ -89,7 +98,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
   public void testWrapResponseAPDURandomKeysMultipleTimes() {
     testWrapResponseAPDURandomKeysMultipleTimes(100);
   }
-  
+    
   public void testWrapResponseAPDURandomKeys() {
     try {
       testWrapResponseAPDU(KEY_GENERATOR.generateKey(), KEY_GENERATOR.generateKey());
@@ -100,8 +109,8 @@ public class AESSecureMessagingWrapperTest extends TestCase {
   
   public void testUnwrapCommandAPDU() {
     try {
-      SecretKey ksEnc = new SecretKeySpec(Hex.hexStringToBytes("22170DC35F4EFD0FF88E846ECA335932F2070A211F67C5DF"), "AES");
-      SecretKey ksMac = new SecretKeySpec(Hex.hexStringToBytes("30FC32D59DF9FE5ADF9A2429AD79D1E866D08971A036E9FC"), "AES");
+      SecretKey ksEnc = KEY_FACTORY.generateSecret(new DESedeKeySpec(Hex.hexStringToBytes("F84CCE37CDC829767568E62385293BECD9897C31B940235D")));
+      SecretKey ksMac = KEY_FACTORY.generateSecret(new DESedeKeySpec(Hex.hexStringToBytes("7F2C26FD16C48086AD7373860E64DC8075FE79A18368CB20")));
       
       testUnwrapCommandAPDU(ksEnc, ksMac);
     } catch (Exception e) {
@@ -144,11 +153,11 @@ public class AESSecureMessagingWrapperTest extends TestCase {
   
   public void testWrapResponseAPDU(SecretKey ksEnc, SecretKey ksMac, ResponseAPDU responseAPDU) {
     try {
-      ReverseAESSecureMessagingWrapper reverseWrapper = new ReverseAESSecureMessagingWrapper(ksEnc, ksMac, 0);
+      ReverseDESedeSecureMessagingWrapper reverseWrapper = new ReverseDESedeSecureMessagingWrapper(ksEnc, ksMac);
       ResponseAPDU wrappedResponseAPDU = reverseWrapper.wrap(responseAPDU);
       assertNotNull(wrappedResponseAPDU);
-      
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(ksEnc, ksMac, 0);
+
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac);
       ResponseAPDU unwrappedWrappedResponseAPDU = wrapper.unwrap(wrappedResponseAPDU);
       assertNotNull(unwrappedWrappedResponseAPDU);
       assertEquals(responseAPDU, unwrappedWrappedResponseAPDU);
@@ -182,12 +191,12 @@ public class AESSecureMessagingWrapperTest extends TestCase {
   
   public void testUnwrapCommandAPDU(SecretKey ksEnc, SecretKey ksMac, CommandAPDU commandAPDU) {
     try {
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(ksEnc, ksMac, 0);
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac);
       
       CommandAPDU wrappedCommandAPDU = wrapper.wrap(commandAPDU);
       assertNotNull(wrappedCommandAPDU);
       
-      ReverseAESSecureMessagingWrapper reverseWrapper = new ReverseAESSecureMessagingWrapper(ksEnc, ksMac, 0);
+      ReverseDESedeSecureMessagingWrapper reverseWrapper = new ReverseDESedeSecureMessagingWrapper(ksEnc, ksMac);
       CommandAPDU unwrappedWrappedCommandAPDU = reverseWrapper.unwrap(wrappedCommandAPDU);
       
       assertEquals(commandAPDU, unwrappedWrappedCommandAPDU);

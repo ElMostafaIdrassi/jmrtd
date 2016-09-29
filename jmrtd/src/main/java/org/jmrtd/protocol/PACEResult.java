@@ -28,7 +28,6 @@ import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
-import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.util.Hex;

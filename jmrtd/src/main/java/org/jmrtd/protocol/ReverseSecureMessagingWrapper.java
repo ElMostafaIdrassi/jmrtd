@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd;
+package org.jmrtd.protocol;
 
 import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ResponseAPDU;

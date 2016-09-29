@@ -31,9 +31,7 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.PassportService;
-import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.CardServiceException;

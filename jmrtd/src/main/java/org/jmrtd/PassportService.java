@@ -45,6 +45,7 @@ import org.jmrtd.protocol.CAProtocol;
 import org.jmrtd.protocol.CAResult;
 import org.jmrtd.protocol.PACEProtocol;
 import org.jmrtd.protocol.PACEResult;
+import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.jmrtd.protocol.TAProtocol;
 import org.jmrtd.protocol.TAResult;
 

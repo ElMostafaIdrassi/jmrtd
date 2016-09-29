@@ -20,7 +20,7 @@
  * $Id$
  */
 
-package org.jmrtd;
+package org.jmrtd.protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,12 +38,13 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import org.jmrtd.Util;
+
 import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
-import net.sf.scuba.util.Hex;
 
 /**
  * A card side secure messaging wrapper that uses triple DES.
@@ -56,13 +57,15 @@ import net.sf.scuba.util.Hex;
  * 
  * @since 0.5.10
  */
-public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrapper {
+public class ReverseDESedeSecureMessagingWrapper extends ReverseSecureMessagingWrapper {
   
   private static final long serialVersionUID = -1427994718980505261L;
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-    
-  private Cipher sscIVCipher;
+  
+  /** Initialization vector consisting of 8 zero bytes. */
+  public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+  
   private Cipher cipher;
   private Mac mac;
   
@@ -74,6 +77,19 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
   
   /**
    * Creates a secure messaging wrapper.
+   * The send sequence counter will initially be set to {@code 0}.
+   * 
+   * @param ksEnc the key to use for encrypting and decrypting APDU payloads
+   * @param ksMac the key to use for generating and checking APDU message authentication codes
+   * 
+   * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
+   */
+  public ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac) throws GeneralSecurityException {
+    this(ksEnc, ksMac, 0L);
+  }
+  
+  /**
+   * Creates a secure messaging wrapper.
    * 
    * @param ksEnc the key to use for encrypting and decrypting APDU payloads
    * @param ksMac the key to use for generating and checking APDU message authentication codes
@@ -82,23 +98,16 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
    * 
    * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
    */
-  public ReverseAESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
-    this(ksEnc, ksMac, "AES/ECB/NoPadding", "AES/CBC/NoPadding", "AESCMAC", ssc);
+  public ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
+    this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", ssc);
   }
   
-  private ReverseAESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String ivCipherAlg, String cipherAlg, String macAlg, long ssc) throws GeneralSecurityException {
+  private ReverseDESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, long ssc) throws GeneralSecurityException {
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
     this.ssc = ssc;
-    
-    sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
-    sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
-
     cipher = Cipher.getInstance(cipherAlg);
-    /* NOTE: Will be initialized later. */
-    
     mac = Mac.getInstance(macAlg);
-    /* NOTE: Will be initialized later. */
   }
   
   /**
@@ -176,13 +185,13 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
             }
             break;
           case ISO7816.TAG_SM_ENCRYPTED_DATA:
-            cipher.init(Cipher.DECRYPT_MODE, ksEnc,  getIV(ssc));
+            cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
             byte[] cipherText = tlvInputStream.readValue();
             data = cipher.doFinal(cipherText);
             data = Util.unpad(data);
             break;
           case ISO7816.TAG_SM_ENCRYPTED_DATA_WITH_PADDING_INDICATOR:
-            cipher.init(Cipher.DECRYPT_MODE, ksEnc,  getIV(ssc));
+            cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
             byte[] cipherTextPrefixedWithOne = tlvInputStream.readValue();
             byte[] cipherTextWithoutPrefixed = new byte[length - 1];
             System.arraycopy(cipherTextPrefixedWithOne, 1, cipherTextWithoutPrefixed, 0, length - 1);
@@ -250,13 +259,7 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
         dataToBeMaccedDataOutputStream.writeLong(getSendSequenceCounter());
         dataToBeMaccedDataOutputStream.write(paddedData, 0, paddedData.length);
         byte[] cc = mac.doFinal(dataToBeMaccedByteArrayOutputStream.toByteArray());
-
-        /* NOTE: Length should be 8 bytes. With AES (blocksize 128) we will get 16 instead. */
-        if (cc.length > 8) {
-          byte[] truncatedCC = new byte[8];
-          System.arraycopy(cc, 0, truncatedCC, 0, 8);
-          cc = truncatedCC;
-        }
+        /* NOTE: Length should be 8. */
         
         tlvOutputStream.writeTag(ISO7816.TAG_SM_CRYPTOGRAPHIC_CHECKSUM);
         tlvOutputStream.writeValue(cc);
@@ -277,62 +280,7 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
     outputStream.write(sw & 0xFF);
   }
   
-  /* FIXME: DUPLICATION OF CODE! */
-  
-  /**
-   * Gets the IV by encrypting the SSC.
-   *
-   * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
-   *
-   * @param ssc the SSC
-   */
   private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-    byte[] sscBytes = getSSCAsBytes(ssc);
-    byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
-    IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
-    return ivParams;
-  }
-  
-  /**
-   * Gets the IV by encrypting the SSC.
-   *
-   * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
-   *
-   * @param sscBytes the SSC as blocksize aligned byte array
-   */
-  private IvParameterSpec getIV(byte[] sscBytes) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-    byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
-    IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
-    return ivParams;
-  }
-  
-  /**
-   * Gets the SSC as bytes.
-   *
-   * @param ssc
-   *
-   * @return the ssc as a 16 byte array
-   */
-  private byte[] getSSCAsBytes(long ssc) {
-    try {
-      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(16);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      byteArrayOutputStream.write(0x00);
-      
-      /* A long will take 8 bytes. */
-      DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-      dataOutputStream.writeLong(ssc);
-      dataOutputStream.close();
-      return byteArrayOutputStream.toByteArray();
-    } catch (IOException ioe) {
-      LOGGER.warning("Exception: " + ioe.getMessage());
-    }
-    return null;
+    return ZERO_IV_PARAM_SPEC;
   }
 }

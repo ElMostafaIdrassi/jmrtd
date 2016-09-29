@@ -26,7 +26,6 @@ import java.security.PublicKey;
 import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
-import org.jmrtd.SecureMessagingWrapper;
 
 import net.sf.scuba.smartcards.CardServiceException;
 

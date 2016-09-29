@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
-import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 import org.jmrtd.cert.CVCPrincipal;

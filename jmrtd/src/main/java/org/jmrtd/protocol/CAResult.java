@@ -28,7 +28,6 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Arrays;
 
-import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 
 import net.sf.scuba.util.Hex;

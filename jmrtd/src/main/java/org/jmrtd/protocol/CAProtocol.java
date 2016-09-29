@@ -38,10 +38,7 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 
-import org.jmrtd.AESSecureMessagingWrapper;
-import org.jmrtd.DESedeSecureMessagingWrapper;
 import org.jmrtd.PassportService;
-import org.jmrtd.SecureMessagingWrapper;
 import org.jmrtd.Util;
 import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;

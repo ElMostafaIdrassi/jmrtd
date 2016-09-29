@@ -30,7 +30,7 @@ import javax.crypto.Cipher;
 import junit.framework.TestCase;
 
 /**
- * Tests explicitly if we have unlimited strength crypto installed on this VM.
+ * Tests explicitly if we have unlimited strength cryptography installed on this VM.
  * 
  * @author The JMRTD team
  * 

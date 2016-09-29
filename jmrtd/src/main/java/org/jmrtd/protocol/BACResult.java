@@ -25,7 +25,6 @@ package org.jmrtd.protocol;
 import java.io.Serializable;
 
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.SecureMessagingWrapper;
 
 public class BACResult implements Serializable {
   
