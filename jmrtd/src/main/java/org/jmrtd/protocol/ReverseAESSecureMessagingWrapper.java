@@ -29,14 +29,12 @@ import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 /**
- * A card side secure messaging wrapper that uses triple DES.
+ * A card side secure messaging wrapper that uses AES.
  * Unwraps Command APDUs received from the terminal,
  * wraps Response APDUs to be sent back to the terminal.
  * 
@@ -52,6 +50,7 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
+  /** The cipher used in updating the SSC. */
   private Cipher sscIVCipher;
   
   /**
@@ -59,7 +58,6 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
    * 
    * @param ksEnc the key to use for encrypting and decrypting APDU payloads
    * @param ksMac the key to use for generating and checking APDU message authentication codes
-   * 
    * @param ssc the initial send sequence counter value
    * 
    * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
@@ -68,7 +66,6 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
     super(ksEnc, ksMac, "AES/CBC/NoPadding", "AESCMAC", ssc);    
     sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
     sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
-
   }
     
   /**

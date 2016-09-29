@@ -60,18 +60,33 @@ public abstract class ReverseSecureMessagingWrapper implements ReverseAPDUWrappe
   private static final long serialVersionUID = 5005702227790003353L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
-  private Cipher cipher;
-  private Mac mac;
-  
+
   /** Encryption key. */
   private SecretKey ksEnc;
 
   /** Message authentication key. */
   private SecretKey ksMac;
   
+  /** Encryption cipher. */
+  private Cipher cipher;
+  
+  /** Message authentication cipher. */
+  private Mac mac;
+  
   /** The Send Sequence Counter. */
   private long ssc;
+
+  /**
+   * Creates a secure messaging wrapper.
+   * 
+   * @param ksEnc the key to use for encrypting and decrypting APDU payloads
+   * @param ksMac the key to use for generating and checking APDU message authentication codes
+   * @param cipherAlg the encryption cipher algorithm
+   * 
+   * @param ssc the initial send sequence counter value
+   * 
+   * @throws GeneralSecurityException on failure to configure the underlying cryptographic primitives
+   */
 
   public ReverseSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, long ssc) throws GeneralSecurityException {
     this.ksEnc = ksEnc;
@@ -97,7 +112,7 @@ public abstract class ReverseSecureMessagingWrapper implements ReverseAPDUWrappe
   /**
    * Gets the initialization vector.
    * 
-   * @return the initialization vecto
+   * @return the initialization vector
    */
   protected abstract IvParameterSpec getIV();
   
