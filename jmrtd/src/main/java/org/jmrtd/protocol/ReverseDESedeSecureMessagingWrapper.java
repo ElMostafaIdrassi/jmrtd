@@ -75,6 +75,12 @@ public class ReverseDESedeSecureMessagingWrapper extends ReverseSecureMessagingW
     super(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", ssc);
   }
   
+  /**
+   * Gets the initialization vector.
+   * DESede secure messaging uses a static all zero vector.
+   * 
+   * @return the initialization vector
+   */
   protected IvParameterSpec getIV() {
     return ZERO_IV_PARAM_SPEC;
   }

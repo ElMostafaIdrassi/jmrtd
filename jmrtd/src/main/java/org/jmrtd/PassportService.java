@@ -319,6 +319,8 @@ public class PassportService extends PassportApduService implements Serializable
    * @param bacKey the key based on the document number,
    *               the card holder's birth date,
    *               and the document's expiration date
+   *               
+   * @return the BAC result
    *
    * @throws CardServiceException if authentication failed
    */

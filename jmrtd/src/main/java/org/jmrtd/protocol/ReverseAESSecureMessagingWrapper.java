@@ -74,12 +74,9 @@ public class ReverseAESSecureMessagingWrapper extends ReverseSecureMessagingWrap
   /**
    * Gets the IV by encrypting the SSC.
    *
-   * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
-   *
-   * @param ssc the SSC
+   * AES secure messaging uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
    * 
-   * @throws BadPaddingException 
-   * @throws IllegalBlockSizeException 
+   * @return the initialization vector
    */
   protected IvParameterSpec getIV() {
     try {
