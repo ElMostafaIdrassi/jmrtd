@@ -194,19 +194,16 @@ public class CAProtocol {
       }
       
       /* Start secure messaging. */
-      SecretKey ksEnc = null;
-      SecretKey ksMac = null;
-      //     ksEnc = Util.deriveKey(secret, Util.ENC_MODE);
-      //     ksMac = Util.deriveKey(secret, Util.MAC_MODE);
-      
-      ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE);
-      ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE);
+      SecretKey ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE);
+      SecretKey ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE);
       
       if (cipherAlg.startsWith("DESede")) {
         wrapper = new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L);
       } else if (cipherAlg.startsWith("AES")) {
         long ssc = 0L; // wrapper == null ? 0L : wrapper.getSendSequenceCounter();
         wrapper = new AESSecureMessagingWrapper(ksEnc, ksMac, ssc);
+      } else {
+        throw new IllegalStateException("Unsupported cipher algorithm " + cipherAlg);
       }
       
       return new CAResult(keyId, piccPublicKey, keyHash, pcdKeyPair, wrapper);

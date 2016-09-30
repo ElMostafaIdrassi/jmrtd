@@ -380,7 +380,7 @@ public class PassportService extends PassportApduService implements Serializable
    * protocol and create new secure messaging keys.
    * A new secure messaging channel is set up as a result.
    *
-   * @param keyId passport's public key id (stored in DG14), -1 if none
+   * @param keyId passport's public key id (stored in DG14), {@code null} if none
    * @param oid the object identifier indicating the Chip Authentication protocol
    * @param publicKeyOID the object identifier indicating the public key algorithm used
    * @param publicKey passport's public key (stored in DG14)
