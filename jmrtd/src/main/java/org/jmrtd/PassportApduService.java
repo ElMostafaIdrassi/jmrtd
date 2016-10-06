@@ -905,7 +905,7 @@ public class PassportApduService extends CardService {
    * @param l a listener
    */
   public void removePlainTextAPDUListener(APDUListener l) {
-    if (plainTextAPDUListeners != null) { plainTextAPDUListeners.add(l); }
+    if (plainTextAPDUListeners != null) { plainTextAPDUListeners.remove(l); }
   }
   
   /**
