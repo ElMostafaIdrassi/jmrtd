@@ -286,6 +286,8 @@ public class Util {
    * @param in the input
    * 
    * @return the unpadded bytes
+   *
+   * @throws BadPaddingException on padding exception
    */
   public static byte[] unpad(byte[] in) throws BadPaddingException {
     int i = in.length - 1;
@@ -764,7 +766,10 @@ public class Util {
    * @return the same public key (if not EC or error), or a reconstructed one (if EC)
    */
   public static PublicKey reconstructPublicKey(PublicKey publicKey) {
-    if (!(publicKey instanceof ECPublicKey)) { return publicKey; }
+    if (!(publicKey instanceof ECPublicKey)) {
+      return publicKey;
+    }
+    
     try {
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
       ECPoint w = ecPublicKey.getW();

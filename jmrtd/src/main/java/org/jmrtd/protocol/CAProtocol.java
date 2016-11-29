@@ -137,14 +137,13 @@ public class CAProtocol {
     try {      
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
       AlgorithmParameterSpec params = null;
+      LOGGER.info("DEBUG: Chip Authentication uses public key: " + Util.getDetailedPublicKeyAlgorithm(piccPublicKey));
       if ("DH".equals(agreementAlg)) {
         DHPublicKey dhPublicKey = (DHPublicKey)piccPublicKey;
         params = dhPublicKey.getParams();
-        LOGGER.info("DEBUG: Chip Authentication with DH");
       } else if ("ECDH".equals(agreementAlg)) {
         ECPublicKey ecPublicKey = (ECPublicKey)piccPublicKey;
         params = ecPublicKey.getParams();
-        LOGGER.info("DEBUG: Chip Authentication with ECDH uses curve " + Util.getCurveName((ECParameterSpec)params));
       } else {
         throw new IllegalStateException("Unsupported algorithm \"" + agreementAlg + "\"");
       }

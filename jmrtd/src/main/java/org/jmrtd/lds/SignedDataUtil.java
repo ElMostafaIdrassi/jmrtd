@@ -112,6 +112,8 @@ import org.jmrtd.JMRTDSecurityProvider;
   X9_SHA1_WITH_ECDSA_OID = "1.2.840.10045.4.1",
   X9_SHA224_WITH_ECDSA_OID = "1.2.840.10045.4.3.1",
   X9_SHA256_WITH_ECDSA_OID = "1.2.840.10045.4.3.2",
+  X9_SHA384_WITH_ECDSA_OID = "1.2.840.10045.4.3.3",
+  X9_SHA512_WITH_ECDSA_OID = "1.2.840.10045.4.3.4",
   IEEE_P1363_SHA1_OID = "1.3.14.3.2.26";
   
   /**
@@ -490,7 +492,9 @@ import org.jmrtd.JMRTDSecurityProvider;
     if(oid.equals(NISTObjectIdentifiers.id_sha512.getId())) { return "SHA-512"; }
     if (oid.equals(X9_SHA1_WITH_ECDSA_OID)) { return "SHA1withECDSA"; }
     if (oid.equals(X9_SHA224_WITH_ECDSA_OID)) { return "SHA224withECDSA"; }
-    if (oid.equals(X9_SHA256_WITH_ECDSA_OID)) { return "SHA256withECDSA"; }   
+    if (oid.equals(X9_SHA256_WITH_ECDSA_OID)) { return "SHA256withECDSA"; }
+    if (oid.equals(X9_SHA384_WITH_ECDSA_OID)) { return "SHA384withECDSA"; }
+    if (oid.equals(X9_SHA512_WITH_ECDSA_OID)) { return "SHA512withECDSA"; }
     if (oid.equals(PKCS1_RSA_OID)) { return "RSA"; }
     if (oid.equals(PKCS1_MD2_WITH_RSA_OID)) { return "MD2withRSA"; }
     if (oid.equals(PKCS1_MD4_WITH_RSA_OID)) { return "MD4withRSA"; }
@@ -530,6 +534,8 @@ import org.jmrtd.JMRTDSecurityProvider;
     if (name.equalsIgnoreCase("SHA1withECDSA")) { return X9_SHA1_WITH_ECDSA_OID; }
     if (name.equalsIgnoreCase("SHA224withECDSA")) { return X9_SHA224_WITH_ECDSA_OID; }
     if (name.equalsIgnoreCase("SHA256withECDSA")) { return X9_SHA256_WITH_ECDSA_OID; }
+    if (name.equalsIgnoreCase("SHA384withECDSA")) { return X9_SHA384_WITH_ECDSA_OID; }
+    if (name.equalsIgnoreCase("SHA512withECDSA")) { return X9_SHA512_WITH_ECDSA_OID; }
     if (name.equalsIgnoreCase("SAwithRSA/PSS")) { return PKCS1_RSASSA_PSS_OID; }
     if (name.equalsIgnoreCase("SSAwithRSA/PSS")) { return PKCS1_RSASSA_PSS_OID; }
     if (name.equalsIgnoreCase("RSASSA-PSS")) { return PKCS1_RSASSA_PSS_OID; }

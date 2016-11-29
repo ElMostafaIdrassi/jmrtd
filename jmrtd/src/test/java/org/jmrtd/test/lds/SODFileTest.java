@@ -72,7 +72,9 @@ public class SODFileTest extends TestCase {
   }
   
   public void testReflexive() {
-    testReflexive(createTestObject());
+    testReflexive(createTestObject("SHA-1", "SHA1WithRSA"));
+    testReflexive(createTestObject("SHA-256", "SHA256WithRSA"));
+    testReflexive(createTestObject("SHA-256", "SHA256WithECDSA"));
   }
   
   private byte[] readBytes(InputStream inputStream) throws IOException {
@@ -116,9 +118,14 @@ public class SODFileTest extends TestCase {
     }
   }
   
-  private static KeyPair createTestKeyPair() throws NoSuchAlgorithmException {
+  private static KeyPair createRSATestKeyPair() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(1024);
+    return keyPairGenerator.generateKeyPair();
+  }
+  
+  private static KeyPair createECTestKeyPair() throws NoSuchAlgorithmException {
+    KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
     return keyPairGenerator.generateKeyPair();
   }
   
@@ -142,7 +149,9 @@ public class SODFileTest extends TestCase {
   }
   
   public void testFields() {
-    testFields(createTestObject());
+    testFields(createTestObject("SHA-1", "SHA1WithRSA"));
+    testFields(createTestObject("SHA-256", "SHA256WithRSA"));
+    testFields(createTestObject("SHA-256", "SHA256WithECDSA"));
   }
   
   public void testFields(SODFile sodFile) {
@@ -204,7 +213,7 @@ public class SODFileTest extends TestCase {
     }
   }
   
-  public static SODFile createTestObject() {
+  public static SODFile createTestObject(String digestAlgorithm, String signatureAlgorithm) {
     try {
       Security.insertProviderAt(BC_PROVIDER, 4);
       
@@ -216,13 +225,12 @@ public class SODFileTest extends TestCase {
       //			DG15File dg15File = DG15FileTest.createTestObject();
       //			byte[] dg15Bytes = dg15File.getEncoded();
       
-      KeyPair keyPair = createTestKeyPair();
+      KeyPair keyPair = signatureAlgorithm.endsWith("RSA") ? createRSATestKeyPair() : createECTestKeyPair();
       PublicKey publicKey = keyPair.getPublic();
       PrivateKey privateKey = keyPair.getPrivate();
       Date dateOfIssuing = today;
       Date dateOfExpiry = today;
-      String digestAlgorithm = "SHA-256";
-      String signatureAlgorithm = "SHA256withRSA";
+
       X509V3CertificateGenerator certGenerator = new X509V3CertificateGenerator();
       certGenerator.setSerialNumber(BigInteger.ONE);
       certGenerator.setIssuerDN(new X509Name("C=NL, O=State of the Netherlands, OU=Ministry of the Interior and Kingdom Relations, CN=CSCA NL"));
