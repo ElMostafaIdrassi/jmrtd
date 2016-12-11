@@ -97,22 +97,7 @@ public class CAProtocol {
     
     if (oid == null) {
       LOGGER.info("DEBUG: OID is null, publicKeyOID = " + publicKeyOID + ", piccPublicKey.getAlgorithm() = " + piccPublicKey.getAlgorithm());
-      if (ChipAuthenticationPublicKeyInfo.ID_PK_ECDH.equals(publicKeyOID)) {
-        /*
-         * This seems to work for French passports (generation 2013, 2014),
-         * but it is best effort.
-         */
-        LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-ECDH-3DES-CBC-CBC");
-        oid = ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC;
-      } else if (ChipAuthenticationPublicKeyInfo.ID_PK_DH.equals(publicKeyOID)) {
-        /*
-         * Not tested. Best effort.
-         */
-        LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-DH-3DES-CBC-CBC");
-        oid = ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC;
-      } else {
-        LOGGER.severe("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
-      }
+      oid = inferChipAuthenticationOIDfromPublicKeyOID(publicKeyOID);
     }
     
     String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
@@ -157,8 +142,8 @@ public class CAProtocol {
       agreement.doPhase(piccPublicKey, true);
       byte[] sharedSecret = agreement.generateSecret();
       
-      // TODO: this SHA1ing may have to be removed?
-      // TODO: this hashing is needed for JMRTD's Java Card passport applet implementation
+      /* TODO: this SHA1ing may have to be removed? */
+      /* TODO: this hashing is needed for JMRTD's Java Card passport applet implementation. */
       // byte[] secret = md.digest(secret);
       
       byte[] keyData = null;
@@ -218,5 +203,34 @@ public class CAProtocol {
    */
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
+  }
+  
+  /**
+   * Infers the Chip Authentication OID form a Chip Authentication public key OID.
+   * This is a best effort.
+   * 
+   * @param publicKeyOID the Chip Authentication public key OID
+   * 
+   * @return an OID or {@code null}
+   */
+  private String inferChipAuthenticationOIDfromPublicKeyOID(String publicKeyOID) {
+    if (ChipAuthenticationPublicKeyInfo.ID_PK_ECDH.equals(publicKeyOID)) {
+      /*
+       * This seems to work for French passports (generation 2013, 2014),
+       * but it is best effort.
+       */
+      LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-ECDH-3DES-CBC-CBC");
+      return ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC;
+    } else if (ChipAuthenticationPublicKeyInfo.ID_PK_DH.equals(publicKeyOID)) {
+      /*
+       * Not tested. Best effort.
+       */
+      LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-DH-3DES-CBC-CBC");
+      return ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC;
+    } else {
+      LOGGER.severe("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
+    }
+    
+    return null;
   }
 }

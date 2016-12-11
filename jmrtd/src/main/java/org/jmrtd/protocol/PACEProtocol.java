@@ -139,7 +139,7 @@ public class PACEProtocol {
    * 
    * @return a PACE result
    *
-   * @throws PACEException on error
+   * @throws PACEException if authentication failed
    */
   public PACEResult doPACE(SecretKey staticPACEKey, String oid, AlgorithmParameterSpec params) throws PACEException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
@@ -155,18 +155,7 @@ public class PACEProtocol {
         + ", digestAlg = " + digestAlg
         + ", keyLength = " + keyLength);
     
-    /* Check consistency of input parameters. */
-    if (agreementAlg == null) {
-      throw new IllegalArgumentException("Unknown agreement algorithm");
-    }
-    if (!("ECDH".equals(agreementAlg) || "DH".equals(agreementAlg))) {
-      throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);  
-    }
-    if ("ECDH".equals(agreementAlg) && !(params instanceof ECParameterSpec)) {
-      throw new IllegalArgumentException("Expected ECParameterSpec for agreement algorithm " + agreementAlg + ", found " + params.getClass().getCanonicalName());
-    } else if ("DH".equals(agreementAlg) && !(params instanceof DHParameterSpec)) {
-      throw new IllegalArgumentException("Expected DHParameterSpec for agreement algorithm " + agreementAlg + ", found " + params.getClass().getCanonicalName());
-    }
+    checkConsistency(agreementAlg, cipherAlg, digestAlg, keyLength, params);
     
     Cipher staticPACECipher = null;
     try {
@@ -283,7 +272,11 @@ public class PACEProtocol {
         params,
         piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes, encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
   }
+
+
   
+
+
   /**
    * The first step in the PACE protocol receives an encrypted nonce from the PICC
    * and decrypts it.
@@ -336,7 +329,7 @@ public class PACEProtocol {
    * @param mappingType either CAM, GM, or IM
    * @param agreementAlg the agreement algorithm, either DH or ECDH
    * @param params the static domain parameters
-   * @param piccNonce the received nonce from the PICC
+   * @param piccNonce the nonce received from the PICC
    * 
    * @return the computed ephemeral domain parameters
    * 
@@ -671,6 +664,47 @@ public class PACEProtocol {
     byte[] authenticationToken = new byte[8];
     System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
     return authenticationToken;
+  }
+  
+  /**
+   * Checks consistency of input parameters.
+   * 
+   * @param agreementAlg the agreement algorithm derived from the OID
+   * @param params the parameters
+   */
+  private void checkConsistency(String agreementAlg, String cipherAlg, String digestAlg, int keyLength, AlgorithmParameterSpec params) {
+    if (agreementAlg == null) {
+      throw new IllegalArgumentException("Unknown agreement algorithm");
+    }
+    
+    /* Agreement algorithm should be ECDH or DH. */
+    if (!("ECDH".equalsIgnoreCase(agreementAlg) || "DH".equalsIgnoreCase(agreementAlg))) {
+      throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found \"" + agreementAlg + "\"");
+    }
+    
+    if (cipherAlg == null) {
+      throw new IllegalArgumentException("Unknown cipher algorithm");
+    }
+    
+    if (!("DESede".equalsIgnoreCase(cipherAlg) || "AES".equalsIgnoreCase(cipherAlg))) {
+      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + agreementAlg + "\"");
+    }
+    
+    if (!("SHA-1".equalsIgnoreCase(cipherAlg) || "SHA1".equalsIgnoreCase(cipherAlg)
+        || "SHA-256".equalsIgnoreCase(cipherAlg) || "SHA256".equalsIgnoreCase(cipherAlg))) {
+      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + agreementAlg + "\"");
+    }
+    
+    if (!(keyLength == 128 || keyLength == 192 || keyLength == 256)) {
+      throw new IllegalArgumentException("Unsupported key length, expected 128, 192, or 256, found " + keyLength);
+    }
+    
+    /* Params should be correct param spec type, given agreement algorithm. */
+    if ("ECDH".equalsIgnoreCase(agreementAlg) && !(params instanceof ECParameterSpec)) {
+      throw new IllegalArgumentException("Expected ECParameterSpec for agreement algorithm \"" + agreementAlg + "\", found " + params.getClass().getCanonicalName());
+    } else if ("DH".equalsIgnoreCase(agreementAlg) && !(params instanceof DHParameterSpec)) {
+      throw new IllegalArgumentException("Expected DHParameterSpec for agreement algorithm \"" + agreementAlg + "\", found " + params.getClass().getCanonicalName());
+    }
   }
   
   private static String inferMacAlgorithmFromCipherAlgorithm(String cipherAlg) throws InvalidAlgorithmParameterException {
