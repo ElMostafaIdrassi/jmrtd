@@ -638,8 +638,12 @@ public class DG11File extends DataGroup {
         case FULL_DATE_OF_BIRTH_TAG:
           tlvOut.writeTag(tag);
           String fullDateOfBirthString = SDF.format(fullDateOfBirth);
-          byte[] fullDateOfBirthBytes = Hex.hexStringToBytes(fullDateOfBirthString);
-          tlvOut.writeValue(fullDateOfBirthBytes);		
+          // the following 2 commented lines  write date of birth field incorrectly
+          // (also see that during parsing field in incorrect case of BCD encoding is
+          // handled but JMRTD itself uses incorrect way of writing field)
+          //byte[] fullDateOfBirthBytes = Hex.hexStringToBytes(fullDateOfBirthString);
+          //tlvOut.writeValue(fullDateOfBirthBytes);		
+          tlvOut.writeValue(fullDateOfBirthString.getBytes("UTF-8"));
           break;
         case PLACE_OF_BIRTH_TAG:
           tlvOut.writeTag(tag);

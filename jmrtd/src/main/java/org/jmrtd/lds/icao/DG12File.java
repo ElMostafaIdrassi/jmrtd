@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.DataGroup;
@@ -227,8 +228,13 @@ public class DG12File extends DataGroup {
   
   private void parseDateAndTimeOfPersonalization(byte[] value) {
     try {
-      String field = Hex.bytesToHexString(value);
+      // the following commented line causes invalid parsing of date and time of personalisation field
+      //String field = Hex.bytesToHexString(value);
+      String field = new String(value, "UTF-8");
       dateAndTimeOfPersonalization = SDTF.parse(field.trim());
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: never happens, UTF-8 is supported. */
+      LOGGER.severe("Exception: " + usee.getMessage());
     } catch (ParseException pe) {
       throw new IllegalArgumentException(pe.toString());
     }
@@ -492,7 +498,9 @@ public class DG12File extends DataGroup {
           break;
         case DATE_AND_TIME_OF_PERSONALIZATION:
           tlvOut.writeTag(tag);
-          tlvOut.writeValue(Hex.hexStringToBytes(SDTF.format(dateAndTimeOfPersonalization)));
+          // the following commented line  writes date and time of personalisation field incorrectly
+          //tlvOut.writeValue(Hex.hexStringToBytes(SDTF.format(dateAndTimeOfPersonalization)));
+          tlvOut.writeValue(new String(SDTF.format(dateAndTimeOfPersonalization)).getBytes("UTF-8"));
           break;
         case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
           tlvOut.writeTag(tag);
