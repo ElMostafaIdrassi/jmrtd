@@ -31,7 +31,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.ECParameterSpec;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;

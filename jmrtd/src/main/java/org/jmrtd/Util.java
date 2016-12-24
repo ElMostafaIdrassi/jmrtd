@@ -245,7 +245,7 @@ public class Util {
       return hash;
     }
   }
-
+  
   /**
    * Pads the input <code>in</code> according to ISO9797-1 padding method 2,
    * using the given block size.
@@ -301,7 +301,7 @@ public class Util {
     System.arraycopy(in, 0, out, 0, i);
     return out;
   }
-    
+  
   /**
    * Recovers the M1 part of the message sent back by the AA protocol
    * (INTERNAL AUTHENTICATE command). The algorithm is described in
@@ -333,7 +333,7 @@ public class Util {
       /* Third bit (working from left to right) should be '1' for partial recovery. */
       throw new NumberFormatException("Could not get M1");
     }
-        
+    
     /* Trailer. */
     if (((plaintext[plaintext.length - 1] & 0xF) ^ 0xC) != 0) {
       /* 
@@ -405,7 +405,9 @@ public class Util {
   
   public static byte[] alignKeyDataToSize(byte[] keyData, int size) {
     byte[] result = new byte[size];
-    if (keyData.length < size) { size = keyData.length; }
+    if (keyData.length < size) {
+      size = keyData.length;
+    }
     System.arraycopy(keyData, keyData.length - size, result, result.length - size, size);
     return result;
   }
@@ -441,7 +443,9 @@ public class Util {
     /* Do something with: int sizeInBytes = val.bitLength() / Byte.SIZE; */
     
     int sizeInNibbles = val.toString(16).length();
-    if (sizeInNibbles % 2 != 0) { sizeInNibbles++; }
+    if (sizeInNibbles % 2 != 0) {
+      sizeInNibbles++;
+    }
     int length = sizeInNibbles / 2;
     return i2os(val, length);
   }
@@ -455,7 +459,9 @@ public class Util {
    * @return positive integer
    */
   public static BigInteger os2i(byte[] bytes) {
-    if (bytes == null) { throw new IllegalArgumentException(); }
+    if (bytes == null) {
+      throw new IllegalArgumentException();
+    }
     return os2i(bytes, 0, bytes.length);
   }
   
@@ -470,13 +476,17 @@ public class Util {
    * @return positive integer
    */
   public static BigInteger os2i(byte[] bytes, int offset, int length) {
-    if (bytes == null) { throw new IllegalArgumentException(); }
+    if (bytes == null) {
+      throw new IllegalArgumentException();
+    }
+    
     BigInteger result = BigInteger.ZERO;
     BigInteger base = BigInteger.valueOf(256);
     for (int i = offset; i < offset + length; i++) {
       result = result.multiply(base);
       result = result.add(BigInteger.valueOf(bytes[i] & 0xFF));
     }
+    
     return result;
   }
   
@@ -500,7 +510,10 @@ public class Util {
    * @return a digest algorithm, or null if inference failed
    */
   public static String inferDigestAlgorithmFromSignatureAlgorithm(String signatureAlgorithm) {
-    if (signatureAlgorithm == null) { throw new IllegalArgumentException(); }
+    if (signatureAlgorithm == null) {
+      throw new IllegalArgumentException();
+    }
+    
     String digestAlgorithm = null;
     String signatureAlgorithmToUppercase = signatureAlgorithm.toUpperCase();
     if (signatureAlgorithmToUppercase.contains("WITH")) {
@@ -512,6 +525,7 @@ public class Util {
     if ("SHA256".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-256"; }
     if ("SHA384".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-384"; }
     if ("SHA512".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-512"; }
+    
     return digestAlgorithm;
   }
   
@@ -539,6 +553,10 @@ public class Util {
    * @return the algorithm
    */
   public static String getDetailedPublicKeyAlgorithm(PublicKey publicKey) {
+//    if (publicKey == null) {
+//      return "null";
+//    }
+    
     String algorithm = publicKey.getAlgorithm();
     if (publicKey instanceof RSAPublicKey) {
       RSAPublicKey rsaPublicKey = (RSAPublicKey)publicKey;
@@ -552,10 +570,15 @@ public class Util {
         algorithm += " [" + name + "]";
       }
     }
+    
     return algorithm;
   }
   
   public static String getDetailedPrivateKeyAlgorithm(PrivateKey privateKey) {
+    if (privateKey == null) {
+      return "null";
+    }
+    
     String algorithm = privateKey.getAlgorithm();
     if (privateKey instanceof RSAPrivateKey) {
       RSAPrivateKey rsaPrivateKey = (RSAPrivateKey)privateKey;
@@ -638,8 +661,7 @@ public class Util {
       if (namedSpec.getCurve().equals(ecParamSpec.getCurve())
           && namedSpec.getGenerator().equals(ecParamSpec.getGenerator())
           && namedSpec.getOrder().equals(ecParamSpec.getOrder())
-          && namedSpec.getCofactor() == ecParamSpec.getCofactor()
-          ) {
+          && namedSpec.getCofactor() == ecParamSpec.getCofactor()) {
         namedSpecs.add(namedSpec);
       }
     }
@@ -698,7 +720,9 @@ public class Util {
           
           /* It's a named curve from X9.62. */
           params = X962NamedCurves.getByOID(paramsOID);
-          if (params == null) { throw new IllegalStateException("Could not find X9.62 named curve for OID " + paramsOID.getId()); }
+          if (params == null) {
+            throw new IllegalStateException("Could not find X9.62 named curve for OID " + paramsOID.getId());
+          }
           
           /* Reconstruct the parameters. */
           org.bouncycastle.math.ec.ECPoint generator = params.getG();
@@ -775,8 +799,12 @@ public class Util {
       ECPoint w = ecPublicKey.getW();
       ECParameterSpec params = ecPublicKey.getParams();
       params = toExplicitECParameterSpec(params);
-      if (params == null) { return publicKey; }
+      if (params == null) {
+        return publicKey;
+      }
+      
       ECPublicKeySpec explicitPublicKeySpec = new ECPublicKeySpec(w, params);
+      
       return KeyFactory.getInstance("EC", BC_PROVIDER).generatePublic(explicitPublicKeySpec);
     } catch (Exception e) {
       LOGGER.warning("Could not make public key param spec explicit");
@@ -955,7 +983,10 @@ public class Util {
   }
   
   public static PublicKey decodePublicKeyFromSmartCard(byte[] encodedPublicKey, AlgorithmParameterSpec params) {
-    if (params == null) { throw new IllegalArgumentException("Params cannot be null"); }
+    if (params == null) {
+      throw new IllegalArgumentException("Params cannot be null");
+    }
+    
     try {
       if (params instanceof ECParameterSpec) {
         ECPoint w = os2ECPoint(encodedPublicKey);
@@ -1017,7 +1048,10 @@ public class Util {
    * @deprecated Looks like computing Y coord in ECDH case is buggy. Use DH or ECDH variant directly.
    */
   public static AlgorithmParameterSpec mapNonceGM(byte[] nonceS, byte[] sharedSecretH, AlgorithmParameterSpec params) {
-    if (params == null) { throw new IllegalArgumentException("Unsupported parameters for mapping nonce"); }
+    if (params == null) {
+      throw new IllegalArgumentException("Unsupported parameters for mapping nonce");
+    }
+    
     if (params instanceof ECParameterSpec) {
       ECParameterSpec ecParams = (ECParameterSpec)params;
       
