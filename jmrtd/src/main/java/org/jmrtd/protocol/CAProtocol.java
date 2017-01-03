@@ -119,7 +119,6 @@ public class CAProtocol {
     }
     
     try {      
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
       AlgorithmParameterSpec params = null;
       LOGGER.info("DEBUG: Chip Authentication uses public key: " + Util.getDetailedPublicKeyAlgorithm(piccPublicKey));
       if ("DH".equals(agreementAlg)) {
@@ -131,6 +130,8 @@ public class CAProtocol {
       } else {
         throw new IllegalStateException("Unsupported algorithm \"" + agreementAlg + "\"");
       }
+      
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
@@ -164,14 +165,14 @@ public class CAProtocol {
       
       if (keyId != null) {
         byte[] keyIdBytes = keyId.toByteArray();
-        idData = Util.wrapDO((byte)0x84, keyIdBytes);
+        idData = Util.wrapDO((byte)0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
       }
       
       if (cipherAlg.startsWith("DESede")) {
-        service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData);
+        service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData); /* FIXME: Constant for 0x91. */
       } else if (cipherAlg.startsWith("AES")) {
         service.sendMSESetATIntAuth(wrapper, oid, keyId);        
-        service.sendGeneralAuthenticate(wrapper, Util.wrapDO((byte)0x80, keyData), true);
+        service.sendGeneralAuthenticate(wrapper, Util.wrapDO((byte)0x80, keyData), true); /* FIXME: Constant for 0x80. */
       } else {
         throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
       }
