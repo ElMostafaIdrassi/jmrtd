@@ -691,15 +691,15 @@ public class PassportApduService extends CardService {
       LOGGER.info("DEBUG: explicit case, keyId == " + keyId);
       byte[] oidBytes = toOIDBytes(oid);
       byte[] keyIdBytes = Util.wrapDO((byte)0x84, Util.i2os(keyId));
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       try {
-        bos.write(oidBytes);
-        bos.write(keyIdBytes);
-        bos.close();
+        byteArrayOutputStream.write(oidBytes);
+        byteArrayOutputStream.write(keyIdBytes);
+        byteArrayOutputStream.close();
       } catch (IOException ioe) {
         LOGGER.log(Level.WARNING, "Exception", ioe);
       }
-      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, p1, p2, bos.toByteArray());
+      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, p1, p2, byteArrayOutputStream.toByteArray());
       rapdu = transmit(wrapper, capdu);
     }
     short sw = rapdu == null ? -1 : (short)rapdu.getSW();

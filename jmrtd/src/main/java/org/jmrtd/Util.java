@@ -318,7 +318,7 @@ public class Util {
    */
   public static byte[] recoverMessage(int digestLength, byte[] plaintext) {
     if (plaintext == null || plaintext.length < 1) {
-      throw new IllegalArgumentException("Plaintext too short to recover message");
+      throw new IllegalArgumentException("Plaintext is too short to recover message");
     }
     
     /* Header. */
@@ -331,7 +331,7 @@ public class Util {
     }
     if ((plaintext[0] & 0x20) == 0) {
       /* Third bit (working from left to right) should be '1' for partial recovery. */
-      throw new NumberFormatException("Could not get M1");
+      throw new NumberFormatException("Could not get M1, first byte indicates partial recovery not enabled: " + Integer.toHexString(plaintext[0]));
     }
     
     /* Trailer. */
@@ -553,9 +553,9 @@ public class Util {
    * @return the algorithm
    */
   public static String getDetailedPublicKeyAlgorithm(PublicKey publicKey) {
-//    if (publicKey == null) {
-//      return "null";
-//    }
+    if (publicKey == null) {
+      return "null";
+    }
     
     String algorithm = publicKey.getAlgorithm();
     if (publicKey instanceof RSAPublicKey) {

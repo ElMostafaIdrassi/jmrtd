@@ -24,7 +24,7 @@ package org.jmrtd.protocol;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
 
@@ -44,25 +44,27 @@ public class CAResult implements Serializable {
   private static final long serialVersionUID = 4431711176589761513L;
   
   private BigInteger keyId;
-  private PublicKey publicKey;
+  private PublicKey piccPublicKey;
   private SecureMessagingWrapper wrapper;
   private byte[] keyHash;
-  private KeyPair keyPair;
+  private PublicKey pcdPublicKey;
+  private PrivateKey pcdPrivateKey;
   
   /**
    * Creates a result.
    *
    * @param keyId the key identifier of the ICC's public key or -1
-   * @param publicKey the ICC's public key
+   * @param piccPublicKey the ICC's public key
    * @param keyHash the hash of the key
    * @param keyPair the key pair
    * @param wrapper secure messaging wrapper
    */
-  public CAResult(BigInteger keyId, PublicKey publicKey, byte[] keyHash, KeyPair keyPair, SecureMessagingWrapper wrapper) {
+  public CAResult(BigInteger keyId, PublicKey piccPublicKey, byte[] keyHash, PublicKey pcdPublicKey, PrivateKey pcdPrivateKey, SecureMessagingWrapper wrapper) {
     this.keyId = keyId;
-    this.publicKey = publicKey;
+    this.piccPublicKey = piccPublicKey;
     this.keyHash = keyHash;
-    this.keyPair = keyPair;
+    this.pcdPublicKey = pcdPublicKey;
+    this.pcdPrivateKey = pcdPrivateKey;
     this.wrapper = wrapper;
   }
   
@@ -81,7 +83,7 @@ public class CAResult implements Serializable {
    * @return the public key
    */
   public PublicKey getPublicKey() {
-    return publicKey;
+    return piccPublicKey;
   }
   
   public SecureMessagingWrapper getWrapper() {
@@ -92,11 +94,11 @@ public class CAResult implements Serializable {
   public String toString() {
     return (new StringBuilder())
         .append("CAResult [keyId: ").append(keyId)
-        .append(", publicKey: ").append(publicKey)
+        .append(", PICC public key: ").append(piccPublicKey)
         .append(", wrapper: ").append(wrapper)
-        .append(", keyHash: ").append(Hex.bytesToHexString(keyHash))
-        .append(", keyPair: ")
-        .append(Util.getDetailedPublicKeyAlgorithm(keyPair.getPublic()))
+        .append(", key hash: ").append(Hex.bytesToHexString(keyHash))
+        .append(", PCD public key: ").append(Util.getDetailedPublicKeyAlgorithm(pcdPublicKey))
+        .append(", PCD private key: ").append(Util.getDetailedPrivateKeyAlgorithm(pcdPrivateKey))
         .append("]").toString();
   }
   
@@ -106,8 +108,9 @@ public class CAResult implements Serializable {
     int result = 1;
     result = prime * result + Arrays.hashCode(keyHash);
     result = prime * result + ((keyId == null) ? 0 : keyId.hashCode());
-    result = prime * result + ((keyPair == null) ? 0 : keyPair.hashCode());
-    result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
+    result = prime * result + ((piccPublicKey == null) ? 0 : piccPublicKey.hashCode());
+    result = prime * result + ((pcdPublicKey == null) ? 0 : pcdPublicKey.hashCode());
+    result = prime * result + ((pcdPrivateKey == null) ? 0 : pcdPrivateKey.hashCode());
     result = prime * result + ((wrapper == null) ? 0 : wrapper.hashCode());
     return result;
   }
@@ -134,18 +137,25 @@ public class CAResult implements Serializable {
     } else if (!keyId.equals(other.keyId)) {
       return false;
     }
-    if (keyPair == null) {
-      if (other.keyPair != null) {
+    if (pcdPrivateKey == null) {
+      if (other.pcdPrivateKey != null) {
         return false;
       }
-    } else if (!keyPair.equals(other.keyPair)) {
+    } else if (!pcdPrivateKey.equals(other.pcdPrivateKey)) {
       return false;
     }
-    if (publicKey == null) {
-      if (other.publicKey != null) {
+    if (pcdPublicKey == null) {
+      if (other.pcdPublicKey != null) {
         return false;
       }
-    } else if (!publicKey.equals(other.publicKey)) {
+    } else if (!pcdPublicKey.equals(other.pcdPublicKey)) {
+      return false;
+    }
+    if (piccPublicKey == null) {
+      if (other.piccPublicKey != null) {
+        return false;
+      }
+    } else if (!piccPublicKey.equals(other.piccPublicKey)) {
       return false;
     }
     if (wrapper == null) {
@@ -169,11 +179,21 @@ public class CAResult implements Serializable {
   }
   
   /**
-   * The ephemeral key pair resulting from chip authentication.
+   * The ephemeral public key of the terminal that was used in the key exchange.
    *
-   * @return a key pair
+   * @return the public key
    */
-  public KeyPair getKeyPair() {
-    return keyPair;
+  public PublicKey getPCDPublicKey() {
+    return pcdPublicKey;
   }
+  
+  /**
+   * The ephemeral private key of the terminal that was used in the key exchange.
+   *
+   * @return the private key
+   */
+  public PrivateKey getPCDPrivateKey() {
+    return pcdPrivateKey;
+  }
+
 }
