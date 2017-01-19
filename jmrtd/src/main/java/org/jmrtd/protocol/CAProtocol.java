@@ -118,7 +118,7 @@ public class CAProtocol {
         params = piccECPublicKey.getParams();
       }
       
-      /* Generate the inspection system's ephemeral keypair. */
+      /* Generate the inspection system's ephemeral key pair. */
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();

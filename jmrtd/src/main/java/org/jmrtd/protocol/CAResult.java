@@ -53,9 +53,9 @@ public class CAResult implements Serializable {
   /**
    * Creates a result.
    *
-   * @param keyId the key identifier of the ICC's public key or -1
+   * @param keyId the key identifier of the ICC's public key or {@code null}
    * @param piccPublicKey the ICC's public key
-   * @param keyHash the hash of the key
+   * @param keyHash the hash of the PCD's public key
    * @param pcdPublicKey the public key of the terminal
    * @param pcdPrivateKey the private key of the terminal
    * @param wrapper secure messaging wrapper
@@ -171,9 +171,9 @@ public class CAResult implements Serializable {
   }
   
   /**
-   * Gets the hash of the key.
+   * Gets the hash of the ephemeral public key of the terminal.
    *
-   * @return the hash of the key
+   * @return the hash of the ephemeral public key of the terminal
    */
   public byte[] getKeyHash() {
     return keyHash;
@@ -196,5 +196,4 @@ public class CAResult implements Serializable {
   public PrivateKey getPCDPrivateKey() {
     return pcdPrivateKey;
   }
-
 }
