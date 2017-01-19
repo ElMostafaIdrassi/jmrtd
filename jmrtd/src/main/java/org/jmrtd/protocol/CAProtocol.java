@@ -23,7 +23,6 @@
 package org.jmrtd.protocol;
 
 import java.math.BigInteger;
-
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;

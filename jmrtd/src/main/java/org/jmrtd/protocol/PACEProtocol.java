@@ -53,6 +53,7 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.jmrtd.BACKeySpec;
+import org.jmrtd.CANKey;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.PACEException;
 import org.jmrtd.PassportApduService;
@@ -253,7 +254,7 @@ public class PACEProtocol {
       if (encryptedChipAuthenticationData == null) {
         LOGGER.severe("Encrypted Chip Authentication data is null");
       }
-            
+      
       /* Decrypt A_PICC to recover CA_PICC. */
       try {
         SecretKey secretKey = encKey; // new SecretKeySpec(sharedSecretBytes, "AES");
@@ -272,11 +273,11 @@ public class PACEProtocol {
         params,
         piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes, encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
   }
-
-
   
-
-
+  
+  
+  
+  
   /**
    * The first step in the PACE protocol receives an encrypted nonce from the PICC
    * and decrypts it.
@@ -565,30 +566,36 @@ public class PACEProtocol {
   }
   
   public static byte[] computeKeySeedForPACE(KeySpec keySpec) throws GeneralSecurityException {
-    if (!(keySpec instanceof BACKeySpec)) {
-      throw new IllegalArgumentException("Unsupported key spec, was expecting BAC key spec");
+    
+    /* MRZ based key. */
+    if (keySpec instanceof BACKeySpec) {
+      BACKeySpec accessKey = (BACKeySpec)keySpec;
+      String documentNumber = accessKey.getDocumentNumber();
+      String dateOfBirth = accessKey.getDateOfBirth();
+      String dateOfExpiry = accessKey.getDateOfExpiry();
+      
+      if (dateOfBirth == null || dateOfBirth.length() != 6) {
+        throw new IllegalArgumentException("Wrong date format used for date of birth. Expected yyMMdd, found " + dateOfBirth);
+      }
+      if (dateOfExpiry == null || dateOfExpiry.length() != 6) {
+        throw new IllegalArgumentException("Wrong date format used for date of expiry. Expected yyMMdd, found " + dateOfExpiry);
+      }
+      if (documentNumber == null) {
+        throw new IllegalArgumentException("Wrong document number. Found " + documentNumber);
+      }
+      
+      documentNumber = fixDocumentNumber(documentNumber);
+      
+      return computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
     }
     
-    BACKeySpec bacKey = (BACKeySpec)keySpec;
-    String documentNumber = bacKey.getDocumentNumber();
-    String dateOfBirth = bacKey.getDateOfBirth();
-    String dateOfExpiry = bacKey.getDateOfExpiry();
-    
-    if (dateOfBirth == null || dateOfBirth.length() != 6) {
-      throw new IllegalArgumentException("Wrong date format used for date of birth. Expected yyMMdd, found " + dateOfBirth);
-    }
-    if (dateOfExpiry == null || dateOfExpiry.length() != 6) {
-      throw new IllegalArgumentException("Wrong date format used for date of expiry. Expected yyMMdd, found " + dateOfExpiry);
-    }
-    if (documentNumber == null) {
-      throw new IllegalArgumentException("Wrong document number. Found " + documentNumber);
+    /* CAN based key. */
+    if (keySpec instanceof CANKey) {
+      String cardAccessNumber = ((CANKey)keySpec).getCardAccessNumber();
+      return computeKeySeedForPACE(cardAccessNumber);
     }
     
-    documentNumber = fixDocumentNumber(documentNumber);
-    
-    byte[] keySeed = computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
-    
-    return keySeed;
+    throw new IllegalArgumentException("Unsupported key spec, was expecting BAC or CAN key specification");
   }
   
   /**
@@ -605,7 +612,7 @@ public class PACEProtocol {
     if (!(publicKey instanceof ECPublicKey) || !(privateKey instanceof ECPrivateKey)) {
       throw new NoSuchAlgorithmException("Unsupported key type");
     }
-
+    
     KeyFactory keyFactory = KeyFactory.getInstance("EC");    
     KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
     return keyFactory.generatePublic(keySpec);
@@ -636,6 +643,10 @@ public class PACEProtocol {
       maxDocumentNumber += "<";
     }
     return maxDocumentNumber;
+  }
+  
+  public static byte[] computeKeySeedForPACE(String cardAccessNumber) throws GeneralSecurityException {
+    return Util.computeKeySeed(cardAccessNumber,  "SHA-1", false);
   }
   
   /**
@@ -687,12 +698,12 @@ public class PACEProtocol {
     }
     
     if (!("DESede".equalsIgnoreCase(cipherAlg) || "AES".equalsIgnoreCase(cipherAlg))) {
-      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + agreementAlg + "\"");
+      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + cipherAlg + "\"");
     }
     
-    if (!("SHA-1".equalsIgnoreCase(cipherAlg) || "SHA1".equalsIgnoreCase(cipherAlg)
-        || "SHA-256".equalsIgnoreCase(cipherAlg) || "SHA256".equalsIgnoreCase(cipherAlg))) {
-      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + agreementAlg + "\"");
+    if (!("SHA-1".equalsIgnoreCase(digestAlg) || "SHA1".equalsIgnoreCase(digestAlg)
+        || "SHA-256".equalsIgnoreCase(digestAlg) || "SHA256".equalsIgnoreCase(digestAlg))) {
+      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + digestAlg + "\"");
     }
     
     if (!(keyLength == 128 || keyLength == 192 || keyLength == 256)) {

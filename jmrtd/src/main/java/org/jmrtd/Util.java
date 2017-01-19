@@ -219,20 +219,51 @@ public class Util {
    * @throws GeneralSecurityException on security error
    */
   public static byte[] computeKeySeed(String documentNumber, String dateOfBirth, String dateOfExpiry, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
+    LOGGER.info(String.format("BLA %s %c %s %c %s %c ",
+        documentNumber, MRZInfo.checkDigit(documentNumber),
+        dateOfBirth, MRZInfo.checkDigit(dateOfBirth),
+        dateOfExpiry, MRZInfo.checkDigit(dateOfExpiry)));
+    String text = (new StringBuilder())
+        .append(documentNumber)
+        .append(MRZInfo.checkDigit(documentNumber))
+        .append(dateOfBirth)
+        .append(MRZInfo.checkDigit(dateOfBirth))
+        .append(dateOfExpiry)
+        .append(MRZInfo.checkDigit(dateOfExpiry))
+        .toString();
+        
+    return computeKeySeed(text, digestAlg, doTruncate);
     
     /* Check digits... */
-    byte[] documentNumberCheckDigit = { (byte)MRZInfo.checkDigit(documentNumber) };
-    byte[] dateOfBirthCheckDigit = { (byte)MRZInfo.checkDigit(dateOfBirth) };
-    byte[] dateOfExpiryCheckDigit = { (byte)MRZInfo.checkDigit(dateOfExpiry) };
+//    byte[] documentNumberCheckDigit = { (byte)MRZInfo.checkDigit(documentNumber) };
+//    byte[] dateOfBirthCheckDigit = { (byte)MRZInfo.checkDigit(dateOfBirth) };
+//    byte[] dateOfExpiryCheckDigit = { (byte)MRZInfo.checkDigit(dateOfExpiry) };
     
+//    MessageDigest shaDigest = MessageDigest.getInstance(digestAlg);
+//    
+//    shaDigest.update(getBytes(documentNumber));
+//    shaDigest.update(documentNumberCheckDigit);
+//    shaDigest.update(getBytes(dateOfBirth));
+//    shaDigest.update(dateOfBirthCheckDigit);
+//    shaDigest.update(getBytes(dateOfExpiry));
+//    shaDigest.update(dateOfExpiryCheckDigit);
+//    
+//    byte[] hash = shaDigest.digest();
+//    
+//    if (doTruncate) {
+//      /* FIXME: truncate to 16 byte only for BAC with 3DES. Also for PACE and/or AES? -- MO */
+//      byte[] keySeed = new byte[16];
+//      System.arraycopy(hash, 0, keySeed, 0, 16);
+//      return keySeed;
+//    } else {
+//      return hash;
+//    }
+  }
+  
+  public static byte[] computeKeySeed(String cardAccessNumber, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
     MessageDigest shaDigest = MessageDigest.getInstance(digestAlg);
     
-    shaDigest.update(getBytes(documentNumber));
-    shaDigest.update(documentNumberCheckDigit);
-    shaDigest.update(getBytes(dateOfBirth));
-    shaDigest.update(dateOfBirthCheckDigit);
-    shaDigest.update(getBytes(dateOfExpiry));
-    shaDigest.update(dateOfExpiryCheckDigit);
+    shaDigest.update(getBytes(cardAccessNumber));
     
     byte[] hash = shaDigest.digest();
     
@@ -307,58 +338,68 @@ public class Util {
    * (INTERNAL AUTHENTICATE command). The algorithm is described in
    * ISO 9796-2:2002 9.3.
    *
-   * Based on code by Ronny (ronny@cs.ru.nl) who presumably ripped this
-   * from Bouncy Castle.
-   *
    * @param digestLength should be 20
-   * @param plaintext response from card, already 'decrypted' (using the
-   * AA public key)
+   * @param decryptedResponse response from card, already 'decrypted' (using the AA public key)
    *
    * @return the m1 part of the message
    */
-  public static byte[] recoverMessage(int digestLength, byte[] plaintext) {
-    if (plaintext == null || plaintext.length < 1) {
+  public static byte[] recoverMessage(int digestLength, byte[] decryptedResponse) {
+    if (decryptedResponse == null || decryptedResponse.length < 1) {
       throw new IllegalArgumentException("Plaintext is too short to recover message");
     }
     
+    /* Trailer. */
+    if (((decryptedResponse[decryptedResponse.length - 1] & 0xF) ^ 0xC) != 0) {
+      /* 
+       * Trailer.
+       * NOTE: 0xF = 0000 1111, 0xC = 0000 1100.
+       */
+      throw new NumberFormatException("Could not get M1, malformed trailer");
+    }
+    
+    int trailerLength = 1;
+    /* Trailer. Find out whether this is t=1 or t=2. */
+    if (((decryptedResponse[decryptedResponse.length - 1] & 0xFF) ^ 0xBC) == 0) {
+      /* Option 1 (t = 1): the trailer shall consist of a single octet; this octet shall be equal to hexadecimal 'BC'. */
+      LOGGER.info("DEBUG: Option 1");
+      trailerLength = 1;
+    } else if (((decryptedResponse[decryptedResponse.length - 1] & 0xFF) ^ 0xCC) == 0) {
+      /*
+       * Option 2 (t = 2): the trailer shall consist of two consecutive octets;
+       * the rightmost octet shall be equal hexadecimal 'CC' and the leftmost octet shall be the hash-function identifier.
+       * The hash-function identifier indicates the hash-function in use.
+       */
+      LOGGER.info("DEBUG: Option 2");
+      trailerLength = 2;
+    } else {
+      throw new NumberFormatException("Not an ISO 9796-2 scheme 2 signature trailer");
+    }
+    
     /* Header. */
-    if (((plaintext[0] & 0xC0) ^ 0x40) != 0) {
+    if (((decryptedResponse[0] & 0xC0) ^ 0x40) != 0) {
       /*
        * First two bits (working from left to right) should be '01'.
        * NOTE: 0xC0 = 1100 0000, 0x40 = 0100 0000.
        */
       throw new NumberFormatException("Could not get M1");
     }
-    if ((plaintext[0] & 0x20) == 0) {
+    if ((decryptedResponse[0] & 0x20) == 0) {
       /* Third bit (working from left to right) should be '1' for partial recovery. */
-      throw new NumberFormatException("Could not get M1, first byte indicates partial recovery not enabled: " + Integer.toHexString(plaintext[0]));
-    }
-    
-    /* Trailer. */
-    if (((plaintext[plaintext.length - 1] & 0xF) ^ 0xC) != 0) {
-      /* 
-       * Trailer.
-       * NOTE: 0xF = 0000 1111, 0xC = 0000 1100.
-       */
-      throw new NumberFormatException("Could not get M1");
-    }
-    
-    if (((plaintext[plaintext.length - 1] & 0xFF) ^ 0xBC) != 0) {
-      /* NOTE: 0xBC = 1011 1100. */
-      throw new NumberFormatException("Could not get M1");
+      throw new NumberFormatException("Could not get M1, first byte indicates partial recovery not enabled: " + Integer.toHexString(decryptedResponse[0]));
     }
     
     /* Padding to the left of M1, find out how long. */
     int paddingLength = 0;
-    for (; paddingLength < plaintext.length; paddingLength++) {
+    for (; paddingLength < decryptedResponse.length; paddingLength++) {
       // 0x0A = 0000 1010
-      if (((plaintext[paddingLength] & 0x0F) ^ 0x0A) == 0) {
+      if (((decryptedResponse[paddingLength] & 0x0F) ^ 0x0A) == 0) {
         break;
       }
     }
     int messageOffset = paddingLength + 1;
+    LOGGER.info("DEBUG: messageOffset = " + messageOffset);
     
-    int paddedMessageLength = plaintext.length - 1 - digestLength;
+    int paddedMessageLength = decryptedResponse.length - trailerLength - digestLength;
     int messageLength = paddedMessageLength - messageOffset;    
     
     /* There must be at least one byte of message string. */
@@ -369,7 +410,8 @@ public class Util {
     /* TODO: If we contain the whole message as well, check the hash of that. */
     
     byte[] recoveredMessage = new byte[messageLength];
-    System.arraycopy(plaintext, messageOffset, recoveredMessage, 0, messageLength);
+    System.arraycopy(decryptedResponse, messageOffset, recoveredMessage, 0, messageLength);
+    
     return recoveredMessage;
   }
   

@@ -82,7 +82,7 @@ public class PassportService extends PassportApduService implements Serializable
   private static final long serialVersionUID = 1751933705552226972L;
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
+  
   /** Card Access. */
   public static final short EF_CARD_ACCESS = 0x011C;
   
@@ -171,10 +171,10 @@ public class PassportService extends PassportApduService implements Serializable
   SF_COM = 0x1E,
   SF_SOD = 0x1D,
   SF_CVCA = 0x1C;
-
+  
   /** YYMMDD format. */
   public static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
-
+  
   /** The default maximal blocksize used for unencrypted APDUs. */
   public static final int DEFAULT_MAX_BLOCKSIZE = 224;
   
@@ -361,7 +361,7 @@ public class PassportService extends PassportApduService implements Serializable
    * @param keySpec the MRZ
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
-   * 
+   *
    * @return the result
    *
    * @throws PACEException on error
