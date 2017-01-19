@@ -160,7 +160,6 @@ public class Util {
    */
   public static SecretKey deriveKey(byte[] keySeed, String cipherAlg, int keyLength, byte[] nonce, int counter) throws GeneralSecurityException {
     String digestAlg = inferDigestAlgorithmFromCipherAlgorithmForKeyDerivation(cipherAlg, keyLength);
-    LOGGER.info("DEBUG: key derivation uses digestAlg = " + digestAlg);
     MessageDigest digest = MessageDigest.getInstance(digestAlg);
     digest.reset();
     digest.update(keySeed);
@@ -361,7 +360,6 @@ public class Util {
     /* Trailer. Find out whether this is t=1 or t=2. */
     if (((decryptedResponse[decryptedResponse.length - 1] & 0xFF) ^ 0xBC) == 0) {
       /* Option 1 (t = 1): the trailer shall consist of a single octet; this octet shall be equal to hexadecimal 'BC'. */
-      LOGGER.info("DEBUG: Option 1");
       trailerLength = 1;
     } else if (((decryptedResponse[decryptedResponse.length - 1] & 0xFF) ^ 0xCC) == 0) {
       /*
@@ -369,7 +367,6 @@ public class Util {
        * the rightmost octet shall be equal hexadecimal 'CC' and the leftmost octet shall be the hash-function identifier.
        * The hash-function identifier indicates the hash-function in use.
        */
-      LOGGER.info("DEBUG: Option 2");
       trailerLength = 2;
     } else {
       throw new NumberFormatException("Not an ISO 9796-2 scheme 2 signature trailer");
@@ -397,7 +394,6 @@ public class Util {
       }
     }
     int messageOffset = paddingLength + 1;
-    LOGGER.info("DEBUG: messageOffset = " + messageOffset);
     
     int paddedMessageLength = decryptedResponse.length - trailerLength - digestLength;
     int messageLength = paddedMessageLength - messageOffset;    
