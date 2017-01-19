@@ -56,7 +56,8 @@ public class CAResult implements Serializable {
    * @param keyId the key identifier of the ICC's public key or -1
    * @param piccPublicKey the ICC's public key
    * @param keyHash the hash of the key
-   * @param keyPair the key pair
+   * @param pcdPublicKey the public key of the terminal
+   * @param pcdPrivateKey the private key of the terminal
    * @param wrapper secure messaging wrapper
    */
   public CAResult(BigInteger keyId, PublicKey piccPublicKey, byte[] keyHash, PublicKey pcdPublicKey, PrivateKey pcdPrivateKey, SecureMessagingWrapper wrapper) {

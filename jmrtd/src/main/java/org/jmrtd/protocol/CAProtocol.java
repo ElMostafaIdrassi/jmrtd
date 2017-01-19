@@ -200,7 +200,7 @@ public class CAProtocol {
    * 
    * @return the secure messaging wrapper
    * 
-   * @throws GeneralSecurityException
+   * @throws GeneralSecurityException on error
    */
   public SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret) throws GeneralSecurityException {
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
