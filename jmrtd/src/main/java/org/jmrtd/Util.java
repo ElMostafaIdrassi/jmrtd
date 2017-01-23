@@ -218,10 +218,6 @@ public class Util {
    * @throws GeneralSecurityException on security error
    */
   public static byte[] computeKeySeed(String documentNumber, String dateOfBirth, String dateOfExpiry, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
-    LOGGER.info(String.format("BLA %s %c %s %c %s %c ",
-        documentNumber, MRZInfo.checkDigit(documentNumber),
-        dateOfBirth, MRZInfo.checkDigit(dateOfBirth),
-        dateOfExpiry, MRZInfo.checkDigit(dateOfExpiry)));
     String text = (new StringBuilder())
         .append(documentNumber)
         .append(MRZInfo.checkDigit(documentNumber))
@@ -232,31 +228,6 @@ public class Util {
         .toString();
         
     return computeKeySeed(text, digestAlg, doTruncate);
-    
-    /* Check digits... */
-//    byte[] documentNumberCheckDigit = { (byte)MRZInfo.checkDigit(documentNumber) };
-//    byte[] dateOfBirthCheckDigit = { (byte)MRZInfo.checkDigit(dateOfBirth) };
-//    byte[] dateOfExpiryCheckDigit = { (byte)MRZInfo.checkDigit(dateOfExpiry) };
-    
-//    MessageDigest shaDigest = MessageDigest.getInstance(digestAlg);
-//    
-//    shaDigest.update(getBytes(documentNumber));
-//    shaDigest.update(documentNumberCheckDigit);
-//    shaDigest.update(getBytes(dateOfBirth));
-//    shaDigest.update(dateOfBirthCheckDigit);
-//    shaDigest.update(getBytes(dateOfExpiry));
-//    shaDigest.update(dateOfExpiryCheckDigit);
-//    
-//    byte[] hash = shaDigest.digest();
-//    
-//    if (doTruncate) {
-//      /* FIXME: truncate to 16 byte only for BAC with 3DES. Also for PACE and/or AES? -- MO */
-//      byte[] keySeed = new byte[16];
-//      System.arraycopy(hash, 0, keySeed, 0, 16);
-//      return keySeed;
-//    } else {
-//      return hash;
-//    }
   }
   
   public static byte[] computeKeySeed(String cardAccessNumber, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
@@ -290,45 +261,45 @@ public class Util {
   }
   
   /**
-   * Pads the input {@code in} indicated by {@code offset} and {@code length}
+   * Pads the input {@code bytes} indicated by {@code offset} and {@code length}
    * according to ISO9797-1 padding method 2, using the given block size in {@code blockSize}.
    *
-   * @param in input
+   * @param bytes input
    * @param offset the offset
    * @param length the length
    * @param blockSize the block size
    *
    * @return padded bytes
    */
-  public static byte[] pad(/*@ non_null */ byte[] in, int offset, int length, int blockSize) {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    out.write(in, offset, length);
-    out.write((byte)0x80);
-    while (out.size() % blockSize != 0) {
-      out.write((byte)0x00);
+  public static byte[] pad(/*@ non_null */ byte[] bytes, int offset, int length, int blockSize) {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    outputStream.write(bytes, offset, length);
+    outputStream.write((byte)0x80);
+    while (outputStream.size() % blockSize != 0) {
+      outputStream.write((byte)0x00);
     }
-    return out.toByteArray();
+    return outputStream.toByteArray();
   }
   
   /**
-   * Unpads the input {@code in} according to ISO9797-1 padding method 2.
+   * Unpads the input {@code bytes} according to ISO9797-1 padding method 2.
    * 
-   * @param in the input
+   * @param bytes the input
    * 
    * @return the unpadded bytes
    *
    * @throws BadPaddingException on padding exception
    */
-  public static byte[] unpad(byte[] in) throws BadPaddingException {
-    int i = in.length - 1;
-    while (i >= 0 && in[i] == 0x00) {
+  public static byte[] unpad(byte[] bytes) throws BadPaddingException {
+    int i = bytes.length - 1;
+    while (i >= 0 && bytes[i] == 0x00) {
       i--;
     }
-    if ((in[i] & 0xFF) != 0x80) {
-      throw new BadPaddingException("Expected constant 0x80, found 0x" + Integer.toHexString((in[i] & 0x000000FF)) + "\nDEBUG: in = " + Hex.bytesToHexString(in) + ", index = " + i);
+    if ((bytes[i] & 0xFF) != 0x80) {
+      throw new BadPaddingException("Expected constant 0x80, found 0x" + Integer.toHexString((bytes[i] & 0x000000FF)) + "\nDEBUG: in = " + Hex.bytesToHexString(bytes) + ", index = " + i);
     }
     byte[] out = new byte[i];
-    System.arraycopy(in, 0, out, 0, i);
+    System.arraycopy(bytes, 0, out, 0, i);
     return out;
   }
   

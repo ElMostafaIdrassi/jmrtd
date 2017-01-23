@@ -121,6 +121,15 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
   
   /**
+   * Gets the protocol object identifier as a human readable string.
+   * 
+   * @return a string
+   */
+  public String getProtocolOIDString() {
+    return toProtocolOIDString(oid);
+  }
+  
+  /**
    * Gets the parameter id, or -1 if this is the only domain parameter info.
    *
    * @return the parameter id or -1
@@ -162,16 +171,16 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
   
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("PaceDomainParameterInfo");
+    StringBuilder result = new StringBuilder();
+    result.append("PACEDomainParameterInfo");
     result.append("[");
-    result.append("protocol: " + toProtocolOIDString(oid));
+    result.append("protocol: ").append(toProtocolOIDString(oid));
     result.append(", ");
     result.append("domainParameter: [");
-    result.append("algorithm: " + domainParameter.getAlgorithm().getId()); // e.g. ID_EC_PUBLIC_KEY
+    result.append("algorithm: ").append(domainParameter.getAlgorithm().getId()); // e.g. ID_EC_PUBLIC_KEY
     result.append(", ");
     ASN1Encodable parameters = domainParameter.getParameters(); // e.g. ASN1 sequence of length 6
-    result.append("parameters: " + parameters);
+    result.append("parameters: ").append(parameters);
     result.append("]");
     if (parameterId != null) {
       result.append(", parameterId: " + parameterId);

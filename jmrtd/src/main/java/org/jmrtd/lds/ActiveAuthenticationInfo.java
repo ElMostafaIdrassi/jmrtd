@@ -113,12 +113,25 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
   
   /**
-   * Gets the object identifier of this AA security info.
+   * Gets the protocol object identifier of this AA security info.
    *
    * @return an object identifier
    */
   public String getObjectIdentifier() {
     return oid;
+  }
+  
+  public int getVersion() {
+    return version;
+  }
+  
+  /**
+   * Gets the protocol object identifier as a human readable string.
+   * 
+   * @return a string
+   */
+  public String getProtocolOIDString() {
+    return toProtocolOIDString(oid);
   }
   
   /**
@@ -238,11 +251,14 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
   
   private String toProtocolOIDString(String oid) {
-    if (ID_AA.equals(oid)) { return "id-AA"; }
+    if (ID_AA.equals(oid)) {
+      return "id-AA";
+    }
+    
     return oid;
   }
   
-  private String toSignatureAlgorithmOIDString(String oid) {
+  public static String toSignatureAlgorithmOIDString(String oid) {
     if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }    
     if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }
     if (ECDSA_PLAIN_SHA256_OID.equals(oid)) { return "ecdsa-plain-SHA256"; }

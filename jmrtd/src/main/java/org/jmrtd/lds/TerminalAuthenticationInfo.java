@@ -134,8 +134,19 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
    *
    * @return an object identifier
    */
+  @Override
   public String getObjectIdentifier() {
     return oid;
+  }
+  
+  /**
+   * Gets the protocol object identifier as a human readable string.
+   * 
+   * @return a string
+   */
+  @Override
+  public String getProtocolOIDString() {
+    return toProtocolOIDString(oid);
   }
   
   /**
@@ -157,20 +168,22 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     return getShortFileId(efCVCA);
   }
   
+  @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("TerminalAuthenticationInfo [");
-    result.append("protocol: " + toProtocolOIDString(oid));
+    result.append("protocol: ").append(toProtocolOIDString(oid));
     result.append(", ");
-    result.append("version: " + version);
+    result.append("version: ").append(version);
     result.append(", ");
-    result.append("fileID: " + getFileId());
+    result.append("fileID: ").append(getFileId());
     result.append(", ");
-    result.append("shortFileID: " + getShortFileId());
+    result.append("shortFileID: ").append(getShortFileId());
     result.append("]");
     return result.toString();
   }
   
+  @Override
   public int hashCode() {
     return 123
         + 7 * (oid == null ? 0 : oid.hashCode())
@@ -178,6 +191,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
         + 3 * (efCVCA == null ? 1 : efCVCA.hashCode());
   }
   
+  @Override
   public boolean equals(Object other) {
     if (other == null) { return false; }
     if (other == this) { return true; }

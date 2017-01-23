@@ -141,6 +141,16 @@ public class PACEInfo extends SecurityInfo {
     return protocolOID;
   }
   
+  /**
+   * Gets the protocol object identifier as a human readable string.
+   * 
+   * @return a string
+   */
+  @Override
+  public String getProtocolOIDString() {
+    return toProtocolOIDString(protocolOID);
+  }
+  
   public int getVersion() {
     return version;
   }
@@ -168,12 +178,12 @@ public class PACEInfo extends SecurityInfo {
   }
   
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("PaceInfo [");
-    result.append("protocol: " + toProtocolOIDString(protocolOID));
-    result.append(", version: " + version);
+    StringBuilder result = new StringBuilder();
+    result.append("PACEInfo [");
+    result.append("protocol: ").append(toProtocolOIDString(protocolOID));
+    result.append(", version: ").append(version);
     if (parameterId != null) {
-      result.append(", parameterId: " + toStandardizedParamIdString(parameterId));
+      result.append(", parameterId: ").append(toStandardizedParamIdString(parameterId));
     }
     result.append("]");
     return result.toString();
@@ -384,10 +394,11 @@ public class PACEInfo extends SecurityInfo {
     }
   }
   
-  private String toStandardizedParamIdString(BigInteger stdDomainParam) {
+  public static String toStandardizedParamIdString(BigInteger stdDomainParam) {
     if (stdDomainParam == null) {
       return "null";
     }
+    
     switch (stdDomainParam.intValue()) {
       case PARAM_ID_GFP_1024_160: /* 0 */ return "1024-bit MODP Group with 160-bit Prime Order Subgroup";
       case PARAM_ID_GFP_2048_224: /* 1 */ return "2048-bit MODP Group with 224-bit Prime Order Subgroup";

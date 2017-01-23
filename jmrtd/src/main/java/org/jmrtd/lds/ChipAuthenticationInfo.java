@@ -113,6 +113,19 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     return oid;
   }
   
+  public int getVersion() {
+    return version;
+  }
+  
+  /**
+   * Gets the protocol object identifier as a human readable string.
+   * 
+   * @return a string
+   */
+  public String getProtocolOIDString() {
+    return toProtocolOIDString(oid);
+  }
+  
   /**
    * Returns a key identifier stored in this ChipAuthenticationInfo structure,
    * {@code null} if not present.

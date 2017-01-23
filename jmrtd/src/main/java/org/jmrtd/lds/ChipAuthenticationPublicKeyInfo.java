@@ -124,6 +124,15 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   }
   
   /**
+   * Gets the protocol object identifier as a human readable string.
+   * 
+   * @return a string
+   */
+  public String getProtocolOIDString() {
+    return toProtocolOIDString(oid);
+  }
+  
+  /**
    * Returns a key identifier stored in this ChipAuthenticationPublicKeyInfo
    * structure, {@code null} if not present.
    *

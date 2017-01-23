@@ -167,12 +167,14 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   }
   
   /**
-   * Returns the object identifier of this SecurityInfo.
+   * Gets the protocol object identifier of this SecurityInfo.
    *
-   * @return this SecurityInfo object identifier
+   * @return this protocol object identifier
    */
   public abstract String getObjectIdentifier();
   
+  public abstract String getProtocolOIDString();
+    
   /**
    * Factory method for creating security info objects given an input.
    *
@@ -246,5 +248,5 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
       LOGGER.log(Level.SEVERE, "Exception", e);
       throw new IllegalArgumentException("Malformed input stream.");
     }
-  }
+  }  
 }
