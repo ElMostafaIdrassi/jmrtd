@@ -37,53 +37,53 @@ import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 public class DG12FileTest extends TestCase {
-  
+
   Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
-  
+
   public DG12FileTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     DG12File dg12File = createTestObject();
     String expectedResult = "DG12File [, 19711019, , , , , , 19711019, ]";
     assertEquals(dg12File.toString(), expectedResult);
   }
-  
+
   public void testReflexive() {
     testReflexive(createTestObject());
   }
-  
+
   public void testReflexive(DG12File dg12File) {
     try {
       if (dg12File == null) { fail("Input file is null"); }
       byte[] encoded = dg12File.getEncoded();
       assertNotNull(encoded);
       //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encoded));
-      
+
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
       DG12File copy = new DG12File(in);
-      
+
       assertNotNull(copy);
       assertEquals(dg12File, copy);
-      
+
       byte[] encodedCopy = copy.getEncoded();
       assertNotNull(encodedCopy);
       //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encodedCopy));
-      
+
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
-      
+
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.toString());
     }
   }
-  
+
   public void testEarlySpecSample() {
     byte[] bytes = {
-        
+
         0x6C, /* L */ 0x40,
         0x5C, /* L = 6, i.e. 3 tags */ 0x06,
         0x5F, 0x19, 0x5F, 0x26, 0x5F, 0x1A,
@@ -94,7 +94,7 @@ public class DG12FileTest extends TestCase {
         0x5F, 0x1A, /* L */ 0x0F,
         'S', 'M', 'I', 'T', 'H', '<', '<', 'B', 'R', 'E', 'N', 'D', 'A', '<', 'P'
     };
-    
+
     ByteArrayInputStream in = new ByteArrayInputStream(bytes);
     try {
       DG12File file = new DG12File(in);
@@ -106,10 +106,10 @@ public class DG12FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testNewSpecSample() {
     byte[] bytes = {
-        
+
         0x6C, /* L */ 0x45,
         0x5C, /* L = 6, i.e. 3 tags */ 0x06,
         0x5F, 0x19, 0x5F, 0x26, 0x5F, 0x1A,
@@ -122,7 +122,7 @@ public class DG12FileTest extends TestCase {
         0x5F, 0x1A, /* L */ 0x0F,
         'S', 'M', 'I', 'T', 'H', '<', '<', 'B', 'R', 'E', 'N', 'D', 'A', '<', 'P'
     };
-    
+
     ByteArrayInputStream in = new ByteArrayInputStream(bytes);
     try {
       DG12File file = new DG12File(in);
@@ -134,7 +134,7 @@ public class DG12FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testComplex() {
     try {
       DG12File dg12 = createComplexTestObject();
@@ -142,16 +142,16 @@ public class DG12FileTest extends TestCase {
       assertEquals(SDF.format(dg12.getDateOfIssue()), "19711019");
       assertNotNull(dg12.getNamesOfOtherPersons());
       assert(dg12.getNamesOfOtherPersons().size() > 0);
-      
+
       byte[] encoded = dg12.getEncoded();
       //			LOGGER.info("DEBUG: encoded = \n" + Hex.bytesToPrettyString(encoded));
       DG12File copy = new DG12File(new ByteArrayInputStream(encoded));
-      
+
       assertEquals(copy.getIssuingAuthority(), "UTOPIA");
       assertEquals(SDF.format(copy.getDateOfIssue()), "19711019");
       assertNotNull(copy.getNamesOfOtherPersons());
       assert(dg12.getNamesOfOtherPersons().size() > 0);
-      
+
       assertEquals(dg12, copy);
       assert(Arrays.equals(dg12.getEncoded(), copy.getEncoded()));
     } catch (Exception e) {
@@ -159,7 +159,7 @@ public class DG12FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public static DG12File createComplexTestObject() {
     String issuingAuthority = "UTOPIA";
     Calendar cal = Calendar.getInstance();
@@ -172,13 +172,13 @@ public class DG12FileTest extends TestCase {
     byte[] imageOfRear = null;
     Date dateAndTimeOfPersonalization = cal.getTime();
     String personalizationSystemSerialNumber = "";
-    
+
     return new DG12File(issuingAuthority, dateOfIssue, namesOfOtherPersons,
         endorseMentsAndObservations, taxOrExitRequirements, imageOfFront,
         imageOfRear,  dateAndTimeOfPersonalization,
         personalizationSystemSerialNumber);
   }
-  
+
   public static DG12File createTestObject() {
     String issuingAuthority = "";
     Calendar cal = Calendar.getInstance();
@@ -191,13 +191,13 @@ public class DG12FileTest extends TestCase {
     byte[] imageOfRear = null;
     Date dateAndTimeOfPersonalization = cal.getTime();
     String personalizationSystemSerialNumber = "";
-    
+
     return new DG12File(issuingAuthority, dateOfIssue, namesOfOtherPersons,
         endorseMentsAndObservations, taxOrExitRequirements, imageOfFront,
         imageOfRear,  dateAndTimeOfPersonalization,
         personalizationSystemSerialNumber);
   }
-  
+
   public void testFile(InputStream in) {
     try {
       testReflexive(new DG12File(in));

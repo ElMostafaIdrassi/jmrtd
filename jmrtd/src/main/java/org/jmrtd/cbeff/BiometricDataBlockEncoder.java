@@ -37,7 +37,7 @@ import java.io.OutputStream;
  * @since 0.4.7
  */
 public interface BiometricDataBlockEncoder<B extends BiometricDataBlock> {
-  
+
   /**
    * Writes the biometric data block in <code>bdb</code> to the output stream.
    * 

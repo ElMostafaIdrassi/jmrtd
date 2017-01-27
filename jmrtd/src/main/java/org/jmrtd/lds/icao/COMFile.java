@@ -48,20 +48,20 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @version $Revision$
  */
 public class COMFile extends AbstractTaggedLDSFile {
-  
+
   private static final long serialVersionUID = 2002455279067170063L;
-  
+
   private static final int TAG_LIST_TAG = 0x5C;
   private static final int VERSION_UNICODE_TAG = 0x5F36;
   private static final int VERSION_LDS_TAG = 0x5F01;
-  
+
   private String versionLDS;
   private String updateLevelLDS;
   private String majorVersionUnicode;
   private String minorVersionUnicode;
   private String releaseLevelUnicode;
   private List<Integer> tagList;
-  
+
   /**
    * Constructs a new COM file.
    *
@@ -80,7 +80,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     super(EF_COM_TAG);
     initialize(versionLDS, updateLevelLDS, majorVersionUnicode, minorVersionUnicode, releaseLevelUnicode, tagList);
   }
-  
+
   /**
    * Constructs a new COM file.
    *
@@ -115,7 +115,7 @@ public class COMFile extends AbstractTaggedLDSFile {
       throw new IllegalArgumentException("Could not parse version number. " + ifce.getMessage());
     }
   }
-  
+
   private void initialize(String versionLDS, String updateLevelLDS,
       String majorVersionUnicode, String minorVersionUnicode,
       String releaseLevelUnicode, int[] tagList) {
@@ -136,7 +136,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     this.tagList = new ArrayList<Integer>(tagList.length);
     for (int tag: tagList) { this.tagList.add(tag); }
   }
-  
+
   /**
    * Constructs a new EF_COM file based on the encoded
    * value in <code>in</code>.
@@ -149,7 +149,7 @@ public class COMFile extends AbstractTaggedLDSFile {
   public COMFile(InputStream in) throws IOException {
     super(EF_COM_TAG, in);
   }
-  
+
   protected void readContent(InputStream in) throws IOException {
     TLVInputStream tlvIn = in instanceof TLVInputStream ? (TLVInputStream)in : new TLVInputStream(in);
     int versionLDSTag = tlvIn.readTag();
@@ -163,7 +163,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     byte[] versionLDSBytes = tlvIn.readValue();
     versionLDS = new String(versionLDSBytes, 0, 2);
     updateLevelLDS = new String(versionLDSBytes, 2, 2);
-    
+
     int versionUnicodeTag = tlvIn.readTag();
     if (versionUnicodeTag != VERSION_UNICODE_TAG) {
       throw new IllegalArgumentException("Expected VERSION_UNICODE_TAG (" + Integer.toHexString(VERSION_UNICODE_TAG) + "), found " + Integer.toHexString(versionUnicodeTag));
@@ -176,7 +176,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     majorVersionUnicode = new String(versionUnicodeBytes, 0, 2);
     minorVersionUnicode = new String(versionUnicodeBytes, 2, 2);
     releaseLevelUnicode = new String(versionUnicodeBytes, 4, 2);
-    
+
     int tagListTag = tlvIn.readTag();
     if (tagListTag != TAG_LIST_TAG) {
       throw new IllegalArgumentException("Expected TAG_LIST_TAG (" + Integer.toHexString(TAG_LIST_TAG) + "), found " + Integer.toHexString(tagListTag));
@@ -186,7 +186,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     tagList = new ArrayList<Integer>();
     for (int i = 0; i < tagBytes.length; i++) { int dgTag = (tagBytes[i] & 0xFF); tagList.add(dgTag); }
   }
-  
+
   /**
    * Gets the LDS version as a dot seperated string
    * containing version and update level.
@@ -204,7 +204,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     }
     return ldsVersion;
   }
-  
+
   /**
    * Gets the unicode version as a dot seperated string
    * containing major version, minor version, and release level.
@@ -215,7 +215,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     String unicodeVersion = majorVersionUnicode
         + "." + minorVersionUnicode
         + "." + releaseLevelUnicode;
-    
+
     try {
       int major = Integer.parseInt(majorVersionUnicode);
       int minor = Integer.parseInt(minorVersionUnicode);
@@ -224,10 +224,10 @@ public class COMFile extends AbstractTaggedLDSFile {
     } catch (NumberFormatException nfe) {
       /* NOTE: leave unicodeVersion as is. */
     }
-    
+
     return unicodeVersion;
   }
-  
+
   /**
    * Gets the ICAO datagroup tags as a list of bytes.
    *
@@ -241,7 +241,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     }
     return result;
   }
-  
+
   /**
    * Inserts a tag in a proper place if not already present
    *
@@ -251,9 +251,9 @@ public class COMFile extends AbstractTaggedLDSFile {
     if(tagList.contains(tag)) { return; }
     tagList.add(tag);
     Collections.sort(tagList);
-    
+
   }
-  
+
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
     tlvOut.writeTag(VERSION_LDS_TAG);
@@ -261,13 +261,13 @@ public class COMFile extends AbstractTaggedLDSFile {
     tlvOut.writeTag(VERSION_UNICODE_TAG);
     tlvOut.writeValue((majorVersionUnicode + minorVersionUnicode + releaseLevelUnicode).getBytes());
     tlvOut.writeTag(TAG_LIST_TAG);
-    
+
     tlvOut.writeLength(tagList.size());
     for (int tag: tagList) {
       tlvOut.write((byte)tag);
     }
   }
-  
+
   /**
    * Gets a textual representation of this file.
    *
@@ -291,7 +291,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     result.append("]");
     return result.toString();
   }
-  
+
   /**
    * Whether other is equal to this file.
    *
@@ -309,7 +309,7 @@ public class COMFile extends AbstractTaggedLDSFile {
         releaseLevelUnicode.equals(otherCOMFile.releaseLevelUnicode) &&
         tagList.equals(otherCOMFile.tagList);
   }
-  
+
   public int hashCode() {
     return 3 * versionLDS.hashCode() +
         5 * updateLevelLDS.hashCode() +

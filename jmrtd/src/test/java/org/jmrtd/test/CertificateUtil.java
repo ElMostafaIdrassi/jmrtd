@@ -36,15 +36,15 @@ import org.jmrtd.JMRTDSecurityProvider;
  * @version $Revision$
  */
 public class CertificateUtil {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /**
    * Prevents instantiation.
    */
   private CertificateUtil() {
   }
-  
+
   /**
    * Generates a certificate.
    * 
@@ -74,19 +74,19 @@ public class CertificateUtil {
       JMRTDSecurityProvider.endPreferBouncyCastleProvider(n);
     }
   }
-  
+
   /**
    * A content signer implementation.
    */
   private static class JCESigner implements ContentSigner {
-    
+
     private static final List<String> SUPPORTED_ALGORITHMS = Arrays.asList(new String[] { "SHA256withRSA", "SHA256withECDSA" });
     private static final AlgorithmIdentifier PKCS1_SHA256_WITH_RSA_OID = new AlgorithmIdentifier(new ASN1ObjectIdentifier("1.2.840.113549.1.1.11"));
     private static final AlgorithmIdentifier X9_SHA256_WITH_ECDSA_OID = new AlgorithmIdentifier(new ASN1ObjectIdentifier("1.2.840.10045.4.3.2"));
-    
+
     private Signature signature;
     private ByteArrayOutputStream outputStream;
-    
+
     public JCESigner(PrivateKey privateKey, String signatureAlgorithm) {
       if (!SUPPORTED_ALGORITHMS.contains(signatureAlgorithm)) {
         throw new IllegalArgumentException("Signature algorithm \"" + signatureAlgorithm + "\" not yet supported");
@@ -102,7 +102,7 @@ public class CertificateUtil {
         JMRTDSecurityProvider.endPreferBouncyCastleProvider(n);
       }
     }
-    
+
     public AlgorithmIdentifier getAlgorithmIdentifier() {
       if (signature.getAlgorithm().equals("SHA256withRSA")) {
         return PKCS1_SHA256_WITH_RSA_OID;
@@ -112,11 +112,11 @@ public class CertificateUtil {
         return null;
       }
     }
-    
+
     public OutputStream getOutputStream() {
       return outputStream;
     }
-    
+
     public byte[] getSignature() {
       try {
         signature.update(outputStream.toByteArray());

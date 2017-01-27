@@ -32,9 +32,9 @@ import java.security.spec.KeySpec;
  * @version $Revision: 1633 $
  */
 public class CANKey implements KeySpec {
-  
+
   private String cardAccessNumber;
-  
+
   /**
    * Constructs a key specification.
    * 
@@ -43,7 +43,7 @@ public class CANKey implements KeySpec {
   public CANKey(String cardAccessNumber) {
     this.cardAccessNumber = cardAccessNumber;
   }
-  
+
   /**
    * Gets the card access number.
    * 

@@ -41,43 +41,43 @@ import org.jmrtd.io.SplittableInputStream;
  * @version $Revision$
  */
 public abstract class AbstractImageInfo implements ImageInfo {
-  
+
   private static final long serialVersionUID = 2870092217269116309L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private int type;
   private String mimeType;
   private byte[] imageBytes;
-  
+
   private SplittableInputStream splittableInputStream;
   int imagePositionInInputStream;
   int imageLength;
-  
+
   private int width, height;
-  
+
   /* PACKAGE ONLY VISIBLE CONSTRUCTORS BELOW */
-  
+
   AbstractImageInfo() {
   }
-  
+
   protected AbstractImageInfo(int type) {
     this.type = type;
   }
-  
+
   protected AbstractImageInfo(int type, String mimeType) {
     this(type);
     this.mimeType = mimeType;
   }
-  
+
   private AbstractImageInfo(int type, int width, int height, String mimeType) {
     this(type, mimeType);
     this.width = width;
     this.height = height;
   }
-  
+
   /* PUBLIC CONSRTUCTOR BELOW */
-  
+
   /**
    * Constructs an abstract image info.
    * 
@@ -94,9 +94,9 @@ public abstract class AbstractImageInfo implements ImageInfo {
     this(type, width, height, mimeType);
     readImage(inputStream, imageLength);
   }
-  
+
   /* PUBLIC METHODS BELOW */
-  
+
   /**
    * Content type, one of
    * {@link ImageInfo#TYPE_PORTRAIT},
@@ -109,7 +109,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   public int getType() {
     return type;
   }
-  
+
   /**
    * Gets the mime-type of the encoded image.
    * 
@@ -118,7 +118,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   public String getMimeType() {
     return mimeType;
   }
-  
+
   /**
    * Gets the width of the image.
    * 
@@ -127,7 +127,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   public int getWidth() {
     return width;
   }
-  
+
   /**
    * Gets the height of the image.
    * 
@@ -136,7 +136,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   public int getHeight() {
     return height;
   }
-  
+
   /**
    * Gets the length of the encoded image.
    * 
@@ -147,14 +147,14 @@ public abstract class AbstractImageInfo implements ImageInfo {
     if (splittableInputStream != null) {
       return imageLength;
       /* DEBUG: END */
-      
+
     } else if (imageBytes != null) {
       return imageBytes.length;
     } else {
       throw new IllegalStateException("DEBUG");
     }
   }
-  
+
   /**
    * Gets a textual representation of this image info.
    * 
@@ -169,7 +169,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     result.append("]");
     return result.toString();
   }
-  
+
   public int hashCode() {
     int result = 1234567891;
     result = 3 * result + 5 * type;
@@ -177,7 +177,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     result += 7 * getImageLength() + 11;
     return result;
   }
-  
+
   public boolean equals(Object other) {
     try {
       if (other == null) { return false; }
@@ -193,7 +193,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
       return false;
     }
   }
-  
+
   /**
    * Encodes this image info.
    * 
@@ -209,14 +209,14 @@ public abstract class AbstractImageInfo implements ImageInfo {
     }
     return out.toByteArray();
   }
-  
+
   /**
    * Gets the record length.
    * 
    * @return the record length
    */
   public abstract long getRecordLength();
-  
+
   /**
    * Gets the encoded image as an input stream.
    * 
@@ -234,7 +234,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
       throw new IllegalStateException("DEBUG");
     }
   }
-  
+
   /**
    * Clients should call this method after positioning the input stream to the
    * image bytes.
@@ -250,7 +250,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
       this.imageBytes = null;
       this.splittableInputStream = (SplittableInputStream)inputStream;
       this.imagePositionInInputStream = splittableInputStream.getPosition();
-      
+
       this.imageLength = (int)imageLength;
       long skippedBytes = 0;
       while (skippedBytes < imageLength) {
@@ -264,27 +264,27 @@ public abstract class AbstractImageInfo implements ImageInfo {
       dataIn.readFully(this.imageBytes);
     }
   }
-  
+
   protected void writeImage(OutputStream outputStream) throws IOException {
     outputStream.write(getImageBytes());
   }
-  
+
   final protected void setMimeType(String mimeType) {
     this.mimeType = mimeType;
   }
-  
+
   final protected void setType(int type) {
     this.type = type;
   }
-  
+
   final protected void setWidth(int width) {
     this.width = width;
   }
-  
+
   final protected void setHeight(int height) {
     this.height = height;
   }
-  
+
   final protected void setImageBytes(byte[] imageBytes) {
     try {
       readImage(new ByteArrayInputStream(imageBytes), imageBytes.length);
@@ -292,13 +292,13 @@ public abstract class AbstractImageInfo implements ImageInfo {
       LOGGER.severe("Exception: " + e.getMessage());
     }
   }
-  
+
   protected abstract void readObject(InputStream in) throws IOException;
-  
+
   protected abstract void writeObject(OutputStream out) throws IOException;
-  
+
   /* ONLY PRIVATE METHODS BELOW */
-  
+
   private byte[] getImageBytes() throws IOException {
     InputStream inputStream = null;
     int length = getImageLength();
@@ -308,7 +308,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     imageInputStream.readFully(imageBytes);
     return imageBytes;
   }
-  
+
   private static String typeToString(int type) {
     switch (type) {
       case TYPE_PORTRAIT: return "Portrait";

@@ -34,11 +34,11 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @since 0.4.8
  */
 public class BACDeniedException extends CardServiceException {
-  
+
   private static final long serialVersionUID = -7094953658210693249L;
-  
+
   private BACKeySpec bacKey;
-  
+
   /**
    * Creates an exception.
    * 
@@ -50,7 +50,7 @@ public class BACDeniedException extends CardServiceException {
     super(msg, sw);
     this.bacKey = bacKey;
   }
-  
+
   /**
    * Gets the BAC entries that were tried before BAC failed
    * 

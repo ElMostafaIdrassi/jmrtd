@@ -180,6 +180,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     return ID_PK_DH.equals(oid) || ID_PK_ECDH.equals(oid);
   }
   
+  @Override
   public String toString() {
     return "ChipAuthenticationPublicKeyInfo ["
         + "protocol: " + toProtocolOIDString(oid) + ", "
@@ -188,10 +189,12 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
         + "]";
   }
   
+  @Override
   public int hashCode() {
     return 	123 + 1337 * (oid.hashCode() + (keyId == null ? 111 : keyId.hashCode()) + (subjectPublicKeyInfo == null ? 111 : subjectPublicKeyInfo.hashCode()));
   }
   
+  @Override
   public boolean equals(Object other) {
     if (other == null) { return false; }
     if (other == this) { return true; }

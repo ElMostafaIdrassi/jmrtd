@@ -51,22 +51,23 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @version $Revision$
  */
 public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
-  
+
   private static final long serialVersionUID = 2702959939408371946L;
-  
+
   protected static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
+  /** For writing the optional random data block. */
   private Random random;
-  
+
   /** Records in the BIT group. Each record represents a single BIT. */
   private List<R> subRecords;
-  
+
   protected CBEFFDataGroup(int dataGroupTag, List<R> subRecords) {
     super(dataGroupTag);
     addAll(subRecords);
     this.random = new Random();
   }
-  
+
   /**
    * Constructs an instance.
    *
@@ -79,27 +80,28 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     super(dataGroupTag, inputStream);
     this.random = new Random();
   }
-  
+
   public void add(R record) {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     subRecords.add(record);
   }
-  
+
   public void addAll(List<R> records) {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     subRecords.addAll(records);
   }
-  
+
   public void remove(int index) {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     subRecords.remove(index);		
   }
-  
+
   public List<R> getSubRecords() {
     if (subRecords == null) { subRecords = new ArrayList<R>(); }
     return new ArrayList<R>(subRecords);
   }
-  
+
+  @Override
   public boolean equals(Object other) {
     if (other == null) { return false; }
     if (other == this) { return true; }
@@ -127,7 +129,8 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
       return false;
     }
   }
-  
+
+  @Override
   public int hashCode() {
     int result = 1234567891;
     List<R> subRecords = getSubRecords();
@@ -140,7 +143,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     }
     return 7 * result + 11;
   }
-  
+
   /**
    * Concrete implementations of EAC protected CBEFF DataGroups should call this
    * method at the end of their {@link #writeContent(OutputStream)} method to add

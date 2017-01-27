@@ -52,14 +52,14 @@ import org.bouncycastle.asn1.DLSet;
  * @since 0.5.1
  */
 public class CardAccessFile implements Serializable {
-  
+
   private static final long serialVersionUID = -3536507558193769951L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** The security infos that make up this file. */
   private Set<SecurityInfo> securityInfos;
-  
+
   /**
    * Constructs a new file from the provided data.
    *
@@ -69,7 +69,7 @@ public class CardAccessFile implements Serializable {
     if (securityInfos == null) { throw new IllegalArgumentException("Null securityInfos"); }
     this.securityInfos = new HashSet<SecurityInfo>(securityInfos);
   }
-  
+
   /**
    * Constructs a new file from the data in an input stream.
    *
@@ -80,7 +80,7 @@ public class CardAccessFile implements Serializable {
   public CardAccessFile(InputStream inputStream) throws IOException {
     readContent(inputStream);
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {
     securityInfos = new HashSet<SecurityInfo>();
     ASN1InputStream asn1In = new ASN1InputStream(inputStream);
@@ -92,7 +92,7 @@ public class CardAccessFile implements Serializable {
       securityInfos.add(securityInfo);
     }
   }
-  
+
   /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
   protected void writeContent(OutputStream outputStream) throws IOException {
     ASN1EncodableVector vector = new ASN1EncodableVector();
@@ -102,7 +102,7 @@ public class CardAccessFile implements Serializable {
     ASN1Set derSet = new DLSet(vector);
     outputStream.write(derSet.getEncoded(ASN1Encoding.DER));
   }
-  
+
   /**
    * Gets the security infos as an unordered collection.
    *
@@ -111,7 +111,7 @@ public class CardAccessFile implements Serializable {
   public Collection<SecurityInfo> getSecurityInfos() {
     return securityInfos;
   }
-  
+
   /**
    * Gets the PACE infos embedded in this card access file.
    * If no infos are present, an empty list is returned.
@@ -127,7 +127,7 @@ public class CardAccessFile implements Serializable {
     }
     return paceInfos;
   }
-  
+
   /**
    * Gets the signature algorithm object identifier.
    *
@@ -136,7 +136,7 @@ public class CardAccessFile implements Serializable {
   public String toString() {
     return "CardAccessFile [" + securityInfos.toString() + "]";
   }
-  
+
   /**
    * Tests equality with respect to another object.
    *
@@ -152,7 +152,7 @@ public class CardAccessFile implements Serializable {
     if (other.securityInfos == null) { return securityInfos == null; }
     return securityInfos.equals(other.securityInfos);
   }
-  
+
   /**
    * Gets a hash code of this object.
    *

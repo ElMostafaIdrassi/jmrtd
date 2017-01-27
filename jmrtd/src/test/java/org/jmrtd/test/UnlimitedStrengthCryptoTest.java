@@ -37,12 +37,12 @@ import junit.framework.TestCase;
  * @version $Revision$
  */
 public class UnlimitedStrengthCryptoTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public void testUnlimitedStrength() {
     try {
-//      LOGGER.info("DEBUG: Checking unlimited crypto for VM " +  System.getProperties());      
+      //      LOGGER.info("DEBUG: Checking unlimited crypto for VM " +  System.getProperties());      
       assertTrue(Cipher.getMaxAllowedKeyLength("AES") >= 256);
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Unexpected exception", e);

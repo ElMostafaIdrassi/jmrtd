@@ -78,78 +78,78 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @version $Revision:352 $
  */
 public class PassportService extends PassportApduService implements Serializable {
-  
+
   private static final long serialVersionUID = 1751933705552226972L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Card Access. */
   public static final short EF_CARD_ACCESS = 0x011C;
-  
+
   /** Card Security. */
   public static final short EF_CARD_SECURITY = 0x011D;
-  
+
   /** File identifier for data group 1. Data group 1 contains the MRZ. */
   public static final short EF_DG1 = 0x0101;
-  
+
   /** File identifier for data group 2. Data group 2 contains face image data. */
   public static final short EF_DG2 = 0x0102;
-  
+
   /** File identifier for data group 3. Data group 3 contains finger print data. */
   public static final short EF_DG3 = 0x0103;
-  
+
   /** File identifier for data group 4. Data group 4 contains iris data. */
   public static final short EF_DG4 = 0x0104;
-  
+
   /** File identifier for data group 5. Data group 5 contains displayed portrait. */
   public static final short EF_DG5 = 0x0105;
-  
+
   /** File identifier for data group 6. Data group 6 is RFU. */
   public static final short EF_DG6 = 0x0106;
-  
+
   /** File identifier for data group 7. Data group 7 contains displayed signature. */
   public static final short EF_DG7 = 0x0107;
-  
+
   /** File identifier for data group 8. Data group 8 contains data features. */
   public static final short EF_DG8 = 0x0108;
-  
+
   /** File identifier for data group 9. Data group 9 contains structure features. */
   public static final short EF_DG9 = 0x0109;
-  
+
   /** File identifier for data group 10. Data group 10 contains substance features. */
   public static final short EF_DG10 = 0x010A;
-  
+
   /** File identifier for data group 11. Data group 11 contains additional personal details. */
   public static final short EF_DG11 = 0x010B;
-  
+
   /** File identifier for data group 12. Data group 12 contains additional document details. */
   public static final short EF_DG12 = 0x010C;
-  
+
   /** File identifier for data group 13. Data group 13 contains optional details. */
   public static final short EF_DG13 = 0x010D;
-  
+
   /** File identifier for data group 14. Data group 14 contains security infos. */
   public static final short EF_DG14 = 0x010E;
-  
+
   /** File identifier for data group 15. Data group 15 contains the public key used for Active Authentication. */
   public static final short EF_DG15 = 0x010F;
-  
+
   /** File identifier for data group 16. Data group 16 contains person(s) to notify. */
   public static final short EF_DG16 = 0x0110;
-  
+
   /** The security document. */
   public static final short EF_SOD = 0x011D;
-  
+
   /** The data group presence list. */
   public static final short EF_COM = 0x011E;
-  
+
   /**
    * Contains EAC CVA references. Note: this can be overridden by a file
    * identifier in the DG14 file (in a TerminalAuthenticationInfo). Check DG14
    * first. Also, this file does not have a header tag, like the others.
    */
   public static final short EF_CVCA = 0x011C;
-  
+
   /** Short file identifier for file. */
   public static final byte
   SF_DG1 = 0x01,
@@ -171,20 +171,20 @@ public class PassportService extends PassportApduService implements Serializable
   SF_COM = 0x1E,
   SF_SOD = 0x1D,
   SF_CVCA = 0x1C;
-  
+
   /** YYMMDD format. */
   public static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
-  
+
   /** The default maximal blocksize used for unencrypted APDUs. */
   public static final int DEFAULT_MAX_BLOCKSIZE = 224;
-  
+
   /**
    * The file read block size, some passports cannot handle large values
    *
    * @deprecated hack
    */
   public int maxBlockSize;
-  
+
   enum State {
     SESSION_STOPPED_STATE,  
     SESSION_STARTED_STATE,
@@ -194,17 +194,17 @@ public class PassportService extends PassportApduService implements Serializable
     CA_EXECUTED_STATE,
     TA_AUTHENTICATED_STATE
   }
-  
+
   /* FIXME: We should keep track of a stack of these states instead. -- MO */
   private State state;
-  
+
   /**
    * @deprecated visibility will be set to private
    */
   protected SecureMessagingWrapper wrapper;
-  
+
   private MRTDFileSystem fs;
-  
+
   /**
    * Creates a new passport service for accessing the passport.
    *
@@ -221,7 +221,7 @@ public class PassportService extends PassportApduService implements Serializable
   public PassportService(CardService service) throws CardServiceException {
     this(service, DEFAULT_MAX_BLOCKSIZE);
   }
-  
+
   /**
    * Creates a new passport service for accessing the passport.
    *
@@ -240,11 +240,11 @@ public class PassportService extends PassportApduService implements Serializable
     super(service);
     this.maxBlockSize = maxBlockSize;
     fs = new MRTDFileSystem(this);
-    
+
     state = State.SESSION_STOPPED_STATE;
     LOGGER.info("DEBUG: isExtendedAPDULengthSupported: " + isExtendedAPDULengthSupported());
   }
-  
+
   /**
    * Opens a session to the card. As of 0.4.10 this no longer auto selects the passport application,
    * caller is responsible to call #sendSelectApplet(boolean) now.
@@ -260,7 +260,7 @@ public class PassportService extends PassportApduService implements Serializable
       state = State.SESSION_STARTED_STATE;
     }
   }
-  
+
   /**
    * Selects the MRTD card side applet. If PACE has been executed successfully previously, then the card has authenticated
    * us and a secure messaging channel has already been established. If not, then the caller should request BAC execution as a next
@@ -279,7 +279,7 @@ public class PassportService extends PassportApduService implements Serializable
       sendSelectApplet(null, APPLET_AID);
     }
   }
-  
+
   /**
    * Gets whether this service is open.
    *
@@ -288,7 +288,7 @@ public class PassportService extends PassportApduService implements Serializable
   public boolean isOpen() {
     return (state != State.SESSION_STOPPED_STATE);
   }
-  
+
   /**
    * Selects a file within the MRTD application.
    *
@@ -297,7 +297,7 @@ public class PassportService extends PassportApduService implements Serializable
   public synchronized void sendSelectFile(short fid) throws CardServiceException {
     sendSelectFile(wrapper, fid);
   }
-  
+
   /**
    * Sends a <code>READ BINARY</code> command to the passport, use wrapper when secure channel set up.
    *
@@ -312,7 +312,7 @@ public class PassportService extends PassportApduService implements Serializable
   public synchronized byte[] sendReadBinary(int offset, int le, boolean longRead) throws CardServiceException {
     return sendReadBinary(wrapper, offset, le, longRead);
   }
-  
+
   /**
    * Performs the <i>Basic Access Control</i> protocol.
    *
@@ -330,7 +330,7 @@ public class PassportService extends PassportApduService implements Serializable
     state = State.BAC_AUTHENTICATED_STATE;
     return bacResult;
   }
-  
+
   /**
    * Performs the <i>Basic Access Control</i> protocol.
    * It does BAC using kEnc and kMac keys, usually calculated
@@ -353,7 +353,7 @@ public class PassportService extends PassportApduService implements Serializable
     state = State.BAC_AUTHENTICATED_STATE;
     return bacResult;
   }
-  
+
   /**
    * Performs the PACE 2.0 / SAC protocol.
    * A secure messaging channel is set up as a result.
@@ -373,7 +373,7 @@ public class PassportService extends PassportApduService implements Serializable
     state = State.PACE_AUTHENTICATED_STATE;
     return paceResult;
   }
-  
+
   /**
    * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
    * ver. 1.11. In short, we authenticate the chip with (EC)DH key agreement
@@ -396,7 +396,7 @@ public class PassportService extends PassportApduService implements Serializable
     state = State.CA_EXECUTED_STATE;
     return caResult;
   }
-  
+
   /* From BSI-03110 v1.1, B.2:
    *
    * <pre>
@@ -435,7 +435,7 @@ public class PassportService extends PassportApduService implements Serializable
     state = State.TA_AUTHENTICATED_STATE;
     return taResult;
   }
-  
+
   /**
    * Performs the <i>Active Authentication</i> protocol.
    *
@@ -453,7 +453,7 @@ public class PassportService extends PassportApduService implements Serializable
     state = State.AA_EXECUTED_STATE;
     return aaResult;
   }
-  
+
   /**
    * Closes this service.
    */
@@ -465,7 +465,7 @@ public class PassportService extends PassportApduService implements Serializable
       state = State.SESSION_STOPPED_STATE;
     }
   }
-  
+
   /**
    * Gets the wrapper. Returns <code>null</code> until BAC has been
    * performed.
@@ -475,7 +475,7 @@ public class PassportService extends PassportApduService implements Serializable
   public APDUWrapper getWrapper() {
     return wrapper;
   }
-  
+
   /**
    * @deprecated hack
    *
@@ -484,7 +484,7 @@ public class PassportService extends PassportApduService implements Serializable
   public void setWrapper(SecureMessagingWrapper wrapper) {
     this.wrapper = wrapper;
   }
-  
+
   /**
    * Gets the file as an input stream indicated by a file identifier.
    * The resulting input stream will send APDUs to the card.

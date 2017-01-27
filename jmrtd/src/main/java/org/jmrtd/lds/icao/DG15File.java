@@ -45,13 +45,13 @@ import org.jmrtd.lds.DataGroup;
  * @version $Revision$
  */
 public class DG15File extends DataGroup {
-  
+
   private static final long serialVersionUID = 3834304239673755744L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private PublicKey publicKey;
-  
+
   /**
    * Constructs a new file.
    *
@@ -61,7 +61,7 @@ public class DG15File extends DataGroup {
     super(EF_DG15_TAG);
     this.publicKey = publicKey;
   }
-  
+
   /**
    * Constructs a new file from binary representation.
    *
@@ -72,24 +72,24 @@ public class DG15File extends DataGroup {
   public DG15File(InputStream inputStream) throws IOException {
     super(EF_DG15_TAG, inputStream);
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {
     DataInputStream dataInputStream = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
     try {
       byte[] value = new byte[getLength()];
       dataInputStream.readFully(value);
-      
+
       publicKey = getPublicKey(value);
     } catch (GeneralSecurityException e) {
       throw new IllegalArgumentException(e.toString());
     }
   }
-  
+
   private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {
     X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
-    
+
     String[] algorithms = { "RSA", "EC" };
-    
+
     for (String algorithm: algorithms) {
       try {
         KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
@@ -101,11 +101,11 @@ public class DG15File extends DataGroup {
     }
     throw new InvalidAlgorithmParameterException();
   }
-  
+
   protected void writeContent(OutputStream out) throws IOException {
     out.write(publicKey.getEncoded());
   }
-  
+
   /**
    * Gets the public key stored in this file.
    *
@@ -114,18 +114,18 @@ public class DG15File extends DataGroup {
   public PublicKey getPublicKey() {
     return publicKey;
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (obj.getClass() != this.getClass()) { return false; }
     DG15File other = (DG15File)obj;
     return publicKey.equals(other.publicKey);
   }
-  
+
   public int hashCode() {
     return 5 * publicKey.hashCode() + 61;
   }
-  
+
   public String toString() {
     return "DG15File [" + publicKey.toString() + "]";
   }

@@ -57,13 +57,13 @@ import org.bouncycastle.asn1.DLSequence;
  * @version $Revision$
  */
 public class ActiveAuthenticationInfo extends SecurityInfo {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final long serialVersionUID = 6830847342039845308L;
-  
+
   public static final int VERSION_1 = 1;
-  
+
   /** Specified in BSI TR 03111 Section 5.2.1. */
   public static final String
   ECDSA_PLAIN_SIGNATURES = "0.4.0.127.0.7.1.1.4.1",
@@ -73,11 +73,11 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   ECDSA_PLAIN_SHA384_OID = ECDSA_PLAIN_SIGNATURES + ".4", /* 0.4.0.127.0.7.1.1.4.1.4, ecdsa-plain-SHA384 */
   ECDSA_PLAIN_SHA512_OID = ECDSA_PLAIN_SIGNATURES + ".5", /* 0.4.0.127.0.7.1.1.4.1.5, ecdsa-plain-SHA512 */
   ECDSA_PLAIN_RIPEMD160_OID = ECDSA_PLAIN_SIGNATURES + ".6"; /* 0.4.0.127.0.7.1.1.4.1.6, ecdsa-plain-RIPEMD160 */
-  
+
   private String oid;
   private int version;
   private String signatureAlgorithmOID;
-  
+
   /**
    * Constructs a new object.
    *
@@ -91,7 +91,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     this.signatureAlgorithmOID = signatureAlgorithmOID;
     checkFields();
   }
-  
+
   /**
    * Constructs a new object.
    *
@@ -100,7 +100,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   public ActiveAuthenticationInfo(String signatureAlgorithmOID) {
     this(ID_AA, VERSION_1, signatureAlgorithmOID);
   }
-  
+
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector v = new ASN1EncodableVector();
@@ -111,7 +111,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     }
     return new DLSequence(v);
   }
-  
+
   /**
    * Gets the protocol object identifier of this AA security info.
    *
@@ -120,11 +120,11 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   public String getObjectIdentifier() {
     return oid;
   }
-  
+
   public int getVersion() {
     return version;
   }
-  
+
   /**
    * Gets the protocol object identifier as a human readable string.
    * 
@@ -133,7 +133,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
-  
+
   /**
    * Gets the signature algorithm object identifier.
    *
@@ -142,7 +142,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   public String getSignatureAlgorithmOID() {
     return signatureAlgorithmOID;
   }
-  
+
   /**
    * Gets a textual representation of this object.
    *
@@ -181,7 +181,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     ActiveAuthenticationInfo otherActiveAuthenticationInfo = (ActiveAuthenticationInfo)other;
     return getDERObject().equals(otherActiveAuthenticationInfo.getDERObject());
   }
-  
+
   /**
    * Gets a hash code of this object.
    *
@@ -193,7 +193,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
         + 5 * version
         + 11 * (signatureAlgorithmOID == null ? 1 : signatureAlgorithmOID.hashCode());
   }
-  
+
   /**
    * Translates an OID string to a Java mnemonic algorithm string.
    *
@@ -212,9 +212,9 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) { return "RIPEMD160withECDSA"; }
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
-  
+
   /* ONLY NON-PUBLIC METHODS BELOW */
-  
+
   /**
    * Checks whether the given object identifier identifies a
    * ActiveAuthenticationInfo structure.
@@ -226,7 +226,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   static boolean checkRequiredIdentifier(String id) {
     return ID_AA.equals(id);
   }
-  
+
   /**
    * Checks the correctness of the data for this instance of SecurityInfo
    */
@@ -235,7 +235,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
       if (!checkRequiredIdentifier(oid)) { throw new IllegalArgumentException("Wrong identifier: " + oid); }
       if (version != VERSION_1) { throw new IllegalArgumentException("Wrong version: " + version); }
       /* FIXME check to see if signatureAlgorithmOID is valid. */
-      
+
       if (!ECDSA_PLAIN_SHA1_OID.equals(signatureAlgorithmOID)
           && !ECDSA_PLAIN_SHA224_OID.equals(signatureAlgorithmOID)
           && !ECDSA_PLAIN_SHA256_OID.equals(signatureAlgorithmOID)
@@ -249,15 +249,15 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
       throw new IllegalArgumentException("Malformed ActiveAuthenticationInfo.");
     }
   }
-  
+
   private String toProtocolOIDString(String oid) {
     if (ID_AA.equals(oid)) {
       return "id-AA";
     }
-    
+
     return oid;
   }
-  
+
   public static String toSignatureAlgorithmOIDString(String oid) {
     if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }    
     if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }

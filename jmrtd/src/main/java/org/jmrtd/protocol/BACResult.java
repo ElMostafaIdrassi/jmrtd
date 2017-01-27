@@ -27,29 +27,29 @@ import java.io.Serializable;
 import org.jmrtd.BACKeySpec;
 
 public class BACResult implements Serializable {
-  
+
   private static final long serialVersionUID = -7114911372181772099L;
-  
+
   private BACKeySpec bacKey;
   private SecureMessagingWrapper wrapper;
-  
+
   public BACResult(SecureMessagingWrapper wrapper) {
     this(null, wrapper);
   }
-  
+
   public BACResult(BACKeySpec bacKey, SecureMessagingWrapper wrapper) {
     this.bacKey = bacKey;
     this.wrapper = wrapper;
   }
-  
+
   public BACKeySpec getBACKey() {
     return bacKey;
   }
-  
+
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }
-  
+
   @Override
   public String toString() {
     return (new StringBuilder())
@@ -58,7 +58,7 @@ public class BACResult implements Serializable {
         .append("]")
         .toString();
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 1234567891;
@@ -67,7 +67,7 @@ public class BACResult implements Serializable {
     result = prime * result + ((wrapper == null) ? 0 : wrapper.hashCode());
     return result;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -79,7 +79,7 @@ public class BACResult implements Serializable {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     BACResult other = (BACResult) obj;
     if (bacKey == null) {
       if (other.bacKey != null) {
@@ -95,7 +95,7 @@ public class BACResult implements Serializable {
     } else if (!wrapper.equals(other.wrapper)) {
       return false;
     }
-    
+
     return true;
   }
 }

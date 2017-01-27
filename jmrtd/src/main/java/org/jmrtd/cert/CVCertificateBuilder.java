@@ -45,7 +45,7 @@ import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
  * @version $Revision$
  */
 public class CVCertificateBuilder {
-  
+
   /**
    * Card verifiable certificate factory method.
    * 
@@ -83,7 +83,7 @@ public class CVCertificateBuilder {
                 holderRef.getSeqNumber()), getRole(authZTemplate.getRole()), getAccessRight(authZTemplate.getAccessRight()),
             validFrom, validTo, provider));
   }
-  
+
   private static org.ejbca.cvc.AuthorizationRoleEnum getRole(Role role) {
     switch (role) {
       case CVCA: return org.ejbca.cvc.AuthorizationRoleEnum.CVCA;
@@ -93,7 +93,7 @@ public class CVCertificateBuilder {
     }
     throw new NumberFormatException("Cannot decode role " + role);
   }
-  
+
   private static org.ejbca.cvc.AccessRightEnum getAccessRight(Permission accessRight) {
     switch (accessRight) {
       case READ_ACCESS_NONE: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_NONE;

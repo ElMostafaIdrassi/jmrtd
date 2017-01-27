@@ -37,7 +37,7 @@ import java.io.InputStream;
  * @since 0.4.7
  */
 public interface BiometricDataBlockDecoder<B extends BiometricDataBlock> {
-  
+
   /**
    * Reads a biometric data block from an input stream.
    * 

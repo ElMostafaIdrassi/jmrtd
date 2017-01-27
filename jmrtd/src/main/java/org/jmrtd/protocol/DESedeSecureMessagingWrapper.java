@@ -60,22 +60,22 @@ import net.sf.scuba.tlv.TLVUtil;
  * @version $Revision$
  */
 public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper implements Serializable {
-  
+
   private static final long serialVersionUID = -2859033943345961793L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Initialization vector consisting of 8 zero bytes. */
   public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
-  
+
   private SecretKey ksEnc, ksMac;
   private transient Cipher cipher;
   private transient Mac mac;
-  
+
   private long ssc;
-  
+
   private boolean shouldCheckMAC;
-  
+
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys. The initial value of the send sequence counter is set to
@@ -92,7 +92,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac) throws GeneralSecurityException {
     this(ksEnc, ksMac, true);
   }
-  
+
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys. The initial value of the send sequence counter is set to
@@ -110,7 +110,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC) throws GeneralSecurityException {
     this(ksEnc, ksMac, doCheckMAC, 0L);
   }
-  
+
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys and the initial value of the send sequence counter.
@@ -127,7 +127,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", true, ssc);
   }
-  
+
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys and the initial value of the send sequence counter.
@@ -145,7 +145,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", doCheckMAC, ssc);
   }
-  
+
   private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
@@ -154,7 +154,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     cipher = Cipher.getInstance(cipherAlg);
     mac = Mac.getInstance(macAlg);
   }
-  
+
   /**
    * Wraps the APDU buffer <code>capdu</code> of a command APDU.
    * As a side effect, this method increments the internal send
@@ -176,7 +176,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       throw new IllegalStateException(ioe.getMessage());
     }
   }
-  
+
   /**
    * Unwraps the apdu buffer <code>rapdu</code> of a response apdu.
    *
@@ -202,15 +202,15 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       throw new IllegalStateException(ioe.getMessage());
     }
   }
-  
+
   public SecretKey getEncryptionKey() {
     return ksEnc;
   }
-  
+
   public SecretKey getMACKey() {
     return ksMac;
   }
-  
+
   /**
    * Gets the current value of the send sequence counter.
    *
@@ -220,12 +220,12 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public long getSendSequenceCounter() {
     return ssc;
   }
-  
+
   @Override
   public String toString() {
     return "DESedeSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
   }
-  
+
   /**
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
@@ -238,17 +238,17 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU, long ssc) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();
     int le = commandAPDU.getNe();
-    
+
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
-    
+
     byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
     byte[] paddedMaskedHeader = Util.pad(maskedHeader, 8);
-    
+
     boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
-    
+
     byte[] do8587 = new byte[0];
     byte[] do97 = new byte[0];
-    
+
     if (le > 0) {
       bOut.reset();
       bOut.write((byte)0x97);
@@ -256,14 +256,14 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       bOut.write((byte)le);
       do97 = bOut.toByteArray();
     }
-    
+
     cipher.init(Cipher.ENCRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
-    
+
     if (lc > 0) {
       /* If we have command data, encrypt it. */
       byte[] data = Util.pad(commandAPDU.getData(), 8);
       byte[] ciphertext = cipher.doFinal(data);
-      
+
       bOut.reset();
       bOut.write(hasDO85 ? (byte)0x85 : (byte)0x87);
       bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
@@ -271,17 +271,17 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       bOut.write(ciphertext, 0, ciphertext.length);
       do8587 = bOut.toByteArray();
     }
-    
+
     bOut.reset();
     DataOutputStream dataOut = new DataOutputStream(bOut);
     dataOut.writeLong(ssc);
     dataOut.write(paddedMaskedHeader);
     dataOut.write(do8587);
     dataOut.write(do97);
-    
+
     dataOut.flush();
     byte[] n = Util.pad(bOut.toByteArray(), 8);
-    
+
     /* Compute cryptographic checksum... */
     mac.init(ksMac);
     byte[] cc = mac.doFinal(n);
@@ -289,28 +289,28 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     if (ccLength != 8) {
       ccLength = 8;
     }
-    
+
     bOut.reset();
     bOut.write((byte) 0x8E);
     bOut.write(ccLength);
     bOut.write(cc, 0, ccLength);
     byte[] do8E = bOut.toByteArray();
-    
+
     /* Construct protected APDU... */
     bOut.reset();
     bOut.write(do8587);
     bOut.write(do97);
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
-    
+
     CommandAPDU wrappedCommandAPDU = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
-    
+
     /* FIXME: If extended length APDUs are supported (they must for EAC, that 256 should be 65536). See bug #26 in SF bugtracker. -- MO */
     //		wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
-    
+
     return wrappedCommandAPDU;
   }
-  
+
   /**
    * Unwraps a response APDU sent by the ICC.
    * Based on Section E.3 of TR-PKI, especially the examples.
@@ -349,7 +349,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     bOut.write(sw & 0x00FF);
     return new ResponseAPDU(bOut.toByteArray());
   }
-  
+
   /*
    *
    * The SM Data Objects (see [ISO/IEC 7816-4]) MUST be used in the following order:
@@ -357,7 +357,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    *   - Response APDU: [DO‘85’ or DO‘87’] [DO‘99’] DO‘8E’.
    * 
    */
-  
+
   /**
    * The <code>0x87</code> tag has already been read.
    *
@@ -377,16 +377,16 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
         length = (length << 8) | inputStream.readUnsignedByte();
       }
     }
-    
+
     if (!do85) {
       buf = inputStream.readUnsignedByte(); /* should be 0x01... */
       if (buf != 0x01) {
         throw new IllegalStateException("DO'87 expected 0x01 marker, found " + Integer.toHexString(buf & 0xFF));
       }
-      
+
       length--; /* takes care of the extra 0x01 marker... */
     }
-    
+
     /* Read, decrypt, unpad the data... */
     byte[] ciphertext = new byte[length];
     inputStream.readFully(ciphertext);
@@ -394,7 +394,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     byte[] data = Util.unpad(paddedData);
     return data;
   }
-  
+
   /**
    * The <code>0x99</code> tag has already been read.
    *
@@ -409,7 +409,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     byte sw2 = inputStream.readByte();
     return (short) (((sw1 & 0x000000FF) << 8) | (sw2 & 0x000000FF));
   }
-  
+
   /**
    * The <code>0x8E</code> tag has already been read.
    *
@@ -424,7 +424,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     inputStream.readFully(cc1);
     return cc1;
   }
-  
+
   /**
    * Check the MAC.
    * 

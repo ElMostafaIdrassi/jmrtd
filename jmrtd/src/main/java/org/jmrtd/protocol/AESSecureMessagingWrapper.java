@@ -54,18 +54,18 @@ import net.sf.scuba.tlv.TLVUtil;
  * @version $Revision$
  */
 public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements Serializable {
-  
+
   private static final long serialVersionUID = 2086301081448345496L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private SecretKey ksEnc, ksMac;
   private transient Cipher sscIVCipher;
   private transient Cipher cipher;
   private transient Mac mac;
-  
+
   private long ssc;
-  
+
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys and the initial value of the send sequence counter.
@@ -81,18 +81,18 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
     this.ssc = ssc;
-    
+
     sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
     sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
-    
+
     cipher = Cipher.getInstance("AES/CBC/NoPadding");
     /* NOTE: We will init this cipher in wrapCommandAPDU and unwrapResponseAPDU. */
-    
+
     String macAlg = "AESCMAC";
     mac = Mac.getInstance(macAlg);
     mac.init(ksMac);
   }
-  
+
   /**
    * Gets the current value of the send sequence counter.
    *
@@ -101,7 +101,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   public long getSendSequenceCounter() {
     return ssc;
   }
-  
+
   /**
    * Wraps the apdu buffer <code>capdu</code> of a command apdu.
    * As a side effect, this method increments the internal send
@@ -122,7 +122,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       throw new IllegalStateException(ioe.toString());
     }
   }
-  
+
   /**
    * Unwraps the buffer of a response APDU.
    *
@@ -147,22 +147,22 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       throw new IllegalStateException(ioe.toString());
     }
   }
-  
+
   @Override
   public SecretKey getEncryptionKey() {
     return ksEnc;
   }
-  
+
   @Override
   public SecretKey getMACKey() {
     return ksMac;
   }
-  
+
   @Override
   public String toString() {
     return "AESSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
   }
-  
+
   /**
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
@@ -175,17 +175,17 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();
     int le = commandAPDU.getNe();
-    
+
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
-    
+
     byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
     byte[] paddedMaskedHeader = Util.pad(maskedHeader, 16); // 128 bits is 16 bytes
-    
+
     boolean hasDO85 = ((byte)commandAPDU.getINS() == ISO7816.INS_READ_BINARY2);
-    
+
     byte[] do8587 = new byte[0];
     byte[] do97 = new byte[0];
-    
+
     if (le > 0) {
       bOut.reset();
       bOut.write((byte)0x97);
@@ -193,19 +193,19 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       bOut.write((byte)le);
       do97 = bOut.toByteArray();
     }
-    
+
     ssc++;
     byte[] sscBytes = getSSCAsBytes(ssc);
-    
+
     if (lc > 0) {
       /* If we have command data, encrypt it. */
       byte[] data = Util.pad(commandAPDU.getData(), 16);
-      
+
       /* Re-initialize cipher, this time with IV based on SSC. */
       cipher.init(Cipher.ENCRYPT_MODE, ksEnc, getIV(sscBytes));
-      
+
       byte[] ciphertext = cipher.doFinal(data);
-      
+
       bOut.reset();
       bOut.write(hasDO85 ? (byte)0x85 : (byte)0x87);
       bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
@@ -213,20 +213,20 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       bOut.write(ciphertext);
       do8587 = bOut.toByteArray();
     }
-    
+
     bOut.reset();
     bOut.write(paddedMaskedHeader);
     bOut.write(do8587);
     bOut.write(do97);
-    
+
     byte[] m = bOut.toByteArray();
-    
+
     bOut.reset();
     bOut.write(sscBytes);
     bOut.write(m);
     bOut.flush();
     byte[] n = Util.pad(bOut.toByteArray(), 16);
-    
+
     /* Compute cryptographic checksum... */
     mac.init(ksMac);
     byte[] cc = mac.doFinal(n);
@@ -234,24 +234,24 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     if (ccLength != 8) {
       ccLength = 8;
     }
-    
+
     bOut.reset();
     bOut.write((byte) 0x8E);
     bOut.write(ccLength);
     bOut.write(cc, 0, ccLength);
     byte[] do8E = bOut.toByteArray();
-    
+
     /* Construct protected apdu... */
     bOut.reset();
     bOut.write(do8587);
     bOut.write(do97);
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
-    
+
     CommandAPDU wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
     return wc;
   }
-  
+
   /**
    * Does the actual decoding of a response apdu. Based on Section E.3 of
    * TR-PKI, especially the examples.
@@ -302,7 +302,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       }
     }
   }
-  
+
   /**
    * The <code>0x87</code> tag has already been read.
    *
@@ -344,7 +344,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     byte[] data = Util.unpad(paddedData);
     return data;
   }
-  
+
   /**
    * The <code>0x99</code> tag has already been read.
    *
@@ -359,7 +359,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     byte sw2 = in.readByte();
     return (short)(((sw1 & 0x000000FF) << 8) | (sw2 & 0x000000FF));
   }
-  
+
   /**
    * The <code>0x8E</code> tag has already been read.
    *
@@ -374,11 +374,11 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     inputStream.readFully(cc1);
     return cc1;
   }
-  
+
   private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
     return true; // FIXME: Note this will be a 16 byte Mac?
   }
-  
+
   /**
    * Gets the IV by encrypting the SSC.
    *
@@ -392,7 +392,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
     return ivParams;
   }
-  
+
   /**
    * Gets the IV by encrypting the SSC.
    *
@@ -405,7 +405,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
     return ivParams;
   }
-  
+
   /**
    * Gets the SSC as bytes.
    *
@@ -424,7 +424,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       byteArrayOutputStream.write(0x00);
       byteArrayOutputStream.write(0x00);
       byteArrayOutputStream.write(0x00);
-      
+
       /* A long will take 8 bytes. */
       DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
       dataOutputStream.writeLong(ssc);

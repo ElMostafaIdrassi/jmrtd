@@ -37,19 +37,19 @@ import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 public class DG11FileTest extends TestCase {
-  
+
   private Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public DG11FileTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     DG11File dg11File = createTestObject();
     String expectedResult = "DG11File [, [], , 19711019, [], [], , , , , , [], ]";
     assertEquals(dg11File.toString(), expectedResult);
   }
-  
+
   public void testDecodeEncode() {
     byte[] simpleDG11 = new byte[] {
         0x6B, 0x34, 0x5C, 0x10, 0x5F, 0x0E, 0x5F, 0x10,
@@ -60,50 +60,50 @@ public class DG11FileTest extends TestCase {
         0x12, 0x00, 0x5F, 0x13, 0x00, 0x5F, 0x14, 0x00,
         0x5F, 0x15, 0x00, 0x5F, 0x18, 0x00
     };
-    
+
     try {
       DG11File dg11File = new DG11File(new ByteArrayInputStream(simpleDG11));
       byte[] encoded = dg11File.getEncoded();
-      
+
       assertEquals(Hex.bytesToHexString(simpleDG11), Hex.bytesToHexString(encoded));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
   }
-  
+
   public void testReflexive() {
     testReflexive(createTestObject());
   }
-  
+
   public void testReflexive(DG11File dg11File) {
     try {
       if (dg11File == null) {
         fail("Input file is null");
       }
-      
+
       byte[] encoded = dg11File.getEncoded();
       assertNotNull(encoded);
       //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encoded));
-      
+
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
       DG11File copy = new DG11File(in);
-      
+
       assertNotNull(copy);
       assertEquals(dg11File, copy);
-      
+
       byte[] encodedCopy = copy.getEncoded();
       assertNotNull(encodedCopy);
       //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encodedCopy));
-      
+
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
-      
+
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.toString());
     }
   }
-  
+
   /**
    * Ronny is a fictional character.
    * Any resemblance to living persons is pure coincidence.
@@ -118,7 +118,7 @@ public class DG11FileTest extends TestCase {
         0x4E, 0x45, 0x53, 0x3C, 0x4D, 0x41, 0x52, 0x49,
         0x41
     };
-    
+
     ByteArrayInputStream in = new ByteArrayInputStream(bytes);
     try {
       DG11File file = new DG11File(in);
@@ -135,7 +135,7 @@ public class DG11FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testSpecSample() {
     byte[] bytes = {
         0x6B, /* L */ 0x63,
@@ -156,7 +156,7 @@ public class DG11FileTest extends TestCase {
         0x5F, 0x13, /* L */ 0x0C,
         'T', 'R', 'A', 'V', 'E', 'L', '<', 'A', 'G', 'E', 'N', 'T'
     };
-    
+
     ByteArrayInputStream in = new ByteArrayInputStream(bytes);
     try {
       DG11File file = new DG11File(in);
@@ -181,7 +181,7 @@ public class DG11FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testComplex() {
     try {
       DG11File dg11 = createComplexTestObject();
@@ -196,7 +196,7 @@ public class DG11FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public static DG11File createComplexTestObject() {
     String fullNamePrimaryIdentifier = "TEST";
     String fullNameSecondaryIdentifiers = "FIRST" + "<" + "SECOND";
@@ -221,7 +221,7 @@ public class DG11FileTest extends TestCase {
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
   }
-  
+
   public static DG11File createTestObject() {
     String nameOfHolder = "";
     List<String> otherNames = new ArrayList<String>();
@@ -244,7 +244,7 @@ public class DG11FileTest extends TestCase {
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
   }
-  
+
   public void testFile(InputStream in) {
     try {
       testReflexive(new DG11File(in));

@@ -50,9 +50,9 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @see CardVerifiableCertificate
  */
 public class CVCertificateFactorySpi extends CertificateFactorySpi {
-  
+
   private static final int CV_CERTIFICATE_TAG = 0x7F21;
-  
+
   /**
    * Generates the certificate based on an input source.
    * 
@@ -65,10 +65,12 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
       /* Read certificate as byte[] */
       TLVInputStream tlvIn = new TLVInputStream(inputStream);
       int tag = tlvIn.readTag();
-      if (tag != CV_CERTIFICATE_TAG) { throw new CertificateException("Expected CV_CERTIFICATE_TAG, found " + Integer.toHexString(tag)); }
+      if (tag != CV_CERTIFICATE_TAG) {
+        throw new CertificateException("Expected CV_CERTIFICATE_TAG, found " + Integer.toHexString(tag));
+      }
       /* int length = */ tlvIn.readLength();
       byte[] value = tlvIn.readValue();
-      
+
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       TLVOutputStream tlvOut = new TLVOutputStream(out);
       tlvOut.writeTag(CV_CERTIFICATE_TAG);
@@ -84,7 +86,7 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
       throw new CertificateException(pe.getMessage());
     }
   }
-  
+
   /**
    * Not implemented.
    * 
@@ -93,7 +95,7 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
   public CRL engineGenerateCRL(InputStream inputStream) throws CRLException {
     return null; // TODO
   }
-  
+
   /**
    * Not implemented.
    * 
@@ -102,7 +104,7 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
   public Collection<? extends CRL> engineGenerateCRLs(InputStream inputStream) throws CRLException {
     return null; // TODO
   }
-  
+
   public Collection<? extends Certificate> engineGenerateCertificates(InputStream in) throws CertificateException {
     return null; // TODO
   }

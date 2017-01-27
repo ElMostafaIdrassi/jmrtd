@@ -40,14 +40,14 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @version $Revision$
  */
 public abstract class DisplayedImageDataGroup extends DataGroup {
-  
+
   private static final long serialVersionUID = 5994136177872308962L;
-  
+
   private static final int DISPLAYED_IMAGE_COUNT_TAG = 0x02;
-  
+
   private int displayedImageTagToUse;
   private List<DisplayedImageInfo> imageInfos;
-  
+
   /**
    * Constructs a displayed image data group from a list of displayed images.
    *
@@ -62,7 +62,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     this.imageInfos = new ArrayList<DisplayedImageInfo>(imageInfos);
     checkTypesConsistentWithTag();
   }
-  
+
   /**
    * Constructs a displayed image data group from binary representation.
    *
@@ -76,7 +76,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     if (this.imageInfos == null) { this.imageInfos = new ArrayList<DisplayedImageInfo>(); }
     checkTypesConsistentWithTag();
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int countTag = tlvIn.readTag();
@@ -98,7 +98,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
       add(imageInfo);
     }
   }
-  
+
   protected void writeContent(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(DISPLAYED_IMAGE_COUNT_TAG);
@@ -107,7 +107,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
       imageInfo.writeObject(tlvOut);
     }
   }
-  
+
   public String toString() {
     StringBuffer result = new StringBuffer();
     result.append(getClass().getSimpleName());
@@ -124,11 +124,11 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     result.append("]");
     return result.toString();
   }
-  
+
   public int hashCode() {
     return 1337 + (imageInfos == null ? 1 : imageInfos.hashCode()) + 31337;
   }
-  
+
   public boolean equals(Object other) {
     if (other == null) { return false; }
     if (other == this) { return true; }
@@ -136,7 +136,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     DisplayedImageDataGroup otherDG = (DisplayedImageDataGroup)other;
     return this.imageInfos == otherDG.imageInfos || this.imageInfos != null && this.imageInfos.equals(otherDG.imageInfos);
   }
-  
+
   /**
    * Gets the image infos.
    *
@@ -145,14 +145,14 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
   public List<DisplayedImageInfo> getImages() {
     return new ArrayList<DisplayedImageInfo>(imageInfos);
   }
-  
+
   private void add(DisplayedImageInfo image) {
     if (imageInfos == null) {
       imageInfos = new ArrayList<DisplayedImageInfo>();
     }
     imageInfos.add(image);
   }
-  
+
   private void checkTypesConsistentWithTag() {
     for (DisplayedImageInfo imageInfo: imageInfos) {
       switch (imageInfo.getType()) {

@@ -30,14 +30,14 @@ import org.jmrtd.lds.CVCAFile;
 import junit.framework.TestCase;
 
 public class CVCAFileTest extends TestCase {
-  
+
   public void test1() {
     String name1 = "CAReference00001";
     CVCAFile f = new CVCAFile(name1, null);
     assertEquals(name1, f.getCAReference().getName());
     assertEquals(null, f.getAltCAReference());
   }
-  
+
   public void test2() {
     String name1 = "CAReference00001";
     String name2 = "CAReference00002";
@@ -45,7 +45,7 @@ public class CVCAFileTest extends TestCase {
     assertEquals(name1, f.getCAReference().getName());
     assertEquals(name2, f.getAltCAReference().getName());
   }
-  
+
   public void testReflexive1() {
     try {
       String name1 = "CAReference00001";
@@ -58,7 +58,7 @@ public class CVCAFileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testReflexive2() {
     try {
       String name1 = "CAReference00001";

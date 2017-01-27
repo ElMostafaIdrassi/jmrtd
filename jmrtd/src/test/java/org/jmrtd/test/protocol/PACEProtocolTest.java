@@ -43,11 +43,11 @@ import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 public class PACEProtocolTest extends TestCase {
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   //	PARAM_ID_GFP_1024_160 = 0,
   //	PARAM_ID_GFP_2048_224 = 1,
   //	PARAM_ID_GFP_2048_256 = 2,
@@ -63,7 +63,7 @@ public class PACEProtocolTest extends TestCase {
   //	PARAM_ID_ECP_BRAINPOOL_P384_R1 = 16,
   //	PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   //	PARAM_ID_ECP_NIST_P512_R1 = 18;
-  
+
   public void testMacs() {
     try {
       Mac macDESede = Mac.getInstance("DESedeMac", BC_PROVIDER);
@@ -72,7 +72,7 @@ public class PACEProtocolTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testPoint() {
     try {
       byte[] paceInfoBytes = Hex.hexStringToBytes("3012060A 04007F00 07020204 02020201 0202010D");
@@ -87,18 +87,18 @@ public class PACEProtocolTest extends TestCase {
           Util.os2i(Hex.hexStringToBytes("3556F3B3 B186DF10 B857B58F 6A7EB80F 20BA5DC7 BE1D43D9 BF850149 FBB36462")));
       KeyFactory keyFactory  = KeyFactory.getInstance("EC");
       PublicKey publicKey = keyFactory.generatePublic(new ECPublicKeySpec(publicKeyPoint, (ECParameterSpec)params));
-      
+
       byte[] encodedPublicKeyForSmartCard = Util.encodePublicKeyForSmartCard(publicKey);
       LOGGER.info("DEBUG: encoded public key for smart card = \n" + Hex.bytesToPrettyString(encodedPublicKeyForSmartCard));
-      
+
       byte[] encodedPublicKeyForMac = Util.encodePublicKeyDataObject(oid, publicKey);
       LOGGER.info("DEBUG: encoded public key for MAC = \n" + Hex.bytesToPrettyString(encodedPublicKeyForMac));
-      
+
     } catch(Exception e) {
       fail(e.getMessage());
     }
   }
-  
+
   /**
    * G.1.1. ECDH based example
    * 
@@ -107,39 +107,39 @@ public class PACEProtocolTest extends TestCase {
    */
   public void testSupplementSampleECDHGM() {
     try {
-      
+
       String serialNumber = "T22000129"; /* Check digit 3 */
       String dateOfBirth = "640812"; /* Check digit 5 */
       String dateOfExpiry = "101031"; /* Check digit 8 */
       byte[] paceInfoBytes = Hex.hexStringToBytes("3012060A 04007F00 07020204 02020201 0202010D");
-      
+
       PACEInfo paceInfo = PACEInfo.createPACEInfo(paceInfoBytes);
       assertNotNull(paceInfo);
       BigInteger paramId = paceInfo.getParameterId();
       String oid = paceInfo.getObjectIdentifier();
-      
+
       assertEquals("0.4.0.127.0.7.2.2.4.2.2", oid);
       assertEquals(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128, oid);
-      
+
       assertEquals(BigInteger.valueOf(13), paramId);
       assertEquals(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, paramId.intValue());
-      
+
       AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paramId);
       assertTrue(params instanceof ECParameterSpec);
       ECParameterSpec ecParams = (ECParameterSpec)params;
       KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
-      
+
       String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
       assertEquals(cipherAlg, "AES");
       String digestAlg = PACEInfo.toDigestAlgorithm(oid);
       assertEquals(digestAlg, "SHA-1");
       int keyLength = PACEInfo.toKeyLength(oid);
       assertEquals(keyLength, 128);
-      
+
       /* Given */
       byte[] expectedKeySeed = Hex.hexStringToBytes("7E2D2A41 C74EA0B3 8CD36F86 3939BFA8 E9032AAD");
       byte[] expectedEncodedSecretKey = Hex.hexStringToBytes("89DED1B2 6624EC1E 634C1989 302849DD");
-      
+
       /* FIXME: SHA-1 hardcoded here? */
       byte[] keySeed = Util.computeKeySeed(serialNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
       LOGGER.info("DEBUG: keySeed = " + Hex.bytesToHexString(keySeed));
@@ -147,88 +147,88 @@ public class PACEProtocolTest extends TestCase {
       SecretKey secretKey = Util.deriveKey(keySeed, cipherAlg, keyLength, Util.PACE_MODE);
       LOGGER.info("DEBUG: secretKey = " + Hex.bytesToHexString(secretKey.getEncoded()));
       assertTrue(Arrays.equals(expectedEncodedSecretKey, secretKey.getEncoded()));
-      
+
       /*
        * Encrypted Nonce.
        * 
        * Next, the chip randomly generates the nonce s and encrypts it by means of K_pi.
        */
-      
+
       /* Given in example. */
       byte[] nonceS = Hex.hexStringToBytes("3F00C4D3 9D153F2B 2A214A07 8D899B22");
-      
+
       /* 
        * Map nonce.
        * 
        * The nonce is mapped to an ephemeral group generator via generic mapping. The required randomly chosen
        * ephemeral keys are also collected in the next table.
        */
-      
+
       /* Terminal's Private Key. */
       BigInteger pcdMappingPrivateKeyFieldElement = Util.os2i(Hex.hexStringToBytes("7F4EF07B 9EA82FD7 8AD689B3 8D0BC78C F21F249D 953BC46F 4C6E1925 9C010F99"));
       PrivateKey pcdMappingPrivateKey = keyFactory.generatePrivate(new ECPrivateKeySpec(pcdMappingPrivateKeyFieldElement, ecParams));
-      
+
       /* Terminal's Public Key. */
       ECPoint pcdMappingPublicKeyECPoint = new ECPoint(
           Util.os2i(Hex.hexStringToBytes("7ACF3EFC 982EC455 65A4B155 129EFBC7 4650DCBF A6362D89 6FC70262 E0C2CC5E")),
           Util.os2i(Hex.hexStringToBytes("544552DC B6725218 799115B5 5C9BAA6D 9F6BC3A9 618E70C2 5AF71777 A9C4922D")));
       PublicKey pcdMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(pcdMappingPublicKeyECPoint, ecParams));
-      
+
       /* Chip's Private Key. */
       BigInteger piccMappingPrivateKeyFieldElement = Util.os2i(Hex.hexStringToBytes("498FF497 56F2DC15 87840041 839A8598 2BE7761D 14715FB0 91EFA7BC E9058560"));
       PrivateKey piccMappingPrivateKey = keyFactory.generatePrivate(new ECPrivateKeySpec(piccMappingPrivateKeyFieldElement, ecParams));
-      
+
       /* Chip's Public Key. */
       ECPoint piccMappingPublicKeyECPoint = new ECPoint(
           Util.os2i(Hex.hexStringToBytes("824FBA91 C9CBE26B EF53A0EB E7342A3B F178CEA9 F45DE0B7 0AA60165 1FBA3F57")),
           Util.os2i(Hex.hexStringToBytes("30D8C879 AAA9C9F7 3991E61B 58F4D52E B87A0A0C 709A49DC 63719363 CCD13C54")));			
       PublicKey piccMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccMappingPublicKeyECPoint, ecParams));
-      
+
       /* Given in example. */
       ECPoint expectedSharedSecretECPointH = new ECPoint(
           Util.os2i(Hex.hexStringToBytes("60332EF2 450B5D24 7EF6D386 8397D398 852ED6E8 CAF6FFEE F6BF85CA 57057FD5")),
           Util.os2i(Hex.hexStringToBytes("0840CA74 15BAF3E4 3BD414D3 5AA4608B 93A2CAF3 A4E3EA4E 82C9C13D 03EB7181")));
-      
+
       KeyAgreement mappingAgreement = KeyAgreement.getInstance("ECDHC");
       mappingAgreement.init(pcdMappingPrivateKey);
-      
+
       mappingAgreement.doPhase(piccMappingPublicKey, true);
       byte[] sharedSecretH = mappingAgreement.generateSecret();
-      
+
       ECParameterSpec ephemeralParams = (ECParameterSpec)Util.mapNonceGM(nonceS, sharedSecretH, ecParams);
-      
+
       KeyPairGenerator keyPairGenerator = null;
       KeyPair kp = null;
       PrivateKey pcdPrivateKey = null;
       KeyAgreement keyAgreement = null;
-      
+
       keyPairGenerator = KeyPairGenerator.getInstance("ECDHC", BC_PROVIDER);
       keyPairGenerator.initialize(ephemeralParams);
       kp = keyPairGenerator.generateKeyPair();
       pcdPrivateKey = kp.getPrivate();
       keyAgreement = KeyAgreement.getInstance("ECDHC");
       keyAgreement.init(pcdPrivateKey);
-            
+
       //      keyAgreement.doPhase(piccMappingPublicKey, true);
       keyAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdPrivateKey), true);
-      
+
       byte[] generatedSharedSecretBytesH = keyAgreement.generateSecret();
-      
+
       /* Given in example. */
       byte[] expectedEphemeralGeneratorX = Hex.hexStringToBytes("8CED63C9 1426D4F0 EB1435E7 CB1D74A4 6723A0AF 21C89634 F65A9AE8 7A9265E2");
       byte[] expectedEphemeralGeneratorY = Hex.hexStringToBytes("8C879506 743F8611 AC33645C 5B985C80 B5F09A0B 83407C1B 6A4D857A E76FE522");
-      
+
       BigInteger s = Util.os2i(nonceS);
-      
+
       ECParameterSpec ephemeralECParams = (ECParameterSpec)Util.mapNonceGM(nonceS, sharedSecretH, ecParams);
-      
+
       ECPoint ephemeralGenerator = ephemeralECParams.getGenerator();
       byte[] ephemeralGeneratorX = Util.i2os(ephemeralGenerator.getAffineX());
       byte[] ephemeralGeneratorY = Util.i2os(ephemeralGenerator.getAffineY());
-      
+
       assertTrue(Arrays.equals(expectedEphemeralGeneratorX, ephemeralGeneratorX));
       assertTrue(Arrays.equals(expectedEphemeralGeneratorY, ephemeralGeneratorY));
-      
+
       /*
        * Perform Key Agreement.
        * 
@@ -238,7 +238,7 @@ public class PACEProtocolTest extends TestCase {
        * derive the session keys.
        */
       BigInteger p = Util.getPrime(ephemeralParams);
-      
+
       BigInteger pcdPrivateKeyFieldElement = Util.os2i(Hex.hexStringToBytes("A73FB703 AC1436A1 8E0CFA5A BB3F7BEC 7A070E7A 6788486B EE230C4A 22762595"));
       ECPoint pcdPublicKeyPoint = new ECPoint(
           Util.os2i(Hex.hexStringToBytes("2DB7A64C 0355044E C9DF1905 14C625CB A2CEA487 54887122 F3A5EF0D 5EDD301C")),
@@ -246,53 +246,53 @@ public class PACEProtocolTest extends TestCase {
       ECPoint piccPublicKeyPoint = new ECPoint(
           Util.os2i(Hex.hexStringToBytes("9E880F84 2905B8B3 181F7AF7 CAA9F0EF B743847F 44A306D2 D28C1D9E C65DF6DB")),
           Util.os2i(Hex.hexStringToBytes("7764B222 77A2EDDC 3C265A9F 018F9CB8 52E111B7 68B32690 4B59A019 3776F094")));
-      
+
       /* Given in example. */
       byte[] expectedSharedSecret = Hex.hexStringToBytes("28768D20 701247DA E81804C9 E780EDE5 82A9996D B4A31502 0B273319 7DB84925");
       LOGGER.info("DEBUG: expectedSharedSecret.length = " + expectedSharedSecret.length);
-      
+
       keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
       pcdPrivateKey = keyFactory.generatePrivate(new ECPrivateKeySpec(pcdPrivateKeyFieldElement, ephemeralECParams));
       PublicKey pcdPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(pcdPublicKeyPoint, ephemeralECParams));
       PublicKey piccPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccPublicKeyPoint, ephemeralECParams));
-      
+
       keyAgreement = KeyAgreement.getInstance("ECDHC", BC_PROVIDER);
       assertNotNull(keyAgreement);
       keyAgreement.init(pcdPrivateKey);
-      
+
       if (pcdPublicKey.equals(piccPublicKey)) { throw new GeneralSecurityException("pcdPublicKey and piccPublicKey are the same!"); }
       keyAgreement.doPhase(piccPublicKey, true);
       byte[] sharedSecretBytes = keyAgreement.generateSecret();
       assertNotNull(sharedSecretBytes);
-      
+
       assertTrue(Arrays.equals(expectedSharedSecret, sharedSecretBytes));
-      
+
       /*
        * Derive secure messaging keys.
        */
-      
+
       /* Given in example. */
       byte[] expectedEncKeyBytes = Hex.hexStringToBytes("F5F0E35C 0D7161EE 6724EE51 3A0D9A7F");
       byte[] expectedMacKeyBytes = Hex.hexStringToBytes("FE251C78 58B356B2 4514B3BD 5F4297D1");
-      
+
       SecretKey encKey = null;
       SecretKey macKey = null;
       try {
         LOGGER.info("DEBUG: digestAlg = " + digestAlg);
-        
+
         encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
         byte[] encKeyBytes = encKey.getEncoded();
         assertTrue(Arrays.equals(expectedEncKeyBytes, encKeyBytes));
-        
+
         macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
         byte[] macKeyBytes = macKey.getEncoded();
         assertTrue(Arrays.equals(expectedMacKeyBytes, macKeyBytes));
-        
+
       } catch (GeneralSecurityException gse) {
         gse.printStackTrace();
         throw new IllegalStateException(gse.getMessage());
       }
-      
+
       /*
        * Mutual authentication.
        */
@@ -308,25 +308,25 @@ public class PACEProtocolTest extends TestCase {
           + "301C3556 F3B3B186 DF10B857 B58F6A7E"
           + "B80F20BA 5DC7BE1D 43D9BF85 0149FBB3"
           + "6462");
-      
+
       byte[] encodedPCDPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, pcdPublicKey);
-      
+
       LOGGER.info("DEBUG: expectedInputDataForPICCToken = " + Hex.bytesToHexString(expectedInputDataForPICCToken));
       LOGGER.info("DEBUG: encodedPCDPublicKeyDataObject = " + Hex.bytesToHexString(encodedPCDPublicKeyDataObject));
-      
-      
+
+
       assertTrue(Arrays.equals(expectedInputDataForPICCToken, encodedPCDPublicKeyDataObject));
-      
+
       byte[] encodedPICCPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, piccPublicKey);
       assertTrue(Arrays.equals(expectedInputDataForPCDToken, encodedPICCPublicKeyDataObject));
-      
+
       /* Given in example. */
       byte[] expectedPCDAuthenticationToken = Hex.hexStringToBytes("C2B0BD78 D94BA866");
       byte[] expectedPICCAuthenticationToken = Hex.hexStringToBytes("3ABB9674 BCE93C08");
-      
+
       byte[] pcdToken = PACEProtocol.generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] piccToken =  PACEProtocol.generateAuthenticationToken(oid, macKey, pcdPublicKey);
-      
+
       assertTrue(Arrays.equals(expectedPCDAuthenticationToken, pcdToken));
       assertTrue(Arrays.equals(expectedPICCAuthenticationToken, piccToken));
     } catch (Exception e) {
@@ -334,20 +334,20 @@ public class PACEProtocolTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   private boolean equals(ECParameterSpec ecParams1, ECParameterSpec ecParams2) {
-    
+
     if (ecParams1.getCofactor() != ecParams2.getCofactor()) {
       return false;
     }
-    
+
     if (!curveToString(ecParams1).equals(curveToString(ecParams2))) {
       return false;
     }
-    
+
     return true;
   }
-  
+
   private String toString(ECParameterSpec params) {
     StringBuilder result = new StringBuilder();
     result.append("ECParameterSpec[");
@@ -357,22 +357,22 @@ public class PACEProtocolTest extends TestCase {
     result.append("]");
     return result.toString();
   }
-  
+
   private String toString(ECPoint ecPoint) {
     return "(" + ecPoint.getAffineX() + ", " + ecPoint.getAffineY() + ")";
   }
-  
+
   private String curveToString(ECParameterSpec params) {
     String curveName = Util.getCurveName(params);
-    
+
     if (curveName != null) {
       return "EllipticCurve [" + curveName + "]";
     }
-    
+
     EllipticCurve curve = params.getCurve();
-    
+
     StringBuilder result = new StringBuilder();
-    
+
     ECField field = curve.getField();
     if (field instanceof ECFieldFp) {
       ECFieldFp fieldFp = (ECFieldFp)field;
@@ -388,11 +388,11 @@ public class PACEProtocolTest extends TestCase {
     result.append("]");
     return result.toString();
   }
-  
+
   public void testMultiplicationWithEphemeralParams(ECParameterSpec params) {
     ECPoint Q = Util.multiply(BigInteger.ONE, params.getGenerator(), params);
   }
-  
+
   public void testSupplementDHGMSample() {
     /*
      * G.1.2. DH based example
@@ -401,14 +401,14 @@ public class PACEProtocolTest extends TestCase {
      * specified by RFC 5114. The example is taken from the EAC 2 worked example (BSI 2010), making minor
      * modifications.
      */
-    
+
     try {
       /* Input. Given in example. */
       byte[] paceInfoBytes = Hex.hexStringToBytes("3012060A 04007F00 07020204 01020201 02020100");
-      
+
       /* Input. Given in example. */
       byte[] nonceSBytes = Hex.hexStringToBytes("FA5B7E3E 49753A0D B9178B7B 9BD898C8");
-      
+
       /* Input. Given in example. */
       byte[] sharedSecretHBytes = Hex.hexStringToBytes(
           "5BABEBEF 5B74E5BA 94B5C063 FDA15F1F"
@@ -419,7 +419,7 @@ public class PACEProtocolTest extends TestCase {
               + "FB4BD111 E5A968ED 6B6F08B2 6CA87C41"
               + "0B3CE0C3 10CE104E ABD16629 AA48620C"
               + "1279270C B0750C0D 37C57FFF E302AE7F");
-      
+
       /* Output. Given in example. */
       byte[] expectedEphemeralGeneratorBytes = Hex.hexStringToBytes(
           "7C9CBFE9 8F9FBDDA 8D143506 FA7D9306"
@@ -430,10 +430,10 @@ public class PACEProtocolTest extends TestCase {
               + "36067682 9B826BEA 57291B5A D69FBC84"
               + "EF1E7790 32A30580 3F743417 93E86974"
               + "2D401325 B37EE856 5FFCDEE6 18342DC5");
-      
+
       PACEInfo paceInfo = PACEInfo.createPACEInfo(paceInfoBytes);
       assertNotNull(paceInfo);
-      
+
       String oid = paceInfo.getObjectIdentifier();
       assertEquals(oid, PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_128); // id-PACE-DH-GM-AES-CBC-CMAC-128
       String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
@@ -444,30 +444,30 @@ public class PACEProtocolTest extends TestCase {
       assertEquals(128, keyLength);
       String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid);
       assertEquals("DH", agreementAlg);
-      
+
       AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paceInfo.getParameterId());
       assertTrue(params instanceof DHParameterSpec);
-      
+
       DHParameterSpec dhParams = (DHParameterSpec)params;
-      
+
       BigInteger nonceS = Util.os2i(nonceSBytes);
-      
+
       BigInteger sharedSecretH = Util.os2i(sharedSecretHBytes);
-      
+
       AlgorithmParameterSpec ephemeralParams = Util.mapNonceGM(nonceSBytes, sharedSecretHBytes, dhParams);
       assertTrue(ephemeralParams instanceof DHParameterSpec);
       DHParameterSpec ephemeralDHParams = (DHParameterSpec)ephemeralParams;
-      
+
       BigInteger ephemeralGenerator = ephemeralDHParams.getG();
       byte[] ephemeralGeneratorBytes = Util.i2os(ephemeralGenerator);
       assertTrue(Arrays.equals(expectedEphemeralGeneratorBytes, ephemeralGeneratorBytes));
-      
+
       /*
        * Key agreement.
        */
       BigInteger p = Util.getPrime(ephemeralParams);
       KeyFactory keyFactory = KeyFactory.getInstance("DH", BC_PROVIDER);
-      
+
       BigInteger pcdPrivateKeyFieldElement = Util.os2i(Hex.hexStringToBytes("4BD0E547 40F9A028 E6A515BF DAF96784"
           + "8C4F5F5F FF65AA09 15947FFD 1A0DF2FA"
           + "6981271B C905F355 1457B7E0 3AC3B806"
@@ -492,7 +492,7 @@ public class PACEProtocolTest extends TestCase {
           + "A5DC4189 9238A250 767A6D46 DB974064"
           + "386CD456 743585F8 E5D90CC8 B4004B1F" 
           + "6D866C79 CE0584E4 9687FF61 BC29AEA1"));
-      
+
       /* Given in example. */
       byte[] expectedSharedSecret = Hex.hexStringToBytes("6BABC7B3 A72BCD7E A385E4C6 2DB2625B"
           + "D8613B24 149E146A 629311C4 CA6698E3"
@@ -502,38 +502,38 @@ public class PACEProtocolTest extends TestCase {
           + "8CFF6BD3 E977DDE6 ABE4C31D 55C0FA2E"
           + "465E553E 77BDF75E 3193D383 4FC26E8E"
           + "B1EE2FA1 E4FC97C1 8C3F6CFF FE2607FD");
-      
+
       PrivateKey pcdPrivateKey = keyFactory.generatePrivate(new DHPrivateKeySpec(pcdPrivateKeyFieldElement, p, ephemeralGenerator));
       PublicKey pcdPublicKey = keyFactory.generatePublic(new DHPublicKeySpec(pcdPublicKeyFieldElement, p, ephemeralGenerator));
       PublicKey piccPublicKey = keyFactory.generatePublic(new DHPublicKeySpec(piccPublicKeyFieldElement, p, ephemeralGenerator));
-      
+
       KeyAgreement keyAgreement = KeyAgreement.getInstance("DH", BC_PROVIDER);
       assertNotNull(keyAgreement);
       keyAgreement.init(pcdPrivateKey);
-      
+
       if (pcdPublicKey.equals(piccPublicKey)) { throw new GeneralSecurityException("pcdPublicKey and piccPublicKey are the same!"); }
       keyAgreement.doPhase(piccPublicKey, true);
       byte[] sharedSecretBytes = keyAgreement.generateSecret();
       assertNotNull(sharedSecretBytes);
-      
+
       assertTrue(Arrays.equals(expectedSharedSecret, sharedSecretBytes));
-      
+
       /*
        * Derive secure messaging keys.
        */
-      
+
       /* Given in example. */
       byte[] expectedEncKeyBytes = Hex.hexStringToBytes("2F7F46AD CC9E7E52 1B45D192 FAFA9126");
       byte[] expectedMacKeyBytes = Hex.hexStringToBytes("805A1D27 D45A5116 F73C5446 9462B7D8");
-      
+
       SecretKey encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
       byte[] encKeyBytes = encKey.getEncoded();
       assertTrue(Arrays.equals(expectedEncKeyBytes, encKeyBytes));
-      
+
       SecretKey macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
       byte[] macKeyBytes = macKey.getEncoded();
       assertTrue(Arrays.equals(expectedMacKeyBytes, macKeyBytes));
-      
+
       /*
        * Mutual authentication.
        */
@@ -557,20 +557,20 @@ public class PACEProtocolTest extends TestCase {
           + "172236B7 747D1671 E6D692A3 C7D40A0C"
           + "3C5CE397 545D015C 175EB513 0551EDBC"
           + "2EE5D4");
-      
+
       byte[] encodedPCDPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, pcdPublicKey);
       assertTrue(Arrays.equals(expectedInputDataForPICCToken, encodedPCDPublicKeyDataObject));
-      
+
       byte[] encodedPICCPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, piccPublicKey);
       assertTrue(Arrays.equals(expectedInputDataForPCDToken, encodedPICCPublicKeyDataObject));
-      
+
       /* Given in example. */
       byte[] expectedPCDAuthenticationToken = Hex.hexStringToBytes("B46DD9BD 4D98381F");
       byte[] expectedPICCAuthenticationToken = Hex.hexStringToBytes("917F37B5 C0E6D8D1");
-      
+
       byte[] pcdAuthenticationToken = PACEProtocol.generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] piccAuthenticationToken =  PACEProtocol.generateAuthenticationToken(oid, macKey, pcdPublicKey);
-      
+
       assertTrue(Arrays.equals(expectedPCDAuthenticationToken, pcdAuthenticationToken));
       assertTrue(Arrays.equals(expectedPICCAuthenticationToken, piccAuthenticationToken));
     } catch (Exception e) {
@@ -578,16 +578,16 @@ public class PACEProtocolTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testDutch2014PassportWithGMAndECDH() {
     try {
       String oid = "0.4.0.127.0.7.2.2.4.2.4"; // id-PACE-ECDH-GM-AES-CBC-CMAC-256
       assertEquals(oid, PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256);
-      
+
       int version = 2;
       int paramId = 14;
       PACEInfo paceInfo = new PACEInfo(oid, version, paramId);
-      
+
       String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
       assertEquals("AES", cipherAlg);
       String digestAlg = PACEInfo.toDigestAlgorithm(oid);
@@ -596,38 +596,38 @@ public class PACEProtocolTest extends TestCase {
       assertEquals(256, keyLength);
       String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid);
       assertEquals("ECDH", agreementAlg);
-      
+
       AlgorithmParameterSpec params = PACEInfo.toParameterSpec(paceInfo.getParameterId());
       assertTrue(params instanceof ECParameterSpec);
-      
+
       ECParameterSpec ecParams = (ECParameterSpec)params;
       BigInteger p = Util.getPrime(ecParams);
-      
+
       byte[] nonceS = Hex.hexStringToBytes("1BBF56756A0C1E74AE3524685D970724");
-      
+
       BigInteger pcdMappingPrivateKeyFieldElement = Util.os2i(Hex.hexStringToBytes("CFE032E195BC18D1B6C7F5C137CF9FDA52ECACF04A066839022AC1AF686AB3AA2102E9C918624262"));
-      
+
       byte[] piccMappingEncodedPublicKey = Hex.hexStringToBytes("04"
           + "AED562971B07877839B064B39132394E79CEF2BED81D8907B539030FB85D1D45EEA9788F28280629"
           + "53C25E414F44CA391C633FFA9983C0EC05C895636A4B2B44B446848FE57E9F8587B0202CFF4BE70E");
-      
+
       KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
       PrivateKey pcdMappingPrivateKey = keyFactory.generatePrivate(new ECPrivateKeySpec(pcdMappingPrivateKeyFieldElement, ecParams));
       //			PublicKey piccMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccMappingPublicKeyPoint, ecParams));
       PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
-      
+
       KeyAgreement mappingAgreement = KeyAgreement.getInstance("ECDHC");
       mappingAgreement.init(pcdMappingPrivateKey);
-      
-//      mappingAgreement.doPhase(piccMappingPublicKey, true);
+
+      //      mappingAgreement.doPhase(piccMappingPublicKey, true);
       mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey), true);
 
       byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
-      
+
       LOGGER.info("DEBUG: mappingSharedSecretBytes = " + Hex.bytesToHexString(mappingSharedSecretBytes));
-      
+
       ECParameterSpec ephemeralParams = (ECParameterSpec)Util.mapNonceGM(nonceS, mappingSharedSecretBytes, ecParams);
-      
+
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDHC", BC_PROVIDER);
       keyPairGenerator.initialize(ephemeralParams);
       KeyPair kp = keyPairGenerator.generateKeyPair();
@@ -639,7 +639,7 @@ public class PACEProtocolTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testBlockSize() {
     try {
       Security.addProvider(new BouncyCastleProvider());

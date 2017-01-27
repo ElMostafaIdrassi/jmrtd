@@ -30,21 +30,21 @@ import org.jmrtd.lds.icao.COMFile;
 import junit.framework.TestCase;
 
 public class COMFileTest extends TestCase {
-  
+
   public COMFileTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     COMFile dg1File = createTestObject();
     String expectedResult = "COMFile LDS 01.07, Unicode 04.00.00, [DG1, DG2, DG15]";
     assertEquals(dg1File.toString(), expectedResult);
   }
-  
+
   public void testReflexive() {
     testReflexive(createTestObject());
   }
-  
+
   private void testReflexive(COMFile comFile) {
     try {
       byte[] encoded = comFile.getEncoded();
@@ -61,7 +61,7 @@ public class COMFileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testSpecSample() {
     byte[] bytes = { 0x60, /* L */ 0x16,
         0x5F, 0x01, /* L */ 0x04,
@@ -70,13 +70,13 @@ public class COMFileTest extends TestCase {
         '0', '4', '0', '0', '0', '0',
         0x5C, /* L */ 0x04,
         0x61, 0x75, 0x76, 0x6C };
-    
+
     ByteArrayInputStream in = new ByteArrayInputStream(bytes);
     try {
       COMFile comFile = new COMFile(in);
       assertEquals(comFile.getLDSVersion(), "1.7");
       assertEquals(comFile.getUnicodeVersion(), "4.0.0");
-      
+
       int[] tagList = comFile.getTagList();
       assertNotNull(tagList);
       assertEquals(tagList.length, 4);
@@ -88,7 +88,7 @@ public class COMFileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testAlternativeConstructor() {
     int[] tagList1 = new int[2];
     tagList1[0] = LDSFile.EF_DG1_TAG;
@@ -103,10 +103,10 @@ public class COMFileTest extends TestCase {
     assertEquals(comFile1, comFile2);
     assertEquals(comFile2.getLDSVersion(), "1.7");
     assertEquals(comFile2.getUnicodeVersion(), "4.0.0");
-    
+
     assertEquals(new COMFile("01.7", "4.00.0", tagList1), new COMFile("1.07", "04.0.00", tagList2));
   }
-  
+
   public static COMFile createTestObject() {
     int[] tagList = new int[3];
     tagList[0] = LDSFile.EF_DG1_TAG;
@@ -114,7 +114,7 @@ public class COMFileTest extends TestCase {
     tagList[2] = LDSFile.EF_DG15_TAG;
     return new COMFile("01", "07", "04", "00", "00", tagList);
   }
-  
+
   public void testFile(InputStream in) {
     try {
       testReflexive(new COMFile(in));

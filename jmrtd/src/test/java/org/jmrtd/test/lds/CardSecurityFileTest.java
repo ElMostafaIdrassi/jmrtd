@@ -61,29 +61,29 @@ import net.sf.scuba.util.Hex;
  * @since 0.5.6
  */
 public class CardSecurityFileTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public void testParseSampleCardSecurityFileFromResource() {
     try {
       InputStream inputStream = createSampleInputStream();
       CardSecurityFile cardSecurityFile = new CardSecurityFile(inputStream);
       testAttributesSHA256withECDSASample(cardSecurityFile);
-      
+
       /* Re-encode it, and test again. */
       byte[] encoded = cardSecurityFile.getEncoded();
       assertNotNull(encoded);
       CardSecurityFile cardSecurityFile2 = new CardSecurityFile(new ByteArrayInputStream(encoded));
-      
+
       testSimilar(cardSecurityFile, cardSecurityFile2);
-      
+
       testAttributesSHA256withECDSASample(cardSecurityFile2);      
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
     }
   }
-  
+
   private void testSimilar(CardSecurityFile cardSecurityFile, CardSecurityFile cardSecurityFile2) {
     assertEquals(cardSecurityFile, cardSecurityFile2);
     assertEquals(cardSecurityFile.getDigestAlgorithm(), cardSecurityFile2.getDigestAlgorithm());    
@@ -93,21 +93,21 @@ public class CardSecurityFileTest extends TestCase {
   public void testConstructedSample() {
     try {
       Security.insertProviderAt(new BouncyCastleProvider(), 0);
-      
+
       CardSecurityFile cardSecurityFile = createConstructedSample();
       assertNotNull(cardSecurityFile);
-      
+
       testAttributesSHA256withECDSASample(cardSecurityFile);
-      
+
       /* Encode it. */
       byte[] encoded = cardSecurityFile.getEncoded();
       assertNotNull(encoded);
       LOGGER.info("DEBUG: file\n" + Hex.bytesToPrettyString(encoded));
-      
+
       /* Decode it, test again. */
       CardSecurityFile cardSecurityFile2 = new CardSecurityFile(new ByteArrayInputStream(encoded));
       testAttributesSHA256withECDSASample(cardSecurityFile2);
-      
+
       testSimilar(cardSecurityFile, cardSecurityFile2);
 
     } catch (Exception e) {
@@ -115,59 +115,59 @@ public class CardSecurityFileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testAttributesSHA256withECDSASample(CardSecurityFile cardSecurityFile) {
     assertEquals("SHA-256", cardSecurityFile.getDigestAlgorithm());
     assertEquals("SHA256withECDSA", cardSecurityFile.getDigestEncryptionAlgorithm());
-    
+
     Collection<SecurityInfo> securityInfos = cardSecurityFile.getSecurityInfos();
-    
+
     assertNotNull(securityInfos);
-    
+
     assertTrue(securityInfos.size() > 0);
-    
+
     for (SecurityInfo securityInfo: securityInfos) {
       LOGGER.info("DEBUG: securityInfo = " + securityInfo);
     }
   }
-  
+
   public CardSecurityFile createConstructedSample() {
     try {
       SecurityInfo caSecurityInfo = new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_AES_CBC_CMAC_256, ChipAuthenticationInfo.VERSION_1);
       SecurityInfo taSecurityInfo = new TerminalAuthenticationInfo();
-      
+
       Set<SecurityInfo> securityInfos = new HashSet<SecurityInfo>(2);
       securityInfos.add(caSecurityInfo);
       securityInfos.add(taSecurityInfo);
-      
+
       /* Generate a document signer certificate and private signing key. */
       String digestAlgorithm = "SHA-256";
       String digestEncryptionAlgorithm = "SHA256withECDSA";
-      
+
       ECNamedCurveParameterSpec bcParamSpec = ECNamedCurveTable.getParameterSpec("brainpoolp256r1");
       ECParameterSpec jceParamSpec = new ECNamedCurveSpec(bcParamSpec.getName(), bcParamSpec.getCurve(), bcParamSpec.getG(), bcParamSpec.getN(), bcParamSpec.getH(), bcParamSpec.getSeed());
-      
+
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
       keyPairGenerator.initialize(jceParamSpec);
-      
+
       KeyPair cscaKeyPair = keyPairGenerator.generateKeyPair();
       KeyPair dsKeyPair = keyPairGenerator.generateKeyPair();
-      
+
       Calendar calendar = Calendar.getInstance();
-      
+
       Date dateOfIssuing = calendar.getTime();
       calendar.add(Calendar.MONTH, 2);
       Date dateOfDSExpiry = calendar.getTime();
       calendar.add(Calendar.YEAR, 5);
       Date dateOfCSCAExpiry = calendar.getTime();
-      
+
       String issuer = "C=UT, O=Gov, CN=CSCA";
       String subject = "C=UT, O=Gov, CN=DS-01";
-      
+
       X509Certificate cscaCert = CertificateUtil.createCertificate(issuer, issuer, dateOfIssuing, dateOfCSCAExpiry, cscaKeyPair.getPublic(), cscaKeyPair.getPrivate(), digestEncryptionAlgorithm);
-      
+
       X509Certificate dsCert = CertificateUtil.createCertificate(issuer, subject, dateOfIssuing, dateOfDSExpiry, dsKeyPair.getPublic(), cscaKeyPair.getPrivate(), digestEncryptionAlgorithm);
-      
+
       /* Create the card security file. */
       return new CardSecurityFile(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, dsKeyPair.getPrivate(), dsCert, "BC");
     } catch (Exception e) {
@@ -176,7 +176,7 @@ public class CardSecurityFileTest extends TestCase {
       return null;
     }
   }
-  
+
   public InputStream createSampleInputStream() {
     try {
       return ResourceUtil.getInputStream("/efcardsecurity/efcardsecurity.dump");

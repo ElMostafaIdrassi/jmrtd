@@ -40,37 +40,37 @@ import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 public class DG15FileTest extends TestCase {
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   private static final String BC_PROVIDER_NAME = BC_PROVIDER == null ? null : BC_PROVIDER.getName();
-  
+
   public DG15FileTest(String name) {
     super(name);
   }
-  
+
   public void testReflexive() {
     testReflexive(createTestObject());
   }
-  
+
   public void testReflexive(DG15File dg15File) {
     try {
       byte[] encoded = dg15File.getEncoded();
-      
+
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
       DG15File copy = new DG15File(in);
-      
+
       assertEquals(dg15File, copy);
       assertEquals(dg15File.getPublicKey(), copy.getPublicKey());
-      
+
       byte[] encodedCopy = copy.getEncoded();
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
-      
+
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
   }
-  
+
   public void testGetPublic() {
     try {
       KeyPair keyPair = createTestKeyPair();
@@ -82,11 +82,11 @@ public class DG15FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testNewNonX509() {
     try {
       //			Security.insertProviderAt(BC_PROVIDER, 4);
-      
+
       /* This is a live DG15 public key as found in a Dutch 2014 PP. */
       byte[] dgValue = {
           0x30, (byte)0x82, 0x01, 0x75, 0x30, (byte)0x82, 0x01, 0x1D, 0x06, 0x07, 0x2A, (byte)0x86, 0x48, (byte)0xCE, 0x3D, 0x02,
@@ -123,7 +123,7 @@ public class DG15FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public static DG15File createTestObject() {
     try {
       KeyPair keyPair = createTestKeyPair();
@@ -132,13 +132,13 @@ public class DG15FileTest extends TestCase {
       return null;
     }
   }
-  
+
   private static KeyPair createTestKeyPair() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(1024);
     return keyPairGenerator.generateKeyPair();
   }
-  
+
   public void testFile(InputStream in) {
     try {
       testReflexive(new DG15File(in));

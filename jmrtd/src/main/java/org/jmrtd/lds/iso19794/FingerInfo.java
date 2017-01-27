@@ -47,31 +47,31 @@ import org.jmrtd.lds.AbstractListInfo;
  * @version $Revision$
  */
 public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements BiometricDataBlock {
-  
+
   private static final long serialVersionUID = 5808625058034008176L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Format identifier 'F', 'I', 'R', 0x00. Specified in ISO/IEC 19794-4 Section 7.1, Table 2.  */
   private static final int FORMAT_IDENTIFIER = 0x46495200;
-  
+
   /** Version number '0', '1', '0', 0x00. Specified in ISO/IEC 19794-4 Section 7.1, Table 2. */
   private static final int VERSION_NUMBER = 0x30313000;
-  
+
   /** Format owner identifier of ISO/IEC JTC1/SC37. */
   private static final int FORMAT_OWNER_VALUE = 0x0101;
-  
+
   /**
    * ISO/IEC JTC1/SC37 uses 0x0007 according to <a href="http://www.ibia.org/cbeff/_bdb.php">IBIA</a>.
    * (ISO FCD 19794-4 specified this as 0x0401).
    */
   private static final int FORMAT_TYPE_VALUE = 0x0007;
-  
+
   /**
    * Scale units.
    */
   public static final int SCALE_UNITS_PPI = 1, SCALE_UNITS_PPCM = 2;
-  
+
   /**
    * Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4.
    */
@@ -82,7 +82,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   COMPRESSION_JPEG = 3,
   COMPRESSION_JPEG2000 = 4,
   COMPRESSION_PNG = 5;
-  
+
   private int captureDeviceId;
   private int acquisitionLevel;
   private int scaleUnits;
@@ -90,9 +90,9 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   private int imageResolutionHorizontal, imageResolutionVertical;
   private int depth;
   private int compressionAlgorithm;
-  
+
   private StandardBiometricHeader sbh;
-  
+
   /**
    * Constructs a finger info record.
    * 
@@ -117,7 +117,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
         imageResolutionHorizontal, imageResolutionVertical,
         depth, compressionAlgorithm, fingerImageInfos);
   }
-  
+
   /**
    * Constructs a finger info record.
    * 
@@ -151,7 +151,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     this.compressionAlgorithm = compressionAlgorithm;
     addAll(fingerImageInfos);
   }
-  
+
   /**
    * Constructs a finger info record.
    * 
@@ -162,7 +162,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public FingerInfo(InputStream inputStream) throws IOException {
     this(null, inputStream);
   }
-  
+
   /**
    * Constructs a finger info record.
    * 
@@ -175,7 +175,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     this.sbh = sbh;
     readObject(inputStream);
   }
-  
+
   /**
    * Gets the Capture device Id. As specified in Section 7.1.4 of ISO 19794-4.
    * Only low-order 12 bits are significant.
@@ -185,7 +185,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getCaptureDeviceId() {
     return captureDeviceId;
   }
-  
+
   /**
    * Gets the image acquisition level. As specified in Section 7.1.5 and Table 1 of ISO 19794-4.
    * Valid settings are: 10 (125 ppi), 20 (250 ppi), 30 (500 ppi), 31 (500 ppi), 40 (1000 ppi), 41 (1000 ppi).
@@ -196,7 +196,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getAcquisitionLevel() {
     return acquisitionLevel;
   }
-  
+
   /**
    * Gets the units used to describe the scanning and resolution of the image.
    * Either PPI or PPCM. As specified in Section 7.1.7 of ISO 19794-4.
@@ -206,7 +206,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getScaleUnits() {
     return scaleUnits;
   }
-  
+
   /**
    * Gets the rounded scanning resolution used in the horizontal direction.
    * As specified in Section 7.1.8 of ISO 19794-4.
@@ -217,7 +217,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getHorizontalScanningResolution() {
     return scanResolutionHorizontal;
   }
-  
+
   /**
    * Gets the rounded scanning resolution used in the vertical direction.
    * As specified in Section 7.1.9 of ISO 19794-4.
@@ -228,7 +228,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getVerticalScanningResolution() {
     return scanResolutionVertical;
   }
-  
+
   /**
    * Gets the rounded image resolution used in the horizontal direction.
    * As specified in Section 7.1.10 of ISO 19794-4.
@@ -239,7 +239,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getHorizontalImageResolution() {
     return imageResolutionHorizontal;
   }
-  
+
   /**
    * Gets the rounded image resolution used in the vertical direction.
    * As specified in Section 7.1.11 of ISO 19794-4.
@@ -250,7 +250,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getVerticalImageResolution() {
     return imageResolutionVertical;
   }
-  
+
   /**
    * Gets the pixel depth. As specified in Section 7.1.12 of ISO 19794-4.
    * Valid values are between <code>0x1</code> to <code>0x10</code>.
@@ -260,7 +260,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getDepth() {
     return depth;
   }
-  
+
   /**
    * Gets the compression algorithm. One of
    * {@link #COMPRESSION_UNCOMPRESSED_BIT_PACKED},
@@ -276,7 +276,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   public int getCompressionAlgorithm() {
     return compressionAlgorithm;
   }
-  
+
   /**
    * Reads a finger info from an input stream.
    * 
@@ -286,15 +286,15 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    */
   public void readObject(InputStream inputStream) throws IOException {
     /* General record header (32) according to Table 2 in Section 7.1 of ISO/IEC 19794-4. */
-    
+
     DataInputStream dataIn = (inputStream instanceof DataInputStream) ? (DataInputStream)inputStream : new DataInputStream(inputStream);
-    
+
     int fir0 = dataIn.readInt(); /* header (e.g. "FIR", 0x00) (4) */
     if (fir0 != FORMAT_IDENTIFIER) { throw new IllegalArgumentException("'FIR' marker expected! Found " + Integer.toHexString(fir0)); }
-    
+
     int version = dataIn.readInt(); /* version in ASCII (e.g. "010" 0x00) (4) */
     if (version != VERSION_NUMBER) { throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version)); }
-    
+
     long recordLength = readUnsignedLong(dataIn, 6); // & 0xFFFFFFFFFFFFL;
     captureDeviceId = dataIn.readUnsignedShort(); /* all zeros means 'unreported', only lower 12-bits used, see 7.1.4 ISO/IEC 19794-4. */
     acquisitionLevel = dataIn.readUnsignedShort();
@@ -313,12 +313,12 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
      * 5 PNG
      */
     /* int RFU = */ dataIn.readUnsignedShort(); /* Should be 0x0000 */
-    
+
     long headerLength = 4 + 4 + 6 + 2 + 2 + 1 + 1 + 2 + 2 + 2 + 2 + 1 + 1 + 2;
     long dataLength = recordLength - headerLength;
-    
+
     long constructedDataLength = 0L;
-    
+
     for (int i = 0; i < count; i++) {
       FingerImageInfo imageInfo = new FingerImageInfo(inputStream, compressionAlgorithm);
       constructedDataLength += imageInfo.getRecordLength();
@@ -329,7 +329,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
       //			throw new IllegalStateException("DEBUG: constructedDataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
     }
   }
-  
+
   /**
    * Writes this finger info to an output stream.
    * 
@@ -338,26 +338,26 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * @throws IOException if writing fails
    */
   public void writeObject(OutputStream outputStream) throws IOException {
-    
+
     long headerLength = 32; /* 4 + 4 + 6 + 2 + 2 + 1 + 1 + 2 + 2 + 2 + 2 + 1 + 1 + 2 */
-    
+
     long dataLength = 0;
     List<FingerImageInfo> fingerImageInfos = getSubRecords();
     for (FingerImageInfo fingerImageInfo: fingerImageInfos) {
       dataLength += fingerImageInfo.getRecordLength();
     }
-    
+
     long recordLength = headerLength + dataLength;
-    
+
     /* General record header, should be 32... */
-    
+
     DataOutputStream dataOut = outputStream instanceof DataOutputStream ? (DataOutputStream)outputStream : new DataOutputStream(outputStream);
-    
+
     dataOut.writeInt(FORMAT_IDENTIFIER);			/* 4 */
     dataOut.writeInt(VERSION_NUMBER);				/* + 4 = 8 */
-    
+
     writeLong(recordLength, dataOut, 6);			/* + 6 = 14 */
-    
+
     dataOut.writeShort(captureDeviceId);			/* + 2 = 16 */
     dataOut.writeShort(acquisitionLevel);			/* +2 = 18 */
     dataOut.writeByte(fingerImageInfos.size());		/* + 1 = 19 */
@@ -367,15 +367,15 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     dataOut.writeShort(imageResolutionHorizontal);	/* + 2 = 26 */
     dataOut.writeShort(imageResolutionVertical);	/* + 2 = 28 */
     dataOut.writeByte(depth);						/* + 1 = 29 */
-    
+
     dataOut.writeByte(compressionAlgorithm);		/* + 1 = 30 */
     dataOut.writeShort(0x0000); /* RFU */			/* + 2 = 32 */
-    
+
     for (FingerImageInfo fingerImageInfo: fingerImageInfos) {
       fingerImageInfo.writeObject(dataOut);
     }
   }
-  
+
   public String toString() {
     StringBuffer result = new StringBuffer();
     result.append("FingerInfo [");
@@ -386,7 +386,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     result.append("]");
     return result.toString();
   }
-  
+
   /**
    * Gets the standard biometric header of this biometric data block
    * 
@@ -398,41 +398,41 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
       byte[] biometricSubtype = { (byte)getBiometricSubtype() };
       byte[] formatOwner = { (byte)((FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(FORMAT_OWNER_VALUE & 0xFF) };
       byte[] formatType = { (byte)((FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(FORMAT_TYPE_VALUE & 0xFF) };
-      
+
       SortedMap<Integer, byte[]> elements = new TreeMap<Integer, byte[]>();
       elements.put(ISO781611.BIOMETRIC_TYPE_TAG, biometricType);
       elements.put(ISO781611.BIOMETRIC_SUBTYPE_TAG, biometricSubtype);
       elements.put(ISO781611.FORMAT_OWNER_TAG, formatOwner);
       elements.put(ISO781611.FORMAT_TYPE_TAG, formatType);
-      
+
       sbh = new StandardBiometricHeader(elements);
     }
     return sbh;
   }
-  
+
   /**
    * Gets the finger image infos embedded in this finger info.
    * 
    * @return the embedded finger image infos
    */
   public List<FingerImageInfo> getFingerImageInfos() { return getSubRecords(); }
-  
+
   /**
    * Adds a finger image info to this finger info.
    * 
    * @param fingerImageInfo the finger image info to add
    */
   public void addFingerImageInfo(FingerImageInfo fingerImageInfo) { add(fingerImageInfo); }
-  
+
   /**
    * Removes a finger image info from this finger info.
    * 
    * @param index the index of the finger image info to remove
    */
   public void removeFingerImageInfo(int index) { remove(index); }	
-  
+
   /* ONLY PRIVATE BELOW */
-  
+
   private static long readUnsignedLong(InputStream in, int byteCount) throws IOException {
     DataInputStream dataIn = in instanceof DataInputStream ? (DataInputStream)in : new DataInputStream(in);
     byte[] buf = new byte[byteCount];
@@ -444,7 +444,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     }
     return result;
   }
-  
+
   private static void writeLong(long value, OutputStream out, int byteCount) throws IOException {
     if (byteCount <= 0) { return; }
     for (int i = 0; i < (byteCount - 8); i++) {
@@ -457,7 +457,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
       out.write(b);
     }		
   }
-  
+
   /**
    * Compression algorithm codes based on Table 3 in Section 7.1.13 of 19794-4.
    * 
@@ -483,7 +483,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     }
     return null;
   }
-  
+
   static int fromMimeType(String mimeType) {
     if ("image/x-wsq".equals(mimeType)) { return FingerInfo.COMPRESSION_WSQ; }
     if ("image/jpeg".equals(mimeType)) { return FingerInfo.COMPRESSION_JPEG; }
@@ -491,7 +491,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     if ("images/png".equals(mimeType)) { return FingerInfo.COMPRESSION_PNG; }
     throw new IllegalArgumentException("Did not recognize mimeType");
   }
-  
+
   private int getBiometricSubtype() {
     int result = CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
     boolean isFirst = true;

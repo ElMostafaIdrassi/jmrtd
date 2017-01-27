@@ -47,29 +47,29 @@ import org.jmrtd.lds.AbstractListInfo;
  * @version $Revision$
  */
 public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements BiometricDataBlock {
-  
+
   private static final long serialVersionUID = -6053206262773400725L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Facial Record Header 'F', 'A', 'C', 0x00. Section 5.4, Table 2 of ISO/IEC 19794-5. */
   private static final int FORMAT_IDENTIFIER = 0x46414300;
-  
+
   /** Version number '0', '1', '0', 0x00. Section 5.4, Table 2 of ISO/IEC 19794-5. */
   private static final int VERSION_NUMBER = 0x30313000;
-  
+
   /** Format owner identifier of ISO/IEC JTC1/SC37. */
   private static final int FORMAT_OWNER_VALUE = 0x0101;
-  
+
   /**
    * ISO/IEC JTC1/SC37 uses 0x0008 according to <a href="http://www.ibia.org/cbeff/_bdb.php">IBIA</a>.
    * Also see supplement to Doc 9303: R3-p1_v2_sII_0001.
    * (ISO FCD 19794-5 specified this as 0x0501).
    */	
   private static final int FORMAT_TYPE_VALUE = 0x0008;
-  
+
   private StandardBiometricHeader sbh;
-  
+
   /**
    * Constructs a face info from a list of face image infos.
    * 
@@ -78,7 +78,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
   public FaceInfo(List<FaceImageInfo> faceImageInfos) {
     this(null, faceImageInfos);
   }
-  
+
   /**
    * Constructs a face info from a list of face image infos.
    * 
@@ -89,7 +89,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
     this.sbh = sbh;
     addAll(faceImageInfos);
   }
-  
+
   /**
    * Constructs a face info from binary encoding.
    * 
@@ -100,7 +100,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
   public FaceInfo(InputStream inputStream) throws IOException {
     this(null, inputStream);
   }
-  
+
   /**
    * Constructs a face info from binary encoding.
    *  
@@ -113,7 +113,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
     this.sbh = sbh;		
     readObject(inputStream);
   }
-  
+
   /**
    * Reads the facial record from an input stream. Note that the standard biometric header
    * has already been read.
@@ -122,23 +122,23 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
    */
   public void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataInputStream = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
-    
+
     /* Facial Record Header (14) */
-    
+
     int fac0 = dataInputStream.readInt(); // header (e.g. "FAC", 0x00)						/* 4 */
     if (fac0 != FORMAT_IDENTIFIER) { throw new IllegalArgumentException("'FAC' marker expected! Found " + Integer.toHexString(fac0)); }
-    
+
     int version = dataInputStream.readInt(); // version in ASCII (e.g. "010" 0x00)			/* + 4 = 8 */
     if (version != VERSION_NUMBER) { throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version)); }
-    
+
     long recordLength = dataInputStream.readInt() & 0xFFFFFFFFL;	 						/* + 4 = 12 */
     long headerLength = 14; /* 4 + 4 + 4 + 2 */
     long dataLength = recordLength - headerLength;
-    
+
     long constructedDataLength = 0L;
-    
+
     int count = dataInputStream.readUnsignedShort();										/* + 2 = 14 */
-    
+
     for (int i = 0; i < count; i++) {
       FaceImageInfo imageInfo = new FaceImageInfo(inputStream);
       constructedDataLength += imageInfo.getRecordLength();
@@ -149,7 +149,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
       //			throw new IllegalStateException("DEBUG: constructed DataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
     }
   }
-  
+
   /**
    * Writes the facial record to an output stream. Note that the standard biometric header
    * (part of CBEFF structure) is not written here.
@@ -157,22 +157,22 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
    * @param outputStream an output stream
    */
   public void writeObject(OutputStream outputStream) throws IOException {		
-    
+
     int headerLength = 14; /* 4 + 4 + 4 + 2 (Section 5.4 of ISO/IEC 19794-5) */
-    
+
     long dataLength = 0;
     List<FaceImageInfo> faceImageInfos = getSubRecords();
     for (FaceImageInfo faceImageInfo: faceImageInfos) {
       dataLength += faceImageInfo.getRecordLength();
     }
-    
+
     long recordLength = headerLength + dataLength;
-    
+
     DataOutputStream dataOut = outputStream instanceof DataOutputStream ? (DataOutputStream)outputStream : new DataOutputStream(outputStream);
-    
+
     dataOut.writeInt(FORMAT_IDENTIFIER);													/* 4 */
     dataOut.writeInt(VERSION_NUMBER);														/* + 4 = 8 */
-    
+
     /*
      * The (4 byte) Length of Record field shall
      * be the combined length in bytes for the record.
@@ -180,14 +180,14 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
      * the Facial Record Header and Facial Record Data.
      */
     dataOut.writeInt((int)(recordLength & 0x00000000FFFFFFFFL));							/* + 4 = 12 */
-    
+
     dataOut.writeShort(faceImageInfos.size()); /* Number of facial record data blocks. */	/* + 2 = 14 */
-    
+
     for (FaceImageInfo faceImageInfo: faceImageInfos) {
       faceImageInfo.writeObject(dataOut);
     }
   }
-  
+
   /**
    * Gets the standard biometric header of this biometric data block
    * 
@@ -199,7 +199,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
       byte[] biometricSubtype = { (byte)CBEFFInfo.BIOMETRIC_SUBTYPE_NONE };
       byte[] formatOwner = { (byte)((FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(FORMAT_OWNER_VALUE & 0xFF) };
       byte[] formatType = { (byte)((FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(FORMAT_TYPE_VALUE & 0xFF) };
-      
+
       SortedMap<Integer, byte[]> elements = new TreeMap<Integer, byte[]>();
       elements.put(ISO781611.BIOMETRIC_TYPE_TAG, biometricType);
       elements.put(ISO781611.BIOMETRIC_SUBTYPE_TAG, biometricSubtype);
@@ -209,21 +209,21 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
     }
     return sbh;
   }
-  
+
   /**
    * Gets the face image infos embedded in this face info.
    * 
    * @return the embedded face image infos
    */
   public List<FaceImageInfo> getFaceImageInfos() { return getSubRecords(); }
-  
+
   /**
    * Adds a face image info to this face info.
    * 
    * @param faceImageInfo the face image info to add
    */
   public void addFaceImageInfo(FaceImageInfo faceImageInfo) { add(faceImageInfo); }
-  
+
   /**
    * Removes a face image info from this face info.
    * 

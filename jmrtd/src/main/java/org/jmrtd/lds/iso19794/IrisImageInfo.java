@@ -40,11 +40,11 @@ import org.jmrtd.lds.AbstractImageInfo;
  * @version $Revision$
  */
 public class IrisImageInfo extends AbstractImageInfo {
-  
+
   private static final long serialVersionUID = 833541246115625112L;
-  
+
   /* TODO: proper enums for data types */
-  
+
   /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
   public static int
   IMAGE_QUAL_UNDEF = 0xFE, /* (decimal 254) */
@@ -54,21 +54,21 @@ public class IrisImageInfo extends AbstractImageInfo {
   IMAGE_QUAL_MED_HI = 0x4B, /* (decimal 51-75) */
   IMAGE_QUAL_HIGH_LO = 0x4C,
   IMAGE_QUAL_HIGH_HI = 0x64; /* (decimal 76-100) */
-  
+
   private static final int
   ROT_ANGLE_UNDEF = 0xFFFF,
   ROT_UNCERTAIN_UNDEF = 0xFFFF;
-  
+
   /** The imageFormat (is more precise than mimeType). Constants are in {@link IrisInfo}. */
   private int imageFormat;
-  
+
   private int imageNumber;
   private int quality;
-  
+
   // TODO: rotation angle of eye and rotation uncertainty as angles, instead of encoded.
   private int rotationAngle;
   private int rotationAngleUncertainty;
-  
+
   /**
    * Constructs an iris image info.
    *
@@ -93,7 +93,7 @@ public class IrisImageInfo extends AbstractImageInfo {
     this.rotationAngle = rotationAngle;
     this.rotationAngleUncertainty = rotationAngleUncertainty;
   }
-  
+
   /**
    * Constructs an iris image info.
    *
@@ -110,7 +110,7 @@ public class IrisImageInfo extends AbstractImageInfo {
     this(imageNumber, IMAGE_QUAL_UNDEF, ROT_ANGLE_UNDEF, ROT_UNCERTAIN_UNDEF,
         width, height, imageBytes, imageLength, imageFormat);
   }
-  
+
   /**
    * Constructs a new iris image record.
    *
@@ -125,7 +125,7 @@ public class IrisImageInfo extends AbstractImageInfo {
     setMimeType(getMimeTypeFromImageFormat(imageFormat));
     readObject(inputStream);
   }
-  
+
   /**
    * Gets the image format.
    *
@@ -134,7 +134,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public int getImageFormat() {
     return imageFormat;
   }
-  
+
   /**
    * Gets the image number.
    *
@@ -143,7 +143,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public int getImageNumber() {
     return imageNumber;
   }
-  
+
   /**
    * Gets the quality.
    *
@@ -152,7 +152,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public int getQuality() {
     return quality;
   }
-  
+
   /**
    * Gets the rotation angle.
    *
@@ -161,7 +161,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public int getRotationAngle() {
     return rotationAngle;
   }
-  
+
   /**
    * Gets the rotation angle uncertainty.
    *
@@ -170,7 +170,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public int getRotationAngleUncertainty() {
     return rotationAngleUncertainty;
   }
-  
+
   /**
    * Gets the record length.
    *
@@ -179,7 +179,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public long getRecordLength() {
     return 11 + getImageLength();
   }
-  
+
   /**
    * Generates a textual representation of this object.
    *
@@ -198,13 +198,13 @@ public class IrisImageInfo extends AbstractImageInfo {
     result.append("]");
     return result.toString();
   }
-  
+
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
-    
+
     this.imageNumber = dataIn.readUnsignedShort();				/* 2 */
     this.quality = dataIn.readUnsignedByte();					/* + 1 = 3 */
-    
+
     /*
      * (65536*angle/360) modulo 65536
      * ROT_ANGLE_UNDEF = 0xFFFF
@@ -214,7 +214,7 @@ public class IrisImageInfo extends AbstractImageInfo {
      * entry shall be ROT_ANGLE_UNDEF
      */
     rotationAngle = dataIn.readShort();							/* + 2 + 5 */
-    
+
     /*
      * Rotation uncertainty = (unsigned short) round
      * (65536 * uncertainty/180)
@@ -224,22 +224,22 @@ public class IrisImageInfo extends AbstractImageInfo {
      * the absolute value of maximum error
      */
     rotationAngleUncertainty = dataIn.readUnsignedShort();		/* + 2 = 7 */
-    
+
     /*
      * Size of image data, bytes, 0 - 4294967295.
      */
     long imageLength = dataIn.readInt() & 0x00000000FFFFFFFFL;	/* + 4 = 11 */
-    
+
     readImage(inputStream, imageLength);
   }
-  
+
   protected void writeObject(OutputStream out) throws IOException {
-    
+
     DataOutputStream dataOut = out instanceof DataOutputStream ? (DataOutputStream)out : new DataOutputStream(out);
-    
+
     dataOut.writeShort(this.imageNumber);					/* 2 */
     dataOut.writeByte(this.quality);						/* + 1 = 3 */
-    
+
     /*
      * (65536*angle/360) modulo 65536
      * ROT_ANGLE_UNDEF = 0xFFFF
@@ -249,7 +249,7 @@ public class IrisImageInfo extends AbstractImageInfo {
      * entry shall be ROT_ANGLE_UNDEF
      */
     dataOut.writeShort(rotationAngle);						/* + 2 = 5 */
-    
+
     /*
      * Rotation uncertainty = (unsigned short) round
      * (65536 * uncertainty/180)
@@ -259,11 +259,11 @@ public class IrisImageInfo extends AbstractImageInfo {
      * the absolute value of maximum error
      */
     dataOut.writeShort(rotationAngleUncertainty);			/* + 2 = 7 */
-    
+
     dataOut.writeInt(getImageLength());						/* + 4 = 11 */
     writeImage(dataOut);
   }
-  
+
   private static String getMimeTypeFromImageFormat(int imageFormat) {
     switch (imageFormat) {
       case IrisInfo.IMAGEFORMAT_MONO_RAW:

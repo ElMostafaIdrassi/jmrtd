@@ -39,15 +39,15 @@ import net.sf.scuba.tlv.TLVUtil;
  * @version $Revision$
  */
 public class DisplayedImageInfo extends AbstractImageInfo {
-  
+
   private static final long serialVersionUID = 3801320585294302721L;
-  
+
   public static final int DISPLAYED_PORTRAIT_TAG = 0x5F40;
 
   public static final int DISPLAYED_SIGNATURE_OR_MARK_TAG = 0x5F43;
-  
+
   private int displayedImageTag;
-  
+
   /**
    * Constructs a displayed image info from the image bytes.
    * 
@@ -60,7 +60,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     setMimeType(getMimeTypeFromType(type));
     setImageBytes(imageBytes);
   }
-  
+
   /**
    * Constructs a displayed image info from binary encoding.
    * 
@@ -71,7 +71,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
   public DisplayedImageInfo(InputStream in) throws IOException {
     readObject(in);
   }
-  
+
   /**
    * Reads the displayed image. This method should be implemented by concrete
    * subclasses. The 5F2E or 7F2E tag and the length are already read.
@@ -82,33 +82,33 @@ public class DisplayedImageInfo extends AbstractImageInfo {
    */
   protected void readObject(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
-    
+
     displayedImageTag = tlvIn.readTag();
     if (displayedImageTag != DISPLAYED_PORTRAIT_TAG /* 5F40 */
         && displayedImageTag != DISPLAYED_SIGNATURE_OR_MARK_TAG /* 5F43 */) {
       throw new IllegalArgumentException("Expected tag 0x5F40 or 0x5F43, found " + Integer.toHexString(displayedImageTag));
     }
-    
+
     int type = getTypeFromDisplayedImageTag(displayedImageTag);
     setType(type);
     setMimeType(getMimeTypeFromType(type));
-    
+
     long imageLength = tlvIn.readLength();
-    
+
     readImage(tlvIn, imageLength);
   }
-  
+
   protected void writeObject(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(getDisplayedImageTagFromType(getType()));
     writeImage(tlvOut);
     tlvOut.writeValueEnd();		
   }
-  
+
   int getDisplayedImageTag() {
     return displayedImageTag;
   }
-  
+
   public long getRecordLength() {
     long length = 0;
     int imageLength = getImageLength();
@@ -117,9 +117,9 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     length += imageLength;
     return length;
   }
-  
+
   /* ONLY PRIVATE METHODS BELOW */
-  
+
   /**
    * As per A1.11.4 in Doc 9303 Part 3 Vol 2:
    * 
@@ -135,7 +135,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
       default: throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }
   }
-  
+
   private static int getDisplayedImageTagFromType(int type) {
     switch(type) {
       case TYPE_PORTRAIT: return DISPLAYED_PORTRAIT_TAG;
@@ -143,7 +143,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
       default: throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }
   }
-  
+
   private static int getTypeFromDisplayedImageTag(int tag) {
     switch(tag) {
       case DISPLAYED_PORTRAIT_TAG: return DisplayedImageInfo.TYPE_PORTRAIT;

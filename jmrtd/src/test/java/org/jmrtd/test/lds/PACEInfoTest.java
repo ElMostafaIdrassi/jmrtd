@@ -14,11 +14,11 @@ import org.jmrtd.lds.PACEInfo;
 import junit.framework.TestCase;
 
 public class PACEInfoTest extends TestCase {
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   //	PARAM_ID_GFP_1024_160 = 0,
   //	PARAM_ID_GFP_2048_224 = 1,
   //	PARAM_ID_GFP_2048_256 = 2,
@@ -34,15 +34,15 @@ public class PACEInfoTest extends TestCase {
   //	PARAM_ID_ECP_BRAINPOOL_P384_R1 = 16,
   //	PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   //	PARAM_ID_ECP_NIST_P512_R1 = 18;
-  
-  
+
+
   public void testToParameterSpecNotNull() {
-    
+
     //		Enumeration names = ECNamedCurveTable.getNames();
     //		while (names.hasMoreElements()) {
     //			LOGGER.info(names.nextElement());
     //		}
-    
+
     testToParameterSpecNotNull(0);
     testToParameterSpecNotNull(1);
     testToParameterSpecNotNull(2);
@@ -58,19 +58,19 @@ public class PACEInfoTest extends TestCase {
     testToParameterSpecNotNull(17);
     testToParameterSpecNotNull(18);
   }	
-  
+
   public void testToParameterSpecNotNull(int stdDomainParams) {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(BigInteger.valueOf(stdDomainParams));
     assertNotNull(paramSpec);
   }
-  
+
   public void testToParameterSpecDHParameterSpecOrECParameterSpec() {
-    
+
     //		Enumeration names = ECNamedCurveTable.getNames();
     //		while (names.hasMoreElements()) {
     //			LOGGER.info(names.nextElement());
     //		}
-    
+
     testGetParameterSpecDHParameterSpecOrECParameterSpec(0);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(1);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(2);
@@ -86,12 +86,12 @@ public class PACEInfoTest extends TestCase {
     testGetParameterSpecDHParameterSpecOrECParameterSpec(17);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(18);
   }	
-  
+
   public void testGetParameterSpecDHParameterSpecOrECParameterSpec(int stdDomainParams) {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(BigInteger.valueOf(stdDomainParams));
     assertTrue(paramSpec instanceof DHParameterSpec || paramSpec instanceof ECParameterSpec);		
   }
-  
+
   public void testECDHPrime() {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_NST_P256_R1);
     LOGGER.info("DEBUG: paramSpec: " + paramSpec.getClass().getCanonicalName());

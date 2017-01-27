@@ -36,16 +36,16 @@ import net.sf.scuba.smartcards.APDUWrapper;
  * @version $Revision$
  */
 public abstract class SecureMessagingWrapper implements Serializable, APDUWrapper {
-  
+
   private static final long serialVersionUID = 4709645514566992414L;
-  
+
   /**
    * Gets the send sequence counter.
    *
    * @return the send sequence counter
    */
   public abstract long getSendSequenceCounter();
-    
+
   /**
    * Gets the shared key for encrypting APDU payloads.
    * 

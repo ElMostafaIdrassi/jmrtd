@@ -13,7 +13,7 @@ import org.jmrtd.lds.iso19794.IrisInfo;
 import junit.framework.TestCase;
 
 public class IrisImageInfoTest extends TestCase {
-  
+
   public void testToString() {
     try {
       IrisImageInfo info = createTestObject();
@@ -26,14 +26,14 @@ public class IrisImageInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testLength() {
     IrisImageInfo irisImageInfo = createTestObject();
     int imageLength = irisImageInfo.getImageLength();
     int recordLength = (int)irisImageInfo.getRecordLength();
     assertTrue(imageLength < recordLength);
   }
-  
+
   public static IrisImageInfo createTestObject() {
     try {
       BufferedImage image = new BufferedImage(300, 200, BufferedImage.TYPE_BYTE_GRAY);

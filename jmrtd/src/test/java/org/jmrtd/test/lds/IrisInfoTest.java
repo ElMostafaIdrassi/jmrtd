@@ -35,11 +35,11 @@ import org.jmrtd.lds.iso19794.IrisInfo;
 import junit.framework.TestCase;
 
 public class IrisInfoTest extends TestCase {
-  
+
   public IrisInfoTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     try {
       IrisInfo info = createTestObject();
@@ -52,13 +52,13 @@ public class IrisInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testSBHFields() {
     IrisInfo irisInfo = createTestObject();
     testMandatorySBHFields(irisInfo);
     testOptionalSBHFields(irisInfo);
   }
-  
+
   /*
    * Doc 9303 says:
    * - Biometric type (Optional, but mandatory if subtype specified) // FIXME: is this true?
@@ -80,7 +80,7 @@ public class IrisInfoTest extends TestCase {
     assertTrue(tags.contains(0x87)); assertTrue(tags.contains(ISO781611.FORMAT_OWNER_TAG));
     assertTrue(tags.contains(0x88)); assertTrue(tags.contains(ISO781611.FORMAT_TYPE_TAG));
   }
-  
+
   public void testOptionalSBHFields(IrisInfo irisInfo) {
     Integer[] possibleTagsArray = { 0x81, 0x82, 0x83, /* 0x84, */ 0x85, 0x86, 0x87, 0x88 };
     Set<Integer> possibleTags = new HashSet<Integer>(Arrays.asList(possibleTagsArray));
@@ -90,7 +90,7 @@ public class IrisInfoTest extends TestCase {
       assertTrue(possibleTags.contains(tag));
     }
   }
-  
+
   public static IrisInfo createTestObject() {
     IrisBiometricSubtypeInfo irisFeatureInfo = IrisBiometricSubtypeInfoTest.createTestObject();
     int captureDeviceId = IrisInfo.CAPTURE_DEVICE_UNDEF;
@@ -111,7 +111,7 @@ public class IrisInfoTest extends TestCase {
     int intensityDepth = 24;
     int imageTransformation = IrisInfo.TRANS_UNDEF;
     byte[] deviceUniqueId = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    
+
     List<IrisBiometricSubtypeInfo> irisFeatureInfos = Arrays.asList(new IrisBiometricSubtypeInfo[] { irisFeatureInfo });
     IrisInfo irisInfo = new IrisInfo(captureDeviceId, horizontalOrientation, verticalOrientation,
         scanType, irisOcclusion, occlusionFilling, boundaryExtraction, irisDiameter, imageFormat,

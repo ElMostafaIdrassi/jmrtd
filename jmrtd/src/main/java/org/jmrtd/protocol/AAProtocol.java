@@ -39,18 +39,18 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @since 0.5.6
  */
 public class AAProtocol {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private PassportService service;
-  
+
   private SecureMessagingWrapper wrapper;
-  
+
   public AAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
   }
-  
+
   /**
    * Performs the <i>Active Authentication</i> protocol.
    *

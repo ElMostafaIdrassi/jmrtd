@@ -53,18 +53,18 @@ import org.bouncycastle.asn1.DLSequence;
  * @version $Revision$
  */
 public class TerminalAuthenticationInfo extends SecurityInfo {
-  
+
   private static final long serialVersionUID = 6220506985707094044L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public static final int VERSION_1 = 1;
   private static final int VERSION_2 = 2;
-  
+
   private String oid;
   private int version;
   private ASN1Sequence efCVCA; /* FIXME: this contains just a file identifier, and possibly a short file identifier? Why not short instead of ASN1Sequence? -- MO */
-  
+
   /**
    * Constructs a new object.
    *
@@ -78,7 +78,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     this.efCVCA = efCVCA;
     checkFields();
   }
-  
+
   /**
    * Constructs a new object.
    *
@@ -88,7 +88,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   TerminalAuthenticationInfo(String identifier, int version) {
     this(identifier, version, null);
   }
-  
+
   /**
    * Constructs a terminal authentication info using id_TA identifier {@link #ID_TA}
    * and version {@value #VERSION_1}.
@@ -96,7 +96,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public TerminalAuthenticationInfo() {
     this(ID_TA, VERSION_1);
   }
-  
+
   /**
    * Constructs a new Terminal Authentication info with the required
    * object identifier and version number 1, and file identifier and
@@ -108,7 +108,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public TerminalAuthenticationInfo(short fileId, byte shortFileId) {
     this(ID_TA, VERSION_1, constructEFCVCA(fileId, shortFileId));
   }
-  
+
   /**
    * Gets the version. This will be 1 or 2.
    * 
@@ -117,7 +117,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public int getVersion() {
     return version;
   }
-  
+
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector v = new ASN1EncodableVector();
@@ -128,7 +128,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     }
     return new DLSequence(v);
   }
-  
+
   /**
    * Gets the object identifier of this Terminal Authentication info.
    *
@@ -138,7 +138,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public String getObjectIdentifier() {
     return oid;
   }
-  
+
   /**
    * Gets the protocol object identifier as a human readable string.
    * 
@@ -148,7 +148,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
-  
+
   /**
    * Returns the efCVCA file identifier stored in this file, -1 if none
    *
@@ -157,7 +157,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public int getFileId() {
     return getFileId(efCVCA);
   }
-  
+
   /**
    * Returns the efCVCA short file identifier stored in this file, -1 if none
    * or not present
@@ -167,7 +167,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   public byte getShortFileId() {
     return getShortFileId(efCVCA);
   }
-  
+
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
@@ -182,7 +182,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     result.append("]");
     return result.toString();
   }
-  
+
   @Override
   public int hashCode() {
     return 123
@@ -190,7 +190,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
         + 5 * version
         + 3 * (efCVCA == null ? 1 : efCVCA.hashCode());
   }
-  
+
   @Override
   public boolean equals(Object other) {
     if (other == null) { return false; }
@@ -201,9 +201,9 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     if (efCVCA != null && otherTerminalAuthenticationInfo.efCVCA == null) { return false; }
     return getDERObject().equals(otherTerminalAuthenticationInfo.getDERObject());
   }
-  
+
   /* ONLY NON-PUBLIC METHODS BELOW */
-  
+
   /**
    * Checks whether the given object identifier identifies a
    * TerminalAuthenticationInfo structure.
@@ -215,7 +215,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   static boolean checkRequiredIdentifier(String id) {
     return ID_TA.equals(id);
   }
-  
+
   /**
    * Checks the correctness of the data for this instance of SecurityInfo
    */
@@ -243,7 +243,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
       throw new IllegalArgumentException("Malformed TerminalAuthenticationInfo.");
     }
   }
-  
+
   private static ASN1Sequence constructEFCVCA(short fileId, byte shortFileId) {
     if (shortFileId != -1) {
       return new DLSequence(new ASN1Encodable[] {
@@ -254,7 +254,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
           new DEROctetString(new byte[] { (byte)((fileId & 0xFF00) >> 8), (byte)(fileId & 0xFF) }) });
     }
   }
-  
+
   private static short getFileId(ASN1Sequence efCVCA) {
     if (efCVCA == null) { return -1; }
     ASN1Sequence s = (ASN1Sequence)efCVCA;
@@ -262,13 +262,13 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     byte[] bytes = fid.getOctets();
     return (short)(((bytes[0] & 0xFF) << 8) | (bytes[1] & 0xFF));		
   }
-  
+
   private static byte getShortFileId(ASN1Sequence efCVCA) {
     if (efCVCA == null) { return -1; }
     if (efCVCA.size() != 2) { return -1; }
     return ((DEROctetString)efCVCA.getObjectAt(1)).getOctets()[0];
   }
-  
+
   private String toProtocolOIDString(String oid) {
     if (ID_TA.equals(oid)) { return "id-TA"; }
     if (ID_TA_RSA.equals(oid)) { return "id-TA-RSA"; }

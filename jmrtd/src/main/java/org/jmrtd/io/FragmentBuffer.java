@@ -36,22 +36,22 @@ import java.util.HashSet;
  * @version $Revision$
  */
 public class FragmentBuffer implements Serializable {
-  
+
   private static final long serialVersionUID = -3510872461790499721L;
-  
+
   /** Buffer with the actual bytes. */
   private byte[] buffer; // FIXME can we make this buffer grow dynamically?
-  
+
   /** Administration of which parts of buffer are filled. */
   private Collection<Fragment> fragments;
-  
+
   /**
    * Creates a fragment buffer.
    */
   public FragmentBuffer() {
     this(1024);
   }
-  
+
   /**
    * Creates a fragment buffer.
    * 
@@ -61,18 +61,18 @@ public class FragmentBuffer implements Serializable {
     this.buffer = new byte[length];
     this.fragments = new HashSet<Fragment>();
   }
-  
+
   public synchronized void updateFrom(FragmentBuffer other) {
     for (Fragment otherFragment: other.fragments) {
       addFragment(otherFragment.offset, other.buffer, otherFragment.offset, otherFragment.length);
     }
   }
-  
+
   public synchronized void addFragment(int offset, byte b) {
     /* FIXME: can this be done more efficiently for common case resulting from InputStreamBuffer read, scan all fragments and extend neighboring one */
     addFragment(offset, new byte[] { b });
   }
-  
+
   /**
    * Adds a fragment of bytes at a specific offset to this file.
    * 
@@ -82,7 +82,7 @@ public class FragmentBuffer implements Serializable {
   public synchronized void addFragment(int offset, byte[] bytes) {
     addFragment(offset, bytes, 0, bytes.length);
   }
-  
+
   /**
    * Adds a fragment of bytes at a specific offset to this file.
    * 
@@ -95,7 +95,7 @@ public class FragmentBuffer implements Serializable {
     if (offset + srcLength > buffer.length) {
       setLength(2 * Math.max(offset + srcLength, buffer.length));
     }
-    
+
     System.arraycopy(bytes, srcOffset, buffer, offset, srcLength);
     int thisOffset = offset;
     int thisLength = srcLength;
@@ -141,7 +141,7 @@ public class FragmentBuffer implements Serializable {
     }
     fragments.add(Fragment.getInstance(thisOffset, thisLength));			
   }
-  
+
   public synchronized int getPosition() {
     int result = 0;
     for (int i = 0; i < buffer.length; i++) {
@@ -151,7 +151,7 @@ public class FragmentBuffer implements Serializable {
     }
     return result;
   }
-  
+
   public synchronized int getBytesBuffered() {
     int result = 0;
     for (int i = 0; i < buffer.length; i++) {
@@ -161,11 +161,11 @@ public class FragmentBuffer implements Serializable {
     }
     return result;
   }
-  
+
   public synchronized boolean isCoveredByFragment(int offset) {
     return isCoveredByFragment(offset, 1);
   }
-  
+
   public synchronized boolean isCoveredByFragment(int offset, int length) {
     for (Fragment fragment: fragments) {
       int left = fragment.getOffset();
@@ -174,7 +174,7 @@ public class FragmentBuffer implements Serializable {
     }
     return false;		
   }
-  
+
   /**
    * Calculates the number of bytes left in the buffer starting from index <code>index</code>.
    * 
@@ -195,19 +195,19 @@ public class FragmentBuffer implements Serializable {
     }
     return result;
   }	
-  
+
   public Collection<Fragment> getFragments() {
     return fragments;
   }
-  
+
   public byte[] getBuffer() {
     return buffer;
   }
-  
+
   public int getLength() {
     return buffer.length;
   }
-  
+
   /**
    * Gets the smallest fragment that contains <code>offset</code> and <code>offset + length</code>
    * that has <strong>not</strong> been buffered in this buffer.
@@ -261,11 +261,11 @@ public class FragmentBuffer implements Serializable {
     }
     return Fragment.getInstance(thisOffset, thisLength);
   }
-  
+
   public synchronized String toString() {
     return "FragmentBuffer [" + buffer.length + ", " + fragments + "]";
   }
-  
+
   public synchronized boolean equals(Object otherObject) {
     if (otherObject == null) { return false; }
     if (otherObject == this) { return true; }
@@ -277,48 +277,48 @@ public class FragmentBuffer implements Serializable {
     if (otherBuffer.fragments != null && this.fragments == null) { return false; }
     return Arrays.equals(otherBuffer.buffer, this.buffer) && otherBuffer.fragments.equals(this.fragments);
   }
-  
+
   public int hashCode() {
     return 3 * Arrays.hashCode(buffer) + 2 * fragments.hashCode() + 7;
   }
-  
+
   private synchronized void setLength(int length) {
     if (length <= buffer.length) { return; }
     byte[] newBuffer = new byte[length];
     System.arraycopy(this.buffer, 0, newBuffer, 0, this.buffer.length);
     this.buffer = newBuffer;
   }
-  
+
   /**
    * Fragments encapsulate pairs of offset and length.
    */
   public static class Fragment implements Serializable {
-    
+
     private static final long serialVersionUID = -3795931618553980328L;
-    
+
     private int offset, length;
-    
+
     public int getOffset() {
       return offset;
     }
-    
+
     public int getLength() {
       return length;
     }
-    
+
     private Fragment(int offset, int length) {
       this.offset = offset;
       this.length = length;
     }
-    
+
     public static Fragment getInstance(int offset, int length) {
       return new Fragment(offset, length);
     }
-    
+
     public String toString() {
       return "[" + offset + " .. " + (offset + length - 1)  + " (" + length + ")]";
     }
-    
+
     public boolean equals(Object otherObject) {
       if (otherObject == null) { return false; }
       if (otherObject == this) { return true; }
@@ -326,7 +326,7 @@ public class FragmentBuffer implements Serializable {
       Fragment otherFragment = (Fragment)otherObject;
       return otherFragment.offset == offset && otherFragment.length == length;
     }
-    
+
     public int hashCode() {
       return 2 * offset + 3 * length + 5;
     }

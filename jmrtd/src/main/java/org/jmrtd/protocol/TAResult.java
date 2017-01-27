@@ -43,18 +43,18 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class TAResult implements Serializable {
-  
+
   private static final long serialVersionUID = -2926063872890928748L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private CAResult chipAuthenticationResult;
   private CVCPrincipal caReference;
   private List<CardVerifiableCertificate> terminalCertificates = new ArrayList<CardVerifiableCertificate>();
   private PrivateKey terminalKey;
   private String documentNumber;
   private byte[] cardChallenge;
-  
+
   /**
    * Constructs a new terminal authentication result.
    *
@@ -77,7 +77,7 @@ public class TAResult implements Serializable {
     this.documentNumber = documentNumber;
     this.cardChallenge = cardChallenge;
   }
-  
+
   /**
    * Gets the chip authentication result;
    *
@@ -86,7 +86,7 @@ public class TAResult implements Serializable {
   public CAResult getChipAuthenticationResult() {
     return chipAuthenticationResult;
   }
-  
+
   /**
    * Gets CA certificate's reference used during EAC.
    *
@@ -95,7 +95,7 @@ public class TAResult implements Serializable {
   public CVCPrincipal getCAReference() {
     return caReference;
   }
-  
+
   /**
    * Gets the chain of CVCertificates used to authenticate the terminal to
    * the card.
@@ -106,7 +106,7 @@ public class TAResult implements Serializable {
   public List<CardVerifiableCertificate> getCVCertificates() {
     return terminalCertificates;
   }
-  
+
   /**
    * Gets the terminal private key used during EAC.
    *
@@ -115,7 +115,7 @@ public class TAResult implements Serializable {
   public PrivateKey getTerminalKey() {
     return terminalKey;
   }
-  
+
   /**
    * Gets the id of the card used during EAC.
    *
@@ -124,7 +124,7 @@ public class TAResult implements Serializable {
   public String getDocumentNumber() {
     return documentNumber;
   }
-  
+
   /**
    * Gets the card's challenge generated during EAC.
    *
@@ -133,7 +133,7 @@ public class TAResult implements Serializable {
   public byte[] getCardChallenge() {
     return cardChallenge;
   }
-  
+
   /**
    * Gets a textual representation of this terminal authentication result.
    *
@@ -161,7 +161,7 @@ public class TAResult implements Serializable {
     result.append("]");
     return result.toString();
   }
-  
+
   private Object toString(CardVerifiableCertificate cert) {
     StringBuilder result = new StringBuilder();
     result.append("CardVerifiableCertificate [");
@@ -176,7 +176,7 @@ public class TAResult implements Serializable {
     }
 
     result.append("]");
-    
+
     return result.toString();
   }
 }

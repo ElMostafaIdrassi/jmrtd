@@ -37,11 +37,11 @@ import org.jmrtd.lds.iso19794.FingerInfo;
 import junit.framework.TestCase;
 
 public class FingerInfoTest extends TestCase {
-  
+
   public FingerInfoTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     try {
       FingerInfo imageInfo = createSingleRightIndexFingerTestObject();
@@ -54,29 +54,29 @@ public class FingerInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testEncodeDecode() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testEncodeDecode(fingerInfo);
   }
-  
+
   public void testReflexive() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testReflexiveReconstruct(fingerInfo);
   }
-  
+
   public void testElements() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testElements(fingerInfo);
   }
-  
-  
+
+
   public void testFields() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testFieldsReasonable(fingerInfo);
     testFieldsSameAfterReconstruct(fingerInfo);
   }
-  
+
   public void testEncodeDecode(FingerInfo fingerInfo) {
     try {
       byte[] encoded = fingerInfo.getEncoded();
@@ -88,12 +88,12 @@ public class FingerInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testReflexiveReconstruct(FingerInfo fingerInfo) {
     FingerInfo fingerInfo2 = new FingerInfo(fingerInfo.getCaptureDeviceId(), fingerInfo.getAcquisitionLevel(), fingerInfo.getScaleUnits(), fingerInfo.getHorizontalScanningResolution(), fingerInfo.getVerticalScanningResolution(), fingerInfo.getHorizontalImageResolution(), fingerInfo.getVerticalImageResolution(), fingerInfo.getDepth(), fingerInfo.getCompressionAlgorithm(), fingerInfo.getFingerImageInfos());
     assertEquals(fingerInfo, fingerInfo2);
   }
-  
+
   public void testElements(FingerInfo fingerInfo) {
     List<FingerImageInfo> imageInfos = fingerInfo.getFingerImageInfos();
     for (FingerImageInfo imageInfo: imageInfos) {
@@ -103,7 +103,7 @@ public class FingerInfoTest extends TestCase {
       imageInfoTest.testValidType(imageInfo);
     }
   }
-  
+
   public void testFieldsReasonable(FingerInfo fingerInfo) {
     int captureDeviceId = fingerInfo.getCaptureDeviceId();
     int acquisitionLevel = fingerInfo.getAcquisitionLevel();
@@ -114,13 +114,13 @@ public class FingerInfoTest extends TestCase {
     int imageResolutionVertical = fingerInfo.getVerticalImageResolution();
     int depth = fingerInfo.getDepth();
     int compressionAlgorithm = fingerInfo.getCompressionAlgorithm();
-    
+
     assertTrue(scaleUnits == FingerInfo.SCALE_UNITS_PPI || scaleUnits == FingerInfo.SCALE_UNITS_PPCM);
     assertTrue(scanResolutionHorizontal >= 0);
     assertTrue(scanResolutionVertical >= 0);
     assertTrue(imageResolutionHorizontal >= 0);
     assertTrue(imageResolutionVertical >= 0);
-    
+
     /* FIXME: is there some relation between scanRes and imgRes? Is scanRes <= imgRes? */
     //		assertTrue("scanResolutionHorizontal == " + scanResolutionHorizontal
     //				+ ", imageResolutionHorizontal == " + imageResolutionHorizontal,
@@ -128,7 +128,7 @@ public class FingerInfoTest extends TestCase {
     //		assertTrue("scanResolutionVertical == " + scanResolutionVertical
     //				+ ", imageResolutionVertical == " + imageResolutionVertical,
     //				scanResolutionVertical >= imageResolutionVertical);
-    
+
     assertTrue(depth >= 0);
     assertTrue(compressionAlgorithm == FingerInfo.COMPRESSION_JPEG
         || compressionAlgorithm == FingerInfo.COMPRESSION_JPEG2000
@@ -137,7 +137,7 @@ public class FingerInfoTest extends TestCase {
         || compressionAlgorithm == FingerInfo.COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING
         || compressionAlgorithm == FingerInfo.COMPRESSION_WSQ);
   }
-  
+
   public void testFieldsSameAfterReconstruct(FingerInfo fingerInfo) {
     FingerInfo fingerInfo2 = new FingerInfo(fingerInfo.getCaptureDeviceId(), fingerInfo.getAcquisitionLevel(), fingerInfo.getScaleUnits(), fingerInfo.getHorizontalScanningResolution(), fingerInfo.getVerticalScanningResolution(), fingerInfo.getHorizontalImageResolution(), fingerInfo.getVerticalImageResolution(), fingerInfo.getDepth(), fingerInfo.getCompressionAlgorithm(), fingerInfo.getFingerImageInfos());
     int captureDeviceId = fingerInfo.getCaptureDeviceId();
@@ -149,7 +149,7 @@ public class FingerInfoTest extends TestCase {
     int imageResolutionVertical = fingerInfo.getVerticalImageResolution();
     int depth = fingerInfo.getDepth();
     int compressionAlgorithm = fingerInfo.getCompressionAlgorithm();
-    
+
     int captureDeviceId2 = fingerInfo2.getCaptureDeviceId();
     int acquisitionLevel2 = fingerInfo2.getAcquisitionLevel();
     int scaleUnits2 = fingerInfo2.getScaleUnits();
@@ -159,7 +159,7 @@ public class FingerInfoTest extends TestCase {
     int imageResolutionVertical2 = fingerInfo2.getVerticalImageResolution();
     int depth2 = fingerInfo2.getDepth();
     int compressionAlgorithm2 = fingerInfo2.getCompressionAlgorithm();
-    
+
     assertEquals(captureDeviceId, captureDeviceId2);
     assertEquals(acquisitionLevel,acquisitionLevel2);
     assertEquals(scaleUnits, scaleUnits2);
@@ -169,18 +169,18 @@ public class FingerInfoTest extends TestCase {
     assertEquals(imageResolutionVertical, imageResolutionVertical2);
     assertEquals(depth, depth2);
     assertEquals(compressionAlgorithm, compressionAlgorithm2);
-    
+
     assertNotNull(fingerInfo.getFingerImageInfos());
     assertNotNull(fingerInfo2.getFingerImageInfos());
     assertEquals(fingerInfo.getFingerImageInfos(), fingerInfo2.getFingerImageInfos());
   }
-  
+
   public void testSBHFields() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testMandatorySBHFields(fingerInfo);
     testOptionalSBHFields(fingerInfo);
   }
-  
+
   /*
    * Doc 9303 says:
    * - Biometric type (Optional, but mandatory if subtype specified) // FIXME: is this true?
@@ -201,18 +201,18 @@ public class FingerInfoTest extends TestCase {
     assertTrue(tags.contains(0x82)); assertTrue(tags.contains(ISO781611.BIOMETRIC_SUBTYPE_TAG));
     assertTrue(tags.contains(0x87)); assertTrue(tags.contains(ISO781611.FORMAT_OWNER_TAG));
     assertTrue(tags.contains(0x88)); assertTrue(tags.contains(ISO781611.FORMAT_TYPE_TAG));
-    
+
     byte[] bioType = sbh.getElements().get(ISO781611.BIOMETRIC_TYPE_TAG);
     assertNotNull(bioType);
     assertEquals(bioType.length, 1);
     assertEquals(bioType[0], CBEFFInfo.BIOMETRIC_TYPE_FINGERPRINT);
     assertEquals(bioType[0], 8);
-    
+
     /* FIXME: is bio type really mandatory for DG3 (according to ICAO)? */
     byte[] bioSubType = sbh.getElements().get(ISO781611.BIOMETRIC_SUBTYPE_TAG);
     assertNotNull(bioSubType);
     assertEquals(bioSubType.length, 1);
-    
+
     /* Possible subtypes for finger. */
     assertTrue("Bio sub type = " + bioSubType[0],
         bioSubType[0] == 5
@@ -226,7 +226,7 @@ public class FingerInfoTest extends TestCase {
         || bioSubType[0] == 18
         || bioSubType[0] == 22);
   }
-  
+
   public void testOptionalSBHFields(FingerInfo fingerInfo) {
     Integer[] possibleTagsArray = { 0x81, 0x82, 0x83, /* 0x84, */ 0x85, 0x86, 0x87, 0x88 };
     Set<Integer> possibleTags = new HashSet<Integer>(Arrays.asList(possibleTagsArray));
@@ -236,12 +236,12 @@ public class FingerInfoTest extends TestCase {
       assertTrue(possibleTags.contains(tag));
     }
   }
-  
+
   public void testBiometricSubType() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testBiometricSubType(fingerInfo);
   }
-  
+
   public void testBiometricSubType(FingerInfo fingerInfo) {
     StandardBiometricHeader sbh = fingerInfo.getStandardBiometricHeader();
     byte[] bioSubType = sbh.getElements().get(ISO781611.BIOMETRIC_SUBTYPE_TAG);
@@ -266,7 +266,7 @@ public class FingerInfoTest extends TestCase {
       }
     }
   }
-  
+
   public static FingerInfo createSingleRightIndexFingerTestObject() {
     List<FingerImageInfo> fingerImageInfos = new LinkedList<FingerImageInfo>();
     FingerImageInfo fingerImageInfo = FingerImageInfoTest.createRightIndexFingerTestObject();

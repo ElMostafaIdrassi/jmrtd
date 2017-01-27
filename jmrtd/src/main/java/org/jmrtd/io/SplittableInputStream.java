@@ -36,12 +36,12 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 public class SplittableInputStream extends InputStream {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public InputStreamBuffer inputStreamBuffer; // FIXME should be private
   private InputStreamBuffer.SubInputStream carrier;
-  
+
   /**
    * Wraps an input stream so that copy streams can be split off.
    * 
@@ -52,11 +52,11 @@ public class SplittableInputStream extends InputStream {
     this.inputStreamBuffer = new InputStreamBuffer(inputStream, length);
     this.carrier = inputStreamBuffer.getInputStream();
   }
-  
+
   public void updateFrom(SplittableInputStream other) {
     inputStreamBuffer.updateFrom(other.inputStreamBuffer);
   }
-  
+
   /**
    * Gets a copy of the inputstream positioned at <code>position</code>.
    * 
@@ -76,7 +76,7 @@ public class SplittableInputStream extends InputStream {
       throw new IllegalStateException(ioe.getMessage());
     }
   }
-  
+
   /**
    * The position of the input stream (the number of bytes read since this input stream was constructed)
    * 
@@ -85,7 +85,7 @@ public class SplittableInputStream extends InputStream {
   public int getPosition() {
     return carrier.getPosition();
   }
-  
+
   /**
    * Reads the next byte of data from the input stream. The value byte is
    * returned as an <code>int</code> in the range <code>0</code> to
@@ -98,10 +98,11 @@ public class SplittableInputStream extends InputStream {
    *             stream is reached.
    * @exception  IOException  if an I/O error occurs.
    */
+  @Override
   public int read() throws IOException {
     return carrier.read();
   }
-  
+
   /**
    * Skips over and discards <code>n</code> bytes of data from this input
    * stream. The <code>skip</code> method may, for a variety of reasons, end
@@ -115,10 +116,11 @@ public class SplittableInputStream extends InputStream {
    * @return the actual number of bytes skipped.
    * @throws IOException if the stream does not support seek, or if some other I/O error occurs.
    */
+  @Override
   public long skip(long n) throws IOException {
     return carrier.skip(n);
   }
-  
+
   /**
    * Returns an estimate of the number of bytes that can be read (or
    * skipped over) from this input stream without blocking by the next
@@ -131,20 +133,22 @@ public class SplittableInputStream extends InputStream {
    *         it reaches the end of the input stream.
    * @throws IOException on error
    */
+  @Override
   public int available() throws IOException {
     return carrier.available();
   }
-  
+
   /**
    * Closes this input stream and releases any system resources associated
    * with the stream.
    *
    * @throws IOException on error
    */
+  @Override
   public void close() throws IOException {
     carrier.close();
   }
-  
+
   /**
    * Marks the current position in this input stream. A subsequent call to
    * the <code>reset</code> method repositions this stream at the last marked
@@ -166,10 +170,11 @@ public class SplittableInputStream extends InputStream {
    *
    * @see     java.io.InputStream#reset()
    */
+  @Override
   public synchronized void mark(int readlimit) {
     carrier.mark(readlimit);
   }
-  
+
   /**
    * Repositions this stream to the position at the time the
    * <code>mark</code> method was last called on this input stream.
@@ -214,10 +219,11 @@ public class SplittableInputStream extends InputStream {
    * 
    * @throws IOException on error
    */
+  @Override
   public synchronized void reset() throws IOException {
     carrier.reset();
   }
-  
+
   /**
    * Tests if this input stream supports the <code>mark</code> and
    * <code>reset</code> methods. Whether or not <code>mark</code> and
@@ -230,14 +236,15 @@ public class SplittableInputStream extends InputStream {
    * @see     java.io.InputStream#mark(int)
    * @see     java.io.InputStream#reset()
    */
+  @Override
   public boolean markSupported() {
     return carrier.markSupported();
   }
-  
+
   public int getLength() {
     return inputStreamBuffer.getLength();
   }
-  
+
   public int getBytesBuffered() {
     return inputStreamBuffer.getBytesBuffered();
   }

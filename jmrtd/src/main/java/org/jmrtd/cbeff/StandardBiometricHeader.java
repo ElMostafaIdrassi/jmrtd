@@ -37,11 +37,11 @@ import java.util.TreeMap;
  * @since 0.4.7
  */
 public class StandardBiometricHeader implements Serializable {
-  
+
   private static final long serialVersionUID = 4113147521594478513L;
-  
+
   private SortedMap<Integer, byte[]> elements;
-  
+
   /**
    * Constructs a standard biometric header.
    * 
@@ -50,7 +50,7 @@ public class StandardBiometricHeader implements Serializable {
   public StandardBiometricHeader(Map<Integer, byte[]> elements) {
     this.elements = new TreeMap<Integer, byte[]>(elements);
   }
-  
+
   /**
    * Gets the elements of this standard biometric header.
    * 

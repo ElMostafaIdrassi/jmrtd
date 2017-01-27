@@ -48,12 +48,12 @@ import org.jmrtd.Util;
  * @since 0.5.0
  */
 public class PACEInfo extends SecurityInfo {
-  
+
   private static final long serialVersionUID = 7960925013249578359L;
-  
+
   /** Generic mapping and Integrated mapping and CAM mapping. */
   public enum MappingType { GM, IM, CAM };
-  
+
   /** Standardized domain parameters. Based on Table 6. */
   public static final int
   PARAM_ID_GFP_1024_160 = 0,
@@ -72,12 +72,12 @@ public class PACEInfo extends SecurityInfo {
   PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   PARAM_ID_ECP_NIST_P521_R1 = 18;
   /* RFU 19-31 */
-  
+
   private static final DHParameterSpec
   PARAMS_GFP_1024_160 = Util.toExplicitDHParameterSpec(DHStandardGroups.rfc5114_1024_160),
   PARAMS_GFP_2048_224 = Util.toExplicitDHParameterSpec(DHStandardGroups.rfc5114_2048_224),
   PARAMS_GFP_2048_256 = Util.toExplicitDHParameterSpec(DHStandardGroups.rfc5114_2048_256);
-  
+
   private static final ECParameterSpec
   PARAMS_ECP_NIST_P192_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("secp192r1")),
   PARAMS_ECP_NIST_P224_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("secp224r1")),
@@ -90,15 +90,15 @@ public class PACEInfo extends SecurityInfo {
   PARAMS_ECP_BRAINPOOL_P320_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("brainpoolp320r1")),
   PARAMS_ECP_BRAINPOOL_P384_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("brainpoolp384r1")),
   PARAMS_ECP_BRAINPOOL_P512_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("brainpoolp512r1"));
-  
+
   private String protocolOID;
   private int version;
   private BigInteger parameterId;
-  
+
   public PACEInfo(String oid, int version, int parameterId) {
     this(oid, version, BigInteger.valueOf(parameterId));
   }
-  
+
   /**
    * Creates a PACEInfo instance.
    *
@@ -113,7 +113,7 @@ public class PACEInfo extends SecurityInfo {
     this.version = version;
     this.parameterId = parameterId;
   }
-  
+
   public static PACEInfo createPACEInfo(byte[] paceInfoBytes) {
     /*
      * FIXME: Should add a constructor to PACEInfo that takes byte[] or InputStream, or
@@ -126,21 +126,21 @@ public class PACEInfo extends SecurityInfo {
     if (sequence.size() == 3) {
       optionalData = sequence.getObjectAt(2).toASN1Primitive();
     }
-    
+
     int version = ((ASN1Integer)requiredData).getValue().intValue();
     BigInteger parameterId = null;
     if (optionalData != null) {
       parameterId = ((ASN1Integer)optionalData).getValue();
     }
-    
+
     return new PACEInfo(oid, version, parameterId);
   }
-  
+
   @Override
   public String getObjectIdentifier() {
     return protocolOID;
   }
-  
+
   /**
    * Gets the protocol object identifier as a human readable string.
    * 
@@ -150,33 +150,33 @@ public class PACEInfo extends SecurityInfo {
   public String getProtocolOIDString() {
     return toProtocolOIDString(protocolOID);
   }
-  
+
   public int getVersion() {
     return version;
   }
-  
+
   public BigInteger getParameterId() {
     return parameterId;
   }
-  
+
   @Deprecated
   @Override
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    
+
     /* Protocol */
     vector.add(new ASN1ObjectIdentifier(protocolOID));
-    
+
     /* Required data */
     vector.add(new ASN1Integer(version));
-    
+
     /* Optional data */
     if (parameterId != null) {
       vector.add(new ASN1Integer(parameterId));
     }
     return new DLSequence(vector);
   }
-  
+
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("PACEInfo [");
@@ -188,14 +188,14 @@ public class PACEInfo extends SecurityInfo {
     result.append("]");
     return result.toString();
   }
-  
+
   public int hashCode() {
     return 1234567891
         + 7 * protocolOID.hashCode()
         + 5 * version
         + 3 * (parameterId == null ? 1991 : parameterId.hashCode());
   }
-  
+
   public boolean equals(Object other) {
     if (other == null) { return false; }
     if (other == this) { return true; }
@@ -203,7 +203,7 @@ public class PACEInfo extends SecurityInfo {
     PACEInfo otherPACEInfo = (PACEInfo)other;
     return getDERObject().equals(otherPACEInfo.getDERObject());
   }
-  
+
   public static boolean checkRequiredIdentifier(String oid) {
     return ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
@@ -225,12 +225,12 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
         || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid);
   }
-  
+
   /*
    * FIXME: perhaps we should introduce an enum for PACE identifiers (with a String toOID() method),
    * so that we can get rid of static methods below. -- MO
    */
-  
+
   public static MappingType toMappingType(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
@@ -258,7 +258,7 @@ public class PACEInfo extends SecurityInfo {
     //		return null;
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
-  
+
   public static String toKeyAgreementAlgorithm(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
@@ -285,7 +285,7 @@ public class PACEInfo extends SecurityInfo {
     //		return null;
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
-  
+
   public static String toCipherAlgorithm(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
@@ -313,7 +313,7 @@ public class PACEInfo extends SecurityInfo {
     //			return null;
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
-  
+
   public static String toDigestAlgorithm(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
@@ -340,7 +340,7 @@ public class PACEInfo extends SecurityInfo {
     //			return null;
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
-  
+
   public static int toKeyLength(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
@@ -369,11 +369,11 @@ public class PACEInfo extends SecurityInfo {
       throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
     }
   }
-  
+
   public static AlgorithmParameterSpec toParameterSpec(BigInteger stdDomainParam) {
     return toParameterSpec(stdDomainParam.intValue());
   }
-  
+
   public static AlgorithmParameterSpec toParameterSpec(int stdDomainParam) {
     switch (stdDomainParam) {
       case PARAM_ID_GFP_1024_160: return PARAMS_GFP_1024_160;
@@ -393,12 +393,12 @@ public class PACEInfo extends SecurityInfo {
       default: throw new NumberFormatException("Unknown standardized domain parameters " + stdDomainParam);
     }
   }
-  
+
   public static String toStandardizedParamIdString(BigInteger stdDomainParam) {
     if (stdDomainParam == null) {
       return "null";
     }
-    
+
     switch (stdDomainParam.intValue()) {
       case PARAM_ID_GFP_1024_160: /* 0 */ return "1024-bit MODP Group with 160-bit Prime Order Subgroup";
       case PARAM_ID_GFP_2048_224: /* 1 */ return "2048-bit MODP Group with 224-bit Prime Order Subgroup";
@@ -419,7 +419,7 @@ public class PACEInfo extends SecurityInfo {
       default: return stdDomainParam.toString();
     }
   }
-  
+
   private String toProtocolOIDString(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)) { return "id-PACE-DH-GM-3DES-CBC-CBC"; }
     if (ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)) { return "id-PACE-DH-GM-AES-CBC-CMAC-128"; }

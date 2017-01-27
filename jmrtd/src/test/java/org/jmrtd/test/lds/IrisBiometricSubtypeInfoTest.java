@@ -10,7 +10,7 @@ import org.jmrtd.lds.iso19794.IrisInfo;
 import junit.framework.TestCase;
 
 public class IrisBiometricSubtypeInfoTest extends TestCase {
-  
+
   public void testCreate() {
     IrisBiometricSubtypeInfo irisSubtypeInfo = createTestObject();
     int subtypeId = irisSubtypeInfo.getBiometricSubtype();
@@ -20,7 +20,7 @@ public class IrisBiometricSubtypeInfoTest extends TestCase {
     int imageFormat = irisSubtypeInfo.getImageFormat();
     assertTrue(imageFormat >= 0);
   }
-  
+
   public void testToString() {
     try {
       IrisBiometricSubtypeInfo info = createTestObject();
@@ -33,12 +33,12 @@ public class IrisBiometricSubtypeInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public static IrisBiometricSubtypeInfo createTestObject() {
     IrisImageInfo irisImageInfo = IrisImageInfoTest.createTestObject();
     List<IrisImageInfo> irisImageInfos = Arrays.asList(new IrisImageInfo[] { irisImageInfo });
     IrisBiometricSubtypeInfo irisSubtypeInfo = new IrisBiometricSubtypeInfo(IrisBiometricSubtypeInfo.EYE_LEFT, IrisInfo.IMAGEFORMAT_MONO_JPEG, irisImageInfos);
     return irisSubtypeInfo;
   }
-  
+
 }

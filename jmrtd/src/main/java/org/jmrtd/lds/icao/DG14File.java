@@ -58,14 +58,14 @@ import org.jmrtd.lds.TerminalAuthenticationInfo;
  * @version $Revision$
  */
 public class DG14File extends DataGroup {
-  
+
   private static final long serialVersionUID = -3536507558193769953L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** The security infos that make up this file */
   private Set<SecurityInfo> securityInfos;
-  
+
   /**
    * Constructs a new DG14 file from the provided data.
    *
@@ -76,7 +76,7 @@ public class DG14File extends DataGroup {
     if (securityInfos == null) { throw new IllegalArgumentException("Null securityInfos"); }
     this.securityInfos = new HashSet<SecurityInfo>(securityInfos);
   }
-  
+
   /**
    * Constructs a new DG14 file from the data in an input stream.
    *
@@ -87,7 +87,7 @@ public class DG14File extends DataGroup {
   public DG14File(InputStream inputStream) throws IOException {
     super(EF_DG14_TAG, inputStream);
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {
     securityInfos = new HashSet<SecurityInfo>();
     ASN1InputStream asn1In = new ASN1InputStream(inputStream);
@@ -106,7 +106,7 @@ public class DG14File extends DataGroup {
       }
     }
   }
-  
+
   /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
   protected void writeContent(OutputStream outputStream) throws IOException {
     ASN1EncodableVector vector = new ASN1EncodableVector();
@@ -117,7 +117,7 @@ public class DG14File extends DataGroup {
     ASN1Set derSet = new DLSet(vector);
     outputStream.write(derSet.getEncoded(ASN1Encoding.DER));
   }
-  
+
   /**
    * Gets Terminal Authentication infos.
    *
@@ -132,8 +132,8 @@ public class DG14File extends DataGroup {
     }
     return terminalAuthenticationInfos;
   }
-  
-  
+
+
   /**
    * Gets the Chip Authentication infos.
    *
@@ -152,7 +152,7 @@ public class DG14File extends DataGroup {
     }
     return map;
   }
-  
+
   /**
    * Gets the mapping of key identifiers to public keys. The key identifier
    * may be -1 if there is only one key.
@@ -168,7 +168,7 @@ public class DG14File extends DataGroup {
     }
     return publicKeys;
   }
-  
+
   public List<ActiveAuthenticationInfo> getActiveAuthenticationInfos() {
     List<ActiveAuthenticationInfo> resultList = new ArrayList<ActiveAuthenticationInfo>();
     for (SecurityInfo securityInfo : securityInfos) {
@@ -179,7 +179,7 @@ public class DG14File extends DataGroup {
     }
     return resultList;
   }
-  
+
   /**
    * Gets the security infos as an unordered collection.
    *
@@ -188,11 +188,11 @@ public class DG14File extends DataGroup {
   public Collection<SecurityInfo> getSecurityInfos() {
     return securityInfos;
   }
-  
+
   public String toString() {
     return "DG14File [" + securityInfos.toString() + "]";
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == null) {
       return false;
@@ -200,7 +200,7 @@ public class DG14File extends DataGroup {
     if (!(obj.getClass().equals(this.getClass()))) {
       return false;
     }
-    
+
     DG14File other = (DG14File)obj;
     if (securityInfos == null) {
       return  other.securityInfos == null;  
@@ -208,10 +208,10 @@ public class DG14File extends DataGroup {
     if (other.securityInfos == null) {
       return securityInfos == null;
     }
-    
+
     return securityInfos.equals(other.securityInfos);
   }
-  
+
   public int hashCode() {
     return 5 * securityInfos.hashCode() + 41;
   }

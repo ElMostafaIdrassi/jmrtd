@@ -61,24 +61,24 @@ import org.jmrtd.test.ResourceUtil;
 import junit.framework.TestCase;
 
 public class DG14FileTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   static {
     Security.addProvider(BC_PROVIDER);
   }
-  
+
   public void testConstruct() {
     try {
       Map<Integer, PublicKey> keys = new TreeMap<Integer, PublicKey>();
-      
+
       /* Using BC here, since SunJCE doesn't support EC. */
       KeyPairGenerator keyGen1 = KeyPairGenerator.getInstance("EC", BC_PROVIDER);
       keyGen1.initialize(192);
       KeyPair keyPair1 = keyGen1.generateKeyPair();
       assertNotNull(keyPair1);
-      
+
       /* Using SunJCE here, since BC sometimes hangs?!?! Bug in BC?
        *
        * FIXME: This happened to MO on WinXP, Eclipse 3.4, Sun JDK1.6.0_15,
@@ -86,26 +86,26 @@ public class DG14FileTest extends TestCase {
        * if this test hangs forever.
        */
       KeyPairGenerator keyGen2 = KeyPairGenerator.getInstance("DH", "SunJCE");
-      
+
       LOGGER.info("DEBUG: DG14FileTest: Generating key pair 2");
       KeyPair keyPair2 = keyGen2.generateKeyPair();
       assertNotNull(keyPair2);
-      
+
       PublicKey publicKey1 = keyPair1.getPublic();
       assertNotNull(publicKey1);
       PublicKey publicKey2 = keyPair2.getPublic();
       assertNotNull(publicKey2);
-      
+
       keys.put(1, publicKey1);
       keys.put(2, publicKey2);
-      
+
       LOGGER.info("DEBUG: publicKey1.getAlgorithm() = " + publicKey1.getAlgorithm());
       LOGGER.info("DEBUG: publicKey2.getAlgorithm() = " + publicKey2.getAlgorithm());
-      
+
       Map<Integer, String> algs = new TreeMap<Integer, String>();
       algs.put(1, SecurityInfo.ID_CA_DH_3DES_CBC_CBC);
       algs.put(2, SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC);
-      
+
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));
@@ -122,19 +122,19 @@ public class DG14FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testEncodeDecode() {
     try {
       DG14File dg14 = getSampleObject();
       byte[] encoded = dg14.getEncoded();
       assertNotNull(encoded);
-      
+
       DG14File copy = new DG14File(new ByteArrayInputStream(encoded));
       assertEquals(dg14, copy);
-      
+
       byte[] copyEncoded = dg14.getEncoded();
       assertNotNull(copyEncoded);
-      
+
       DG14File copyOfCopy = new DG14File(new ByteArrayInputStream(copyEncoded));
       assertEquals(dg14, copyOfCopy);
       assertEquals(copyOfCopy, copy);
@@ -143,21 +143,21 @@ public class DG14FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testDecodeEncode() {
     DG14File dg14 = getSampleObject();
     Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
     assertNotNull(securityInfos);
     DG14File copy = new DG14File(securityInfos);
     assertEquals(dg14, copy);
-    
+
     byte[] encoded = dg14.getEncoded();
     assertNotNull(encoded);
     byte[] copyEncoded = copy.getEncoded();
     assertNotNull(copyEncoded);
     assertTrue(Arrays.equals(encoded, copyEncoded));
   }
-  
+
   public void testDecodeEncode1() {
     try {
       DG14File dg14 = getSampleObject();
@@ -170,38 +170,38 @@ public class DG14FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testSpecSample() {
     try {
       byte[] specSample = getSpecSampleDG14File();
       DG14File dg14 = new DG14File(new ByteArrayInputStream(specSample));
       byte[] encoded = dg14.getEncoded();
-      
+
       Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
       for (SecurityInfo securityInfo: securityInfos) {
         LOGGER.info("DEBUG: securityInfo " + securityInfo);
       }
-      
+
       //			assertTrue(Arrays.equals(specSample, encoded));
       DG14File copy = new DG14File(new ByteArrayInputStream(encoded));
-      
+
       Collection<SecurityInfo> copySecurityInfos = copy.getSecurityInfos();
 
       for (SecurityInfo securityInfo: copySecurityInfos) {
         LOGGER.info("DEBUG: securityInfo " + securityInfo);
       }
-      
+
       assertEquals(securityInfos, copySecurityInfos);
-      
+
       assertEquals(dg14, copy);
-      
-      
+
+
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
   }
-  
+
   public void testSpecSample1() {
     try {
       byte[] encoded0 = getSpecSampleDG14File();
@@ -217,14 +217,14 @@ public class DG14FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   /** Tests a specific sample. */
   public void testGWSample() {
     try {
       DG14File dg14 = getGWSample();
-      
+
       testLDS_E_3(dg14);
-      
+
       //			byte[] bytes = dg14.getEncoded();
       //			FileOutputStream fileOutputStream = new FileOutputStream("c:/gw_dg14.bin");
       //			fileOutputStream.write(bytes);
@@ -234,12 +234,12 @@ public class DG14FileTest extends TestCase {
       e.printStackTrace();
     }
   }
-  
+
   /*
    * Tests from TR03105.
    * See https://www.bsi.bund.de/EN/Publications/TechnicalGuidelines/TR03105/BSITR03105.html.
    */
-  
+
   public void testLDS_E_1() {
     try {
       Collection<DG14File> dg14s = getSampleObjects();
@@ -251,19 +251,19 @@ public class DG14FileTest extends TestCase {
       e.printStackTrace();
     }
   }
-  
+
   public void testLDS_E_1(DG14File dg14) {
     byte[] encoded = dg14.getEncoded();
     assertNotNull(encoded);
     assertTrue(encoded.length > 0);
     assertEquals(encoded[0], 0x6E);
-    
+
     int length = dg14.getLength();
     //		LOGGER.info("length = " + length + ", encoded length = " + encoded.length);
     assertTrue(length > 0);
     assertTrue(length <= encoded.length);
   }
-  
+
   public void testLDS_E_2() {
     try {
       Collection<DG14File> dg14s = getSampleObjects();
@@ -275,7 +275,7 @@ public class DG14FileTest extends TestCase {
       e.printStackTrace();
     }
   }
-  
+
   public void testLDS_E_2(DG14File dg14) {
     Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
     int chipAuthenticationPublicKeyInfoCount = 0;
@@ -289,7 +289,7 @@ public class DG14FileTest extends TestCase {
         }
       }
     }
-    
+
     /* For profiles CA_KAT, CA_ATGA:
      *
      * The SecurityInfos set MUST contain at least one 
@@ -300,7 +300,7 @@ public class DG14FileTest extends TestCase {
      */
     assertTrue(chipAuthenticationPublicKeyInfoCount > 0);
   }
-  
+
   public void testLDS_E_3() {
     try {
       Collection<DG14File> dg14s = getSampleObjects();
@@ -312,7 +312,7 @@ public class DG14FileTest extends TestCase {
       e.printStackTrace();
     }
   }
-  
+
   public void testLDS_E_3(DG14File dg14) {
     try {
       Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
@@ -330,7 +330,7 @@ public class DG14FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   /**
    * 1. The ChipAuthenticationPublicKeyInfo element must follow the ASN.1
    *    syntax definition in the EAC specification [R2] and [R11].
@@ -365,13 +365,13 @@ public class DG14FileTest extends TestCase {
           + "was expecting 0.4.0.127.0.7.2.2.1.1 (id-PK-DH) or 0.4.0.127.0.7.2.2.1.2 (id-PK-ECDH), "
           + "found OID " + oid);
     }
-    
+
     /* 1. By definition (the fact that it is a ChipAuthenticationPublicKeyInfo object). */
     /* 2. */
     BigInteger keyId = chipAuthenticationPublicKeyInfo.getKeyId();
     //    assertNotNull(keyId);
     //    assertTrue(keyId.compareTo(BigInteger.valueOf(-1)) == 0 || keyId.compareTo(BigInteger.ZERO) > 0);
-    
+
     /* 3. */
     PublicKey publicKey = chipAuthenticationPublicKeyInfo.getSubjectPublicKey();
     assertNotNull(publicKey);
@@ -379,7 +379,7 @@ public class DG14FileTest extends TestCase {
     assertNotNull(algorithm);
     if ("0.4.0.127.0.7.2.2.1.1".equals(oid)) { assertEquals("DH", algorithm); } // id-PK-DH
     if ("0.4.0.127.0.7.2.2.1.2".equals(oid)) { assertTrue("EC".equals(algorithm) || "ECDH".equals(algorithm)); } // id-PK-ECDH
-    
+
     /* 4. */
     if ("DH".equals(algorithm)) {
       /* DH case. */
@@ -391,10 +391,10 @@ public class DG14FileTest extends TestCase {
         BigInteger g = params.getG();
         int l = params.getL();
         BigInteger p = params.getP();
-        
+
         assertTrue(BigInteger.ZERO.compareTo(g) < 0);
         assertTrue(g.compareTo(p) < 0);
-        
+
         if (l != 0) {
           assertTrue(l > 0);
           assertTrue(BigInteger.valueOf(2 * l - 1).compareTo(p) < 0);
@@ -407,43 +407,43 @@ public class DG14FileTest extends TestCase {
       }
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
       ECPoint w = ecPublicKey.getW();
-      
+
       ECParameterSpec params = ecPublicKey.getParams();
       assertNotNull(params);
       int coFactor = params.getCofactor();
       //			ECPoint generator = params.getGenerator();
       BigInteger order = params.getOrder();
-      
+
       EllipticCurve curve = params.getCurve();
       assertNotNull(curve);
       BigInteger a = curve.getA();
       assertNotNull(a);
       BigInteger b = curve.getB();
       assertNotNull(b);
-      
+
       ECField field = curve.getField();
       assertNotNull(field);
       if (!(field instanceof ECFieldFp)) {
         fail("Was expecting a prime field, found " + field.getClass().getSimpleName());
       }
-      
+
       ECFieldFp primeField = (ECFieldFp)field;
       BigInteger p = primeField.getP();
       assertNotNull(p);
       assertTrue(p.compareTo(BigInteger.valueOf(2)) > 0);
-      
+
       assertTrue(BigInteger.ZERO.compareTo(a) <= 0);
       assertTrue(a.compareTo(p) < 0);
       assertTrue(BigInteger.ZERO.compareTo(b) <= 0);
       assertTrue(b.compareTo(p) < 0);
-      
+
       BigInteger sum = BigInteger.valueOf(4).multiply(a.pow(3)).add(BigInteger.valueOf(27).multiply(b.pow(2)));
       assertTrue(sum.compareTo(BigInteger.ZERO) != 0);
-      
+
       assertTrue(isOnCurve(w, curve));
-      
+
       assertTrue(coFactor > 0);
-      
+
       assertTrue(order.compareTo(BigInteger.ZERO) > 0);
       assertTrue(order.compareTo(p) != 0);
       assertTrue(order.multiply(BigInteger.valueOf(coFactor)).compareTo(p.multiply(BigInteger.valueOf(2))) <= 0);
@@ -451,7 +451,7 @@ public class DG14FileTest extends TestCase {
       fail("Was expecting DH, EC or ECDH algorithm for public key. Found " + algorithm);
     }
   }
-  
+
   public Collection<DG14File> getSampleObjects() {
     List<DG14File> dg14s = new ArrayList<DG14File>();
     try { dg14s.add(getSampleObject()); } catch (Exception e) { e.printStackTrace(); }
@@ -459,7 +459,7 @@ public class DG14FileTest extends TestCase {
     try { dg14s.add(new DG14File(ResourceUtil.getInputStream("/lds/bsi2008/Datagroup14.bin"))); } catch (Exception e) { e.printStackTrace(); }
     return dg14s;
   }
-  
+
   /** Elaborate sample. */
   public DG14File getSampleObject() {
     try {
@@ -467,7 +467,7 @@ public class DG14FileTest extends TestCase {
       KeyPairGenerator keyGen1 = KeyPairGenerator.getInstance("EC", BC_PROVIDER);
       keyGen1.initialize(192);
       KeyPair keyPair1 = keyGen1.generateKeyPair();
-      
+
       /* Using SunJCE here, since BC sometimes hangs?!?! Bug in BC?
        *
        * FIXME: This happened to MO on WinXP, Eclipse 3.4, Sun JDK1.6.0_15,
@@ -475,12 +475,12 @@ public class DG14FileTest extends TestCase {
        * if this test halts forever.
        */
       KeyPairGenerator keyGen2 = KeyPairGenerator.getInstance("DH", "SunJCE");
-      
+
       KeyPair keyPair2 = keyGen2.generateKeyPair();
-      
+
       PublicKey publicKey1 = keyPair1.getPublic();
       PublicKey publicKey2 = keyPair2.getPublic();
-      
+
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));	
@@ -495,8 +495,8 @@ public class DG14FileTest extends TestCase {
       return null;
     }
   }
-  
-  
+
+
   /** Sanity check. */
   public void showSecurityInfos(DG14File dg14) {
     Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
@@ -519,7 +519,7 @@ public class DG14FileTest extends TestCase {
       }
     }
   }
-  
+
   /** Sanity check. */
   private void showSubjectPublicKeyInfo(PublicKey publicKey) {
     ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
@@ -546,7 +546,7 @@ public class DG14FileTest extends TestCase {
       LOGGER.info("DEBUG: Field is F_2^" + m);
     }
   }
-  
+
   private DG14File getGWSample() throws GeneralSecurityException {
     Collection<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
     securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC, ChipAuthenticationInfo.VERSION_1));
@@ -554,13 +554,13 @@ public class DG14FileTest extends TestCase {
     DG14File dg14 = new DG14File(securityInfos);
     return dg14;
   }
-  
+
   private ChipAuthenticationPublicKeyInfo getGWSampleChipAuthenticationPublicKeyInfo() throws GeneralSecurityException {
     PublicKey publicKey = getGWSamplePublicKey();
     ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo = new ChipAuthenticationPublicKeyInfo(publicKey);
     return chipAuthenticationPublicKeyInfo;
   }
-  
+
   private PublicKey getGWSamplePublicKey() throws GeneralSecurityException {
     ECPoint w = new ECPoint(new BigInteger("104351772082740350592218973609013984525419572253879843433078472109506934675868"), new BigInteger("14166132649477039766003768534081831647667842724916480786968553069450191944115"));
     ECPoint g = new ECPoint(new BigInteger("48439561293906451759052585252797914202762949526041747995844080717082404635286"), new BigInteger("36134250956749795798585127919587881956611106672985015071877198253568414405109"));
@@ -575,18 +575,18 @@ public class DG14FileTest extends TestCase {
     ECPublicKeySpec publicKeySpec = new ECPublicKeySpec(w, params);
     return KeyFactory.getInstance("EC", "BC").generatePublic(publicKeySpec);
   }
-  
+
   public static String toString(ECPoint ecPoint) {
     return "(" + ecPoint.getAffineX() + ", " + ecPoint.getAffineY() + ")";
   }
-  
+
   public DG14File getSimpleObject() {
     try {
       /* Using BC here, since SunJCE doesn't support EC. */
       KeyPairGenerator keyGen1 = KeyPairGenerator.getInstance("EC", BC_PROVIDER);
       keyGen1.initialize(192);
       KeyPair keyPair1 = keyGen1.generateKeyPair();
-      
+
       /* Using SunJCE here, since BC sometimes hangs?!?! Bug in BC?
        *
        * FIXME: This happened to MO on WinXP, Eclipse 3.4, Sun JDK1.6.0_15,
@@ -594,12 +594,12 @@ public class DG14FileTest extends TestCase {
        * if this test halts forever.
        */
       KeyPairGenerator keyGen2 = KeyPairGenerator.getInstance("DH", "SunJCE");
-      
+
       KeyPair keyPair2 = keyGen2.generateKeyPair();
-      
+
       PublicKey publicKey1 = keyPair1.getPublic();
       PublicKey publicKey2 = keyPair2.getPublic();
-      
+
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));	
@@ -614,7 +614,7 @@ public class DG14FileTest extends TestCase {
       return null;
     }
   }
-  
+
   /**
    * Figure D.3 from TR 03110 v1.11, specifies DG14 (DH).
    * 
@@ -639,7 +639,7 @@ public class DG14FileTest extends TestCase {
         /*01C0:*/ 0x30, 0x0F, 0x06, 0x0A, 0x04, 0x00, 0x7F, 0x00, 0x07, 0x02, 0x02, 0x03, 0x01, 0x01, 0x02, 0x01, 0x01, 0x30, 0x0D, 0x06, 0x08, 0x04, 0x00, 0x7F, 0x00, 0x07, 0x02, 0x02, 0x02, 0x02, 0x01, 0x01
     };
   }
-  
+
   public boolean equalsDHPublicKey(DHPublicKey thisPublicKey, Object other) {
     if (!(other instanceof DHPublicKey)) { return false; }
     DHPublicKey otherPublicKey = (DHPublicKey)other;
@@ -651,10 +651,10 @@ public class DG14FileTest extends TestCase {
         && params1.getP().equals(params2.getP())
         && thisPublicKey.getY().equals(otherPublicKey.getY());
   }
-  
+
   private boolean isOnCurve(ECPoint point, EllipticCurve curve) {
     /* Adapted from http://stackoverflow.com/a/6664005/27190. */
-    
+
     BigInteger a = curve.getA();
     BigInteger b = curve.getB();
     ECField field = curve.getField();
@@ -666,14 +666,14 @@ public class DG14FileTest extends TestCase {
     } else {
       throw new IllegalStateException("Unexpected field type: " + field.getClass().getSimpleName());
     }
-    
+
     BigInteger x = point.getAffineX();
     BigInteger y = point.getAffineY();
-    
+
     /* FIXME: more efficient equals modulo possible? Use BC ECFieldElement for this? */
     BigInteger lhs = y.multiply(y);
     BigInteger rhs = x.multiply(x).multiply(x).add(a.multiply(x)).add(b);
-    
+
     return lhs.mod(modulus).equals(rhs.mod(modulus));
   }
 }

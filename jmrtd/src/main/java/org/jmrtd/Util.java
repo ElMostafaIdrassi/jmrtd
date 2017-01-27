@@ -101,20 +101,20 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class Util {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Mode for KDF. */
   public static final int
   ENC_MODE = 1,
   MAC_MODE = 2,
   PACE_MODE = 3;
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-  
+
   private Util() {
   }
-  
+
   /**
    * Derives the ENC or MAC key for BAC from the keySeed.
    *
@@ -128,7 +128,7 @@ public class Util {
   public static SecretKey deriveKey(byte[] keySeed, int mode) throws GeneralSecurityException {
     return deriveKey(keySeed, "DESede", 128, mode);
   }
-  
+
   /**
    * Derives the ENC or MAC key for BAC or PACE
    *
@@ -144,7 +144,7 @@ public class Util {
   public static SecretKey deriveKey(byte[] keySeed, String cipherAlgName, int keyLength, int mode) throws GeneralSecurityException {	
     return deriveKey(keySeed, cipherAlgName, keyLength, null, mode);
   }
-  
+
   /**
    * Derives a shared key.
    *
@@ -203,7 +203,7 @@ public class Util {
     }
     return new SecretKeySpec(keyBytes, cipherAlg);
   }
-  
+
   /**
    * Computes the static key seed, based on information from the MRZ.
    *
@@ -226,17 +226,17 @@ public class Util {
         .append(dateOfExpiry)
         .append(MRZInfo.checkDigit(dateOfExpiry))
         .toString();
-        
+
     return computeKeySeed(text, digestAlg, doTruncate);
   }
-  
+
   public static byte[] computeKeySeed(String cardAccessNumber, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
     MessageDigest shaDigest = MessageDigest.getInstance(digestAlg);
-    
+
     shaDigest.update(getBytes(cardAccessNumber));
-    
+
     byte[] hash = shaDigest.digest();
-    
+
     if (doTruncate) {
       /* FIXME: truncate to 16 byte only for BAC with 3DES. Also for PACE and/or AES? -- MO */
       byte[] keySeed = new byte[16];
@@ -246,7 +246,7 @@ public class Util {
       return hash;
     }
   }
-  
+
   /**
    * Pads the input <code>in</code> according to ISO9797-1 padding method 2,
    * using the given block size.
@@ -259,7 +259,7 @@ public class Util {
   public static byte[] pad(/*@ non_null */ byte[] in, int blockSize) {
     return pad(in, 0, in.length, blockSize);
   }
-  
+
   /**
    * Pads the input {@code bytes} indicated by {@code offset} and {@code length}
    * according to ISO9797-1 padding method 2, using the given block size in {@code blockSize}.
@@ -280,7 +280,7 @@ public class Util {
     }
     return outputStream.toByteArray();
   }
-  
+
   /**
    * Unpads the input {@code bytes} according to ISO9797-1 padding method 2.
    * 
@@ -302,7 +302,7 @@ public class Util {
     System.arraycopy(bytes, 0, out, 0, i);
     return out;
   }
-  
+
   /**
    * Recovers the M1 part of the message sent back by the AA protocol
    * (INTERNAL AUTHENTICATE command). The algorithm is described in
@@ -317,7 +317,7 @@ public class Util {
     if (decryptedResponse == null || decryptedResponse.length < 1) {
       throw new IllegalArgumentException("Plaintext is too short to recover message");
     }
-    
+
     /* Trailer. */
     if (((decryptedResponse[decryptedResponse.length - 1] & 0xF) ^ 0xC) != 0) {
       /* 
@@ -326,7 +326,7 @@ public class Util {
        */
       throw new NumberFormatException("Could not get M1, malformed trailer");
     }
-    
+
     int trailerLength = 1;
     /* Trailer. Find out whether this is t=1 or t=2. */
     if (((decryptedResponse[decryptedResponse.length - 1] & 0xFF) ^ 0xBC) == 0) {
@@ -342,7 +342,7 @@ public class Util {
     } else {
       throw new NumberFormatException("Not an ISO 9796-2 scheme 2 signature trailer");
     }
-    
+
     /* Header. */
     if (((decryptedResponse[0] & 0xC0) ^ 0x40) != 0) {
       /*
@@ -355,7 +355,7 @@ public class Util {
       /* Third bit (working from left to right) should be '1' for partial recovery. */
       throw new NumberFormatException("Could not get M1, first byte indicates partial recovery not enabled: " + Integer.toHexString(decryptedResponse[0]));
     }
-    
+
     /* Padding to the left of M1, find out how long. */
     int paddingLength = 0;
     for (; paddingLength < decryptedResponse.length; paddingLength++) {
@@ -365,23 +365,23 @@ public class Util {
       }
     }
     int messageOffset = paddingLength + 1;
-    
+
     int paddedMessageLength = decryptedResponse.length - trailerLength - digestLength;
     int messageLength = paddedMessageLength - messageOffset;    
-    
+
     /* There must be at least one byte of message string. */
     if (messageLength <= 0) {
       throw new NumberFormatException("Could not get M1");
     }
-    
+
     /* TODO: If we contain the whole message as well, check the hash of that. */
-    
+
     byte[] recoveredMessage = new byte[messageLength];
     System.arraycopy(decryptedResponse, messageOffset, recoveredMessage, 0, messageLength);
-    
+
     return recoveredMessage;
   }
-  
+
   /**
    * For ECDSA the EAC 1.11 specification requires the signature to be stripped down from any ASN.1 wrappers, as so.
    *
@@ -411,7 +411,7 @@ public class Util {
       out.close();
     }
   }
-  
+
   public static byte[] alignKeyDataToSize(byte[] keyData, int size) {
     byte[] result = new byte[size];
     if (keyData.length < size) {
@@ -420,7 +420,7 @@ public class Util {
     System.arraycopy(keyData, keyData.length - size, result, result.length - size, size);
     return result;
   }
-  
+
   /**
    * Converts an integer to an octet string.
    * Based on BSI TR 03111 Section 3.1.2.
@@ -440,7 +440,7 @@ public class Util {
     }
     return result;
   }
-  
+
   /**
    * Converts an integer to an octet string.
    *
@@ -450,7 +450,7 @@ public class Util {
   public static byte[] i2os(BigInteger val) {
     /* FIXME: Quick hack. What if val < 0? -- MO */
     /* Do something with: int sizeInBytes = val.bitLength() / Byte.SIZE; */
-    
+
     int sizeInNibbles = val.toString(16).length();
     if (sizeInNibbles % 2 != 0) {
       sizeInNibbles++;
@@ -458,7 +458,7 @@ public class Util {
     int length = sizeInNibbles / 2;
     return i2os(val, length);
   }
-  
+
   /**
    * Converts an octet string to an integer.
    * Based on BSI TR 03111 Section 3.1.2.
@@ -473,7 +473,7 @@ public class Util {
     }
     return os2i(bytes, 0, bytes.length);
   }
-  
+
   /**
    * Converts an octet string to an integer.
    * Based on BSI TR 03111 Section 3.1.2.
@@ -488,17 +488,17 @@ public class Util {
     if (bytes == null) {
       throw new IllegalArgumentException();
     }
-    
+
     BigInteger result = BigInteger.ZERO;
     BigInteger base = BigInteger.valueOf(256);
     for (int i = offset; i < offset + length; i++) {
       result = result.multiply(base);
       result = result.add(BigInteger.valueOf(bytes[i] & 0xFF));
     }
-    
+
     return result;
   }
-  
+
   /**
    * Convert an octet string to field element via OS2FE as specified in BSI TR-03111.
    *
@@ -510,7 +510,7 @@ public class Util {
   public static BigInteger os2fe(byte[] bytes, BigInteger p) {
     return Util.os2i(bytes).mod(p);
   }
-  
+
   /* Best effort. FIXME: test and improve. -- MO */
   /**
    * Infers a digest algorithm mnemonic from a signature algorithm mnemonic.
@@ -522,7 +522,7 @@ public class Util {
     if (signatureAlgorithm == null) {
       throw new IllegalArgumentException();
     }
-    
+
     String digestAlgorithm = null;
     String signatureAlgorithmToUppercase = signatureAlgorithm.toUpperCase();
     if (signatureAlgorithmToUppercase.contains("WITH")) {
@@ -534,10 +534,10 @@ public class Util {
     if ("SHA256".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-256"; }
     if ("SHA384".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-384"; }
     if ("SHA512".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-512"; }
-    
+
     return digestAlgorithm;
   }
-  
+
   public static String inferDigestAlgorithmFromCipherAlgorithmForKeyDerivation(String cipherAlg, int keyLength) {
     if (cipherAlg == null) { throw new IllegalArgumentException(); }
     if ("DESede".equals(cipherAlg) || "AES-128".equals(cipherAlg)) { return "SHA-1"; }
@@ -546,14 +546,14 @@ public class Util {
     if ("AES".equals(cipherAlg) && (keyLength == 192 || keyLength == 256)) { return "SHA-256"; }
     throw new IllegalArgumentException("Unsupported cipher algorithm or key length \"" + cipherAlg + "\", " + keyLength);
   }
-  
+
   public static DHParameterSpec toExplicitDHParameterSpec(DHParameters params) {
     BigInteger p = params.getP();
     BigInteger generator = params.getG();
     int order = (int)params.getL();
     return new DHParameterSpec(p, generator, order);
   }
-  
+
   /**
    * The public key algorithm (like RSA or) with some extra information (like 1024 bits).
    *
@@ -565,7 +565,7 @@ public class Util {
     if (publicKey == null) {
       return "null";
     }
-    
+
     String algorithm = publicKey.getAlgorithm();
     if (publicKey instanceof RSAPublicKey) {
       RSAPublicKey rsaPublicKey = (RSAPublicKey)publicKey;
@@ -579,15 +579,15 @@ public class Util {
         algorithm += " [" + name + "]";
       }
     }
-    
+
     return algorithm;
   }
-  
+
   public static String getDetailedPrivateKeyAlgorithm(PrivateKey privateKey) {
     if (privateKey == null) {
       return "null";
     }
-    
+
     String algorithm = privateKey.getAlgorithm();
     if (privateKey instanceof RSAPrivateKey) {
       RSAPrivateKey rsaPrivateKey = (RSAPrivateKey)privateKey;
@@ -603,7 +603,7 @@ public class Util {
     }
     return algorithm;
   }
-  
+
   /**
    * Gets the curve name if known (or {@code null}).
    *
@@ -616,11 +616,11 @@ public class Util {
     if (namedECParams == null) { return null; }
     return namedECParams.getName();
   }
-  
+
   public static ECParameterSpec toExplicitECParameterSpec(ECNamedCurveParameterSpec parameterSpec) {
     return toExplicitECParameterSpec(toECNamedCurveSpec(parameterSpec));
   }
-  
+
   /**
    * Translates (named) curve spec to JCA compliant explicit param spec.
    *
@@ -658,7 +658,7 @@ public class Util {
       return params;
     }
   }
-  
+
   private static org.bouncycastle.jce.spec.ECNamedCurveSpec toNamedCurveSpec(ECParameterSpec ecParamSpec) {
     if (ecParamSpec == null) { return null; }
     if (ecParamSpec instanceof org.bouncycastle.jce.spec.ECNamedCurveSpec) { return (org.bouncycastle.jce.spec.ECNamedCurveSpec)ecParamSpec; }
@@ -683,7 +683,7 @@ public class Util {
       return namedSpecs.get(0);
     }
   }
-  
+
   /**
    * Translates internal BC named curve spec to BC provided JCA compliant named curve spec.
    *
@@ -700,7 +700,7 @@ public class Util {
     byte[] seed = namedParamSpec.getSeed();
     return new org.bouncycastle.jce.spec.ECNamedCurveSpec(name, curve, generator, order, coFactor, seed);
   }
-  
+
   /*
    * NOTE: Woj, I moved this here from DG14File, seemed more appropriate here. -- MO
    * FIXME: Do we still need this now that we have reconstructPublicKey? -- MO
@@ -726,13 +726,13 @@ public class Util {
         X9ECParameters params = null;
         if (derEncodedParams instanceof ASN1ObjectIdentifier) {
           ASN1ObjectIdentifier paramsOID = (ASN1ObjectIdentifier)derEncodedParams;
-          
+
           /* It's a named curve from X9.62. */
           params = X962NamedCurves.getByOID(paramsOID);
           if (params == null) {
             throw new IllegalStateException("Could not find X9.62 named curve for OID " + paramsOID.getId());
           }
-          
+
           /* Reconstruct the parameters. */
           org.bouncycastle.math.ec.ECPoint generator = params.getG();
           org.bouncycastle.math.ec.ECCurve curve = generator.getCurve();
@@ -742,7 +742,7 @@ public class Util {
           /* It's not a named curve, we can just return the decoded public key info. */
           return subjectPublicKeyInfo;
         }
-        
+
         if (publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
           org.bouncycastle.jce.interfaces.ECPublicKey ecPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)publicKey;
           AlgorithmIdentifier id = new AlgorithmIdentifier(subjectPublicKeyInfo.getAlgorithm().getAlgorithm(), params.toASN1Primitive());
@@ -770,7 +770,7 @@ public class Util {
       return null;
     }
   }
-  
+
   public static PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) {
     try {
       byte[] encodedPublicKeyInfoBytes = subjectPublicKeyInfo.getEncoded(ASN1Encoding.DER);
@@ -790,7 +790,7 @@ public class Util {
       return null;
     }
   }
-  
+
   /**
    * Reconstructs the public key to use explicit domain params for EC public keys
    *
@@ -802,7 +802,7 @@ public class Util {
     if (!(publicKey instanceof ECPublicKey)) {
       return publicKey;
     }
-    
+
     try {
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
       ECPoint w = ecPublicKey.getW();
@@ -811,16 +811,16 @@ public class Util {
       if (params == null) {
         return publicKey;
       }
-      
+
       ECPublicKeySpec explicitPublicKeySpec = new ECPublicKeySpec(w, params);
-      
+
       return KeyFactory.getInstance("EC", BC_PROVIDER).generatePublic(explicitPublicKeySpec);
     } catch (Exception e) {
       LOGGER.warning("Could not make public key param spec explicit");
       return publicKey;
     }
   }
-  
+
   /**
    * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
    *
@@ -837,7 +837,7 @@ public class Util {
   public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey) throws InvalidKeyException {
     return encodePublicKeyDataObject(oid, publicKey, true);
   }
-  
+
   /**
    * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
    *
@@ -863,7 +863,7 @@ public class Util {
         int l = params.getL();
         BigInteger generator = params.getG();
         BigInteger y = dhPublicKey.getY();
-        
+
         tlvOut.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag  */
         if (!isContextKnown) {
           tlvOut.writeTag(0x81); tlvOut.writeValue(i2os(p)); /* p: Prime modulus */
@@ -882,7 +882,7 @@ public class Util {
         BigInteger order = params.getOrder();
         int coFactor = params.getCofactor();
         ECPoint publicPoint = ecPublicKey.getW();
-        
+
         tlvOut.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag */
         if (!isContextKnown) {
           tlvOut.writeTag(0x81); tlvOut.writeValue(i2os(p)); /* Prime modulus */
@@ -909,7 +909,7 @@ public class Util {
     }
     return bOut.toByteArray();
   }
-  
+
   /*
    * FIXME: how can we be sure coords are uncompressed?
    */
@@ -945,7 +945,7 @@ public class Util {
       throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
     }
   }
-  
+
   public static ECPoint os2ECPoint(byte[] encodedECPoint) {
     try {
       DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedECPoint));
@@ -967,7 +967,7 @@ public class Util {
       throw new IllegalArgumentException(ioe.getMessage());
     }
   }
-  
+
   /**
    * Encode an EC point (for use as public key value).
    * Prefixes a {@code 0x04} (without a length).
@@ -990,12 +990,12 @@ public class Util {
     }
     return bOut.toByteArray();
   }
-  
+
   public static PublicKey decodePublicKeyFromSmartCard(byte[] encodedPublicKey, AlgorithmParameterSpec params) {
     if (params == null) {
       throw new IllegalArgumentException("Params cannot be null");
     }
-    
+
     try {
       if (params instanceof ECParameterSpec) {
         ECPoint w = os2ECPoint(encodedPublicKey);
@@ -1010,9 +1010,9 @@ public class Util {
         byte[] publicValue = new byte[length];
         dataIn.readFully(publicValue);
         dataIn.close();
-        
+
         BigInteger y = Util.os2i(publicValue);
-        
+
         KeyFactory kf = KeyFactory.getInstance("DH");
         DHParameterSpec dhParams = (DHParameterSpec)params;
         return kf.generatePublic(new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
@@ -1026,7 +1026,7 @@ public class Util {
       throw new IllegalArgumentException(gse.getMessage());
     }
   }
-  
+
   /**
    * Infer an EAC object identifier for an EC or DH public key.
    *
@@ -1044,7 +1044,7 @@ public class Util {
       throw new IllegalArgumentException("Wrong key type. Was expecting ECDH or DH public key.");
     }
   }
-  
+
   /**
    * Maps nonce for generic mapping case.
    * 
@@ -1060,13 +1060,13 @@ public class Util {
     if (params == null) {
       throw new IllegalArgumentException("Unsupported parameters for mapping nonce");
     }
-    
+
     if (params instanceof ECParameterSpec) {
       ECParameterSpec ecParams = (ECParameterSpec)params;
-      
+
       BigInteger affineX = os2i(sharedSecretH);
       BigInteger affineY = computeAffineY(affineX, ecParams); /* FIXME: Y coord is wrong about 50% of the time (when tested against Morpho applet). */
-      
+
       ECPoint sharedSecretPointH = new ECPoint(affineX, affineY);
       return mapNonceGMWithECDH(os2i(nonceS), sharedSecretPointH, ecParams);
     } else if (params instanceof DHParameterSpec) {
@@ -1076,12 +1076,12 @@ public class Util {
       throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
     }
   }
-  
+
   public static AlgorithmParameterSpec mapNonceIM(byte[] nonceS, byte[] nonceT, byte[] sharedSecretH, AlgorithmParameterSpec params) {
     /* FIXME: work in progress. */
     return null;
   }
-  
+
   public static ECParameterSpec mapNonceGMWithECDH(BigInteger nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
     /*
      * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
@@ -1100,7 +1100,7 @@ public class Util {
     }
     return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
   }
-  
+
   public static DHParameterSpec mapNonceGMWithDH(BigInteger nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
     // g~ = g^s * h
     BigInteger p = params.getP();
@@ -1108,20 +1108,20 @@ public class Util {
     BigInteger ephemeralGenerator = generator.modPow(nonceS, p).multiply(sharedSecretH).mod(p);
     return new DHParameterSpec(p, ephemeralGenerator, params.getL());
   }
-  
+
   private static ECPoint add(ECPoint x, ECPoint y, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcX = toBouncyCastleECPoint(x, params);
     org.bouncycastle.math.ec.ECPoint bcY = toBouncyCastleECPoint(y, params);
     org.bouncycastle.math.ec.ECPoint bcSum = bcX.add(bcY);
     return fromBouncyCastleECPoint(bcSum);
   }
-  
+
   public static ECPoint multiply(BigInteger s, ECPoint point, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(point, params);
     org.bouncycastle.math.ec.ECPoint bcProd = bcPoint.multiply(s);
     return fromBouncyCastleECPoint(bcProd);
   }
-  
+
   private static byte[] getBytes(String str) {
     byte[] bytes = str.getBytes();
     try {
@@ -1132,12 +1132,12 @@ public class Util {
     }
     return bytes;
   }
-  
+
   public static BigInteger getPrime(AlgorithmParameterSpec params) {
     if (params == null) {
       throw new IllegalArgumentException("Parameters null");
     }
-    
+
     if (params instanceof DHParameterSpec) {
       return ((DHParameterSpec)params).getP();
     } else if (params instanceof ECParameterSpec) {
@@ -1151,7 +1151,7 @@ public class Util {
       throw new IllegalArgumentException("Unsupported agreement algorithm, was expecting DHParameterSpec or ECParameterSpec, found " + params.getClass().getCanonicalName());
     }
   }
-  
+
   public static byte[] wrapDO(byte tag, byte[] data) {
     if (data == null) {
       throw new IllegalArgumentException("Data to wrap is null");
@@ -1162,7 +1162,7 @@ public class Util {
     System.arraycopy(data, 0, result, 2, data.length);
     return result;
   }
-  
+
   public static byte[] unwrapDO(byte expectedTag, byte[] wrappedData) {
     if (wrappedData == null || wrappedData.length < 2)  {
       throw new IllegalArgumentException("Wrapped data is null or length < 2");
@@ -1175,7 +1175,7 @@ public class Util {
     System.arraycopy(wrappedData, 2, result, 0, result.length);
     return result;
   }
-  
+
   public static String inferKeyAgreementAlgorithm(PublicKey publicKey) {
     if (publicKey instanceof ECPublicKey) {
       return "ECDH";
@@ -1185,7 +1185,7 @@ public class Util {
       throw new IllegalArgumentException("Unsupported public key: " + publicKey);
     }
   }
-  
+
   /**
    * This just solves the curve equation for y.
    *
@@ -1201,33 +1201,33 @@ public class Util {
     LOGGER.info("DEBUG: x.bitLength = " + x.bitLength());
     ECFieldElement y = x.multiply(x).add(a).multiply(x).add(b).sqrt();
     LOGGER.info("DEBUG: y.bitLength = " + y.bitLength());
-    
+
     return y.toBigInteger();
   }
-  
+
   private static org.bouncycastle.math.ec.ECPoint toBouncyCastleECPoint(ECPoint point, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECCurve bcCurve = toBouncyCastleECCurve(params);
     return bcCurve.createPoint(point.getAffineX(), point.getAffineY(), false);
     // return new org.bouncycastle.math.ec.ECPoint.Fp(bcCurve, bcCurve.fromBigInteger(point.getAffineX()), bcCurve.fromBigInteger(point.getAffineY()));
   }
-  
+
   public static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
     point = point.normalize();
     if (!point.isValid()) { LOGGER.warning("point not valid"); }
     return new ECPoint(point.getAffineXCoord().toBigInteger(), point.getAffineYCoord().toBigInteger());
   }
-  
+
   public static boolean isValid(ECPoint ecPoint, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(ecPoint, params);
     return bcPoint.isValid();
   }
-  
+
   public static ECPoint normalize(ECPoint ecPoint, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(ecPoint, params);
     bcPoint = bcPoint.normalize();
     return fromBouncyCastleECPoint(bcPoint);
   }
-  
+
   private static ECCurve toBouncyCastleECCurve(ECParameterSpec params) {
     EllipticCurve curve = params.getCurve();
     ECField field = curve.getField();
@@ -1241,19 +1241,19 @@ public class Util {
     BigInteger p = getPrime(params);
     return new ECCurve.Fp(p, a, b, order, BigInteger.valueOf(coFactor));
   }
-  
+
   public static ECPublicKeyParameters toBouncyECPublicKeyParameters(ECPublicKey publicKey) {
     ECParameterSpec ecParams = publicKey.getParams();
     org.bouncycastle.math.ec.ECPoint q = toBouncyCastleECPoint(publicKey.getW(), ecParams);
     return new ECPublicKeyParameters(q, toBouncyECDomainParameters(ecParams));
   }
-  
+
   public static ECPrivateKeyParameters toBouncyECPrivateKeyParameters(ECPrivateKey privateKey) {
     BigInteger d = privateKey.getS();
     ECDomainParameters ecParams = toBouncyECDomainParameters(privateKey.getParams());
     return new ECPrivateKeyParameters(d, ecParams);
   }
-  
+
   public static ECDomainParameters toBouncyECDomainParameters(ECParameterSpec params) {
     ECCurve curve = toBouncyCastleECCurve(params);
     org.bouncycastle.math.ec.ECPoint g = toBouncyCastleECPoint(params.getGenerator(), params);

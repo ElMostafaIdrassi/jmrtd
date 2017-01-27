@@ -44,29 +44,29 @@ import net.sf.scuba.data.Gender;
  * @version $Revision$
  */
 public class MRZInfo extends AbstractLDSInfo {
-  
+
   private static final long serialVersionUID = 7054965914471297804L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Unspecified document type (do not use, choose ID1 or ID3). */
   public static final int DOC_TYPE_UNSPECIFIED = 0;
-  
+
   /** ID1 document type for credit card sized identity cards. Specifies a 3-line MRZ, 30 characters wide. */
   public static final int DOC_TYPE_ID1 = 1;
-  
+
   /** ID2 document type. Specifies a 2-line MRZ, 36 characters wide. */
   public static final int DOC_TYPE_ID2 = 2;
-  
+
   /** ID3 document type for passport booklets. Specifies a 2-line MRZ, 44 characters wide. */
   public static final int DOC_TYPE_ID3 = 3;
-  
+
   /** All valid characters in MRZ. */
   private static final String MRZ_CHARS = "<0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  
+
   /** @deprecated to be replaced with documentCode */
   private int documentType;
-  
+
   private String documentCode;
   private String issuingState;
   private String primaryIdentifier;
@@ -82,7 +82,7 @@ public class MRZInfo extends AbstractLDSInfo {
   private char compositeCheckDigit;
   private String optionalData1; /* NOTE: holds personal number for some issuing states (e.g. NL), but is used to hold (part of) document number for others. */
   private String optionalData2;
-  
+
   /**
    * Creates a new 2-line MRZ compliant with ICAO Doc 9303 part 1 vol 1.
    *
@@ -129,7 +129,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     checkDigit();
   }
-  
+
   /**
    * Creates a new 3-line MRZ compliant with ICAO Doc 9303 part 3 vol 1.
    *
@@ -160,7 +160,7 @@ public class MRZInfo extends AbstractLDSInfo {
         || !(documentCode.startsWith("C") || documentCode.startsWith("I") || documentCode.startsWith("A"))) {
       throw new IllegalArgumentException("Wrong document code: " + documentCode);
     }
-    
+
     this.documentType = getDocumentTypeFromDocumentCode(documentCode);
     this.documentCode = trimFillerChars(documentCode);
     this.issuingState = issuingState;
@@ -176,7 +176,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.optionalData2 = optionalData2;
     checkDigit();
   }
-  
+
   /**
    * Creates a new MRZ based on an input stream.
    *
@@ -191,7 +191,7 @@ public class MRZInfo extends AbstractLDSInfo {
       throw new IllegalArgumentException(ioe.getMessage());
     }
   }
-  
+
   /**
    * Creates a new MRZ based on the text input.
    * The text input may contain newlines, which will be ignored.
@@ -212,10 +212,10 @@ public class MRZInfo extends AbstractLDSInfo {
       throw new IllegalArgumentException(ioe.getMessage());
     }
   }
-  
+
   private void readObject(InputStream inputStream, int length) throws IOException {
     DataInputStream dataIn = new DataInputStream(inputStream);
-    
+
     /* line 1, pos 1 to 2, Document code */
     this.documentCode = readStringWithFillers(dataIn, 2);
     this.documentType = getDocumentTypeFromDocumentCode(this.documentCode);
@@ -227,16 +227,16 @@ public class MRZInfo extends AbstractLDSInfo {
     if (this.documentType == DOC_TYPE_ID1) {
       /* line 1, pos 3 to 5 Issuing State or organization */
       this.issuingState = readCountry(dataIn);
-      
+
       /* line 1, pos 6 to 14 Document number */
       this.documentNumber = readString(dataIn, 9);
-      
+
       /* line 1, pos 15 Check digit */
       this.documentNumberCheckDigit = (char)dataIn.readUnsignedByte();
-      
+
       /* line 1, pos 16 to 30, Optional data elements */
       this.optionalData1 = readStringWithFillers(dataIn, 15);
-      
+
       if (documentNumberCheckDigit == '<') {
         /* Interpret personal number as part of document number, see note j. */
         this.documentNumber += optionalData1.substring(0, optionalData1.length() - 1);
@@ -244,42 +244,42 @@ public class MRZInfo extends AbstractLDSInfo {
         this.optionalData1 = null;
       }
       this.documentNumber = trimFillerChars(this.documentNumber);
-      
+
       /* line 2, pos 1 to 6, Date of birth */
       this.dateOfBirth = readDateOfBirth(dataIn);
-      
+
       /* line 2, pos 7, Check digit */
       this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
-      
+
       /* line 2, pos 8, Sex */
       this.gender = readGender(dataIn);
-      
+
       /* line 2, Pos 9 to 14, Date of expiry */
       this.dateOfExpiry = readDateOfExpiry(dataIn);
-      
+
       /* line 2, pos 15, Check digit */
       this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
-      
+
       /* line 2, pos 16 to 18, Nationality */
       this.nationality = readCountry(dataIn);
-      
+
       /* line 2, pos 19 to 29, Optional data elements */
       this.optionalData2 = readString(dataIn, 11);
-      
+
       /* line 2, pos 30, Overall check digit */
       this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
-      
+
       /* line 3 */
       readNameIdentifiers(readString(dataIn, 30));
     } else {
       /* Assume it's a ID3 document, i.e. 2-line MRZ. */
-      
+
       /* line 1, pos 3 to 5 */
       this.issuingState = readCountry(dataIn);
-      
+
       /* line 1, pos 6 to 44 */
       readNameIdentifiers(readString(dataIn, 39));
-      
+
       /* line 2 */
       this.documentNumber = trimFillerChars(readString(dataIn, 9));
       this.documentNumberCheckDigit = (char)dataIn.readUnsignedByte();
@@ -295,7 +295,7 @@ public class MRZInfo extends AbstractLDSInfo {
       this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
     }
   }
-  
+
   /**
    * Writes the MRZ to an output stream.
    * This just outputs the MRZ characters, and does not add newlines.
@@ -307,7 +307,7 @@ public class MRZInfo extends AbstractLDSInfo {
     writeDocumentType(dataOut);
     if (documentType == DOC_TYPE_ID1) {
       /* Assume it's an ID1 document */
-      
+
       /* top line */
       writeIssuingState(dataOut);
       if (documentNumber.length() > 9 && equalsModuloFillerChars(optionalData1, "")) {
@@ -333,7 +333,7 @@ public class MRZInfo extends AbstractLDSInfo {
         dataOut.write(documentNumberCheckDigit);
         writeString(optionalData1, dataOut, 15); /* FIXME: max size of field */
       }
-      
+
       /* middle line */
       writeDateOfBirth(dataOut);
       dataOut.write(dateOfBirthCheckDigit);
@@ -343,16 +343,16 @@ public class MRZInfo extends AbstractLDSInfo {
       writeNationality(dataOut);
       writeString(optionalData2, dataOut, 11);
       dataOut.write(compositeCheckDigit);
-      
+
       /* bottom line */
       writeName(dataOut, 30);
     } else {
       /* Assume it's a ID3 document */
-      
+
       /* top line */
       writeIssuingState(dataOut);
       writeName(dataOut, 39);
-      
+
       /* bottom line */
       writeString(documentNumber, dataOut, 9);
       dataOut.write(documentNumberCheckDigit);
@@ -366,7 +366,7 @@ public class MRZInfo extends AbstractLDSInfo {
       dataOut.write(compositeCheckDigit);
     }
   }
-  
+
   /**
    * Gets the date of birth of the passport holder.
    *
@@ -375,7 +375,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getDateOfBirth() {
     return dateOfBirth;
   }
-  
+
   /**
    * Sets the date of birth.
    *
@@ -385,7 +385,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.dateOfBirth = dateOfBirth;
     checkDigit();
   }
-  
+
   /**
    * Gets the date of expiry
    *
@@ -394,7 +394,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getDateOfExpiry() {
     return dateOfExpiry;
   }
-  
+
   /**
    * Sets the date of expiry.
    *
@@ -404,7 +404,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.dateOfExpiry = dateOfExpiry;
     checkDigit();
   }
-  
+
   /**
    * Gets the document number.
    *
@@ -413,7 +413,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getDocumentNumber() {
     return documentNumber;
   }
-  
+
   /**
    * Sets the document number.
    *
@@ -423,7 +423,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentNumber = documentNumber.trim();
     checkDigit();
   }
-  
+
   /**
    * Gets the document type.
    *
@@ -432,7 +432,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public int getDocumentType() {
     return documentType;
   }
-  
+
   /**
    * Gets the document type.
    *
@@ -441,7 +441,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getDocumentCode() {
     return documentCode;
   }
-  
+
   public void setDocumentCode(String documentCode) {
     this.documentCode = documentCode;
     this.documentType = getDocumentTypeFromDocumentCode(documentCode);
@@ -450,7 +450,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     /* FIXME: need to adjust some other lengths if we go from ID1 to ID3 or back... */
   }
-  
+
   /**
    * Gets the issuing state as a 3 letter code
    *
@@ -459,7 +459,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getIssuingState() {
     return issuingState;
   }
-  
+
   /**
    * Sets the issuing state.
    *
@@ -469,7 +469,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.issuingState = issuingState;
     checkDigit();
   }
-  
+
   /**
    * Gets the passport holder's last name.
    *
@@ -478,7 +478,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getPrimaryIdentifier() {
     return primaryIdentifier;
   }
-  
+
   /**
    * Sets the passport holder's last name.
    *
@@ -488,7 +488,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.primaryIdentifier = primaryIdentifier.trim();
     checkDigit();
   }
-  
+
   /**
    * Gets the document holder's first names.
    *
@@ -497,7 +497,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getSecondaryIdentifier() {
     return secondaryIdentifier;
   }
-  
+
   /**
    * Gets the document holder's first names.
    *
@@ -506,7 +506,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String[] getSecondaryIdentifierComponents() {
     return secondaryIdentifier.split(" |<");
   }
-  
+
   /**
    * Sets the passport holder's first names.
    *
@@ -526,7 +526,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     checkDigit();
   }
-  
+
   /**
    * Sets the passport holder's first names.
    *
@@ -536,7 +536,7 @@ public class MRZInfo extends AbstractLDSInfo {
     readSecondaryIdentifiers(secondaryIdentifiers.trim());
     checkDigit();
   }
-  
+
   /**
    * Gets the passport holder's nationality as a 3 digit code.
    *
@@ -545,7 +545,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getNationality() {
     return nationality;
   }
-  
+
   /**
    * Sets the passport holder's nationality.
    *
@@ -555,7 +555,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.nationality = nationality;
     checkDigit();
   }
-  
+
   /**
    * Gets the personal number (if a personal number is encoded in optional data 1).
    *
@@ -568,7 +568,7 @@ public class MRZInfo extends AbstractLDSInfo {
       return trimFillerChars(optionalData1);
     }
   }
-  
+
   /**
    * Sets the personal number.
    *
@@ -578,7 +578,7 @@ public class MRZInfo extends AbstractLDSInfo {
     if (personalNumber == null || personalNumber.length() > 14) { throw new IllegalArgumentException("Wrong personal number"); }
     this.optionalData1 = mrzFormat(personalNumber, 14) + checkDigit(personalNumber, true);
   }
-  
+
   /**
    * Gets the contents of the first optional data field for ID-1 and ID-3 style MRZs.
    *
@@ -587,7 +587,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getOptionalData1() {
     return optionalData1;
   }
-  
+
   /**
    * Gets the contents of the second optional data field for ID-1 style MRZs.
    *
@@ -596,7 +596,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public String getOptionalData2() {
     return optionalData2;
   }
-  
+
   /**
    * Sets the contents for the second optional data field for ID-1 style MRZs.
    *
@@ -606,7 +606,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.optionalData2 = trimFillerChars(optionalData2);
     checkDigit();
   }
-  
+
   /**
    * Gets the passport holder's gender.
    *
@@ -615,7 +615,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public Gender getGender() {
     return gender;
   }
-  
+
   /**
    * Sets the gender.
    *
@@ -625,7 +625,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.gender = gender;
     checkDigit();
   }
-  
+
   /**
    * Creates a textual representation of this MRZ.
    * This is the 2 or 3 line representation
@@ -657,7 +657,7 @@ public class MRZInfo extends AbstractLDSInfo {
       throw new IllegalStateException(uee.getMessage());
     }
   }
-  
+
   /**
    * Gets a hash code for this MRZ info.
    *
@@ -666,7 +666,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public int hashCode() {
     return 2 * toString().hashCode() + 53;
   }
-  
+
   /**
    * Whether this MRZ info is identical to some other object.
    *
@@ -678,7 +678,7 @@ public class MRZInfo extends AbstractLDSInfo {
     if (obj == null) { return false; }
     if (!(obj.getClass().equals(this.getClass()))) { return false; }
     MRZInfo other = (MRZInfo)obj;
-    
+
     return
         ((documentCode == null && other.documentCode == null) || documentCode !=  null && documentCode.equals(other.documentCode))
         && ((issuingState == null && other.issuingState == null) || issuingState != null && issuingState.equals(other.issuingState))
@@ -693,7 +693,7 @@ public class MRZInfo extends AbstractLDSInfo {
         && ((optionalData2 == null && other.optionalData2 == null) || optionalData2 != null && equalsModuloFillerChars(optionalData2, other.optionalData2))
         ;
   }
-  
+
   /**
    * Computes the 7-3-1 check digit for part of the MRZ.
    *
@@ -704,9 +704,9 @@ public class MRZInfo extends AbstractLDSInfo {
   public static char checkDigit(String str) {
     return checkDigit(str, false);
   }
-  
+
   /* ONLY PRIVATE METHODS BELOW */
-  
+
   private void readNameIdentifiers(String mrzNameString) {
     int delimIndex = mrzNameString.indexOf("<<");
     if (delimIndex < 0) {
@@ -716,43 +716,43 @@ public class MRZInfo extends AbstractLDSInfo {
     String rest = mrzNameString.substring(mrzNameString.indexOf("<<") + 2);
     readSecondaryIdentifiers(rest);
   }
-  
+
   private void readSecondaryIdentifiers(String secondaryIdentifier) {
     this.secondaryIdentifier = secondaryIdentifier;
   }
-  
+
   private void writeString(String string, DataOutputStream dataOut, int width) throws IOException {
     dataOut.write(mrzFormat(string, width).getBytes("UTF-8"));
   }
-  
+
   private void writeIssuingState(DataOutputStream dataOut) throws IOException {
     dataOut.write(issuingState.getBytes("UTF-8"));
   }
-  
+
   private void writeDateOfExpiry(DataOutputStream dataOut) throws IOException {
     dataOut.write(dateOfExpiry.getBytes("UTF-8"));
   }
-  
+
   private void writeGender(DataOutputStream dataOut) throws IOException {
     dataOut.write(genderToString().getBytes("UTF-8"));
   }
-  
+
   private void writeDateOfBirth(DataOutputStream dataOut) throws IOException {
     dataOut.write(dateOfBirth.getBytes("UTF-8"));
   }
-  
+
   private void writeNationality(DataOutputStream dataOut) throws IOException {
     dataOut.write(nationality.getBytes("UTF-8"));
   }
-  
+
   private void writeName(DataOutputStream dataOut, int width) throws IOException {
     dataOut.write(nameToString(width).getBytes("UTF-8"));
   }
-  
+
   private void writeDocumentType(DataOutputStream dataOut) throws IOException {
     writeString(documentCode, dataOut, 2);
   }
-  
+
   private String genderToString() {
     switch (gender) {
       case MALE: return "M";
@@ -760,11 +760,11 @@ public class MRZInfo extends AbstractLDSInfo {
       default: return "<";
     }
   }
-  
+
   private String nameToString(int width) {
     String[] primaryComponents = primaryIdentifier.split(" |<");
     String[] secondaryComponents = secondaryIdentifier.split(" |<");
-    
+
     StringBuffer name = new StringBuffer();
     for (int i = 0; i < primaryComponents.length; i++) {
       String component = primaryComponents[i];
@@ -777,17 +777,17 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     return mrzFormat(name.toString(), width);
   }
-  
+
   private String readString(DataInputStream in, int count) throws IOException {
     byte[] data = new byte[count];
     in.readFully(data);
     return new String(data).trim();
   }
-  
+
   private String readStringWithFillers(DataInputStream in, int count) throws IOException {
     return trimFillerChars(readString(in, count));
   }
-  
+
   /**
    * Reads the issuing state as a three letter string.
    *
@@ -800,7 +800,7 @@ public class MRZInfo extends AbstractLDSInfo {
     String dataString = readString(in, 3);
     return dataString;
   }
-  
+
   /**
    * Reads the 1 letter gender information.
    *
@@ -820,7 +820,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     return Gender.UNKNOWN;
   }
-  
+
   /**
    * Reads the date of birth of the passport holder.
    * As only the rightmost two digits are stored,
@@ -835,7 +835,7 @@ public class MRZInfo extends AbstractLDSInfo {
   private String readDateOfBirth(DataInputStream in) throws IOException, NumberFormatException {
     return readString(in, 6);
   }
-  
+
   /**
    * Reads the date of expiry of this document.
    * As only the rightmost two digits are stored,
@@ -850,7 +850,7 @@ public class MRZInfo extends AbstractLDSInfo {
   private String readDateOfExpiry(DataInputStream in) throws IOException, NumberFormatException {
     return readString(in, 6);
   }
-  
+
   /**
    * Reformats the input string such that it
    * only contains ['A'-'Z'], ['0'-'9'], '<' characters
@@ -880,7 +880,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     return result.toString();
   }
-  
+
   /**
    * Tests equality of two MRZ string while ignoring extra filler characters.
    *
@@ -896,7 +896,7 @@ public class MRZInfo extends AbstractLDSInfo {
     int length = Math.max(str1.length(), str2.length());
     return mrzFormat(str1, length).equals(mrzFormat(str2, length));
   }
-  
+
   /**
    * Determines the document type based on the document code (the first two characters of the MRZ).
    *
@@ -934,7 +934,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     return DOC_TYPE_UNSPECIFIED;
   }
-  
+
   /**
    * Replaces '<' with ' ' and trims leading and trailing whitespace.
    *
@@ -948,7 +948,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     return (new String(chars)).trim();
   }
-  
+
   /**
    * Updates the check digit fields for document number,
    * date of birth, date of expiry, and personal number.
@@ -995,7 +995,7 @@ public class MRZInfo extends AbstractLDSInfo {
     }
     this.compositeCheckDigit = checkDigit(composite.toString()); /* FIXME: Uses '0' over '<'. Where specified? */
   }
-  
+
   /**
    * Computes the 7-3-1 check digit for part of the MRZ.
    * If <code>preferFillerOverZero</code> is <code>true</code> then '<' will be
@@ -1031,7 +1031,7 @@ public class MRZInfo extends AbstractLDSInfo {
       throw new IllegalArgumentException(e.toString());
     }
   }
-  
+
   /**
    * Looks up the numerical value for MRZ characters. In order to be able
    * to compute check digits.

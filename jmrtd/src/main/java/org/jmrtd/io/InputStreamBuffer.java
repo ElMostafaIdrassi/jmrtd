@@ -37,10 +37,10 @@ import org.jmrtd.io.FragmentBuffer.Fragment;
  * @author The JMRTD team (info@jmrtd.org)
  */
 public class InputStreamBuffer {
-  
+
   private PositionInputStream carrier;
   public FragmentBuffer buffer;
-  
+
   /**
    * Creates an input stream buffer.
    * 
@@ -52,7 +52,7 @@ public class InputStreamBuffer {
     this.carrier.mark(length);
     this.buffer = new FragmentBuffer(length);
   }
-  
+
   /**
    * Updates this buffer based on some other buffer.
    * 
@@ -61,7 +61,7 @@ public class InputStreamBuffer {
   public void updateFrom(InputStreamBuffer other) {
     buffer.updateFrom(other.buffer);
   }
-  
+
   /**
    * Gets a copy of the input stream positioned at <code>0</code>.
    *
@@ -72,41 +72,41 @@ public class InputStreamBuffer {
       return new SubInputStream(carrier);
     }
   }
-  
+
   public synchronized int getPosition() {
     return buffer.getPosition();
   }
-  
+
   public synchronized int getBytesBuffered() {
     return buffer.getBytesBuffered();
   }
-  
+
   public int getLength() {
     return buffer.getLength();
   }
-  
+
   public String toString() {
     return "InputStreamBuffer [" + buffer + "]";
   }
-  
+
   public class SubInputStream extends InputStream { // FIXME set class visibility to package
-    
+
     /** The position within this inputstream. */
     private int position;
     private int markedPosition;
-    
+
     private Object syncObject;
-    
+
     public SubInputStream(Object syncObject) {
       position = 0;
       markedPosition = -1;
       this.syncObject = syncObject;
     }
-    
+
     public FragmentBuffer getBuffer() {
       return buffer;
     }
-    
+
     public int read() throws IOException {
       synchronized(syncObject) {
         if (position >= buffer.getLength()) {
@@ -136,13 +136,13 @@ public class InputStreamBuffer {
         }
       }
     }
-    
+
     public int read(byte[] b) throws IOException {
       synchronized(syncObject) {
         return read(b, 0, b.length);
       }
     }
-    
+
     public int read(byte[] b, int off, int len) throws IOException {
       synchronized(syncObject) {
         if (b == null) {
@@ -152,20 +152,20 @@ public class InputStreamBuffer {
         } else if (len == 0) {
           return 0;
         }
-        
+
         if (len > buffer.getLength() - position) {
           len = buffer.getLength() - position;
         }
-        
+
         if (position >= buffer.getLength()) {
           /* FIXME: is this correct? See FIXME in read(). */
           return -1;
         }
-        
+
         if (carrier.markSupported()) {
           syncCarrierPosition(position);
         }
-        
+
         Fragment fragment = buffer.getSmallestUnbufferedFragment(position, len);
         if (fragment.getLength() > 0) {
           /* Copy buffered prefix to b. */
@@ -173,16 +173,16 @@ public class InputStreamBuffer {
           int unbufferedPostfixLength = fragment.getLength();
           System.arraycopy(buffer.getBuffer(), position, b, off, alreadyBufferedPrefixLength);
           position += alreadyBufferedPrefixLength;
-          
+
           if (carrier.markSupported()) {
             syncCarrierPosition(position);
           }
-          
+
           /* Read unbuffered postfix from carrier, directly to b and buffer it. */
           int bytesReadFromCarrier = carrier.read(b, off + alreadyBufferedPrefixLength, unbufferedPostfixLength);
           buffer.addFragment(fragment.getOffset(), b, off + alreadyBufferedPrefixLength, bytesReadFromCarrier);
           position += bytesReadFromCarrier;
-          
+
           return alreadyBufferedPrefixLength + bytesReadFromCarrier;					
         } else {
           /* No unbuffered fragment. */
@@ -193,11 +193,11 @@ public class InputStreamBuffer {
         }
       }
     }
-    
+
     public long skip(long n) throws IOException {
       synchronized(syncObject) {
         int leftInBuffer = buffer.getBufferedLength(position);
-        
+
         if (n <= leftInBuffer) {
           /* If we can skip within the buffer, we do */
           position += n;
@@ -219,31 +219,31 @@ public class InputStreamBuffer {
         }
       }
     }
-    
+
     public int available() throws IOException {
       return buffer.getBufferedLength(position);
     }
-    
+
     public void close() throws IOException {
     }
-    
+
     public synchronized void mark(int readLimit) {
       markedPosition = position;
     }
-    
+
     public synchronized void reset() throws IOException {
       if (markedPosition < 0) { throw new IOException("Invalid reset, was mark() called?"); }
       position = markedPosition;
     }
-    
+
     public boolean markSupported() {
       return true;
     }
-    
+
     public int getPosition() {
       return position;
     }
-    
+
     /**
      * If necessary, resets the carrier (which must support mark) and
      * skips to the current position in the buffer.

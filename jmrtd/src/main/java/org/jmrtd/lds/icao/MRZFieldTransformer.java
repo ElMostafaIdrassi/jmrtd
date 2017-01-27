@@ -35,7 +35,7 @@ package org.jmrtd.lds.icao;
  * @since 0.4.7
  */
 public interface MRZFieldTransformer {
-  
+
   /**
    * Truncates the primary and secondary identifiers. The resulting array has length
    * 2 and contains the truncated primary and secondary identifiers.
@@ -52,7 +52,7 @@ public interface MRZFieldTransformer {
    * @return an array of length 2 containing the resulting identifier
    */
   String[] truncateNames(String primaryIdentifier, String secondaryIdentifier, int length);
-  
+
   /**
    * Transliterates <code>text</code>, replacing non-ISO characters with ISO characters.
    *

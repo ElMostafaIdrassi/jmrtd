@@ -50,17 +50,17 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
  * @version $Revision$
  */
 public abstract class SecurityInfo extends AbstractLDSInfo {
-  
+
   private static final long serialVersionUID = -7919854443619069808L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /**
    * Used in ECDSA based Active Authentication.
    * <code>{joint-iso-itu-t(2) international-organizations(23) 136 mrtd(1) security(1) aaProtocolObject(5)}</code>.
    */
   public static final String ID_AA = "2.23.136.1.1.5";
-  
+
   public static final String
   ID_PK_DH = EACObjectIdentifiers.id_PK_DH.getId(),
   ID_PK_ECDH = EACObjectIdentifiers.id_PK_ECDH.getId();
@@ -92,50 +92,50 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   ID_TA_ECDSA_SHA_1 = EACObjectIdentifiers.id_TA_ECDSA_SHA_1.getId(),
   ID_TA_ECDSA_SHA_224 = EACObjectIdentifiers.id_TA_ECDSA_SHA_224.getId(),
   ID_TA_ECDSA_SHA_256 = EACObjectIdentifiers.id_TA_ECDSA_SHA_256.getId();
-    
+
   public static final String
   ID_EC_PUBLIC_KEY_TYPE = X9ObjectIdentifiers.id_publicKeyType.getId(),
   ID_EC_PUBLIC_KEY = X9ObjectIdentifiers.id_ecPublicKey.getId();
-  
+
   private static final String ID_BSI = "0.4.0.127.0.7";
-  
+
   /* protocols (2), smartcard (2), PACE (4) */
   public static final String ID_PACE = ID_BSI + ".2.2.4";
-    
+
   public static final String
   ID_PACE_DH_GM = ID_PACE + ".1",
   ID_PACE_DH_GM_3DES_CBC_CBC = ID_PACE_DH_GM + ".1", /* 0.4.0.127.0.7.2.2.4.1.1, id-PACE-DH-GM-3DES-CBC-CBC */
   ID_PACE_DH_GM_AES_CBC_CMAC_128 = ID_PACE_DH_GM + ".2", /* 0.4.0.127.0.7.2.2.4.1.2, id-PACE-DH-GM-AES-CBC-CMAC-128 */
   ID_PACE_DH_GM_AES_CBC_CMAC_192 = ID_PACE_DH_GM + ".3", /* 0.4.0.127.0.7.2.2.4.1.3, id-PACE-DH-GM-AES-CBC-CMAC-192 */
   ID_PACE_DH_GM_AES_CBC_CMAC_256 = ID_PACE_DH_GM + ".4"; /* 0.4.0.127.0.7.2.2.4.1.4, id-PACE-DH-GM-AES-CBC-CMAC-256 */
-  
+
   public static final String
   ID_PACE_ECDH_GM = ID_PACE + ".2",
   ID_PACE_ECDH_GM_3DES_CBC_CBC = ID_PACE_ECDH_GM + ".1", /* 0.4.0.127.0.7.2.2.4.2.1, id-PACE-ECDH-GM-3DES-CBC-CBC */
   ID_PACE_ECDH_GM_AES_CBC_CMAC_128 = ID_PACE_ECDH_GM + ".2", /* 0.4.0.127.0.7.2.2.4.2.2, id-PACE-ECDH-GM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_GM_AES_CBC_CMAC_192 = ID_PACE_ECDH_GM + ".3", /* 0.4.0.127.0.7.2.2.4.2.3, id-PACE-ECDH-GM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_GM_AES_CBC_CMAC_256 = ID_PACE_ECDH_GM + ".4"; /* 0.4.0.127.0.7.2.2.4.2.4, id-PACE-ECDH-GM-AES-CBC-CMAC-256 */
-  
+
   public static final String
   ID_PACE_DH_IM = ID_PACE + ".3",
   ID_PACE_DH_IM_3DES_CBC_CBC = ID_PACE_DH_IM + ".1", /* 0.4.0.127.0.7.2.2.4.3.1, id-PACE-DH-IM-3DES-CBC-CBC */
   ID_PACE_DH_IM_AES_CBC_CMAC_128 = ID_PACE_DH_IM + ".2", /* 0.4.0.127.0.7.2.2.4.3.2, id-PACE-DH-IM-AES-CBC-CMAC-128 */
   ID_PACE_DH_IM_AES_CBC_CMAC_192 = ID_PACE_DH_IM + ".3", /* 0.4.0.127.0.7.2.2.4.3.3, id-PACE-DH-IM-AES-CBC-CMAC-192 */
   ID_PACE_DH_IM_AES_CBC_CMAC_256 = ID_PACE_DH_IM + ".4"; /* 0.4.0.127.0.7.2.2.4.3.4, id-PACE-DH-IM-AES-CBC-CMAC-256 */
-  
+
   public static final String
   ID_PACE_ECDH_IM = ID_PACE + ".4",
   ID_PACE_ECDH_IM_3DES_CBC_CBC = ID_PACE_ECDH_IM + ".1", /* 0.4.0.127.0.7.2.2.4.4.1, id-PACE-ECDH-IM-3DES-CBC-CBC */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_128 = ID_PACE_ECDH_IM + ".2", /* 0.4.0.127.0.7.2.2.4.4.2, id-PACE-ECDH-IM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_192 = ID_PACE_ECDH_IM + ".3", /* 0.4.0.127.0.7.2.2.4.4.3, id-PACE-ECDH-IM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_IM_AES_CBC_CMAC_256 = ID_PACE_ECDH_IM + ".4"; /* 0.4.0.127.0.7.2.2.4.4.4, id-PACE-ECDH-IM-AES-CBC-CMAC-256 */
-  
+
   public static final String
   ID_PACE_ECDH_CAM = ID_PACE + ".6",
   ID_PACE_ECDH_CAM_AES_CBC_CMAC_128 = ID_PACE_ECDH_CAM + ".2", /* 0.4.0.127.0.7.2.2.4.6.2, id-PACE-ECDH-CAM-AES-CBC-CMAC-128 */
   ID_PACE_ECDH_CAM_AES_CBC_CMAC_192 = ID_PACE_ECDH_CAM + ".3", /* 0.4.0.127.0.7.2.2.4.6.3, id-PACE-ECDH-CAM-AES-CBC-CMAC-192 */
   ID_PACE_ECDH_CAM_AES_CBC_CMAC_256 = ID_PACE_ECDH_CAM + ".4"; /* 0.4.0.127.0.7.2.2.4.6.4, id-PACE-ECDH-CAM-AES-CBC-CMAC-256 */
-  
+
   /**
    * Returns a DER object with this SecurityInfo data (DER sequence)
    *
@@ -144,7 +144,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
    * @deprecated Remove this method from visible interface (because of dependency on BC API)
    */
   public abstract ASN1Primitive getDERObject();
-  
+
   /**
    * Writes this SecurityInfo to output stream.
    *
@@ -157,24 +157,24 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
     if (derEncoded == null) {
       throw new IOException("Could not decode from DER.");
     }
-    
+
     byte[] derEncodedBytes = derEncoded.getEncoded(ASN1Encoding.DER);
     if (derEncodedBytes == null) {
       throw new IOException("Could not decode from DER.");
     }
-    
+
     outputStream.write(derEncodedBytes);
   }
-  
+
   /**
    * Gets the protocol object identifier of this SecurityInfo.
    *
    * @return this protocol object identifier
    */
   public abstract String getObjectIdentifier();
-  
+
   public abstract String getProtocolOIDString();
-    
+
   /**
    * Factory method for creating security info objects given an input.
    *
@@ -191,7 +191,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
       if (sequence.size() == 3) {
         optionalData = sequence.getObjectAt(2).toASN1Primitive();
       }
-      
+
       if (ActiveAuthenticationInfo.checkRequiredIdentifier(oid)) {
         int version = ((ASN1Integer)requiredData).getValue().intValue();
         if (optionalData == null) {

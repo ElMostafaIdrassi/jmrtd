@@ -48,7 +48,7 @@ import org.jmrtd.lds.icao.DG7File;
  * @version $Revision$
  */
 public class LDSFileUtil {
-  
+
   /**
    * Factory method for creating LDS files for a given input stream.
    *
@@ -92,7 +92,7 @@ public class LDSFileUtil {
         }
     }
   }
-  
+
   /**
    * Finds a file identifier for an ICAO tag.
    *
@@ -126,7 +126,7 @@ public class LDSFileUtil {
         throw new NumberFormatException("Unknown tag " + Integer.toHexString(tag));
     }
   }
-  
+
   /**
    * Finds a data group number for an ICAO tag.
    * 
@@ -156,7 +156,7 @@ public class LDSFileUtil {
         throw new NumberFormatException("Unknown tag " + Integer.toHexString(tag));   
     }
   }
-  
+
   /**
    * Finds an ICAO tag for a data group number.
    * 
@@ -187,7 +187,7 @@ public class LDSFileUtil {
         throw new NumberFormatException("Unknown number " + number);   
     }
   }
-  
+
   /**
    * Finds an ICAO tag for a data group number.
    * 
@@ -218,7 +218,7 @@ public class LDSFileUtil {
         throw new NumberFormatException("Unknown number " + number);   
     }
   }
-  
+
   /**
    * Finds an ICAO tag for a file identifier.
    *
@@ -252,7 +252,7 @@ public class LDSFileUtil {
         throw new NumberFormatException("Unknown fid " + Integer.toHexString(fid));
     }
   }
-  
+
   /**
    * Finds a data group number by file identifier.
    * 
@@ -282,7 +282,7 @@ public class LDSFileUtil {
         throw new NumberFormatException("Unknown fid " + Integer.toHexString(fid));
     }
   }
-  
+
   /**
    * Returns a mnemonic name corresponding to the file represented by the
    * given ICAO tag, such as "EF_COM", "EF_SOD", or "EF_DG1".
@@ -314,7 +314,7 @@ public class LDSFileUtil {
       default: return "File with tag 0x" + Integer.toHexString(tag);
     }
   }
-  
+
   /**
    * Returns a mnemonic name corresponding to the file represented by the
    * given file identifier, such as "EF_COM", "EF_SOD", or "EF_DG1".

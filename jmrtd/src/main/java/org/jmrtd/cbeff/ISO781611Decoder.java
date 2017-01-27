@@ -43,11 +43,11 @@ import net.sf.scuba.tlv.TLVUtil;
  * @since 0.4.7
  */
 public class ISO781611Decoder implements ISO781611 {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private BiometricDataBlockDecoder<?> bdbDecoder;
-  
+
   /**
    * Constructs an ISO7816-11 decoder that uses the given BDB decoder.
    * 
@@ -56,7 +56,7 @@ public class ISO781611Decoder implements ISO781611 {
   public ISO781611Decoder(BiometricDataBlockDecoder<?> bdbDecoder) {
     this.bdbDecoder = bdbDecoder;
   }
-  
+
   /**
    * Reads a BIT group from an input stream.
    * 
@@ -69,7 +69,7 @@ public class ISO781611Decoder implements ISO781611 {
   public ComplexCBEFFInfo decode(InputStream inputStream) throws IOException {
     return readBITGroup(inputStream);
   }
-  
+
   /**
    * Reads a BIT group from an input stream.
    * 
@@ -92,7 +92,7 @@ public class ISO781611Decoder implements ISO781611 {
             + ", found " + Integer.toHexString(tag));
     }
   }
-  
+
   private ComplexCBEFFInfo readBITGroup(int tag, int length, InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     ComplexCBEFFInfo result = new ComplexCBEFFInfo();
@@ -111,12 +111,12 @@ public class ISO781611Decoder implements ISO781611 {
     for (int i = 0; i < bitCount; i++) {
       result.add(readBIT(inputStream, i));
     }
-    
+
     /* TODO: possibly more content, e.g. 0x53 tag with random as per ICAO 9303 Supplement R7-p1_v2_sIII_0057 */
-    
+
     return result;
   }
-  
+
   /**
    * Reads a BIT from the input stream.
    * 
@@ -133,16 +133,16 @@ public class ISO781611Decoder implements ISO781611 {
     int length = tlvIn.readLength();
     return readBIT(tag, length, inputStream, index);
   }
-  
+
   private CBEFFInfo readBIT(int tag, int length, InputStream inputStream, int index) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     if (tag != BIOMETRIC_INFORMATION_TEMPLATE_TAG /* 7F60 */) { 
       throw new IllegalArgumentException("Expected tag BIOMETRIC_INFORMATION_TEMPLATE_TAG (" + Integer.toHexString(BIOMETRIC_INFORMATION_TEMPLATE_TAG) + "), found " + Integer.toHexString(tag) + ", index is " + index);
     }
-    
+
     int bhtTag = tlvIn.readTag();
     int bhtLength = tlvIn.readLength();
-    
+
     if ((bhtTag == SMT_TAG)) {
       /* The BIT is protected... */
       readStaticallyProtectedBIT(inputStream, bhtTag, bhtLength, index);
@@ -153,10 +153,10 @@ public class ISO781611Decoder implements ISO781611 {
     } else {
       throw new IllegalArgumentException("Unsupported template tag: " + Integer.toHexString(bhtTag));
     }
-    
+
     return null; // FIXME
   }
-  
+
   /**
    *  A1, A2, ...
    *  Will contain DOs as described in ISO 7816-11 Annex C.
@@ -178,7 +178,7 @@ public class ISO781611Decoder implements ISO781611 {
     }
     return new StandardBiometricHeader(elements);
   }
-  
+
   /**
    * Reads a biometric information template protected with secure messaging.
    * Described in ISO7816-11 Annex D.
@@ -198,7 +198,7 @@ public class ISO781611Decoder implements ISO781611 {
     InputStream biometricDataBlockIn = new ByteArrayInputStream(decodeSMTValue(inputStream));
     readBiometricDataBlock(biometricDataBlockIn, sbh, index);
   } /* FIXME: return type??? */
-  
+
   private byte[] decodeSMTValue(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int doTag = tlvIn.readTag();
@@ -223,7 +223,7 @@ public class ISO781611Decoder implements ISO781611 {
     }
     return null;
   }
-  
+
   private BiometricDataBlock readBiometricDataBlock(InputStream inputStream, StandardBiometricHeader sbh, int index) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int bioDataBlockTag = tlvIn.readTag();

@@ -66,16 +66,16 @@ import net.sf.scuba.data.Country;
  * @version $Revision$
  */
 public class CardVerifiableCertificate extends Certificate {
-  
+
   private static final long serialVersionUID = -3585440601605666288L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** The EJBCA CVC that we wrap. */
   private org.ejbca.cvc.CVCertificate cvCertificate;
-  
+
   private transient KeyFactory rsaKeyFactory;
-  
+
   /**
    * Constructs a wrapper.
    *
@@ -91,7 +91,7 @@ public class CardVerifiableCertificate extends Certificate {
     }
     this.cvCertificate = cvCertificate;
   }
-  
+
   /*
    * TODO: perhaps move this to factory class (CertificateFactory, CertificateBuilder, whatever).
    * NOTE: algorithm should be one of"SHA224withECDSA", "SHA256withECDSA", "SHA384withECDSA", "SHA512withECDSA",
@@ -132,7 +132,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new IllegalArgumentException(ce.getMessage());
     }
   }
-  
+
   /**
    * Gets the signature algorithm.
    *
@@ -147,7 +147,7 @@ public class CardVerifiableCertificate extends Certificate {
       return null;
     }
   }
-  
+
   /**
    * Gets the signature algorithm OID
    *
@@ -161,7 +161,7 @@ public class CardVerifiableCertificate extends Certificate {
       return null;
     }
   }
-  
+
   /**
    * Returns the encoded form of this certificate. It is
    * assumed that each certificate type would have only a single
@@ -179,7 +179,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateEncodingException(ioe.getMessage());
     }
   }
-  
+
   /**
    * Gets the public key from this certificate.
    *
@@ -197,7 +197,7 @@ public class CardVerifiableCertificate extends Certificate {
           return publicKey;
         }
       }
-      
+
       /* It's ECDSA... */
       return publicKey;
     } catch (NoSuchFieldException nsfe) {
@@ -205,7 +205,7 @@ public class CardVerifiableCertificate extends Certificate {
       return null;
     }
   }
-  
+
   /**
    * Returns a string representation of this certificate.
    *
@@ -214,7 +214,7 @@ public class CardVerifiableCertificate extends Certificate {
   public String toString() {
     return cvCertificate.toString();
   }
-  
+
   /**
    * Verifies that this certificate was signed using the
    * private key that corresponds to the specified public key.
@@ -246,8 +246,8 @@ public class CardVerifiableCertificate extends Certificate {
       throw new NoSuchAlgorithmException("Tried all security providers: None was able to provide this signature algorithm.");
     }
   }
-  
-  
+
+
   /**
    * Verifies that this certificate was signed using the
    * private key that corresponds to the specified public key.
@@ -268,7 +268,7 @@ public class CardVerifiableCertificate extends Certificate {
       InvalidKeyException, NoSuchProviderException, SignatureException {
     cvCertificate.verify(key, provider);
   }
-  
+
   /**
    * The DER encoded certificate body.
    *
@@ -284,7 +284,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Returns 'Effective Date'.
    *
@@ -299,7 +299,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Returns 'Expiration Date'.
    *
@@ -314,7 +314,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Gets the authority reference.
    *
@@ -332,7 +332,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Gets the holder reference.
    *
@@ -348,7 +348,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Gets the holder authorization template.
    *
@@ -364,7 +364,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Returns the signature (just the value, without the <code>0x5F37</code> tag).
    *
@@ -379,7 +379,7 @@ public class CardVerifiableCertificate extends Certificate {
       throw new CertificateException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * Tests for equality with respect to another object.
    *
@@ -393,7 +393,7 @@ public class CardVerifiableCertificate extends Certificate {
     if (!this.getClass().equals(otherObj.getClass())) { return false; }
     return this.cvCertificate.equals(((CardVerifiableCertificate)otherObj).cvCertificate);
   }
-  
+
   /**
    * Gets a hash code for this object.
    *

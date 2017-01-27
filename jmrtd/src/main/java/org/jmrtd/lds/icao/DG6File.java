@@ -35,9 +35,9 @@ import org.jmrtd.lds.DisplayedImageDataGroup;
  * @version $Revision$
  */
 public class DG6File extends DisplayedImageDataGroup {
-  
+
   private static final long serialVersionUID = -583717105472408528L;
-  
+
   /**
    * Constructs a new file from binary representation.
    * 

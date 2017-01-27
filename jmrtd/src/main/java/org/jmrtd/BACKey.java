@@ -33,21 +33,21 @@ import java.util.Date;
  * @version $Revision$
  */
 public class BACKey implements BACKeySpec {
-  
+
   private static final long serialVersionUID = -1059774581180524710L;
-  
+
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
-  
+
   private String documentNumber;
   private String dateOfBirth;
   private String dateOfExpiry;
-  
+
   /**
    * Creates an empty BAC key entry.
    */
   protected BACKey() {
   }
-  
+
   /**
    * Creates a BAC key.
    * 
@@ -70,7 +70,7 @@ public class BACKey implements BACKeySpec {
     this.dateOfBirth = dateOfBirth;
     this.dateOfExpiry = dateOfExpiry;
   }
-  
+
   /**
    * Creates a BAC key.
    * 
@@ -81,7 +81,7 @@ public class BACKey implements BACKeySpec {
   public BACKey(String documentNumber, Date dateOfBirth, Date dateOfExpiry) {
     this(documentNumber, toString(dateOfBirth), toString(dateOfExpiry));
   }
-  
+
   /**
    * Gets the document number string.
    * 
@@ -90,7 +90,7 @@ public class BACKey implements BACKeySpec {
   public String getDocumentNumber() {
     return documentNumber;
   }
-  
+
   /**
    * Gets the date of birth string.
    * 
@@ -99,7 +99,7 @@ public class BACKey implements BACKeySpec {
   public String getDateOfBirth() {
     return dateOfBirth;
   }
-  
+
   /**
    * Gets the date of expiry string.
    * 
@@ -108,7 +108,7 @@ public class BACKey implements BACKeySpec {
   public String getDateOfExpiry() {
     return dateOfExpiry;
   }
-  
+
   /**
    * Gets a textual representation of this BAC key.
    * 
@@ -119,7 +119,7 @@ public class BACKey implements BACKeySpec {
     assert(dateOfExpiry != null && dateOfExpiry.length() == 6);
     return documentNumber + ", " + dateOfBirth + ", " + dateOfExpiry;
   }
-  
+
   /**
    * Gets the hash code of this BAC key.
    * Document number, date of birth, and date of expiry (with year in <i>yy</i> precision) are taken into account.
@@ -133,7 +133,7 @@ public class BACKey implements BACKeySpec {
     result = 61 * result + (dateOfExpiry == null ? 0: dateOfExpiry.hashCode());
     return result;
   }
-  
+
   /**
    * Tests equality of this BAC key with respect to another object.
    * 
@@ -150,7 +150,7 @@ public class BACKey implements BACKeySpec {
         dateOfBirth.equals(previous.dateOfBirth) &&
         dateOfExpiry.equals(previous.dateOfExpiry);
   }
-  
+
   /**
    * The algorithm of this key specification.
    * 
@@ -159,29 +159,29 @@ public class BACKey implements BACKeySpec {
   public String getAlgorithm() {
     return "BAC";
   }
-  
+
   /* FIXME: not implemented? -- MO */
   public byte[] getEncoded() {
     return null;
   }
-  
+
   /* FIXME: not implemented? -- MO */
   public String getFormat() {
     return null;
   }
-  
+
   protected void setDocumentNumber(String documentNumber) {
     this.documentNumber = documentNumber;
   }
-  
+
   protected void setDateOfBirth(String dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
   }
-  
+
   protected void setDateOfExpiry(String dateOfExpiry) {
     this.dateOfExpiry = dateOfExpiry;
   }
-  
+
   private static synchronized String toString(Date date) {
     return SDF.format(date);
   }

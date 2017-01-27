@@ -46,12 +46,12 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @since 0.5.6
  */
 public class BACProtocol {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private PassportService service;
   private Random random;
-  
+
   /**
    * Constructs a BAC protocol instance.
    * 
@@ -61,7 +61,7 @@ public class BACProtocol {
     this.service = service;
     this.random = new SecureRandom();
   }
-  
+
   /**
    * Performs the <i>Basic Access Control</i> protocol.
    *
@@ -78,7 +78,7 @@ public class BACProtocol {
       byte[] keySeed = computeKeySeedForBAC(bacKey);
       SecretKey kEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
       SecretKey kMac = Util.deriveKey(keySeed, Util.MAC_MODE);
-      
+
       SecureMessagingWrapper wrapper = doBACStep(kEnc, kMac);
       return new BACResult(bacKey, wrapper);
     } catch (CardServiceException cse) {
@@ -89,7 +89,7 @@ public class BACProtocol {
       throw new CardServiceException(gse.toString());
     }
   }
-  
+
   /**
    * Performs the <i>Basic Access Control</i> protocol.
    * It does BAC using kEnc and kMac keys, usually calculated
@@ -107,7 +107,7 @@ public class BACProtocol {
   public BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
     return new BACResult(doBACStep(kEnc, kMac));
   }
-  
+
   private SecureMessagingWrapper doBACStep(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
     byte[] rndICC = service.sendGetChallenge();
     byte[] rndIFD = new byte[8];
@@ -118,7 +118,7 @@ public class BACProtocol {
     byte[] kICC = new byte[16];
     System.arraycopy(response, 16, kICC, 0, 16);
     /* FIXME: We're not checking the other 16 bytes?!? -- MO */
-    
+
     byte[] keySeed = new byte[16];
     for (int i = 0; i < 16; i++) {
       keySeed[i] = (byte) ((kIFD[i] & 0xFF) ^ (kICC[i] & 0xFF));
@@ -126,15 +126,15 @@ public class BACProtocol {
     SecretKey ksEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
     SecretKey ksMac = Util.deriveKey(keySeed, Util.MAC_MODE);
     long ssc = computeSendSequenceCounter(rndICC, rndIFD);
-    
+
     return new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc);
   }
-  
+
   public static byte[] computeKeySeedForBAC(BACKeySpec bacKey) throws GeneralSecurityException {
     String documentNumber = bacKey.getDocumentNumber();
     String dateOfBirth = bacKey.getDateOfBirth();
     String dateOfExpiry = bacKey.getDateOfExpiry();
-    
+
     if (dateOfBirth == null || dateOfBirth.length() != 6) {
       throw new IllegalArgumentException("Wrong date format used for date of birth. Expected yyMMdd, found " + dateOfBirth);
     }
@@ -144,14 +144,14 @@ public class BACProtocol {
     if (documentNumber == null) {
       throw new IllegalArgumentException("Wrong document number. Found " + documentNumber);
     }
-    
+
     documentNumber = fixDocumentNumber(documentNumber);
-    
+
     byte[] keySeed = computeKeySeedForBAC(documentNumber, dateOfBirth, dateOfExpiry);
-    
+
     return keySeed;
   }
-  
+
   public static long computeSendSequenceCounter(byte[] rndICC, byte[] rndIFD) {
     if (rndICC == null || rndICC.length != 8
         || rndIFD == null || rndIFD.length != 8) {
@@ -168,7 +168,7 @@ public class BACProtocol {
     }
     return ssc;
   }
-  
+
   /**
    * Computes the static key seed to be used in BAC KDF, based on information from the MRZ.
    *
@@ -183,11 +183,11 @@ public class BACProtocol {
   private static byte[] computeKeySeedForBAC(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
     return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", true);
   }
-  
+
   private static String fixDocumentNumber(String documentNumber) {
     /* The document number, excluding trailing '<'. */
     String minDocumentNumber = documentNumber.replace('<', ' ').trim().replace(' ', '<');
-    
+
     /* The document number, including trailing '<' until length 9. */
     String maxDocumentNumber = minDocumentNumber;
     while (maxDocumentNumber.length() < 9) {

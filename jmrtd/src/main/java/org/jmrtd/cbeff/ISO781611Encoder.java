@@ -38,9 +38,9 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @version $Revision$
  */
 public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611 {
-  
+
   private BiometricDataBlockEncoder<B> bdbEncoder;
-  
+
   /**
    * Constructs an ISO7816-11 encoder that uses the given BDB encoder.
    * 
@@ -49,7 +49,7 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
   public ISO781611Encoder(BiometricDataBlockEncoder<B> bdbEncoder) {
     this.bdbEncoder = bdbEncoder;
   }
-  
+
   /**
    * Writes a BIT group to an output stream.
    * 
@@ -66,14 +66,14 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
       writeBITGroup(complexCBEFFInfo.getSubRecords(), outputStream);
     }
   }
-  
+
   private void writeBITGroup(List<CBEFFInfo> records, OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(BIOMETRIC_INFORMATION_GROUP_TEMPLATE_TAG); /* 7F61 */
     tlvOut.writeTag(BIOMETRIC_INFO_COUNT_TAG); /* 0x02 */
     int count = records.size();
     tlvOut.writeValue(new byte[] { (byte)count });
-    
+
     for (int index = 0; index < count; index++) {
       @SuppressWarnings("unchecked")
       SimpleCBEFFInfo<B> simpleCBEFFInfo = (SimpleCBEFFInfo<B>)records.get(index);
@@ -81,7 +81,7 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
     }
     tlvOut.writeValueEnd(); /* BIOMETRIC_INFORMATION_GROUP_TEMPLATE_TAG, i.e. 7F61 */
   }
-  
+
   private void writeBIT(TLVOutputStream tlvOut, int index, SimpleCBEFFInfo<B> cbeffInfo) throws IOException {
     if (!(cbeffInfo instanceof SimpleCBEFFInfo)) {
       throw new IllegalArgumentException("Encoder does not support level > 2 nesting");
@@ -91,12 +91,12 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
     writeBiometricDataBlock(tlvOut, cbeffInfo.getBiometricDataBlock());
     tlvOut.writeValueEnd(); /* BIOMETRIC_INFORMATION_TEMPLATE_TAG, i.e. 7F60 */
   }
-  
+
   private void writeBHT(TLVOutputStream tlvOut, int index, SimpleCBEFFInfo<B> cbeffInfo) throws IOException {
     tlvOut.writeTag((BIOMETRIC_HEADER_TEMPLATE_BASE_TAG /* + index */) & 0xFF); /* A1 */
-    
+
     B bdb = cbeffInfo.getBiometricDataBlock();
-    
+
     /* SBH */
     StandardBiometricHeader sbh = bdb.getStandardBiometricHeader();
     SortedMap<Integer, byte[]> elements = sbh.getElements();
@@ -106,10 +106,10 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
     }		
     tlvOut.writeValueEnd(); /* BIOMETRIC_HEADER_TEMPLATE_BASE_TAG, i.e. A1 */
   }
-  
+
   private void writeBiometricDataBlock(TLVOutputStream tlvOut, B bdb) throws IOException {
     tlvOut.writeTag(BIOMETRIC_DATA_BLOCK_TAG); /* 5F2E or 7F2E */
-    
+
     bdbEncoder.encode(bdb, tlvOut);
     tlvOut.writeValueEnd(); /* BIOMETRIC_DATA_BLOCK_TAG, i.e. 5F2E or 7F2E */
   }

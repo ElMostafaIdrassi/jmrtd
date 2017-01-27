@@ -32,7 +32,7 @@ import java.io.Serializable;
  * @version $Revision$
  */
 public interface LDSElement extends Serializable {
-  
+
   /**
    * Gets the encoded contents of this LDS info.
    * 

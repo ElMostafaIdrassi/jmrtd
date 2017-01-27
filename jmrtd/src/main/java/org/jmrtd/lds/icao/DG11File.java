@@ -71,11 +71,11 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class DG11File extends DataGroup {
-  
+
   private static final long serialVersionUID = 8566312538928662937L;
-  
+
   public static final int TAG_LIST_TAG = 0x5C;
-  
+
   public static final int
   FULL_NAME_TAG = 0x5F0E,
   OTHER_NAME_TAG = 0x5F0F,
@@ -90,15 +90,15 @@ public class DG11File extends DataGroup {
   PROOF_OF_CITIZENSHIP_TAG = 0x5F16, // Compressed image per ISO/IEC 10918
   OTHER_VALID_TD_NUMBERS_TAG = 0x5F17, // Separated by '<'
   CUSTODY_INFORMATION_TAG = 0x5F18;
-  
+
   public static final int
   CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0, // 5F0F is always used inside A0 constructed object
   COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
-  
+
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private String nameOfHolder;
   private List<String> otherNames;
   private String personalNumber;
@@ -112,9 +112,9 @@ public class DG11File extends DataGroup {
   private byte[] proofOfCitizenship;
   private List<String> otherValidTDNumbers;
   private String custodyInformation;
-  
+
   private List<Integer> tagPresenceList;
-  
+
   /**
    * Constructs a new file. Use <code>null</code> if data element is not present.
    * Use <code>&#39;&lt;&#39;</code> as separator.
@@ -154,7 +154,7 @@ public class DG11File extends DataGroup {
     this.otherValidTDNumbers = otherValidTDNumbers == null ? new ArrayList<String>() : new ArrayList<String>(otherValidTDNumbers);
     this.custodyInformation = custodyInformation;
   }
-  
+
   /**
    * Constructs a file from binary representation.
    *
@@ -165,19 +165,19 @@ public class DG11File extends DataGroup {
   public DG11File(InputStream inputStream) throws IOException {
     super(EF_DG11_TAG, inputStream);
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tagListTag = tlvInputStream.readTag();
     if (tagListTag != TAG_LIST_TAG) { throw new IllegalArgumentException("Expected tag list in DG11"); }
-    
+
     int tagListLength = tlvInputStream.readLength();
     int tagListBytesRead = 0;
-    
+
     int expectedTagCount = tagListLength / 2;
-    
+
     ByteArrayInputStream tagListBytesInputStream = new ByteArrayInputStream(tlvInputStream.readValue());
-    
+
     /* Find out which tags are present. */
     List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
     while (tagListBytesRead < tagListLength) {
@@ -187,13 +187,13 @@ public class DG11File extends DataGroup {
       tagListBytesRead += TLVUtil.getTagLength(tag);
       tagList.add(tag);
     }
-    
+
     /* Now read the fields in order. */
     for (int t: tagList) {
       readField(t, tlvInputStream);
     }
   }
-  
+
   private void readField(int fieldTag, TLVInputStream tlvIn) throws IOException {
     int tag = tlvIn.readTag();
     if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
@@ -234,9 +234,9 @@ public class DG11File extends DataGroup {
       }
     }
   }
-  
+
   /* Field parsing and interpretation below. */
-  
+
   private void parseCustodyInformation(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -247,7 +247,7 @@ public class DG11File extends DataGroup {
       custodyInformation = new String(value).trim();
     }
   }
-  
+
   private void parseOtherValidTDNumbers(byte[] value) {
     String field = new String(value).trim();
     try {
@@ -262,11 +262,11 @@ public class DG11File extends DataGroup {
       otherValidTDNumbers.add(number);
     }
   }
-  
+
   private void parseProofOfCitizenShip(byte[] value) {
     proofOfCitizenship = value;
   }
-  
+
   private void parsePersonalSummary(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -277,7 +277,7 @@ public class DG11File extends DataGroup {
       personalSummary = new String(value).trim();
     }
   }
-  
+
   private void parseTitle(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -288,7 +288,7 @@ public class DG11File extends DataGroup {
       title = new String(value).trim();
     }
   }
-  
+
   private void parseProfession(byte[] value) {
     String field = new String(value);
     try {
@@ -299,7 +299,7 @@ public class DG11File extends DataGroup {
     //		profession = in.replace("<", " ").trim();
     profession = field.trim();
   }
-  
+
   private void parseTelephone(byte[] value) {
     String field = new String(value);
     try {
@@ -310,7 +310,7 @@ public class DG11File extends DataGroup {
     //		telephone = in.replace("<", " ").trim();
     telephone = field.replace("<", " ").trim();
   }
-  
+
   private void parsePermanentAddress(byte[] value) {
     String field = new String(value);
     try {
@@ -325,7 +325,7 @@ public class DG11File extends DataGroup {
       permanentAddress.add(line);
     }
   }
-  
+
   private void parsePlaceOfBirth(byte[] value) {
     String field = new String(value);
     try {
@@ -340,7 +340,7 @@ public class DG11File extends DataGroup {
       placeOfBirth.add(line);
     }
   }
-  
+
   private void parseFullDateOfBirth(byte[] value) {
     try {
       String field = null;
@@ -361,7 +361,7 @@ public class DG11File extends DataGroup {
       throw new IllegalArgumentException(pe.toString());
     }
   }
-  
+
   private synchronized void parseOtherName(byte[] value) {
     if (otherNames == null) { otherNames = new ArrayList<String>(); }
     try {
@@ -372,7 +372,7 @@ public class DG11File extends DataGroup {
       otherNames.add(new String(value).trim());
     }
   }
-  
+
   private void parsePersonalNumber(byte[] value) {
     String field = new String(value);
     try {
@@ -382,7 +382,7 @@ public class DG11File extends DataGroup {
     }
     personalNumber = field.trim();
   }
-  
+
   private void parseNameOfHolder(byte[] value) {
     String field = new String(value);
     try {
@@ -392,13 +392,13 @@ public class DG11File extends DataGroup {
     }
     nameOfHolder = field.trim();
   }
-  
+
   /* Accessors below. */
-  
+
   public int getTag() {
     return EF_DG11_TAG;
   }
-  
+
   /**
    * Gets list of tags of fields actually present.
    *
@@ -448,7 +448,7 @@ public class DG11File extends DataGroup {
     }
     return tagPresenceList;
   }
-  
+
   /**
    * Gets the full name of the holder (primary and secondary identifiers).
    *
@@ -457,7 +457,7 @@ public class DG11File extends DataGroup {
   public String getNameOfHolder() {
     return nameOfHolder;
   }
-  
+
   /**
    * Gets the other names.
    *
@@ -466,7 +466,7 @@ public class DG11File extends DataGroup {
   public List<String> getOtherNames() {
     return otherNames == null ? new ArrayList<String>() : new ArrayList<String>(otherNames);
   }
-  
+
   /**
    * Gets the personal number.
    *
@@ -475,7 +475,7 @@ public class DG11File extends DataGroup {
   public String getPersonalNumber() {
     return personalNumber;
   }
-  
+
   /**
    * Gets the full date of birth.
    *
@@ -484,7 +484,7 @@ public class DG11File extends DataGroup {
   public Date getFullDateOfBirth() {
     return fullDateOfBirth;
   }
-  
+
   /**
    * Gets the place of birth.
    *
@@ -493,7 +493,7 @@ public class DG11File extends DataGroup {
   public List<String> getPlaceOfBirth() {
     return placeOfBirth;
   }
-  
+
   /**
    * Gets the permanent address.
    *
@@ -502,7 +502,7 @@ public class DG11File extends DataGroup {
   public List<String> getPermanentAddress() {
     return permanentAddress;
   }
-  
+
   /**
    * Gets the telephone number.
    *
@@ -511,7 +511,7 @@ public class DG11File extends DataGroup {
   public String getTelephone() {
     return telephone;
   }
-  
+
   /**
    * Gets the profession.
    *
@@ -520,7 +520,7 @@ public class DG11File extends DataGroup {
   public String getProfession() {
     return profession;
   }
-  
+
   /**
    * Gets the title.
    *
@@ -529,7 +529,7 @@ public class DG11File extends DataGroup {
   public String getTitle() {
     return title;
   }
-  
+
   /**
    * Gets the personal summary.
    *
@@ -538,7 +538,7 @@ public class DG11File extends DataGroup {
   public String getPersonalSummary() {
     return personalSummary;
   }
-  
+
   /**
    * Gets the proof of citizenship.
    *
@@ -547,7 +547,7 @@ public class DG11File extends DataGroup {
   public byte[] getProofOfCitizenship() {
     return proofOfCitizenship;
   }
-  
+
   /**
    * Gets the other valid TD numbers.
    *
@@ -556,7 +556,7 @@ public class DG11File extends DataGroup {
   public List<String> getOtherValidTDNumbers() {
     return otherValidTDNumbers;
   }
-  
+
   /**
    * Gets custody information.
    *
@@ -565,7 +565,7 @@ public class DG11File extends DataGroup {
   public String getCustodyInformation() {
     return custodyInformation;
   }
-  
+
   /**
    * Gets a textual representation of this file.
    *
@@ -590,7 +590,7 @@ public class DG11File extends DataGroup {
     result.append("]");
     return result.toString();
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (obj == this) { return true; }
@@ -598,11 +598,11 @@ public class DG11File extends DataGroup {
     DG11File other = (DG11File)obj;
     return this.toString().equals(other.toString());
   }
-  
+
   public int hashCode() {
     return 13 * toString().hashCode() + 111;
   }
-  
+
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
     tlvOut.writeTag(TAG_LIST_TAG);

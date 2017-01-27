@@ -38,15 +38,15 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class AAResult implements Serializable {
-  
+
   private static final long serialVersionUID = 8800803919646625713L;
-  
+
   private PublicKey publicKey;
   private String digestAlgorithm;
   private String signatureAlgorithm;
   private byte[] challenge;
   private byte[] response;
-  
+
   public AAResult(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge, byte[] response) {
     this.publicKey = publicKey;
     this.digestAlgorithm = digestAlgorithm;
@@ -54,27 +54,27 @@ public class AAResult implements Serializable {
     this.challenge = challenge;
     this.response = response;
   }
-  
+
   public byte[] getChallenge() {
     return challenge;
   }
-  
+
   public byte[] getResponse() {
     return response;
   }
-  
+
   public PublicKey getPublicKey() {
     return publicKey;
   }
-  
+
   public String getDigestAlgorithm() {
     return digestAlgorithm;
   }
-  
+
   public String getSignatureAlgorithm() {
     return signatureAlgorithm;
   }
-  
+
   @Override
   public String toString() {
     return (new StringBuilder())
@@ -86,7 +86,7 @@ public class AAResult implements Serializable {
         .append(", response: ").append(Hex.bytesToHexString(response))
         .toString();
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 1991;
@@ -98,7 +98,7 @@ public class AAResult implements Serializable {
     result = prime * result + ((signatureAlgorithm == null) ? 0 : signatureAlgorithm.hashCode());
     return result;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -110,7 +110,7 @@ public class AAResult implements Serializable {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     AAResult other = (AAResult) obj;
     if (!Arrays.equals(challenge, other.challenge)) {
       return false;
@@ -139,7 +139,7 @@ public class AAResult implements Serializable {
     } else if (!signatureAlgorithm.equals(other.signatureAlgorithm)) {
       return false;
     }
-    
+
     return true;
   }
 }

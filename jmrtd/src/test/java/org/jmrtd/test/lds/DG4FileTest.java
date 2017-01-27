@@ -44,15 +44,15 @@ import org.jmrtd.test.ResourceUtil;
 import junit.framework.TestCase;
 
 public class DG4FileTest extends TestCase {
-  
+
   public static final String TEST_FILE = "/lds/bsi2008/Datagroup4.bin";
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public DG4FileTest(String name) {
     super(name);
   }
-  
+
   public void testConstruct() {
     try {
       DG4File dg4 = new DG4File(Arrays.asList(new IrisInfo[] { }));
@@ -61,15 +61,15 @@ public class DG4FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testReflexive() {
     DG4File dg4 = createTestObject();
     testReflexive(dg4);
-    
+
     dg4 = getTestObject();
     testReflexive(dg4);
   }
-  
+
   public void testReflexive(DG4File dg4) {
     try {
       byte[] bytes = dg4.getEncoded();
@@ -80,54 +80,54 @@ public class DG4FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testEncodeDecode() {
     DG4File dg4 = getTestObject();
     testEncodeDecode(dg4);
-    
+
     dg4 = createTestObject();
     testEncodeDecode(dg4);
   }
-  
+
   public void testEncodeDecode(DG4File dg4) {
     try {
       byte[] dg4Bytes = dg4.getEncoded();
       assertNotNull(dg4Bytes);
-      
+
       DG4File copy = new DG4File(new ByteArrayInputStream(dg4Bytes));
       byte[] copyBytes = copy.getEncoded();
       assertNotNull(copyBytes);
-      
+
       assertTrue(Arrays.equals(dg4Bytes, copyBytes));
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
   }
-  
+
   public void testZeroInstanceTestObjectNotEquals() {
     try {
       DG4File dg4 = new DG4File(new LinkedList<IrisInfo>());
       byte[] dg4Bytes = dg4.getEncoded();
       assertNotNull(dg4Bytes);
-      
+
       DG4File anotherDG4 = new DG4File(new LinkedList<IrisInfo>());
       byte[] anotherDG4Bytes = anotherDG4.getEncoded();
       assertNotNull(anotherDG4Bytes);
-      
+
       assertFalse(Arrays.equals(dg4Bytes, anotherDG4Bytes));
-      
+
       DG4File copy = new DG4File(new ByteArrayInputStream(dg4Bytes));
       byte[] copyBytes = copy.getEncoded();
       assertNotNull(copyBytes);
-      
+
       assertFalse(Arrays.equals(dg4Bytes, copyBytes));
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
   }
-  
+
   public void testFile() {
     try {
       DG4File dg4 = getTestObject();
@@ -161,20 +161,20 @@ public class DG4FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public static DG4File createTestObject() {
     try {
       BufferedImage image = new BufferedImage(300, 200, BufferedImage.TYPE_INT_RGB);
       ByteArrayOutputStream imageOut = new ByteArrayOutputStream();
       ImageIO.write(image, "jpg", imageOut);
       byte[] imageBytes = imageOut.toByteArray();
-      
+
       int imageFormat = IrisInfo.IMAGEFORMAT_RGB_JPEG;
       IrisImageInfo irisImageInfo = new IrisImageInfo(0, 300, 200, new ByteArrayInputStream(imageBytes), imageBytes.length, IrisInfo.IMAGEFORMAT_RGB_JPEG);
-      
+
       int biometricSubtype = IrisBiometricSubtypeInfo.EYE_UNDEF;
       IrisBiometricSubtypeInfo irisBiometricSubtypeInfo = new IrisBiometricSubtypeInfo(biometricSubtype, imageFormat, Arrays.asList(new IrisImageInfo[] { irisImageInfo }));
-      
+
       int captureDeviceId = IrisInfo.CAPTURE_DEVICE_UNDEF;
       int horizontalOrientation = IrisInfo.ORIENTATION_UNDEF;
       int verticalOrientation = IrisInfo.ORIENTATION_UNDEF;
@@ -212,7 +212,7 @@ public class DG4FileTest extends TestCase {
       return null;
     }
   }
-  
+
   public static DG4File getTestObject() {
     try {
       InputStream in = ResourceUtil.getInputStream(TEST_FILE);

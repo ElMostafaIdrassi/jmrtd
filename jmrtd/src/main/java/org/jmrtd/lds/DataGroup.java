@@ -34,11 +34,11 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 public abstract class DataGroup extends AbstractTaggedLDSFile {
-  
+
   private static final long serialVersionUID = -4761360877353069639L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /**
    * Constructs a data group. This constructor
    * is only visible to the other classes in this package.
@@ -48,7 +48,7 @@ public abstract class DataGroup extends AbstractTaggedLDSFile {
   protected DataGroup(int dataGroupTag) {
     super(dataGroupTag);
   }
-  
+
   /**
    * Constructs a data group from the DER encoded data in the
    * given input stream. Tag and length are read, so the input stream
@@ -62,7 +62,7 @@ public abstract class DataGroup extends AbstractTaggedLDSFile {
   protected DataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
     super(dataGroupTag, inputStream);
   }
-  
+
   /**
    * Gets a textual representation of this file.
    *

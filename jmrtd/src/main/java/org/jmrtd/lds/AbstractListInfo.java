@@ -39,31 +39,31 @@ import java.util.List;
  * @param <R> the type of the elements
  */
 public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
-  
+
   private static final long serialVersionUID = 2970076896364365191L;
-  
+
   private List<R> subRecords;
-  
+
   protected List<R> getSubRecords() {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     return new ArrayList<R>(this.subRecords);
   }
-  
+
   protected void add(R subRecord) {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     this.subRecords.add(subRecord);
   }
-  
+
   protected void addAll(List<R> subRecords) {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     this.subRecords.addAll(subRecords);
   }
-  
+
   protected void remove(int index) {
     if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
     this.subRecords.remove(index);
   }
-  
+
   public boolean equals(Object other) {
     if (other == null) { return false; }
     if (other == this) { return true; }
@@ -91,7 +91,7 @@ public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
       return false;
     }
   }
-  
+
   public int hashCode() {
     int result = 1234567891;
     List<R> subRecords = getSubRecords();
@@ -104,8 +104,8 @@ public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
     }
     return 7 * result + 11;
   }
-  
+
   public abstract void writeObject(OutputStream outputStream) throws IOException;
-  
+
   public abstract void readObject(InputStream inputStream) throws IOException;
 }

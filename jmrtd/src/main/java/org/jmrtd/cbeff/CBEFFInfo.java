@@ -32,7 +32,7 @@ package org.jmrtd.cbeff;
  * @since 0.4.7
  */
 public interface CBEFFInfo {
-  
+
   /**
    * Biometric type value, based on
    * Section 5.2.1.5 and Table 4 in NISTIR-6529A,
@@ -61,7 +61,7 @@ public interface CBEFFInfo {
   BIOMETRIC_TYPE_PALM_PRINT = 0x020000,
   BIOMETRIC_TYPE_VEIN_PATTERN = 0x040000,
   BIOMETRIC_TYPE_FOOT_PRINT = 0x080000;
-  
+
   /**
    * Biometric subtype, based on
    * Section 5.1.2.6 and Table 6 in NISTIR-6529A,
@@ -69,10 +69,10 @@ public interface CBEFFInfo {
    * Section 6.5.7 of ISO/IEC 19785-1.
    */
   public static final int
-  BIOMETRIC_SUBTYPE_NONE = 0x00,					/* 00000000 */
-  BIOMETRIC_SUBTYPE_MASK_RIGHT = 0x01,			/* xxxxxx01 */
-  BIOMETRIC_SUBTYPE_MASK_LEFT = 0x02,				/* xxxxxx10 */
-  BIOMETRIC_SUBTYPE_MASK_THUMB = 0x04,			/* xxx001xx */
+  BIOMETRIC_SUBTYPE_NONE = 0x00,					      /* 00000000 */
+  BIOMETRIC_SUBTYPE_MASK_RIGHT = 0x01,			    /* xxxxxx01 */
+  BIOMETRIC_SUBTYPE_MASK_LEFT = 0x02,				    /* xxxxxx10 */
+  BIOMETRIC_SUBTYPE_MASK_THUMB = 0x04,			    /* xxx001xx */
   BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER = 0x08,	/* xxx010xx */
   BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER = 0x0C,	/* xxx011xx */
   BIOMETRIC_SUBTYPE_MASK_RING_FINGER = 0x10,		/* xxx100xx */

@@ -40,29 +40,29 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class PACEResult implements Serializable {
-  
+
   private static final long serialVersionUID = -6819675856205885052L;
-  
+
   private MappingType mappingType;
   private String agreementAlg;
   private String cipherAlg;
   private String digestAlg;
   private int keyLength;
-  
+
   private AlgorithmParameterSpec staticParams;
-  
+
   private byte[] piccNonce;
   private AlgorithmParameterSpec ephemeralParams;
   private KeyPair pcdKeyPair;
   private PublicKey piccPublicKey;
   private byte[] sharedSecretBytes;
-  
+
   /* Only used for PACE-CAM. */
   private byte[] encryptedChipAuthenticationData;
   private byte[] chipAuthenticationData;
-  
+
   private SecureMessagingWrapper wrapper;
-  
+
   public PACEResult(MappingType mappingType, String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
       AlgorithmParameterSpec staticParams,
       byte[] piccNonce, AlgorithmParameterSpec ephemeralParams, KeyPair pcdKeyPair, PublicKey piccPublicKey,
@@ -82,67 +82,67 @@ public class PACEResult implements Serializable {
     this.chipAuthenticationData = chipAuthenticationData;
     this.wrapper = wrapper;
   }
-  
+
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }
-  
+
   public MappingType getMappingType() {
     return mappingType;
   }
-  
+
   public String getAgreementAlg() {
     return agreementAlg;
   }
-  
+
   public String getCipherAlg() {
     return cipherAlg;
   }
-  
+
   public String getDigestAlg() {
     return digestAlg;
   }
-  
+
   public void setDigestAlg(String digestAlg) {
     this.digestAlg = digestAlg;
   }
-  
+
   public int getKeyLength() {
     return keyLength;
   }
-  
+
   public AlgorithmParameterSpec getStaticParams() {
     return staticParams;
   }
-  
+
   public byte[] getPICCNonce() {
     return piccNonce;
   }
-  
+
   public AlgorithmParameterSpec getEphemeralParams() {
     return ephemeralParams;
   }
-  
+
   public KeyPair getPCDKeyPair() {
     return pcdKeyPair;
   }
-  
+
   public PublicKey getPICCPublicKey() {
     return piccPublicKey;
   }
-  
+
   public byte[] getSharedSecretBytes() {
     return sharedSecretBytes;
   }
-  
+
   public byte[] getEncryptedChipAuthenticationData() {
     return encryptedChipAuthenticationData;
   }
-  
+
   public byte[] getChipAuthenticationData() {
     return chipAuthenticationData;
   }
-  
+
   @Override
   public String toString() {
     return (new StringBuilder())
@@ -161,7 +161,7 @@ public class PACEResult implements Serializable {
         .append(", chipAuthenticationData: " + Hex.bytesToHexString(chipAuthenticationData))
         .toString();    
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 1991;
@@ -182,7 +182,7 @@ public class PACEResult implements Serializable {
     result = prime * result + ((wrapper == null) ? 0 : wrapper.hashCode());
     return result;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -270,7 +270,7 @@ public class PACEResult implements Serializable {
     } else if (!wrapper.equals(other.wrapper)) {
       return false;
     }
-    
+
     return true;
   }
 }

@@ -41,13 +41,13 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @version $Revision$
  */
 public class DG1File extends DataGroup {
-  
+
   private static final long serialVersionUID = 5091606125728809058L;
-  
+
   private static final short MRZ_INFO_TAG = 0x5F1F;
-  
+
   private MRZInfo mrzInfo;
-  
+
   /**
    * Creates a new file based on MRZ information.
    *
@@ -57,7 +57,7 @@ public class DG1File extends DataGroup {
     super(EF_DG1_TAG);
     this.mrzInfo = mrzInfo;
   }
-  
+
   /**
    * Creates a new file based on an input stream.
    *
@@ -68,14 +68,14 @@ public class DG1File extends DataGroup {
   public DG1File(InputStream in) throws IOException {
     super(EF_DG1_TAG, in);
   }
-  
+
   protected void readContent(InputStream in) throws IOException {
     TLVInputStream tlvIn = in instanceof TLVInputStream ? (TLVInputStream)in : new TLVInputStream(in);
     tlvIn.skipToTag(MRZ_INFO_TAG);
     int length = tlvIn.readLength();
     this.mrzInfo = new MRZInfo(tlvIn, length);
   }
-  
+
   /**
    * Gets the MRZ information stored in this file.
    *
@@ -84,7 +84,7 @@ public class DG1File extends DataGroup {
   public MRZInfo getMRZInfo() {
     return mrzInfo;
   }
-  
+
   /**
    * Gets a textual representation of this file.
    *
@@ -93,18 +93,18 @@ public class DG1File extends DataGroup {
   public String toString() {
     return "DG1File " + mrzInfo.toString().replaceAll("\n", "").trim();
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (!(obj.getClass().equals(this.getClass()))) { return false; }
     DG1File other = (DG1File)obj;
     return mrzInfo.equals(other.mrzInfo);
   }
-  
+
   public int hashCode() {
     return 3 * mrzInfo.hashCode() + 57;
   }
-  
+
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
     tlvOut.writeTag(MRZ_INFO_TAG);

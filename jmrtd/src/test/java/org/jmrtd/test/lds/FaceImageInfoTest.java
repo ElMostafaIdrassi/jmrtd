@@ -41,13 +41,13 @@ import net.sf.scuba.data.Gender;
 import net.sf.scuba.util.Hex;
 
 public class FaceImageInfoTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public FaceImageInfoTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     FaceImageInfo imageInfo = createNonEmptyTestObject();
     try {
@@ -59,18 +59,18 @@ public class FaceImageInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testNonNullEncoded() {
     FaceImageInfo imageInfo = createNonEmptyTestObject();
     assertNotNull(imageInfo);
     byte[] encoded = imageInfo.getEncoded();
     assertNotNull(encoded);
   }
-  
+
   public void testEncodeDecode() {
     testEncodeDecode(createNonEmptyTestObject());
   }
-  
+
   public void testEncodeDecode(FaceImageInfo original) {
     try {
       byte[] encoded = original.getEncoded();
@@ -86,12 +86,12 @@ public class FaceImageInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testNumExtractImageOnce() {
     FaceImageInfo imageInfo = createNonEmptyTestObject(50, 50);
     testExtractImage(imageInfo, 50, 50);
   }
-  
+
   public void testNumExtractImage() {
     for (int width = 100; width < 1000; width += 200) {
       for (int height = 100; height < 1000; height += 200) {
@@ -100,7 +100,7 @@ public class FaceImageInfoTest extends TestCase {
       }
     }
   }
-  
+
   public void testExtractImage(FaceImageInfo imageInfo, int expectedWidth, int expectedHeight) {
     try {
       InputStream imageInputStream = imageInfo.getImageInputStream();
@@ -115,34 +115,34 @@ public class FaceImageInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testValidType() {
     FaceImageInfo portraitInfo = createTestObject();
     testValidType(portraitInfo);
   }
-  
+
   public void testValidType(FaceImageInfo imageInfo) {
     int type = imageInfo.getType();
     assertEquals(type, ImageInfo.TYPE_PORTRAIT);
   }
-  
+
   public void testLength() {
     FaceImageInfo faceImageInfo = createTestObject();
     int imageLength = faceImageInfo.getImageLength();
     int recordLength = (int)faceImageInfo.getRecordLength();
     assertTrue(imageLength < recordLength);
   }
-  
+
   public static FaceImageInfo createTestObject() {
     return createNonEmptyTestObject(300, 400);
   }
-  
+
   public static FaceImageInfo createNonEmptyTestObject() {
     return createNonEmptyTestObject(1, 1);
   }
-  
+
   public void testCreateAndExtract() {
-    
+
     try {
       FaceImageInfo imageInfo = createNonEmptyTestObject();
       DataInputStream imageInputStream = new DataInputStream(imageInfo.getImageInputStream());
@@ -156,7 +156,7 @@ public class FaceImageInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public static FaceImageInfo createNonEmptyTestObject(int width, int height) {
     try {
       byte[] imageBytes = createTrivialJPEGBytes(width, height);
@@ -193,7 +193,7 @@ public class FaceImageInfoTest extends TestCase {
       return null;
     }
   }
-  
+
   private static byte[] createTrivialJPEGBytes(int width, int height) {
     try {
       BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

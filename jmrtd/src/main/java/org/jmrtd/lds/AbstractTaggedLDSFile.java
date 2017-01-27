@@ -41,14 +41,14 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @version $Revision$
  */
 public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
-  
+
   private static final long serialVersionUID = -4761360877353069639L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private int tag;
   private int length;
-  
+
   /**
    * Constructs a data group. This constructor
    * is only visible to the other classes in this package.
@@ -58,7 +58,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   protected AbstractTaggedLDSFile(int dataGroupTag) {
     this.tag = dataGroupTag;
   }
-  
+
   /**
    * Constructs a data group from the DER encoded data in the
    * given input stream.
@@ -72,7 +72,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
     this.tag = tag;
     readObject(inputStream);
   }
-  
+
   /**
    * Reads the contents of this data group, including tag and length from an input stream.
    *
@@ -89,7 +89,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
     length = tlvIn.readLength();
     readContent(new SplittableInputStream(inputStream, length));
   }
-  
+
   protected void writeObject(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     int ourTag = getTag();
@@ -100,7 +100,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
     if (length != ourLength) { length = ourLength; }
     tlvOut.writeValue(value);
   }
-  
+
   /**
    * Reads the contents of the data group from an input stream.
    * Client code implementing this method should only read the contents
@@ -111,7 +111,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
    * @throws IOException on error reading from input stream
    */
   protected abstract void readContent(InputStream inputStream) throws IOException;
-  
+
   /**
    * Writes the contents of the data group to an output stream.
    * Client code implementing this method should only write the contents
@@ -122,7 +122,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
    * @throws IOException on error writing to output stream
    */
   protected abstract void writeContent(OutputStream outputStream) throws IOException;
-  
+
   /**
    * Gets a textual representation of this file.
    *
@@ -131,7 +131,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   public String toString() {
     return "TaggedLDSFile [" + Integer.toHexString(getTag()) + " (" + getLength() + ")]";
   }
-  
+
   /**
    * The data group tag.
    *
@@ -140,7 +140,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   public int getTag() {
     return tag;
   }
-  
+
   /**
    * Gets the value part of this DG.
    *
@@ -158,7 +158,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
       return null;
     }
   }
-  
+
   /**
    * The length of the value of the data group.
    *

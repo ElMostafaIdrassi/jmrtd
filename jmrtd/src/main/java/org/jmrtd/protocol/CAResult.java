@@ -40,16 +40,16 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class CAResult implements Serializable {
-  
+
   private static final long serialVersionUID = 4431711176589761513L;
-  
+
   private BigInteger keyId;
   private PublicKey piccPublicKey;
   private SecureMessagingWrapper wrapper;
   private byte[] keyHash;
   private PublicKey pcdPublicKey;
   private PrivateKey pcdPrivateKey;
-  
+
   /**
    * Creates a result.
    *
@@ -68,7 +68,7 @@ public class CAResult implements Serializable {
     this.pcdPrivateKey = pcdPrivateKey;
     this.wrapper = wrapper;
   }
-  
+
   /**
    * Gets the ICC's public key identifier
    *
@@ -77,7 +77,7 @@ public class CAResult implements Serializable {
   public BigInteger getKeyId() {
     return keyId;
   }
-  
+
   /**
    * Gets the ICC's public key that was used as input to chip authentication protocol
    *
@@ -86,11 +86,11 @@ public class CAResult implements Serializable {
   public PublicKey getPublicKey() {
     return piccPublicKey;
   }
-  
+
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }
-  
+
   @Override
   public String toString() {
     return (new StringBuilder())
@@ -102,7 +102,7 @@ public class CAResult implements Serializable {
         .append(", PCD private key: ").append(Util.getDetailedPrivateKeyAlgorithm(pcdPrivateKey))
         .append("]").toString();
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -115,7 +115,7 @@ public class CAResult implements Serializable {
     result = prime * result + ((wrapper == null) ? 0 : wrapper.hashCode());
     return result;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -166,10 +166,10 @@ public class CAResult implements Serializable {
     } else if (!wrapper.equals(other.wrapper)) {
       return false;
     }
-    
+
     return true;
   }
-  
+
   /**
    * Gets the hash of the ephemeral public key of the terminal.
    *
@@ -178,7 +178,7 @@ public class CAResult implements Serializable {
   public byte[] getKeyHash() {
     return keyHash;
   }
-  
+
   /**
    * The ephemeral public key of the terminal that was used in the key exchange.
    *
@@ -187,7 +187,7 @@ public class CAResult implements Serializable {
   public PublicKey getPCDPublicKey() {
     return pcdPublicKey;
   }
-  
+
   /**
    * The ephemeral private key of the terminal that was used in the key exchange.
    *

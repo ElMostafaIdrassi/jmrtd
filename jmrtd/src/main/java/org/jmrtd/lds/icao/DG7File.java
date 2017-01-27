@@ -37,9 +37,9 @@ import org.jmrtd.lds.DisplayedImageInfo;
  * @version $Revision$
  */
 public class DG7File extends DisplayedImageDataGroup {
-  
+
   private static final long serialVersionUID = 7189545112850471359L;
-  
+
   /**
    * Constructs a new file from a list of displayed images.
    * 
@@ -48,7 +48,7 @@ public class DG7File extends DisplayedImageDataGroup {
   public DG7File(List<DisplayedImageInfo> images) {
     super(EF_DG7_TAG, images, DisplayedImageInfo.DISPLAYED_SIGNATURE_OR_MARK_TAG);
   }
-  
+
   /**
    * Constructs a new file from binary representation.
    * 

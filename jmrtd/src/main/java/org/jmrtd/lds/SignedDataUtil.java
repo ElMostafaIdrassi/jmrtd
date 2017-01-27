@@ -86,11 +86,11 @@ import org.jmrtd.JMRTDSecurityProvider;
  * @version $Revision$
  */
 /* package-visible */ class SignedDataUtil {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-  
+
   /** SignedData related object identifier. */
   public static final String
   RFC_3369_SIGNED_DATA_OID = "1.2.840.113549.1.7.2",    /* id-signedData OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 } */
@@ -115,35 +115,35 @@ import org.jmrtd.JMRTDSecurityProvider;
   X9_SHA384_WITH_ECDSA_OID = "1.2.840.10045.4.3.3",
   X9_SHA512_WITH_ECDSA_OID = "1.2.840.10045.4.3.4",
   IEEE_P1363_SHA1_OID = "1.3.14.3.2.26";
-  
+
   /**
    * Prevents instantiation.
    */
   private SignedDataUtil() {
   }
-  
+
   public static SignedData readSignedData(InputStream inputStream) throws IOException {
     ASN1InputStream asn1in = new ASN1InputStream(inputStream);
     ASN1Sequence sequence = (ASN1Sequence)asn1in.readObject();
-    
+
     if (sequence.size() != 2) {
       throw new IOException("Was expecting a DER sequence of length 2, found a DER sequence of length " + sequence.size());
     }
-    
+
     String contentTypeOID = ((ASN1ObjectIdentifier)sequence.getObjectAt(0)).getId();
     if (!SignedDataUtil.RFC_3369_SIGNED_DATA_OID.equals(contentTypeOID)) {
       throw new IOException("Was expecting signed-data content type OID (" + SignedDataUtil.RFC_3369_SIGNED_DATA_OID + "), found " + contentTypeOID);
     }
-    
+
     ASN1Primitive asn1SequenceWithSignedData = SignedDataUtil.getObjectFromTaggedObject(sequence.getObjectAt(1));
-    
+
     if (!(asn1SequenceWithSignedData instanceof ASN1Sequence)) {
       throw new IOException("Was expecting an ASN.1 sequence as content");
     }
-    
+
     return SignedData.getInstance(asn1SequenceWithSignedData);
   }
-  
+
   public static void writeData(SignedData signedData, OutputStream outputStream) throws IOException {
     ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(new ASN1ObjectIdentifier(SignedDataUtil.RFC_3369_SIGNED_DATA_OID));
@@ -152,14 +152,14 @@ import org.jmrtd.JMRTDSecurityProvider;
     byte[] fileContentsBytes = fileContentsObject.getEncoded(ASN1Encoding.DER);
     outputStream.write(fileContentsBytes);
   }
-  
+
   public static ASN1Primitive getContent(SignedData signedData) {
     ContentInfo encapContentInfo = signedData.getEncapContentInfo();
-    
+
     String contentType = encapContentInfo.getContentType().getId();
-    
+
     DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();    
-    
+
     ASN1InputStream inputStream = null;
     try {
       inputStream = new ASN1InputStream(new ByteArrayInputStream(eContent.getOctets()));
@@ -177,10 +177,10 @@ import org.jmrtd.JMRTDSecurityProvider;
         }
       }
     }
-    
+
     return null;
   }
-  
+
   /**
    * Removes the tag from a tagged object.
    * 
@@ -194,17 +194,17 @@ import org.jmrtd.JMRTDSecurityProvider;
     if (!(asn1Encodable instanceof ASN1TaggedObject)) {
       throw new IOException("Was expecting an ASN1TaggedObject, found " + asn1Encodable.getClass().getCanonicalName());
     }
-    
+
     ASN1TaggedObject asn1TaggedObject = (ASN1TaggedObject)asn1Encodable;
-    
+
     int tagNo = asn1TaggedObject.getTagNo();
     if (tagNo != 0) {
       throw new IOException("Was expecting tag 0, found " + Integer.toHexString(tagNo));
     }   
-    
+
     return asn1TaggedObject.getObject();     
   }
-  
+
   public static String getSignerInfoDigestAlgorithm(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
@@ -215,7 +215,7 @@ import org.jmrtd.JMRTDSecurityProvider;
       return null; // throw new IllegalStateException(nsae.toString());
     }
   }
-  
+
   public static String getDigestEncryptionAlgorithm(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
@@ -227,7 +227,7 @@ import org.jmrtd.JMRTDSecurityProvider;
       return null; // throw new IllegalStateException(nsae.toString());
     }
   }
-  
+
   /**
    * Gets the contents of the signed data over which the
    * signature is to be computed.
@@ -247,34 +247,34 @@ import org.jmrtd.JMRTDSecurityProvider;
   public static byte[] getEContent(SignedData signedData) {
     SignerInfo signerInfo = getSignerInfo(signedData);
     ASN1Set signedAttributesSet = signerInfo.getAuthenticatedAttributes();
-    
+
     ContentInfo contentInfo = signedData.getEncapContentInfo();
     byte[] contentBytes = ((DEROctetString)contentInfo.getContent()).getOctets();
-    
+
     if (signedAttributesSet.size() == 0) {
       /* Signed attributes absent, return content to be signed... */
       return contentBytes;
     }
-    
+
     /* Signed attributes present (i.e. a structure containing a hash of the content), return that structure to be signed... */
     /* This option is taken by ICAO passports. */
     byte[] attributesBytes = null;
     String digAlg = signerInfo.getDigestAlgorithm().getAlgorithm().getId();
-    
+
     try {
       attributesBytes = signedAttributesSet.getEncoded(ASN1Encoding.DER);
-      
+
       checkEContent(getAttributes(signedAttributesSet), digAlg, contentBytes);
-      
+
     } catch (NoSuchAlgorithmException nsae) {
       LOGGER.warning("Error checking signedAttributes in eContent! No such algorithm: \"" + digAlg + "\": " + nsae.getMessage());
     } catch (IOException ioe) {
       LOGGER.severe("Error getting signedAttributes: " + ioe.getMessage());
     }
-    
+
     return attributesBytes;
   }
-  
+
   /* FIXME: Move this from lds package to verifier. -- MO */
   /* FIXME: This only warns on logger. */
   /**
@@ -291,17 +291,17 @@ import org.jmrtd.JMRTDSecurityProvider;
       if (!RFC_3369_MESSAGE_DIGEST_OID.equals(attribute.getAttrType().getId())) {
         continue;
       }
-      
+
       ASN1Set attrValuesSet = attribute.getAttrValues();
       if (attrValuesSet.size() != 1) {
         LOGGER.warning("Expected only one attribute value in signedAttribute message digest in eContent!");
       }
       byte[] storedDigestedContent = ((DEROctetString)attrValuesSet.getObjectAt(0)).getOctets();
-      
+
       if (storedDigestedContent == null) {
         LOGGER.warning("Error extracting signedAttribute message digest in eContent!");
       } 
-      
+
       MessageDigest dig = MessageDigest.getInstance(digAlg);
       byte[] computedDigestedContent = dig.digest(contentBytes);
       if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
@@ -309,7 +309,7 @@ import org.jmrtd.JMRTDSecurityProvider;
       }
     }    
   }
-  
+
   private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
     List<ASN1Sequence> attributeObjects = Collections.list(signedAttributesSet.getObjects());
     List<Attribute> attributes = new ArrayList(attributeObjects.size());
@@ -319,7 +319,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     }
     return attributes;
   }
-  
+
   /**
    * Gets the stored signature of the security object.
    *
@@ -331,7 +331,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     SignerInfo signerInfo = getSignerInfo(signedData);
     return signerInfo.getEncryptedDigest().getOctets();
   }
-  
+
   public static IssuerAndSerialNumber getIssuerAndSerialNumber(SignedData signedData) {
     SignerInfo signerInfo = getSignerInfo(signedData);
     SignerIdentifier signerIdentifier = signerInfo.getSID();
@@ -340,7 +340,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
     return new IssuerAndSerialNumber(issuer, serialNumber);
   }
-  
+
   private static SignerInfo getSignerInfo(SignedData signedData)  {
     ASN1Set signerInfos = signedData.getSignerInfos();
     if (signerInfos.size() > 1) {
@@ -352,7 +352,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     }
     return null;
   }
-  
+
   public static X509Certificate getDocSigningCertificate(SignedData signedData) throws CertificateException {
     byte[] certSpec = null;
     ASN1Set certs = signedData.getCertificates();
@@ -367,7 +367,7 @@ import org.jmrtd.JMRTDSecurityProvider;
       //      certObject = new X509CertificateObject(X509CertificateStructure.getInstance(certAsASN1Object)); // NOTE: <= BC 1.47
       certSpec = certObject.getEncoded();
     }
-    
+
     /*
      * NOTE: we could have just returned that X509CertificateObject here,
      * but by reconstructing it using the client's default provider we hide
@@ -382,7 +382,7 @@ import org.jmrtd.JMRTDSecurityProvider;
       return certObject;
     }
   }
-  
+
   public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
       String contentTypeOID, ContentInfo contentInfo, byte[] encryptedDigest,
       X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException, IOException {
@@ -392,7 +392,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Object());
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }  
-  
+
   public static SignerInfo createSignerInfo(String digestAlgorithm,
       String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
       byte[] encryptedDigest, X509Certificate docSigningCertificate) throws NoSuchAlgorithmException {
@@ -401,16 +401,16 @@ import org.jmrtd.JMRTDSecurityProvider;
     X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
     BigInteger serial = ((X509Certificate)docSigningCertificate).getSerialNumber();
     SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
-    
+
     AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
     AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestEncryptionAlgorithm)));
-    
+
     ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
     ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
     ASN1Set unAuthenticatedAttributes = null; // should be empty set?
     return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
   }
-  
+
   public static ASN1Set createAuthenticatedAttributes(String digestAlgorithm, String contentTypeOID, ContentInfo contentInfo) throws NoSuchAlgorithmException {
     /* Check bug found by Paulo Assumpco. */
     if ("SHA256".equals(digestAlgorithm)) { digestAlgorithm = "SHA-256"; }
@@ -423,14 +423,14 @@ import org.jmrtd.JMRTDSecurityProvider;
     ASN1Object[] result = { contentTypeAttribute.toASN1Primitive(), messageDigestAttribute.toASN1Primitive() };
     return new DLSet(result);
   }
-  
+
   public static ASN1Sequence createDigestAlgorithms(String digestAlgorithm) throws NoSuchAlgorithmException {
     ASN1ObjectIdentifier algorithmIdentifier = new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm));
     ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(algorithmIdentifier);
     return new DLSequence(v);
   }
-  
+
   public static ASN1Sequence createCertificate(X509Certificate cert) throws CertificateException {
     try {
       byte[] certSpec = cert.getEncoded();
@@ -445,7 +445,7 @@ import org.jmrtd.JMRTDSecurityProvider;
       throw new CertificateException("Could not construct certificate byte stream");
     }
   }
-  
+
   public static byte[] signData(String digestAlgorithm, String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey, String provider) {
     byte[] encryptedDigest = null;
     try {
@@ -465,11 +465,11 @@ import org.jmrtd.JMRTDSecurityProvider;
     }
     return encryptedDigest;
   }
-  
+
   private static ASN1Set createSingletonSet(ASN1Object e) {
     return new DLSet(new ASN1Encodable[] { e });
   }
-  
+
   /**
    * Gets the common mnemonic string (such as "SHA1", "SHA256withRSA") given an OID.
    *
@@ -509,7 +509,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     if (oid.equals(PKCS1_SHA256_WITH_RSA_AND_MGF1)) { return "SHA256withRSAandMGF1"; }
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
-  
+
   public static String lookupOIDByMnemonic(String name) throws NoSuchAlgorithmException {
     if (name.equals("O")) { return X509ObjectIdentifiers.organization.getId(); }
     if (name.equals("OU")) { return X509ObjectIdentifiers.organizationalUnitName.getId(); }

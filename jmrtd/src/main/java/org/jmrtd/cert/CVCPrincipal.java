@@ -36,13 +36,13 @@ import net.sf.scuba.data.Country;
  * @version $Revision$
  */
 public class CVCPrincipal implements Principal, Serializable {
-  
+
   private static final long serialVersionUID = -4905647207367309688L;
-  
+
   private Country country;
   private String mnemonic;
   private String seqNumber;
-  
+
   /**
    * Constructs a principal.
    *
@@ -57,7 +57,7 @@ public class CVCPrincipal implements Principal, Serializable {
     mnemonic = name.substring(2, name.length() - 5);
     seqNumber = name.substring(name.length() - 5, name.length());
   }
-  
+
   /**
    * Constructs a principal.
    * 
@@ -66,13 +66,17 @@ public class CVCPrincipal implements Principal, Serializable {
    * @param seqNumber the sequence number
    */
   public CVCPrincipal(Country country, String mnemonic, String seqNumber) {
-    if (mnemonic == null || mnemonic.length() > 9) { throw new IllegalArgumentException("Wrong length mnemonic"); }
-    if (seqNumber == null || seqNumber.length() != 5) { throw new IllegalArgumentException("Wrong length seqNumber"); }
+    if (mnemonic == null || mnemonic.length() > 9) {
+      throw new IllegalArgumentException("Wrong length mnemonic");
+    }
+    if (seqNumber == null || seqNumber.length() != 5) {
+      throw new IllegalArgumentException("Wrong length seqNumber");
+    }
     this.country = country;
     this.mnemonic = mnemonic;
     this.seqNumber = seqNumber;
   }
-  
+
   /**
    * Consists of the concatenation of
    * country code (length 2), mnemonic (length &lt; 9) and
@@ -83,7 +87,7 @@ public class CVCPrincipal implements Principal, Serializable {
   public String getName() {
     return country.toAlpha2Code() + mnemonic + seqNumber;
   }
-  
+
   /**
    * Gets a textual representation of this principal.
    * 
@@ -92,7 +96,7 @@ public class CVCPrincipal implements Principal, Serializable {
   public String toString() {
     return country.toAlpha2Code() + "/" + mnemonic + "/" + seqNumber;
   }
-  
+
   /**
    * Gets the country.
    *
@@ -101,7 +105,7 @@ public class CVCPrincipal implements Principal, Serializable {
   public Country getCountry() {
     return country;
   }
-  
+
   /**
    * Gets the mnemonic.
    *
@@ -110,7 +114,7 @@ public class CVCPrincipal implements Principal, Serializable {
   public String getMnemonic() {
     return mnemonic;
   }
-  
+
   /**
    * Gets the sequence number.
    *
@@ -119,7 +123,7 @@ public class CVCPrincipal implements Principal, Serializable {
   public String getSeqNumber() {
     return seqNumber;
   }
-  
+
   /**
    * Tests for equality with respect to another object.
    * 
@@ -128,15 +132,21 @@ public class CVCPrincipal implements Principal, Serializable {
    * @return whether this principal equals the other object
    */
   public boolean equals(Object otherObj) {
-    if (otherObj == null) { return false; }
-    if (otherObj == this) { return true; }
-    if (!otherObj.getClass().equals(this.getClass())) { return false; }
+    if (otherObj == null) {
+      return false;
+    }
+    if (otherObj == this) {
+      return true;
+    }
+    if (!otherObj.getClass().equals(this.getClass())) {
+      return false;
+    }
     CVCPrincipal otherPrincipal = (CVCPrincipal)otherObj;
     return otherPrincipal.country.equals(this.country)
         && otherPrincipal.mnemonic.equals(this.mnemonic)
         && otherPrincipal.seqNumber.equals(this.seqNumber);
   }
-  
+
   /**
    * Gets a hash code of this object.
    * 

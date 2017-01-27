@@ -60,23 +60,23 @@ import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 public class SODFileTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** We need this for SHA-256 (and probably more). */
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
   private static final String BC_PROVIDER_NAME = BC_PROVIDER == null ? null : BC_PROVIDER.getName();
-  
+
   public SODFileTest(String name) {
     super(name);
   }
-  
+
   public void testReflexive() {
     testReflexive(createTestObject("SHA-1", "SHA1WithRSA"));
     testReflexive(createTestObject("SHA-256", "SHA256WithRSA"));
     testReflexive(createTestObject("SHA-256", "SHA256WithECDSA"));
   }
-  
+
   private byte[] readBytes(InputStream inputStream) throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     int nRead;
@@ -87,24 +87,24 @@ public class SODFileTest extends TestCase {
     buffer.flush();
     return buffer.toByteArray();
   }
-  
+
   public void testDecodeEncode() {
     testDecodeEncode(createMustermannSampleInputStream());
   }
-  
+
   public void testDecodeEncode(InputStream inputStream) {
     try {
       byte[] bytes = readBytes(inputStream);
       SODFile sodFile = new SODFile(new ByteArrayInputStream(bytes));
       byte[] encoded = sodFile.getEncoded();
-      
+
       assertTrue(Arrays.equals(bytes, encoded));
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Failed", e);
       fail(e.getMessage());
     }
   }
-  
+
   public void testReflexive(SODFile sodFile) {
     try {
       byte[] encoded = sodFile.getEncoded();
@@ -117,18 +117,18 @@ public class SODFileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   private static KeyPair createRSATestKeyPair() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(1024);
     return keyPairGenerator.generateKeyPair();
   }
-  
+
   private static KeyPair createECTestKeyPair() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
     return keyPairGenerator.generateKeyPair();
   }
-  
+
   public void testSODInFile(String file) {
     try {
       Provider[] providers = 	Security.getProviders();
@@ -147,37 +147,37 @@ public class SODFileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testFields() {
     testFields(createTestObject("SHA-1", "SHA1WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithECDSA"));
   }
-  
+
   public void testFields(SODFile sodFile) {
     try {
       String ldsVersion = sodFile.getLDSVersion();
       assertTrue(ldsVersion == null || ldsVersion.length() == "aabb".length());
-      
+
       String unicodeVersion = sodFile.getUnicodeVersion();
       assertTrue(unicodeVersion == null || unicodeVersion.length() == "aabbcc".length());
-      
+
       X509Certificate certificate = sodFile.getDocSigningCertificate();
-      
+
       BigInteger serialNumber = sodFile.getSerialNumber();
-      
+
       if (serialNumber != null && certificate != null) {
         assertTrue("serialNumber = " + serialNumber + ", certificate.getSerialNumber() = " + certificate.getSerialNumber(),
             serialNumber.equals(certificate.getSerialNumber()));
       }
-      
+
       X500Principal issuer = sodFile.getIssuerX500Principal();
-      
+
       //      LOGGER.info("DEBUG: issuer = " + issuer);
-      
+
       String issuerName = issuer.getName(X500Principal.RFC2253);
       assertNotNull(issuerName);
-      
+
       if (issuer != null && certificate != null) {
         X500Principal certIssuer = certificate.getIssuerX500Principal();
         //        LOGGER.info("DEBUG: certIssuer = " + certIssuer);
@@ -186,10 +186,10 @@ public class SODFileTest extends TestCase {
         //				assertTrue("issuerName = \"" + issuerName + "\", certIssuerName = \"" + certIssuerName + "\"",
         //						certIssuerName.equals(issuerName));
       }
-      
+
       String digestAlgorithm = sodFile.getDigestAlgorithm();
       String digestEncryptionAlgorithm = sodFile.getDigestEncryptionAlgorithm();
-      
+
       assertNotNull(digestAlgorithm);
       assertNotNull(digestEncryptionAlgorithm);
     } catch (Exception ce) {
@@ -197,11 +197,11 @@ public class SODFileTest extends TestCase {
       fail(ce.getMessage());
     }
   }
-  
+
   public void testMustermann() {
     testFile(createMustermannSampleInputStream());
   }
-  
+
   public void testFile(InputStream in) {
     try {
       SODFile sodFile = new SODFile(in);
@@ -212,11 +212,11 @@ public class SODFileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public static SODFile createTestObject(String digestAlgorithm, String signatureAlgorithm) {
     try {
       Security.insertProviderAt(BC_PROVIDER, 4);
-      
+
       Date today = Calendar.getInstance().getTime();
       DG1File dg1File = DG1FileTest.createTestObject();
       byte[] dg1Bytes = dg1File.getEncoded();
@@ -224,7 +224,7 @@ public class SODFileTest extends TestCase {
       byte[] dg2Bytes = dg2File.getEncoded();			
       //			DG15File dg15File = DG15FileTest.createTestObject();
       //			byte[] dg15Bytes = dg15File.getEncoded();
-      
+
       KeyPair keyPair = signatureAlgorithm.endsWith("RSA") ? createRSATestKeyPair() : createECTestKeyPair();
       PublicKey publicKey = keyPair.getPublic();
       PrivateKey privateKey = keyPair.getPrivate();
@@ -246,12 +246,12 @@ public class SODFileTest extends TestCase {
       hashes.put(2, digest.digest(dg2Bytes));
       //			hashes.put(15, digest.digest(dg15Bytes));
       //			byte[] encryptedDigest = new byte[128]; // Arbitrary value. Use a private key to generate a real signature?
-      
+
       SODFile sod = new SODFile(digestAlgorithm, signatureAlgorithm, hashes, privateKey, docSigningCert);
-      
+
       int[] dgPresenceList = { LDSFile.EF_DG1_TAG, LDSFile.EF_DG2_TAG };
       COMFile com = new COMFile("1.7", "4.0.0", dgPresenceList);
-      
+
       //			File outputDir = new File("tmp");
       //			if (!outputDir.exists()) {
       //				if (!outputDir.mkdirs()) {
@@ -267,7 +267,7 @@ public class SODFileTest extends TestCase {
       //			comOut.write(com.getEncoded());
       //			comOut.flush();
       //			comOut.close();
-      
+
       //			FileOutputStream dg1Out = new FileOutputStream(new File(outputDir, "DataGroup1.bin"));
       //			dg1Out.write(dg1File.getEncoded());
       //			dg1Out.flush();
@@ -282,14 +282,14 @@ public class SODFileTest extends TestCase {
       //			sodOut.write(sod.getEncoded());
       //			sodOut.flush();
       //			sodOut.close();
-      
+
       return sod;
     } catch (Exception e) {
       e.printStackTrace();
       return null;
     }
   }
-  
+
   public InputStream createMustermannSampleInputStream() {
     try {
       return ResourceUtil.getInputStream("/lds/bsi2008/EF_SOD.bin");

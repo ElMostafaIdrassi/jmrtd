@@ -49,25 +49,25 @@ import org.jmrtd.lds.iso19794.FingerInfo;
  * @version $Revision$
  */
 public class DG3File extends CBEFFDataGroup<FingerInfo> {
-  
+
   private static final long serialVersionUID = -1037522331623814528L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FingerInfo>() {
     public FingerInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
       return new FingerInfo(sbh, inputStream);
     }
   });
-  
+
   private static final ISO781611Encoder<FingerInfo> ENCODER = new ISO781611Encoder<FingerInfo>(new BiometricDataBlockEncoder<FingerInfo>() {
     public void encode(FingerInfo info, OutputStream outputStream) throws IOException {
       info.writeObject(outputStream);
     }
   });
-  
+
   private boolean shouldAddRandomDataIfEmpty;
-  
+
   /**
    * Creates a new file with the specified records.
    * 
@@ -76,7 +76,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
   public DG3File(List<FingerInfo> fingerInfos) {
     this(fingerInfos, true);
   }
-  
+
   /**
    * Creates a new file with the specified records.
    * 
@@ -87,7 +87,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
     super(EF_DG3_TAG, fingerInfos);
     this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
   }
-  
+
   /**
    * Creates a new file based on an input stream.
    *
@@ -98,7 +98,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
   public DG3File(InputStream inputStream) throws IOException {
     super(EF_DG3_TAG, inputStream);
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = DECODER.decode(inputStream);
     List<CBEFFInfo> records = cbeffInfo.getSubRecords();
@@ -113,10 +113,10 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
       FingerInfo fingerInfo = (FingerInfo)bdb;
       add(fingerInfo);
     }
-    
+
     /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
   }
-  
+
   protected void writeContent(OutputStream outputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
     List<FingerInfo> fingerInfos = getSubRecords();
@@ -125,13 +125,13 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
       cbeffInfo.add(simpleCBEFFInfo);
     }
     ENCODER.encode(cbeffInfo, outputStream);
-    
+
     /* NOTE: Supplement to ICAO Doc 9303 R7-p1_v2_sIII_0057. */
     if (shouldAddRandomDataIfEmpty) {
       writeOptionalRandomData(outputStream);
     }
   }
-  
+
   /**
    * Gets a textual representation of this file.
    * 
@@ -140,21 +140,21 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
   public String toString() {
     return "DG3File [" + super.toString() + "]";
   }
-  
+
   /**
    * Gets the finger infos embedded in this file.
    * 
    * @return finger infos
    */
   public List<FingerInfo> getFingerInfos() { return getSubRecords(); }
-  
+
   /**
    * Adds a finger info to this file.
    * 
    * @param fingerInfo the finger info to add
    */
   public void addFingerInfo(FingerInfo fingerInfo) { add(fingerInfo); }
-  
+
   /**
    * Removes a finger info from this file.
    * 

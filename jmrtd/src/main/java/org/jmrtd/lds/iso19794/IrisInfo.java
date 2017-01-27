@@ -50,26 +50,26 @@ import org.jmrtd.lds.AbstractListInfo;
  * @version $Revision$
  */
 public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> implements BiometricDataBlock {
-  
+
   private static final long serialVersionUID = -3415309711643815511L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Format identifier 'I', 'I', 'R', 0x00. */
   private static final int FORMAT_IDENTIFIER = 0x49495200;
-  
+
   /** Version number. */
   private static final int VERSION_NUMBER = 0x30313000;
-  
+
   /** Format owner identifier of ISO/IEC JTC1/SC37. */
   private static final int FORMAT_OWNER_VALUE = 0x0101;
-  
+
   /**
    * ISO/IEC JTC1/SC37 uses 0x0009 according to <a href="http://www.ibia.org/cbeff/_bdb.php">IBIA</a>.
    * (ISO FCD 19794-6 specified this as 0x0601).
    */	
   private static final int FORMAT_TYPE_VALUE = 0x0009;
-  
+
   /** Image format */
   /* TODO: reference to specification. */
   public static final int
@@ -81,17 +81,17 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   IMAGEFORMAT_RGB_JPEG_LS = 12, /* (0x000C) */
   IMAGEFORMAT_MONO_JPEG2000 = 14, /* (0x000E) */
   IMAGEFORMAT_RGB_JPEG2000 = 16; /* (0x0010) */
-  
+
   /** Constant for capture device Id, based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int
   CAPTURE_DEVICE_UNDEF = 0;
-  
+
   /** Constant for horizontal and veritical orientation, based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int
   ORIENTATION_UNDEF = 0,
   ORIENTATION_BASE = 1,
   ORIENTATION_FLIPPED = 2;
-  
+
   /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int
   SCAN_TYPE_UNDEF = 0,
@@ -99,54 +99,54 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   SCAN_TYPE_INTERLACE_FRAME = 2,
   SCAN_TYPE_INTERLACE_FIELD = 3,
   SCAN_TYPE_CORRECTED = 4;
-  
+
   /** Iris occlusion (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int
   IROCC_UNDEF = 0,
   IROCC_PROCESSED = 1;
-  
+
   /** Iris occlusion filling (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int
   IROCC_ZEROFILL = 0,
   IROC_UNITFILL = 1;
-  
+
   /* TODO: reference to specification. */
   public static final int
   INTENSITY_DEPTH_UNDEF = 0;
-  
+
   /* TODO: reference to specification. */
   public static final int
   TRANS_UNDEF = 0, TRANS_STD = 1;
-  
+
   /* TODO: reference to specification. */
   public static final int
   IRBNDY_UNDEF = 0,
   IRBNDY_PROCESSED = 1;
-  
+
   private long recordLength;
-  
+
   private int captureDeviceId; /* 16 bit */
-  
+
   private int horizontalOrientation, verticalOrientation;
   private int scanType;
   private int irisOcclusion;
   private int occlusionFilling;
   private int boundaryExtraction;
-  
+
   private int irisDiameter;
   private int imageFormat;
   private int rawImageWidth, rawImageHeight;
   private int intensityDepth;
   private int imageTransformation;
-  
+
   /*
    * Length 16, starts with 'D' (serial), 'M' (MAC address) or 'P' (processor Id),
    * or all zeroes (indicating no serial number).
    */
   private byte[] deviceUniqueId;
-  
+
   private StandardBiometricHeader sbh;
-  
+
   /**
    * Constructs a new iris info object.
    * 
@@ -178,7 +178,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
         rawImageWidth, rawImageHeight, intensityDepth, imageTransformation,
         deviceUniqueId, irisBiometricSubtypeInfos);
   }
-  
+
   /**
    * Constructs a new iris info object.
    * 
@@ -232,7 +232,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     System.arraycopy(deviceUniqueId, 0, this.deviceUniqueId, 0, deviceUniqueId.length);
     this.recordLength = headerLength + dataLength;
   }
-  
+
   /**
    * Constructs an iris info from binary encoding.
    * 
@@ -243,7 +243,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public IrisInfo(InputStream inputStream) throws IOException {
     this(null, inputStream);
   }
-  
+
   /**
    * Constructs an iris info from binary encoding.
    * 
@@ -256,7 +256,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     this.sbh = sbh;
     readObject(inputStream);
   }
-  
+
   /**
    * Reads this iris info from input stream.
    * 
@@ -265,27 +265,27 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
    * @throws IOException if reading fails
    */
   public void readObject(InputStream inputStream) throws IOException {
-    
+
     /* Iris Record Header (45) */
-    
+
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
-    
+
     int iir0 = dataIn.readInt(); /* format id (e.g. "IIR" 0x00) */				/* 4 */
     if (iir0 != FORMAT_IDENTIFIER) { throw new IllegalArgumentException("'IIR' marker expected! Found " + Integer.toHexString(iir0)); }
-    
+
     int version = dataIn.readInt(); /* version (e.g. "010" 0x00) */				/* + 4 = 8 */
     if (version != VERSION_NUMBER) { throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version)); }
-    
+
     this.recordLength = dataIn.readInt(); /* & 0x00000000FFFFFFFFL */			/* + 4 = 12 */
     long headerLength = 45;
     long dataLength = this.recordLength - headerLength;
-    
+
     captureDeviceId = dataIn.readUnsignedShort();								/* + 2 = 14 */
     int count = dataIn.readUnsignedByte();							/* + 1 = 15 */
-    
+
     int recordHeaderLength = dataIn.readUnsignedShort(); /* Should be 45. */	/* + 2 = 17 */
     if (recordHeaderLength != headerLength) { throw new IllegalArgumentException("Expected header length " + headerLength + ", found " + recordHeaderLength); }
-    
+
     /*
      *  16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1
      * [  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  ]
@@ -303,14 +303,14 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     irisOcclusion = (imagePropertiesBits & 0x0080) >> 7;
     occlusionFilling = (imagePropertiesBits & 0x0100) >> 8;
     boundaryExtraction = (imagePropertiesBits & 0x0200) >> 9;
-    
+
     irisDiameter = dataIn.readUnsignedShort();									/* + 2 = 21 */
     imageFormat = dataIn.readUnsignedShort();									/* + 2 = 23 */
     rawImageWidth = dataIn.readUnsignedShort();									/* + 2 = 25 */
     rawImageHeight = dataIn.readUnsignedShort();								/* + 2 = 27 */
     intensityDepth = dataIn.readUnsignedByte();									/* + 1 = 28*/
     imageTransformation =  dataIn.readUnsignedByte();							/* + 1 = 29 */
-    
+
     /*
      * A 16 character string uniquely identifying the
      * device or source of the data. This data can be
@@ -322,9 +322,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
      */
     deviceUniqueId = new byte[16];												/* + 16 = 45 */
     dataIn.readFully(deviceUniqueId);
-    
+
     long constructedDataLength = 0L;
-    
+
     /* A record contains biometric subtype (or: 'feature') blocks (which contain image data blocks)... */
     for (int i = 0; i < count; i++) {
       IrisBiometricSubtypeInfo biometricSubtypeInfo = new IrisBiometricSubtypeInfo(inputStream, imageFormat);
@@ -336,7 +336,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       //			throw new IllegalStateException("DEBUG: constructed DataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
     }
   }
-  
+
   /**
    * Writes this iris info to an output stream.
    * 
@@ -345,31 +345,31 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
    * @throws IOException if writing fails
    */
   public void writeObject(OutputStream outputStream) throws IOException {
-    
+
     int headerLength = 45;
-    
+
     int dataLength = 0;
     List<IrisBiometricSubtypeInfo> biometricSubtypeInfos = getSubRecords();
     for (IrisBiometricSubtypeInfo biometricSubtypeInfo: biometricSubtypeInfos) {
       dataLength += biometricSubtypeInfo.getRecordLength();
     }
-    
+
     int recordLength = headerLength + dataLength;
-    
+
     /* Iris Record Header (45) */
-    
+
     DataOutputStream dataOut = outputStream instanceof DataOutputStream ? (DataOutputStream)outputStream : new DataOutputStream(outputStream);
-    
+
     dataOut.writeInt(FORMAT_IDENTIFIER); /* header (e.g. "IIR", 0x00) */		/* 4 */
     dataOut.writeInt(VERSION_NUMBER); /* version in ASCII (e.g. "010" 0x00) */	/* +4 = 8 */
-    
+
     dataOut.writeInt(recordLength); /* NOTE: bytes 9-12, i.e. 4 bytes, despite "unsigned long" in ISO/IEC FCD 19749-6. */ /* +4 = 12 */
-    
+
     dataOut.writeShort(captureDeviceId);										/* +2 = 14 */
-    
+
     dataOut.writeByte(biometricSubtypeInfos.size());									/* +1 = 15 */
     dataOut.writeShort(headerLength);											/* +2 = 17 */
-    
+
     int imagePropertiesBits = 0;
     imagePropertiesBits |= (horizontalOrientation & 0x0003);
     imagePropertiesBits |= ((verticalOrientation << 2) & 0x00C);
@@ -378,7 +378,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     imagePropertiesBits |= ((occlusionFilling << 8) & 0x0100);
     imagePropertiesBits |= ((boundaryExtraction << 9) & 0x0200);
     dataOut.writeShort(imagePropertiesBits);									/* +2 = 19 */
-    
+
     dataOut.writeShort(irisDiameter);											/* +2 = 21 */
     dataOut.writeShort(imageFormat);											/* +2 = 23 */
     dataOut.writeShort(rawImageWidth);											/* +2 = 25 */
@@ -386,12 +386,12 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     dataOut.writeByte(intensityDepth);											/* +1 = 28 */
     dataOut.writeByte(imageTransformation);										/* +1 = 29 */
     dataOut.write(deviceUniqueId); /* array of length 16 */						/* + 16 = 45 */
-    
+
     for (IrisBiometricSubtypeInfo biometricSubtypeInfo: biometricSubtypeInfos) {
       biometricSubtypeInfo.writeObject(outputStream);
     }
   }
-  
+
   /**
    * Gets the capture device id.
    * 
@@ -400,7 +400,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getCaptureDeviceId() {
     return captureDeviceId;
   }
-  
+
   /**
    * Gets the horizontal orientation
    * 
@@ -409,7 +409,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getHorizontalOrientation() {
     return horizontalOrientation;
   }
-  
+
   /**
    * Gets the vertical orientation
    * 
@@ -418,7 +418,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getVerticalOrientation() {
     return verticalOrientation;
   }
-  
+
   /**
    * Gets the scan type.
    * 
@@ -427,7 +427,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getScanType() {
     return scanType;
   }
-  
+
   /**
    * Gets the iris occlusion.
    * 
@@ -436,7 +436,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getIrisOcclusion() {
     return irisOcclusion;
   }
-  
+
   /**
    * Gets the iris occlusing filling.
    * 
@@ -445,7 +445,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getOcclusionFilling() {
     return occlusionFilling;
   }
-  
+
   /**
    * Gets the boundary extraction.
    * 
@@ -454,7 +454,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getBoundaryExtraction() {
     return boundaryExtraction;
   }
-  
+
   /**
    * Gets the iris diameter.
    * 
@@ -463,7 +463,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getIrisDiameter() {
     return irisDiameter;
   }
-  
+
   /**
    * Gets the image format.
    * 
@@ -472,7 +472,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getImageFormat() {
     return imageFormat;
   }
-  
+
   /**
    * Gets the raw image width.
    * 
@@ -481,7 +481,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getRawImageWidth() {
     return rawImageWidth;
   }
-  
+
   /**
    * Gets the raw image height.
    * 
@@ -490,7 +490,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getRawImageHeight() {
     return rawImageHeight;
   }
-  
+
   /**
    * Gets the intensity depth.
    * 
@@ -499,7 +499,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getIntensityDepth() {
     return intensityDepth;
   }
-  
+
   /**
    * Gets the image transformation.
    * 
@@ -508,7 +508,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public int getImageTransformation() {
     return imageTransformation;
   }
-  
+
   /**
    * Gets the device unique id.
    * 
@@ -517,7 +517,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   public byte[] getDeviceUniqueId() {
     return deviceUniqueId;
   }
-  
+
   /**
    * Gets the standard biometric header of this iris info.
    * 
@@ -529,18 +529,18 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       byte[] biometricSubtype = { (byte)getBiometricSubtype() };
       byte[] formatOwner = { (byte)((FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(FORMAT_OWNER_VALUE & 0xFF) };
       byte[] formatType = { (byte)((FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(FORMAT_TYPE_VALUE & 0xFF) };
-      
+
       SortedMap<Integer, byte[]> elements = new TreeMap<Integer, byte[]>();
       elements.put(ISO781611.BIOMETRIC_TYPE_TAG, biometricType);
       elements.put(ISO781611.BIOMETRIC_SUBTYPE_TAG, biometricSubtype);
       elements.put(ISO781611.FORMAT_OWNER_TAG, formatOwner);
       elements.put(ISO781611.FORMAT_TYPE_TAG, formatType);
-      
+
       sbh = new StandardBiometricHeader(elements);
     }
     return sbh;
   }
-  
+
   /**
    * Generates a textual representation of this object.
    * 
@@ -555,30 +555,30 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     result.append("]");
     return result.toString();
   }
-  
+
   /**
    * Gets the iris biometric subtype infos embedded in this iris info.
    * 
    * @return iris biometric subtype infos
    */
   public List<IrisBiometricSubtypeInfo> getIrisBiometricSubtypeInfos() { return getSubRecords(); }
-  
+
   /**
    * Adds an iris biometric subtype info to this iris info.
    * 
    * @param irisBiometricSubtypeInfo an iris biometric subtype info
    */
   public void addIrisBiometricSubtypeInfo(IrisBiometricSubtypeInfo irisBiometricSubtypeInfo) { add(irisBiometricSubtypeInfo); }
-  
+
   /**
    * Removes an iris biometric subtype info from this iris info.
    * 
    * @param index the index of the biometric subtype info to remove
    */
   public void removeIrisBiometricSubtypeInfo(int index) { remove(index); }
-  
+
   /* ONLY PRIVATE METHODS BELOW */
-  
+
   private int getBiometricSubtype() {
     int result = CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
     List<IrisBiometricSubtypeInfo> irisBiometricSubtypeInfos = getSubRecords();

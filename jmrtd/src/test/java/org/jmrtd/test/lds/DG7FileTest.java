@@ -40,17 +40,17 @@ import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 public class DG7FileTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public DG7FileTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     testToString(createEmptyTestObject(), "DG7File []");
   }
-  
+
   public void testToString(DG7File dg7File, String expectedResult) {
     try {
       assertNotNull(dg7File);
@@ -60,14 +60,14 @@ public class DG7FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testType() {
     testType(createEmptyTestObject());
-    
+
     DG7File dg7 = createNumTestObject(1);
     testType(dg7);
   }
-  
+
   public void testType(DG7File dg7File) {
     try {
       assertNotNull(dg7File);
@@ -80,18 +80,18 @@ public class DG7FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testNonNullEncoded() {
     DG7File dg7File = createEmptyTestObject();
     assertNotNull(dg7File);
     byte[] encoded = dg7File.getEncoded();
     assertNotNull(encoded);
   }
-  
+
   public void testReflexive() {
     testEncodeDecode(createEmptyTestObject());
   }
-  
+
   public void testNum() {
     for (int n = 1; n < 10; n++) {
       DG7File dg7File = createNumTestObject(n);
@@ -103,7 +103,7 @@ public class DG7FileTest extends TestCase {
       testElements(dg7File);
     }
   }
-  
+
   public void testElements(DG7File dg7File) {
     assertNotNull(dg7File);
     List<DisplayedImageInfo> imageInfos = dg7File.getImages();
@@ -111,7 +111,7 @@ public class DG7FileTest extends TestCase {
       assertNotNull(imageInfo);
     }
   }
-  
+
   public void testEncodeDecode(DG7File dg7File) {
     try {
       byte[] encoded = dg7File.getEncoded();
@@ -127,7 +127,7 @@ public class DG7FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testCreate() {
     try {
       DG7File dg7 = createTestObject();
@@ -139,12 +139,12 @@ public class DG7FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public static DG7File createEmptyTestObject() {
     List<DisplayedImageInfo> images = new LinkedList<DisplayedImageInfo>();
     return new DG7File(images);
   }
-  
+
   public static DG7File createNumTestObject(int n) {
     List<DisplayedImageInfo> images = new LinkedList<DisplayedImageInfo>();
     for (int i = 0; i < n; i++) {
@@ -155,14 +155,14 @@ public class DG7FileTest extends TestCase {
     DG7File dg7File = new DG7File(images);
     return dg7File;
   }
-  
+
   public static DG7File createTestObject() {
     byte[] image = createTrivialJPEGBytes(958, 208);
     DisplayedImageInfo imageInfo = new DisplayedImageInfo(ImageInfo.TYPE_SIGNATURE_OR_MARK, image);
     DG7File dg7File = new DG7File(Arrays.asList(new DisplayedImageInfo[] { imageInfo }));
     return dg7File;
   }
-  
+
   public void testFile(InputStream in) {
     try {
       testEncodeDecode(new DG7File(in));
@@ -170,7 +170,7 @@ public class DG7FileTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   private static byte[] createTrivialJPEGBytes(int width, int height) {
     try {
       BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

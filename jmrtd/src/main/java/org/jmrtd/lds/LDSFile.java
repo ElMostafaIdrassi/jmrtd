@@ -30,7 +30,7 @@ package org.jmrtd.lds;
  * @version $Revision$
  */
 public interface LDSFile extends LDSElement {
-  
+
   /**
    * ICAO specific data group tag.
    * Note that in EAC 1.11 documents there is also the CVCA file that has no tag.
@@ -54,7 +54,7 @@ public interface LDSFile extends LDSElement {
   EF_DG15_TAG = 0x6F,
   EF_DG16_TAG = 0x70,
   EF_SOD_TAG = 0x77;
-  
+
   /**
    * Gets the length of this file.
    * 

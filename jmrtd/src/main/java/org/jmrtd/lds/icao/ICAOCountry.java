@@ -33,7 +33,7 @@ import net.sf.scuba.data.Country;
  * @version $Revision$
  */
 public class ICAOCountry extends Country {
-  
+
   public static final ICAOCountry
   DE = new ICAOCountry("DE", "D<<", "Germany", "German"),
   GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen"),
@@ -51,19 +51,19 @@ public class ICAOCountry extends Country {
   XXB = new ICAOCountry("XX","XXB","Refugee", "Refugee"),
   XXC = new ICAOCountry("XX","XXC","Refugee (other)", "Refugee (other)"),
   XXX = new ICAOCountry("XX","XXX","Unspecified", "Unspecified");
-  
+
   private static ICAOCountry[] VALUES = {
       DE,
       GBD, GBN, GBO, GBP, GBS,
       UNO, UNA, UNK,
       XOM, XCC, XXA, XXB, XXC, XXX
   };
-  
+
   private String name;
   private String nationality;
   private String alpha2Code;
   private String alpha3Code;
-  
+
   /**
    * Gets an ICAO country instance.
    *
@@ -82,28 +82,28 @@ public class ICAOCountry extends Country {
     }
     throw new IllegalArgumentException("Illegal ICAO country alpha 3 code " + alpha3Code);
   }
-  
+
   /**
    * Prevent caller from creating instance.
    */
   private ICAOCountry() {
   }
-  
+
   private ICAOCountry(String alpha2Code, String alpha3Code, String name) {
     this(alpha2Code, alpha3Code, name, name);
   }
-  
+
   private ICAOCountry(String alpha2Code, String alpha3Code, String name, String nationality) {
     this.alpha2Code = alpha2Code;
     this.alpha3Code = alpha3Code;
     this.name = name;
     this.nationality = nationality;
   }
-  
+
   public int valueOf() {
     return -1;
   }
-  
+
   /**
    * Gets the full name of the country.
    *
@@ -112,7 +112,7 @@ public class ICAOCountry extends Country {
   public String getName() {
     return name;
   }
-  
+
   /**
    * Gets the adjectival form corresponding to the country.
    *
@@ -121,7 +121,7 @@ public class ICAOCountry extends Country {
   public String getNationality() {
     return nationality;
   }
-  
+
   /**
    * Gets the two-digit country code.
    *
@@ -130,7 +130,7 @@ public class ICAOCountry extends Country {
   public String toAlpha2Code() {
     return alpha2Code;
   }
-  
+
   /**
    * Gets the three-digit country code.
    *

@@ -56,13 +56,13 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @since 0.5.6
  */
 public class CAProtocol {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private PassportService service;
-  
+
   private SecureMessagingWrapper wrapper;
-  
+
   /**
    * Constructs a protocol instance.
    * 
@@ -73,7 +73,7 @@ public class CAProtocol {
     this.service = service;
     this.wrapper = wrapper;
   }
-  
+
   /**
    * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
    * ver. 1.11. In short, we authenticate the chip with DH or ECDH key agreement
@@ -95,7 +95,7 @@ public class CAProtocol {
     if (piccPublicKey == null) {
       throw new IllegalArgumentException("PICC public key is null");
     }
-    
+
     String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
     if (agreementAlg == null) {
       throw new IllegalArgumentException("Unknown agreement algorithm");
@@ -103,11 +103,11 @@ public class CAProtocol {
     if (!("ECDH".equals(agreementAlg) || "DH".equals(agreementAlg))) {
       throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);  
     }
-    
+
     if (oid == null) {
       oid = inferChipAuthenticationOIDfromPublicKeyOID(publicKeyOID);
     }
-    
+
     try {
       AlgorithmParameterSpec params = null;
       if ("DH".equals(agreementAlg)) {
@@ -117,28 +117,28 @@ public class CAProtocol {
         ECPublicKey piccECPublicKey = (ECPublicKey)piccPublicKey;
         params = piccECPublicKey.getParams();
       }
-      
+
       /* Generate the inspection system's ephemeral key pair. */
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
       PrivateKey pcdPrivateKey = pcdKeyPair.getPrivate();
-      
+
       sendPublicKey(service, wrapper, oid, keyId, pcdPublicKey);
-      
+
       byte[] keyHash = getKeyHash(agreementAlg, pcdPublicKey);
-      
+
       byte[] sharedSecret = computeSharedSecret(agreementAlg, piccPublicKey, pcdPrivateKey);
-      
+
       wrapper = restartSecureMessaging(oid, sharedSecret);
-      
+
       return new CAResult(keyId, piccPublicKey, keyHash, pcdPublicKey, pcdPrivateKey, wrapper);
     } catch (GeneralSecurityException e) {
       throw new CardServiceException(e.toString());
     }
   }
-  
+
   /**
    * Sends the PCD's public key to the PICC.
    * 
@@ -153,16 +153,16 @@ public class CAProtocol {
   public void sendPublicKey(PassportService service, SecureMessagingWrapper wrapper, String oid, BigInteger keyId, PublicKey pcdPublicKey) throws CardServiceException {
     String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
-    
+
     byte[] keyData = getKeyData(agreementAlg, pcdPublicKey);
-    
+
     if (cipherAlg.startsWith("DESede")) {
       byte[] idData = null;
       if (keyId != null) {
         byte[] keyIdBytes = keyId.toByteArray();
         idData = Util.wrapDO((byte)0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
       }
-      
+
       service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData); /* FIXME: Constant for 0x91. */
     } else if (cipherAlg.startsWith("AES")) {
       service.sendMSESetATIntAuth(wrapper, oid, keyId);        
@@ -171,7 +171,7 @@ public class CAProtocol {
       throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
     }
   }
-  
+
   /**
    * Does the key agreement step. Genereates a secret based on the PICC's public key and the PCD's private key.
    * 
@@ -191,7 +191,7 @@ public class CAProtocol {
     agreement.doPhase(piccPublicKey, true);
     return agreement.generateSecret();
   }
-  
+
   /**
    * Restarts secure messaging based on the shared secret.
    * 
@@ -205,11 +205,11 @@ public class CAProtocol {
   public SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret) throws GeneralSecurityException {
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
     int keyLength = ChipAuthenticationInfo.toKeyLength(oid);
-    
+
     /* Start secure messaging. */
     SecretKey ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE);
     SecretKey ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE);
-    
+
     if (cipherAlg.startsWith("DESede")) {
       return new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L);
     } else if (cipherAlg.startsWith("AES")) {
@@ -219,7 +219,7 @@ public class CAProtocol {
       throw new IllegalStateException("Unsupported cipher algorithm " + cipherAlg);
     }
   }
-  
+
   private byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
     if ("DH".equals(agreementAlg)) {
       /* TODO: this is probably wrong, what should be hashed? */
@@ -231,10 +231,10 @@ public class CAProtocol {
       byte[] t = Util.i2os(pcdECPublicKey.getQ().getX().toBigInteger());
       return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
     }
-    
+
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
-  
+
   private byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
     if ("DH".equals(agreementAlg)) {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
@@ -243,10 +243,10 @@ public class CAProtocol {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
       return pcdECPublicKey.getQ().getEncoded();
     }
-    
+
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
-  
+
   /**
    * Gets the secure messaging wrapper currently in use.
    * 
@@ -255,7 +255,7 @@ public class CAProtocol {
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }
-  
+
   /**
    * Infers the Chip Authentication OID form a Chip Authentication public key OID.
    * This is a best effort.
@@ -281,7 +281,7 @@ public class CAProtocol {
     } else {
       LOGGER.severe("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
     }
-    
+
     return null;
   }
 }

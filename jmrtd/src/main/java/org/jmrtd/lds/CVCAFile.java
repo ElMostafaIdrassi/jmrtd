@@ -39,22 +39,22 @@ import org.jmrtd.cert.CVCPrincipal;
  */
 /* TODO: Use CVCPrincipal instead of String for references? */
 public class CVCAFile extends AbstractLDSFile {
-  
+
   private static final long serialVersionUID = -1100904058684365703L;
-  
+
   public static final byte CAR_TAG = 0x42;
   public static final int LENGTH = 36;
-  
+
   private short fid;
-  
+
   private String caReference = null;
-  
+
   private String altCaReference = null;
-  
+
   public CVCAFile(InputStream inputStream) throws IOException {
     this(PassportService.EF_CVCA, inputStream);
   }
-  
+
   /**
    * Constructs a new CVCA file from the data contained in an input stream.
    *
@@ -67,7 +67,7 @@ public class CVCAFile extends AbstractLDSFile {
     this.fid = fid;
     readObject(inputStream);
   }
-  
+
   /**
    * Constructs a new CVCA file with default file identifier.
    *
@@ -77,7 +77,7 @@ public class CVCAFile extends AbstractLDSFile {
   public CVCAFile(String caReference, String altCaReference) {
     this(PassportService.EF_CVCA, caReference, altCaReference);
   }
-  
+
   /**
    * Constructs a new CVCA file with the given certificate references.
    *
@@ -95,7 +95,7 @@ public class CVCAFile extends AbstractLDSFile {
     this.caReference = caReference;
     this.altCaReference = altCaReference;
   }
-  
+
   /**
    * Constructs a new CVCA file with the given certificate reference.
    *
@@ -105,7 +105,7 @@ public class CVCAFile extends AbstractLDSFile {
   public CVCAFile(short fid, String caReference) {
     this(fid, caReference, null);
   }
-  
+
   /**
    * Gets the file identifier of this CVCA file.
    *
@@ -114,7 +114,7 @@ public class CVCAFile extends AbstractLDSFile {
   public short getFID() {
     return fid;
   }
-  
+
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = new DataInputStream(inputStream);
     int tag = dataIn.read();
@@ -139,7 +139,7 @@ public class CVCAFile extends AbstractLDSFile {
       tag = dataIn.read();
     }
   }
-  
+
   protected void writeObject(OutputStream outputStream) throws IOException {
     byte[] result = new byte[LENGTH];
     result[0] = CAR_TAG;
@@ -154,7 +154,7 @@ public class CVCAFile extends AbstractLDSFile {
     }
     outputStream.write(result);
   }
-  
+
   /**
    * Returns the CA Certificate identifier
    *
@@ -163,7 +163,7 @@ public class CVCAFile extends AbstractLDSFile {
   public CVCPrincipal getCAReference() {
     return caReference == null ? null : new CVCPrincipal(caReference);
   }
-  
+
   /**
    * Returns the second (alternative) CA Certificate identifier, null if none
    * exists.
@@ -173,17 +173,18 @@ public class CVCAFile extends AbstractLDSFile {
   public CVCPrincipal getAltCAReference() {
     return altCaReference == null ? null : new CVCPrincipal(altCaReference);
   }
-  
+
   /**
    * Gets a textual representation of this CVCAFile.
    *
    * @return a textual representation of this CVCAFile
    */
+  @Override
   public String toString() {
     return "CA reference: \"" + caReference + "\""
         + ((altCaReference != null) ? ", Alternative CA reference: " + altCaReference : "");
   }
-  
+
   /**
    * Tests whether this CVCAFile is equal to the provided object.
    *
@@ -191,26 +192,33 @@ public class CVCAFile extends AbstractLDSFile {
    *
    * @return whether this CVCAFile equals the other object
    */
+  @Override
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (!this.getClass().equals(other.getClass())) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (!this.getClass().equals(other.getClass())) {
+      return false;
+    }
+
     CVCAFile otherCVCAFile = (CVCAFile)other;
     return caReference.equals(otherCVCAFile.caReference)
         && ((altCaReference == null && otherCVCAFile.altCaReference == null)
             || (altCaReference != null && altCaReference.equals(otherCVCAFile.altCaReference)));
   }
-  
+
   /**
    * Computes a hash code of this CVCAFile.
    *
    * @return a hash code
    */
+  @Override
   public int hashCode() {
     return 11 * caReference.hashCode()
         + ((altCaReference != null) ? 13 * altCaReference.hashCode() : 0)
         + 5;
   }
-  
+
   /**
    * Gets the length of the content of this CVCA file. This always returns {@value #LENGTH}.
    *

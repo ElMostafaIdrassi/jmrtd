@@ -39,13 +39,13 @@ import org.jmrtd.lds.iso19794.FaceInfo;
 import junit.framework.TestCase;
 
 public class FaceInfoTest extends TestCase {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public FaceInfoTest(String name) {
     super(name);
   }
-  
+
   public void testToString() {
     try {
       FaceInfo info = createTestObject();
@@ -57,12 +57,12 @@ public class FaceInfoTest extends TestCase {
       fail(e.toString());
     }
   }
-  
+
   public void testElements() {
     FaceInfo faceInfo = createTestObject();
     testElements(faceInfo);
   }
-  
+
   public void testElements(FaceInfo FaceInfo) {
     List<FaceImageInfo> imageInfos = FaceInfo.getFaceImageInfos();
     LOGGER.info("DEBUG: imageInfos: " + imageInfos.size());
@@ -71,28 +71,28 @@ public class FaceInfoTest extends TestCase {
       imageInfoTest.testEncodeDecode(imageInfo);
     }
   }
-  
+
   public void testSBHFields() {
     try {
       FaceInfo faceInfo = createTestObject();
       testMandatorySBHFields(faceInfo);
       testOptionalSBHFields(faceInfo);
-      
+
       byte[] faceInfoEncoded = faceInfo.getEncoded();
-      
+
       StandardBiometricHeader sbh = faceInfo.getStandardBiometricHeader();
       Map<Integer, byte[]> sbhElements = new HashMap<Integer, byte[]>();
       sbhElements.put(0x87, sbh.getElements().get(0x87)); // FORMAT_OWNER
       sbhElements.put(0x88, sbh.getElements().get(0x88)); // FORMAT_TYPE
-      
+
       FaceInfo faceInfoMinimalSBH = new FaceInfo(new StandardBiometricHeader(sbhElements), new ByteArrayInputStream(faceInfoEncoded));
-      
+
       testMandatorySBHFields(faceInfoMinimalSBH);
     } catch (Exception e) {
       fail(e.getMessage());
     }
   }
-  
+
   /*
    * Doc 9303 says:
    * - Biometric type (Optional, but mandatory if subtype specified) // FIXME: is this true?
@@ -112,7 +112,7 @@ public class FaceInfoTest extends TestCase {
     assertTrue(tags.contains(0x87)); assertTrue(tags.contains(ISO781611.FORMAT_OWNER_TAG));
     assertTrue(tags.contains(0x88)); assertTrue(tags.contains(ISO781611.FORMAT_TYPE_TAG));
   }
-  
+
   public void testOptionalSBHFields(FaceInfo faceInfo) {
     Integer[] possibleTagsArray = { 0x81, 0x82, 0x83, /* 0x84, */ 0x85, 0x86, 0x87, 0x88 };
     Set<Integer> possibleTags = new HashSet<Integer>(Arrays.asList(possibleTagsArray));
@@ -122,13 +122,13 @@ public class FaceInfoTest extends TestCase {
       assertTrue(possibleTags.contains(tag));
     }
   }
-  
+
   public void testEncoded() {
     FaceInfo faceInfo = createTestObject();
     byte[] encoded = faceInfo.getEncoded();
     //		LOGGER.info(Hex.bytesToPrettyString(encoded));
   }
-  
+
   public static FaceInfo createTestObject() {
     List<FaceImageInfo> FaceImageInfos = new LinkedList<FaceImageInfo>();
     FaceImageInfo FaceImageInfo = FaceImageInfoTest.createTestObject();

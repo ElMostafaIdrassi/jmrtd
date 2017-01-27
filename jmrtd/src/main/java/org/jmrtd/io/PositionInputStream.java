@@ -34,62 +34,69 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 public class PositionInputStream extends InputStream {
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final long MARK_NOT_SET = -1L;
-  
+
   private InputStream carrier;
-  
+
   private long position;
   private long markedPosition;
-  
+
   public PositionInputStream(InputStream carrier) {
     this.carrier = carrier;
     position = 0L;
     markedPosition = MARK_NOT_SET;
   }
-  
+
+  @Override
   public int read() throws IOException {
     int b = carrier.read();
     if (b >= 0) { position++; }
     return b;
   }
-  
+
+  @Override
   public int read(byte[] dest) throws IOException {
     return read(dest, 0, dest.length);
   }
-  
+
+  @Override
   public int read(byte[] dest, int offset, int length) throws IOException {
     int bytesRead = carrier.read(dest, offset, length);
     position += bytesRead;
     return bytesRead;
   }
-  
+
+  @Override
   public long skip(long n) throws IOException {
     long skippedBytes = carrier.skip(n);
     if (skippedBytes <= 0) {
       LOGGER.warning("Carrier (" + carrier.getClass().getCanonicalName() + ")'s skip(" + n + ") only skipped " + skippedBytes + ", position = " + position);
     }
-    
+
     position += skippedBytes;
     return skippedBytes;
   }
-  
+
+  @Override
   public void mark(int readLimit) {
     carrier.mark(readLimit);
     markedPosition = position;
   }
-  
+
+  @Override
   public void reset() throws IOException {
     carrier.reset();
     position = markedPosition;
   }
-  
+
+  @Override
   public boolean markSupported() {
     return carrier.markSupported();
   }
-  
+
   public long getPosition() {
     return position;
   }

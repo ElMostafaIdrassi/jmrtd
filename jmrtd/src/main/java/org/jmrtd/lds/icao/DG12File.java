@@ -53,11 +53,11 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class DG12File extends DataGroup {
-  
+
   private static final long serialVersionUID = -1979367459379125674L;
-  
+
   private static final int TAG_LIST_TAG = 0x5C;
-  
+
   public static final int ISSUING_AUTHORITY_TAG = 0x5F19,
       DATE_OF_ISSUE_TAG = 0x5F26,  // yyyymmdd
       NAME_OF_OTHER_PERSON_TAG = 0x5F1A, // formatted per ICAO 9303 rules
@@ -69,10 +69,10 @@ public class DG12File extends DataGroup {
       PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG = 0x5F56,
       CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0, // 5F1A is always used inside A0 constructed object
       COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
-  
+
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
   private static final SimpleDateFormat SDTF = new SimpleDateFormat("yyyyMMddhhmmss");
-  
+
   private String issuingAuthority;
   private Date dateOfIssue;
   private List<String> namesOfOtherPersons;
@@ -82,11 +82,11 @@ public class DG12File extends DataGroup {
   private byte[] imageOfRear;
   private Date dateAndTimeOfPersonalization;
   private String personalizationSystemSerialNumber;
-  
+
   private List<Integer> tagPresenceList;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /**
    * Constructs a new file.
    *
@@ -116,7 +116,7 @@ public class DG12File extends DataGroup {
     this.dateAndTimeOfPersonalization = dateAndTimeOfPersonalization;
     this.personalizationSystemSerialNumber = personalizationSystemSerialNumber;
   }
-  
+
   /**
    * Constructs a new file.
    *
@@ -127,19 +127,19 @@ public class DG12File extends DataGroup {
   public DG12File(InputStream inputStream) throws IOException {
     super(EF_DG12_TAG, inputStream);
   }
-  
+
   protected void readContent(InputStream inputStream) throws IOException {	
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tagListTag = tlvInputStream.readTag();
     if (tagListTag != TAG_LIST_TAG) { throw new IllegalArgumentException("Expected tag list in DG12"); }
-    
+
     int tagListLength = tlvInputStream.readLength();
     int tagListBytesRead = 0;
-    
+
     int expectedTagCount = tagListLength / 2;
-    
+
     ByteArrayInputStream tagListBytesInputStream = new ByteArrayInputStream(tlvInputStream.readValue());
-    
+
     /* Find out which tags are present. */
     List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
     while (tagListBytesRead < tagListLength) {
@@ -149,13 +149,13 @@ public class DG12File extends DataGroup {
       tagListBytesRead += TLVUtil.getTagLength(tag);
       tagList.add(tag);
     }
-    
+
     /* Now read the fields in order. */
     for (int t: tagList) {
       readField(t, tlvInputStream);
     }
   }
-  
+
   /**
    * Gets the tags of fields actually present in this file.
    *
@@ -175,7 +175,7 @@ public class DG12File extends DataGroup {
     if(personalizationSystemSerialNumber != null) { tagPresenceList.add(PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG); }
     return tagPresenceList;
   }
-  
+
   private void readField(int expectedFieldTag, TLVInputStream tlvIn) throws IOException {
     int tag = tlvIn.readTag();
     if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
@@ -212,9 +212,9 @@ public class DG12File extends DataGroup {
       }
     }
   }
-  
+
   /* Field parsing below. */
-  
+
   private void parsePersonalizationSystemSerialNumber(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -225,7 +225,7 @@ public class DG12File extends DataGroup {
       personalizationSystemSerialNumber = new String(value).trim();
     }
   }
-  
+
   private void parseDateAndTimeOfPersonalization(byte[] value) {
     try {
       // the following commented line causes invalid parsing of date and time of personalisation field
@@ -239,15 +239,15 @@ public class DG12File extends DataGroup {
       throw new IllegalArgumentException(pe.toString());
     }
   }
-  
+
   private void parseImageOfFront(byte[] value) {
     imageOfFront =  value;
   }
-  
+
   private void parseImageOfRear(byte[] value) {
     imageOfRear =  value;
   }
-  
+
   private void parseTaxOrExitRequirements(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -258,7 +258,7 @@ public class DG12File extends DataGroup {
       taxOrExitRequirements = new String(value).trim();
     }
   }
-  
+
   private void parseEndorsementsAndObservations(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -269,7 +269,7 @@ public class DG12File extends DataGroup {
       endorsementsAndObservations = new String(value).trim();
     }
   }
-  
+
   private synchronized void parseNameOfOtherPerson(byte[] value) {
     if (namesOfOtherPersons == null) { namesOfOtherPersons = new ArrayList<String>(); }
     try {
@@ -281,10 +281,10 @@ public class DG12File extends DataGroup {
       namesOfOtherPersons.add(new String(value).trim());
     }
   }
-  
+
   private void parseDateOfIssue(byte[] value) {
     if (value == null) { throw new IllegalArgumentException("Wrong date format"); }
-    
+
     /* Try to interpret value as a ccyymmdd formatted date string as per Doc 9303. */
     if (value.length == 8) {
       try {
@@ -300,7 +300,7 @@ public class DG12File extends DataGroup {
       }
     }
     LOGGER.warning("DG12 date of issue is not in expected ccyymmdd ASCII format");
-    
+
     /* Some live French MRTDs encode the date as ccyymmdd but in BCD, not in ASCII. */
     if (value.length == 4) {
       try {
@@ -312,11 +312,11 @@ public class DG12File extends DataGroup {
         LOGGER.severe("Exception: " + e.getMessage());
       }
     }
-    
+
     /* Giving up... we can't parse this date. */
     throw new IllegalArgumentException("Wrong date format");
   }
-  
+
   private void parseIssuingAuthority(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -327,9 +327,9 @@ public class DG12File extends DataGroup {
       issuingAuthority = (new String(value)).trim();
     }
   }
-  
+
   /* Accessors below. */
-  
+
   /**
    * Gets the issuing authority.
    *
@@ -338,7 +338,7 @@ public class DG12File extends DataGroup {
   public String getIssuingAuthority() {
     return issuingAuthority;
   }
-  
+
   /**
    * Gets the date of issuance.
    *
@@ -347,7 +347,7 @@ public class DG12File extends DataGroup {
   public Date getDateOfIssue() {
     return dateOfIssue;
   }
-  
+
   /**
    * Gets name of other person.
    *
@@ -356,7 +356,7 @@ public class DG12File extends DataGroup {
   public List<String> getNamesOfOtherPersons() {
     return namesOfOtherPersons;
   }
-  
+
   /**
    * Gets endorsements and observations.
    *
@@ -365,7 +365,7 @@ public class DG12File extends DataGroup {
   public String getEndorsementsAndObservations() {
     return endorsementsAndObservations;
   }
-  
+
   /**
    * Gets tax or exit requirements.
    *
@@ -374,7 +374,7 @@ public class DG12File extends DataGroup {
   public String getTaxOrExitRequirements() {
     return taxOrExitRequirements;
   }
-  
+
   /**
    * Gets image of front.
    *
@@ -383,7 +383,7 @@ public class DG12File extends DataGroup {
   public byte[] getImageOfFront() {
     return imageOfFront;
   }
-  
+
   /**
    * Gets image of rear.
    *
@@ -392,7 +392,7 @@ public class DG12File extends DataGroup {
   public byte[] getImageOfRear() {
     return imageOfRear;
   }
-  
+
   /**
    * Gets date and time of personalization.
    *
@@ -401,7 +401,7 @@ public class DG12File extends DataGroup {
   public Date getDateAndTimeOfPersonalization() {
     return dateAndTimeOfPersonalization;
   }
-  
+
   /**
    * Gets the personalization system serial number.
    *
@@ -410,11 +410,11 @@ public class DG12File extends DataGroup {
   public String getPersonalizationSystemSerialNumber() {
     return personalizationSystemSerialNumber;
   }
-  
+
   public int getTag() {
     return EF_DG12_TAG;
   }
-  
+
   /**
    * Gets a textual representation of this file.
    *
@@ -435,7 +435,7 @@ public class DG12File extends DataGroup {
     result.append("]");
     return result.toString();
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (obj == this) { return true; }
@@ -443,11 +443,11 @@ public class DG12File extends DataGroup {
     DG12File other = (DG12File)obj;
     return this.toString().equals(other.toString());
   }
-  
+
   public int hashCode() {
     return 13 * toString().hashCode() + 112;
   }
-  
+
   protected void writeContent(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(TAG_LIST_TAG);

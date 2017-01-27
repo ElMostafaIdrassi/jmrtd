@@ -72,44 +72,44 @@ import net.sf.scuba.util.Hex;
  * @version $Revision$
  */
 public class PassportApduService extends CardService {
-  
+
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte
   MRZ_PACE_KEY_REFERENCE = 0x01,
   CAN_PACE_KEY_REFERENCE = 0x02,
   PIN_PACE_KEY_REFERENCE = 0x03,
   PUK_PACE_KEY_REFERENCE = 0x04;
-  
+
   private static final long serialVersionUID = 2451509825132976178L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
-  
+
   /** The applet we select when we start a session. */
   protected static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
-  
+
   /** Initialization vector used by the cipher below. */
   private static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
-  
+
   /** The general Authenticate command is used to perform the PACE protocol. See Section 3.2.2 of SAC-TR 1.01. */
   private static final byte INS_PACE_GENERAL_AUTHENTICATE = (byte)0x86;
-  
+
   /** The service we decorate. */
   private CardService service;
-  
+
   private byte[] atr;
-  
+
   /** DESede encryption/decryption cipher. */
   private transient Cipher cipher;
-  
+
   /** ISO9797Alg3Mac. */
   private transient Mac mac;
-  
+
   private Collection<APDUListener> plainTextAPDUListeners;
-  
+
   private int plainAPDUCount;
-  
+
   /**
    * Creates a new passport APDU sending service.
    *
@@ -134,7 +134,7 @@ public class PassportApduService extends CardService {
       throw new CardServiceException(gse.toString());
     }
   }
-  
+
   /**
    * Opens a session by connecting to the card. Since version 0.5.1 this method no longer automatically
    * selects the MRTD applet, caller (for instance {@link PassportService}) is responsible to do this now.
@@ -147,7 +147,7 @@ public class PassportApduService extends CardService {
     }
     atr = service.getATR();
   }
-  
+
   /**
    * Whether this service is open.
    *
@@ -156,7 +156,7 @@ public class PassportApduService extends CardService {
   public synchronized boolean isOpen() {
     return service.isOpen();
   }
-  
+
   /**
    * Tranceives an APDU.
    *
@@ -173,7 +173,7 @@ public class PassportApduService extends CardService {
   public synchronized ResponseAPDU transmit(CommandAPDU capdu) throws CardServiceException {
     return service.transmit(capdu);
   }
-  
+
   /**
    * Gets the answer to reset bytes.
    *
@@ -182,7 +182,7 @@ public class PassportApduService extends CardService {
   public byte[] getATR() {
     return atr;
   }
-  
+
   /**
    * Closes the service.
    */
@@ -191,7 +191,7 @@ public class PassportApduService extends CardService {
       service.close();
     }
   }
-  
+
   /**
    * Sets the service.
    *
@@ -203,7 +203,7 @@ public class PassportApduService extends CardService {
   public void setService(CardService service) {
     this.service = service;
   }
-  
+
   /**
    * Adds a listener.
    *
@@ -212,7 +212,7 @@ public class PassportApduService extends CardService {
   public void addAPDUListener(APDUListener l) {
     service.addAPDUListener(l);
   }
-  
+
   /**
    * Removes a listener.
    *
@@ -221,7 +221,7 @@ public class PassportApduService extends CardService {
   public void removeAPDUListener(APDUListener l) {
     service.removeAPDUListener(l);
   }
-  
+
   /**
    * Transmits an APDU.
    *
@@ -260,7 +260,7 @@ public class PassportApduService extends CardService {
         notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);				
       }
     }
-    
+
     //		if ((sw & ISO7816.SW_CORRECT_LENGTH_00) == ISO7816.SW_CORRECT_LENGTH_00) {
     //			/* Re-transmit with corrected length if incorrect length. */
     //			int ne = (sw & 0xFF);
@@ -274,10 +274,10 @@ public class PassportApduService extends CardService {
     //				notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);
     //			}
     //		}
-    
+
     return rapdu;
   }
-  
+
   /**
    * Sends a <code>SELECT APPLET</code> command to the card.
    *
@@ -289,10 +289,10 @@ public class PassportApduService extends CardService {
   public synchronized void sendSelectApplet(APDUWrapper wrapper, byte[] aid) throws CardServiceException {
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816,ISO7816.INS_SELECT_FILE, (byte) 0x04, (byte) 0x0C, aid);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
-    
+
     checkStatusWordAfterFileOperation(capdu, rapdu);
   }
-  
+
   /**
    * Selects a file.
    *
@@ -303,7 +303,7 @@ public class PassportApduService extends CardService {
   public synchronized void sendSelectFile(short fid) throws CardServiceException {
     sendSelectFile(null, fid);
   }
-  
+
   /**
    * Sends a <code>SELECT FILE</code> command to the passport. Secure
    * messaging will be applied to the command and response apdu.
@@ -317,14 +317,14 @@ public class PassportApduService extends CardService {
     byte[] fiddle = { (byte) ((fid >> 8) & 0xFF), (byte) (fid & 0xFF) };
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte) 0x02, (byte) 0x0c, fiddle, 0);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
-    
+
     if( rapdu == null ) {
       return;
     }
-    
+
     checkStatusWordAfterFileOperation(capdu, rapdu);
   }
-  
+
   /**
    * Sends a <code>READ BINARY</code> command to the passport.
    *
@@ -339,7 +339,7 @@ public class PassportApduService extends CardService {
   public synchronized byte[] sendReadBinary(short offset, int le, boolean longRead) throws CardServiceException {
     return sendReadBinary(null, offset, le, longRead);
   }
-  
+
   /**
    * Sends a <code>READ BINARY</code> command to the passport. Secure
    * messaging will be applied to the command and response apdu.
@@ -381,7 +381,7 @@ public class PassportApduService extends CardService {
     } else {
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetHi, offsetLo, le);
     }
-    
+
     short sw = ISO7816.SW_UNKNOWN;
     try {
       rapdu = transmit(wrapper, capdu);
@@ -389,7 +389,7 @@ public class PassportApduService extends CardService {
     } catch (CardServiceException cse) {
       sw = (short)cse.getSW();
     }
-    
+
     /* There are 3 cases according to R2-p1_v2_sIII_0039... */
     //			if (sw == ISO7816.SW_NO_ERROR) {
     //				/* sw == 0x9000, no need to try again. */
@@ -415,7 +415,7 @@ public class PassportApduService extends CardService {
     //				}
     //			}
     //		} while (retrySending);
-    
+
     byte[] rapduBytes = rapdu == null ? null : rapdu.getData();
     //		short sw = (short)rapdu.getSW(); /* NOTE: Update the SW to the last resent APDU. */
     if (isExtendedLength && sw == ISO7816.SW_NO_ERROR) {
@@ -432,7 +432,7 @@ public class PassportApduService extends CardService {
       rapduBytes = new byte[data.length - index];
       System.arraycopy(data, index, rapduBytes, 0, rapduBytes.length);
     }
-    
+
     if (rapduBytes == null || rapduBytes.length == 0) {
       LOGGER.warning("DEBUG: rapduBytes = " + Arrays.toString(rapduBytes) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
     } else {
@@ -440,7 +440,7 @@ public class PassportApduService extends CardService {
     }
     return rapduBytes;
   }
-  
+
   /**
    * Sends a <code>GET CHALLENGE</code> command to the passport.
    *
@@ -451,7 +451,7 @@ public class PassportApduService extends CardService {
   public synchronized byte[] sendGetChallenge() throws CardServiceException {
     return sendGetChallenge(null);
   }
-  
+
   /**
    * Sends a <code>GET CHALLENGE</code> command to the passport.
    *
@@ -466,7 +466,7 @@ public class PassportApduService extends CardService {
     ResponseAPDU rapdu = transmit(wrapper, capdu);
     return rapdu.getData();
   }
-  
+
   /**
    * Sends an <code>INTERNAL AUTHENTICATE</code> command to the passport.
    * This is part of AA.
@@ -484,7 +484,7 @@ public class PassportApduService extends CardService {
     ResponseAPDU rapdu = transmit(wrapper, capdu);
     return rapdu.getData();
   }
-  
+
   /**
    * Sends an <code>EXTERNAL AUTHENTICATE</code> command to the passport.
    * This is part of BAC.
@@ -511,7 +511,7 @@ public class PassportApduService extends CardService {
       if (kIFD == null || kIFD.length != 16) { throw new IllegalArgumentException("kIFD wrong length"); }
       if (kEnc == null) { throw new IllegalArgumentException("kEnc == null"); }
       if (kMac == null) { throw new IllegalArgumentException("kMac == null"); }
-      
+
       cipher.init(Cipher.ENCRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);
       /*
        * cipher.update(rndIFD); cipher.update(rndICC); cipher.update(kIFD); //
@@ -526,33 +526,33 @@ public class PassportApduService extends CardService {
       if (ciphertext.length != 32) {
         throw new IllegalStateException("Cryptogram wrong length " + ciphertext.length);
       }
-      
+
       mac.init(kMac);
       byte[] mactext = mac.doFinal(Util.pad(ciphertext, 8));
       if (mactext.length != 8) {
         throw new IllegalStateException("MAC wrong length");
       }
-      
+
       byte p1 = (byte)0x00;
       byte p2 = (byte)0x00;
-      
+
       byte[] data = new byte[32 + 8];
       System.arraycopy(ciphertext, 0, data, 0, 32);
       System.arraycopy(mactext, 0, data, 32, 8);
       int le = 40; /* 40 means max ne is 40 (0x28). */
       CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
       ResponseAPDU rapdu = transmit(capdu);
-      
+
       if (rapdu == null) {
         throw new CardServiceException("Mutual authentication failed, received null response APDU");
       }
-      
+
       byte[] rapduBytes = rapdu.getBytes();
       short sw = (short)rapdu.getSW();
       if (rapduBytes == null) {
         throw new CardServiceException("Mutual authentication failed, received empty data in response APDU", sw);
       }
-      
+
       /* Some MRTDs apparently don't support 40 here, try again with 0. See R2-p1_v2_sIII_0035 (and other issues). */
       if (sw != ISO7816.SW_NO_ERROR) {
         le = 0; /* 0 means ne is max 256 (0xFF). */
@@ -561,17 +561,17 @@ public class PassportApduService extends CardService {
         rapduBytes = rapdu.getBytes();
         sw = (short)rapdu.getSW();
       }
-      
+
       if (rapduBytes.length != 42) {
         throw new CardServiceException("Mutual authentication failed: expected length: 40 + 2, actual length: " + rapduBytes.length, sw);
       }
-      
+
       /*
        * byte[] eICC = new byte[32]; System.arraycopy(rapdu, 0, eICC, 0, 32);
        *
        * byte[] mICC = new byte[8]; System.arraycopy(rapdu, 32, mICC, 0, 8);
        */
-      
+
       /* Decrypt the response. */
       cipher.init(Cipher.DECRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);
       byte[] result = cipher.doFinal(rapduBytes, 0, rapduBytes.length - 8 - 2);
@@ -583,7 +583,7 @@ public class PassportApduService extends CardService {
       throw new CardServiceException(gse.toString());
     }
   }
-  
+
   /**
    * Sends the EXTERNAL AUTHENTICATE command.
    * This is used in EAC-TA.
@@ -601,7 +601,7 @@ public class PassportApduService extends CardService {
       throw new CardServiceException("Sending External Authenticate failed.", sw);
     }
   }
-  
+
   /**
    * The MSE KAT APDU, see EAC 1.11 spec, Section B.1
    *
@@ -617,7 +617,7 @@ public class PassportApduService extends CardService {
     if (idData != null) {
       System.arraycopy(idData, 0, data, keyData.length, idData.length);
     }
-    
+
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA6, data);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
     short sw = (short)rapdu.getSW();
@@ -625,7 +625,7 @@ public class PassportApduService extends CardService {
       throw new CardServiceException("Sending MSE KAT failed", sw);
     }
   }
-  
+
   /**
    * The MSE DST APDU, see EAC 1.11 spec, Section B.2
    *
@@ -642,7 +642,7 @@ public class PassportApduService extends CardService {
       throw new CardServiceException("Sending MSE Set DST failed", sw);
     }
   }
-  
+
   /**
    * The MSE Set AT APDU for TA, see EAC 1.11 spec, Section B.2.
    * MANAGE SECURITY ENVIRONMENT command with SET Authentication Template function.
@@ -662,12 +662,12 @@ public class PassportApduService extends CardService {
       throw new CardServiceException("Sending MSE AT failed", sw);
     }
   }
-  
+
   /*
    * FIXME: Make prefixing 0x8x tags responsibilities consistent between ext auth and int auth and mutual auth
    * Now: above method makes caller responsible, below method callee is responsible. -- MO
    */
-  
+
   /* For Chip Authentication. We prefix 0x80 for OID and 0x84 for keyId. */
   /**
    * The  MSE Set AT for chip authentication.
@@ -681,7 +681,7 @@ public class PassportApduService extends CardService {
   public synchronized void sendMSESetATIntAuth(APDUWrapper wrapper, String oid, BigInteger keyId) throws CardServiceException {
     int p1 = 0x41;
     int p2 = 0xA4;
-//  int p2 = 0xA6;
+    //  int p2 = 0xA6;
     ResponseAPDU rapdu = null;
     if (keyId == null || keyId.compareTo(BigInteger.ZERO) < 0) {
       LOGGER.info("DEBUG: implicit case, keyId == " + keyId);
@@ -707,7 +707,7 @@ public class PassportApduService extends CardService {
       throw new CardServiceException("Sending MSE AT failed", sw);
     }
   }
-  
+
   /**
    * The MSE AT APDU for PACE, see ICAO TR-SAC-1.01, Section 3.2.1, BSI TR 03110 v2.03 B11.1.
    * Note that (for now) caller is responsible for prefixing the byte[] params with specified tags.
@@ -721,13 +721,13 @@ public class PassportApduService extends CardService {
    */
   public synchronized void sendMSESetATMutualAuth(APDUWrapper wrapper, String oid,
       int refPublicKeyOrSecretKey, byte[] refPrivateKeyOrForComputingSessionKey) throws CardServiceException {
-    
+
     if (oid == null) {
       throw new IllegalArgumentException("OID cannot be null");
     }
-    
+
     byte[] oidBytes = toOIDBytes(oid);
-    
+
     /*
      * 0x83 Reference of a public key / secret key.
      * The password to be used is indicated as follows: 0x01: MRZ, 0x02: CAN.
@@ -738,9 +738,9 @@ public class PassportApduService extends CardService {
         || refPublicKeyOrSecretKey == PUK_PACE_KEY_REFERENCE)) {
       throw new IllegalArgumentException("Unsupported key type reference (MRZ, CAN, etc), found " + refPublicKeyOrSecretKey);
     }
-    
+
     byte[] refPublicKeyOrSecretKeyBytes = Util.wrapDO((byte)0x83, new byte[] { (byte)refPublicKeyOrSecretKey }); /* FIXME: define constant for 0x83 */
-    
+
     /*
      * 0x84 Reference of a private key / Reference for computing a
      * session key.
@@ -752,7 +752,7 @@ public class PassportApduService extends CardService {
     if (refPrivateKeyOrForComputingSessionKey != null) {
       refPrivateKeyOrForComputingSessionKey = Util.wrapDO((byte)0x84, refPrivateKeyOrForComputingSessionKey);
     }
-    
+
     /* Construct data. */
     ByteArrayOutputStream dataOutputStream = new ByteArrayOutputStream();
     try {
@@ -767,19 +767,19 @@ public class PassportApduService extends CardService {
       throw new IllegalStateException("Error while copying data");
     }
     byte[] data = dataOutputStream.toByteArray();
-    
+
     /* Tranceive APDU. */
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0xC1, 0xA4, data);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
-    
+
     /* Handle error status word. */
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
       throw new CardServiceException("Sending MSE AT failed", sw);
     }
   }
-  
-  
+
+
   /*
    * 0x80 Cryptographic mechanism reference
    * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
@@ -798,7 +798,7 @@ public class PassportApduService extends CardService {
       throw new IllegalArgumentException("Illegal OID: \"" + oid + "\" (" + ioe.getMessage() + ")");
     }
   }
-  
+
   /**
    * Sends a General Authenticate command.
    *
@@ -815,7 +815,7 @@ public class PassportApduService extends CardService {
     byte[] commandData = Util.wrapDO((byte)0x7C, data); // FIXME: constant for 0x7C
     CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_PACE_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 256);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
-    
+
     /* Handle error status word. */
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
@@ -825,7 +825,7 @@ public class PassportApduService extends CardService {
     responseData = Util.unwrapDO((byte)0x7C, responseData);
     return responseData;
   }
-  
+
   /**
    * Sends a perform security operation command in extended length mode.
    *
@@ -840,13 +840,13 @@ public class PassportApduService extends CardService {
     byte[] certData = new byte[certBodyData.length + certSignatureData.length];
     System.arraycopy(certBodyData, 0, certData, 0, certBodyData.length);
     System.arraycopy(certSignatureData, 0, certData, certBodyData.length, certSignatureData.length);
-    
+
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_PSO, 0, 0xBE, certData);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) { throw new CardServiceException("Sending PSO failed", sw); }
   }
-  
+
   /**
    * Sends a perform security operation command in chain mode.
    *
@@ -883,13 +883,13 @@ public class PassportApduService extends CardService {
     }
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816 | 0x00, ISO7816.INS_PSO, 0x00, 0xBE, certData, offset, length);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
-    
+
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
       throw new CardServiceException("Sending PSO failed", sw);
     }
   }
-  
+
   /**
    * Adds a plain text listener.
    *
@@ -898,7 +898,7 @@ public class PassportApduService extends CardService {
   public void addPlainTextAPDUListener(APDUListener l) {
     if (plainTextAPDUListeners != null) { plainTextAPDUListeners.add(l); }
   }
-  
+
   /**
    * Removes a plain text listener.
    *
@@ -907,7 +907,7 @@ public class PassportApduService extends CardService {
   public void removePlainTextAPDUListener(APDUListener l) {
     if (plainTextAPDUListeners != null) { plainTextAPDUListeners.remove(l); }
   }
-  
+
   /**
    * Notifies listeners about APDU event.
    *
@@ -922,7 +922,7 @@ public class PassportApduService extends CardService {
       listener.exchangedAPDU(event);
     }
   }
-  
+
   private static void checkStatusWordAfterFileOperation(CommandAPDU capdu, ResponseAPDU rapdu) throws CardServiceException {
     short sw = (short)rapdu.getSW();
     String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(capdu.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(rapdu.getBytes());
