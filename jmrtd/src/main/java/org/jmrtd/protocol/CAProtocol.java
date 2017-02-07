@@ -150,7 +150,7 @@ public class CAProtocol {
    * 
    * @throws CardServiceException on error
    */
-  public void sendPublicKey(PassportService service, SecureMessagingWrapper wrapper, String oid, BigInteger keyId, PublicKey pcdPublicKey) throws CardServiceException {
+  public static void sendPublicKey(PassportService service, SecureMessagingWrapper wrapper, String oid, BigInteger keyId, PublicKey pcdPublicKey) throws CardServiceException {
     String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
 
@@ -185,7 +185,7 @@ public class CAProtocol {
    * 
    * @throws InvalidKeyException if one of the keys is invalid
    */
-  public byte[] computeSharedSecret(String agreementAlg, PublicKey piccPublicKey, PrivateKey pcdPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
+  public static byte[] computeSharedSecret(String agreementAlg, PublicKey piccPublicKey, PrivateKey pcdPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
     KeyAgreement agreement = KeyAgreement.getInstance(agreementAlg);
     agreement.init(pcdPrivateKey);
     agreement.doPhase(piccPublicKey, true);
@@ -202,7 +202,7 @@ public class CAProtocol {
    * 
    * @throws GeneralSecurityException on error
    */
-  public SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret) throws GeneralSecurityException {
+  public static SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret) throws GeneralSecurityException {
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
     int keyLength = ChipAuthenticationInfo.toKeyLength(oid);
 
@@ -220,7 +220,16 @@ public class CAProtocol {
     }
   }
 
-  private byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
+  /**
+   * Gets the secure messaging wrapper currently in use.
+   * 
+   * @return a secure messaging wrapper
+   */
+  public SecureMessagingWrapper getWrapper() {
+    return wrapper;
+  }
+
+  private static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
     if ("DH".equals(agreementAlg)) {
       /* TODO: this is probably wrong, what should be hashed? */
       MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -235,7 +244,7 @@ public class CAProtocol {
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
 
-  private byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
+  private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
     if ("DH".equals(agreementAlg)) {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
       return pcdDHPublicKey.getY().toByteArray();
@@ -246,16 +255,7 @@ public class CAProtocol {
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
-
-  /**
-   * Gets the secure messaging wrapper currently in use.
-   * 
-   * @return a secure messaging wrapper
-   */
-  public SecureMessagingWrapper getWrapper() {
-    return wrapper;
-  }
-
+  
   /**
    * Infers the Chip Authentication OID form a Chip Authentication public key OID.
    * This is a best effort.
