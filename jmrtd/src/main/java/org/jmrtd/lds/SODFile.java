@@ -60,7 +60,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.jmrtd.JMRTDSecurityProvider;
 
-
 /**
  * File structure for the EF_SOD file (the Document Security Object).
  * Based on Appendix 3 of Doc 9303 Part 1 Vol 2.
@@ -302,7 +301,7 @@ public class SODFile extends AbstractTaggedLDSFile {
     try {
       return SignedDataUtil.lookupMnemonicByOID(ldsSecurityObject.getDigestAlgorithmIdentifier().getAlgorithm().getId());
     } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.severe("Exception: " + nsae.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", nsae);
       return null; // throw new IllegalStateException(nsae.toString());
     }
   }
@@ -369,80 +368,6 @@ public class SODFile extends AbstractTaggedLDSFile {
    */
   public X509Certificate getDocSigningCertificate() throws CertificateException {
     return SignedDataUtil.getDocSigningCertificate(signedData);
-  }
-
-  /**
-   * Verifies the signature over the contents of the security object.
-   * Clients can also use the accessors of this class and check the
-   * validity of the signature for themselves.
-   *
-   * See RFC 3369, Cryptographic Message Syntax, August 2002,
-   * Section 5.4 for details.
-   *
-   * @param docSigningCert the certificate to use
-   *        (should be X509 certificate)
-   *
-   * @return status of the verification
-   *
-   * @throws GeneralSecurityException if something goes wrong
-   * 
-   * @deprecated this method will be moved, LDS data objects should not be responsible for verification
-   */
-  /* FIXME: move this out of lds package. */
-  public boolean checkDocSignature(Certificate docSigningCert) throws GeneralSecurityException {
-    byte[] eContent = getEContent();
-    byte[] signature = getEncryptedDigest();
-
-    String digestEncryptionAlgorithm = null;
-    try {
-      digestEncryptionAlgorithm = getDigestEncryptionAlgorithm();
-    } catch (Exception e) {
-      digestEncryptionAlgorithm = null;
-    }
-
-    /*
-     * For the cases where the signature is simply a digest (haven't seen a passport like this,
-     * thus this is guessing)
-     */
-    if (digestEncryptionAlgorithm == null) {
-      String digestAlg = getSignerInfoDigestAlgorithm();
-      MessageDigest digest = null;
-      try {
-        digest = MessageDigest.getInstance(digestAlg);
-      } catch (Exception e) {
-        digest = MessageDigest.getInstance(digestAlg, BC_PROVIDER);
-      }
-      digest.update(eContent);
-      byte[] digestBytes = digest.digest();
-      return Arrays.equals(digestBytes, signature);
-    }
-
-    /* For RSA_SA_PSS
-     *    1. the default hash is SHA1,
-     *    2. The hash id is not encoded in OID
-     * So it has to be specified "manually".
-     */
-    if ("SSAwithRSA/PSS".equals(digestEncryptionAlgorithm)) {
-      String digestAlg = getSignerInfoDigestAlgorithm();
-      digestEncryptionAlgorithm = digestAlg.replace("-", "") + "withRSA/PSS";
-    }
-
-    if ("RSA".equals(digestEncryptionAlgorithm)) {
-      String digestJavaString = getSignerInfoDigestAlgorithm();
-      digestEncryptionAlgorithm = digestJavaString.replace("-", "") + "withRSA";
-    }
-
-    LOGGER.info("digestEncryptionAlgorithm = " + digestEncryptionAlgorithm);
-
-    Signature sig = null;
-    try {
-      sig = Signature.getInstance(digestEncryptionAlgorithm);
-    } catch (Exception e) {
-      sig = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER);
-    }
-    sig.initVerify(docSigningCert);
-    sig.update(eContent);
-    return sig.verify(signature);
   }
 
   /**
