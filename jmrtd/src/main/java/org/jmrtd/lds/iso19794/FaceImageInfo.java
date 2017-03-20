@@ -503,26 +503,26 @@ public class FaceImageInfo extends AbstractImageInfo {
    */
   /* TODO: rename this method, distinguish between a pretty print version to be used in JMRTD GUI and a proper toString() */
   public String toString() {
-    StringBuffer out = new StringBuffer();
-    out.append("Image size: "); out.append(getWidth() + " x " + getHeight()); out.append("\n");
-    out.append("Gender: "); out.append(gender == null ? Gender.UNSPECIFIED : gender); out.append("\n");
-    out.append("Eye color: "); out.append(eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor); out.append("\n");
-    out.append("Hair color: "); out.append(hairColorToString()); out.append("\n");
-    out.append("Feature mask: "); out.append(featureMaskToString()); out.append("\n");
-    out.append("Expression: "); out.append(expressionToString()); out.append("\n");
-    out.append("Pose angle: "); out.append(poseAngleToString()); out.append("\n");
-    out.append("Face image type: "); out.append(faceImageTypeToString()); out.append("\n");
-    out.append("Source type: "); out.append(sourceTypeToString()); out.append("\n");
-    out.append("Feature points: "); out.append("\n");
+    StringBuilder out = new StringBuilder();
+    
+    out.append("Image size: ").append(getWidth()).append(" x ").append(getHeight()).append("\n");
+    out.append("Gender: ").append(gender == null ? Gender.UNSPECIFIED : gender).append("\n");
+    out.append("Eye color: ").append(eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor).append("\n");
+    out.append("Hair color: ").append(hairColorToString()).append("\n");
+    out.append("Feature mask: ").append(featureMaskToString()).append("\n");
+    out.append("Expression: ").append(expressionToString()).append("\n");
+    out.append("Pose angle: ").append(poseAngleToString()).append("\n");
+    out.append("Face image type: ").append(faceImageTypeToString()).append("\n");
+    out.append("Source type: ").append(sourceTypeToString()).append("\n");
+    out.append("Feature points: ").append("\n");
     if (featurePoints == null || featurePoints.length == 0) {
       out.append("   (none)\n");
     } else {
       for (int i = 0; i < featurePoints.length; i++) {
-        out.append("   ");
-        out.append(featurePoints[i].toString());
-        out.append("\n");
+        out.append("   ").append(featurePoints[i].toString()).append("\n");
       }
     }
+    
     return out.toString();
   }
 
@@ -625,13 +625,14 @@ public class FaceImageInfo extends AbstractImageInfo {
     if ((featureMask & FEATURE_DISTORTING_MEDICAL_CONDITION) != 0) {
       features.add("distorting medical condition (which could impact feature point detection)");
     }
-    StringBuffer out = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     for (Iterator<String> it = features.iterator(); it.hasNext();) {
       out.append(it.next().toString());
       if (it.hasNext()) {
         out.append(", ");
       }
     }
+    
     return out.toString();
   }
 
@@ -653,26 +654,27 @@ public class FaceImageInfo extends AbstractImageInfo {
         return "squinting";
       case EXPRESSION_FROWNING:
         return "frowning";
+      default:
+        return "unknown";        
     }
-    return "unknown";
   }
 
   private String poseAngleToString() {
-    StringBuffer out = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     out.append("(");
-    out.append("y: "); out.append(poseAngle[YAW]);
+    out.append("y: ").append(poseAngle[YAW]);
     if (poseAngleUncertainty[YAW] != 0) {
-      out.append(" ("); out.append(poseAngleUncertainty[YAW]); out.append(")");
+      out.append(" (").append(poseAngleUncertainty[YAW]).append(")");
     }
     out.append(", ");
-    out.append("p:"); out.append(poseAngle[PITCH]);
+    out.append("p:").append(poseAngle[PITCH]);
     if (poseAngleUncertainty[PITCH] != 0) {
-      out.append(" ("); out.append(poseAngleUncertainty[PITCH]); out.append(")");
+      out.append(" (").append(poseAngleUncertainty[PITCH]).append(")");
     }
     out.append(", ");
-    out.append("r: "); out.append(poseAngle[ROLL]);
+    out.append("r: ").append(poseAngle[ROLL]);
     if (poseAngleUncertainty[ROLL] != 0) {
-      out.append(" ("); out.append(poseAngleUncertainty[ROLL]); out.append(")");
+      out.append(" (").append(poseAngleUncertainty[ROLL]).append(")");
     }
     out.append(")");
     return out.toString();
@@ -724,24 +726,38 @@ public class FaceImageInfo extends AbstractImageInfo {
    */
 
   private static String toMimeType(int compressionAlg) {
+    LOGGER.info("DEBUG: Image type: " + compressionAlg);
+
     switch (compressionAlg) {
-      case IMAGE_DATA_TYPE_JPEG: return JPEG_MIME_TYPE;
-      case IMAGE_DATA_TYPE_JPEG2000: return JPEG2000_MIME_TYPE;
+      case IMAGE_DATA_TYPE_JPEG:
+        return JPEG_MIME_TYPE;
+      case IMAGE_DATA_TYPE_JPEG2000:
+        return JPEG2000_MIME_TYPE;
+      default:
+        LOGGER.info("DEBUG: Unknown image type: " + compressionAlg);
+        return null;
     }
-    return null;
   }
 
   private static String toMimeType(ImageDataType imageDataType) {
     switch(imageDataType) {
-      case TYPE_JPEG: return "image/jpeg";
-      case TYPE_JPEG2000: return "image/jpeg2000"; /* FIXME; Check ietf rfc3745, shouldn't this be "image/jp2"? */
+      case TYPE_JPEG:
+        return "image/jpeg";
+      case TYPE_JPEG2000:
+        return "image/jpeg2000"; /* FIXME; Check ietf rfc3745, shouldn't this be "image/jp2"? */
+      default:
+        return null;
     }
-    return null;
   }
 
   private static int fromMimeType(String mimeType) {
-    if ("image/jpeg".equals(mimeType)) { return IMAGE_DATA_TYPE_JPEG; }
-    if ("image/jpeg2000".equals(mimeType) || "image/jp2".equals(mimeType)) { return IMAGE_DATA_TYPE_JPEG2000; }
+    if ("image/jpeg".equals(mimeType)) {
+      return IMAGE_DATA_TYPE_JPEG;
+    }
+    if ("image/jpeg2000".equals(mimeType) || "image/jp2".equals(mimeType)) {
+      return IMAGE_DATA_TYPE_JPEG2000;
+    }
+    
     throw new IllegalArgumentException("Did not recognize mimeType");
   }
 
@@ -768,8 +784,7 @@ public class FaceImageInfo extends AbstractImageInfo {
      * @param x X-coordinate
      * @param y Y-coordinate
      */
-    public FeaturePoint(int type, int majorCode, int minorCode,
-        int x, int y) {
+    public FeaturePoint(int type, int majorCode, int minorCode, int x, int y) {
       this.type = type;
       this.majorCode = majorCode;
       this.minorCode = minorCode;
@@ -842,14 +857,13 @@ public class FaceImageInfo extends AbstractImageInfo {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-      StringBuffer out = new StringBuffer();
-      out.append("( point: "); out.append(getMajorCode()); out.append("."); out.append(getMinorCode());
-      out.append(", ");
-      out.append("type: "); out.append(Integer.toHexString(type)); out.append(", ");
-      out.append("("); out.append(x); out.append(", ");
-      out.append(y); out.append(")");
-      out.append(")");
-      return out.toString();
+      return (new StringBuilder())
+          .append("( point: ").append(getMajorCode()).append(".").append(getMinorCode())
+          .append(", ")
+          .append("type: ").append(Integer.toHexString(type)).append(", ")
+          .append("(").append(x).append(", ")
+          .append(y).append(")")
+          .append(")").toString();
     }
   }
 }

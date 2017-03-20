@@ -36,6 +36,7 @@ import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
@@ -269,11 +270,22 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
+   * Gets the parameters of the digest encryption (signature) algorithm.
+   * For instance for {@code "RSASSA/PSS"} this includes the hash algorithm
+   * and the salt length.
+   * 
+   * @return the algorithm parameters
+   */
+  public AlgorithmParameterSpec getDigestEncryptionAlgorithmParams() {
+    return SignedDataUtil.getDigestEncryptionAlgorithmParams(signedData);
+  }
+
+  /**
    * Gets the e-content inside the signed data structure.
    *
    * @return the e-content
    */
-  public byte[] getEContent() {
+  public byte[] getEContent() {    
     return SignedDataUtil.getEContent(signedData);
   }
 

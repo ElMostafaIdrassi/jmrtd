@@ -35,6 +35,9 @@ import java.security.Signature;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,6 +70,7 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerIdentifier;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -103,7 +107,7 @@ import org.jmrtd.JMRTDSecurityProvider;
   PKCS1_SHA1_WITH_RSA_OID = "1.2.840.113549.1.1.5",
   //  PKCS1_RSAOAEP_ENC_SET = "1.2.840.113549.1.1.6", // other identifier: ripemd160WithRSAEncryption
   //  PKCS1_RSAES_OAEP = "1.2.840.113549.1.1.7",
-  PKCS1_SHA256_WITH_RSA_AND_MGF1 = "1.2.840.113549.1.1.8",
+  PKCS1_MGF1 = "1.2.840.113549.1.1.8",
   PKCS1_RSASSA_PSS_OID = "1.2.840.113549.1.1.10",
   PKCS1_SHA256_WITH_RSA_OID = "1.2.840.113549.1.1.11",
   PKCS1_SHA384_WITH_RSA_OID = "1.2.840.113549.1.1.12",
@@ -211,19 +215,49 @@ import org.jmrtd.JMRTDSecurityProvider;
       String digestAlgOID = signerInfo.getDigestAlgorithm().getAlgorithm().getId();
       return SignedDataUtil.lookupMnemonicByOID(digestAlgOID);
     } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.severe("Exception: " + nsae.getMessage());
+      LOGGER.log(Level.WARNING, "No such algorithm" + nsae);
       return null; // throw new IllegalStateException(nsae.toString());
     }
+  }
+
+  /**
+   * Gets the parameters of the digest encryption (signature) algorithm.
+   * For instance for {@code "RSASSA/PSS"} this includes the hash algorithm
+   * and the salt length.
+   * 
+   * @param signedData the signed data object
+   * 
+   * @return the algorithm parameters
+   */
+  public static AlgorithmParameterSpec getDigestEncryptionAlgorithmParams(SignedData signedData) {
+    try {
+      SignerInfo signerInfo = getSignerInfo(signedData);
+      AlgorithmIdentifier digestEncryptionAlgorithm = signerInfo.getDigestEncryptionAlgorithm();
+      ASN1Encodable params = digestEncryptionAlgorithm.getParameters();
+
+      String digestEncryptionAlgorithmOID = digestEncryptionAlgorithm.getAlgorithm().getId();
+      if (PKCS1_RSASSA_PSS_OID.equals(digestEncryptionAlgorithmOID)) {
+        RSASSAPSSparams rsaSSAParams = RSASSAPSSparams.getInstance(params);
+        return toAlgorithmParameterSpec(rsaSSAParams);
+      }
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+
+    return null;
   }
 
   public static String getDigestEncryptionAlgorithm(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
       String digestEncryptionAlgorithmOID = signerInfo.getDigestEncryptionAlgorithm().getAlgorithm().getId();
-      if (digestEncryptionAlgorithmOID == null) { return null; }
+      if (digestEncryptionAlgorithmOID == null) {
+        LOGGER.warning("Could not determine digest encryption algorithm OID");
+        return null;
+      }
       return SignedDataUtil.lookupMnemonicByOID(digestEncryptionAlgorithmOID);
     } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.severe("Exception: " + nsae.getMessage());
+      LOGGER.log(Level.WARNING, "No such algorithm", nsae);
       return null; // throw new IllegalStateException(nsae.toString());
     }
   }
@@ -275,51 +309,6 @@ import org.jmrtd.JMRTDSecurityProvider;
     return attributesBytes;
   }
 
-  /* FIXME: Move this from lds package to verifier. -- MO */
-  /* FIXME: This only warns on logger. */
-  /**
-   * Checks that the content actually digests to the hash value contained in the message digest attribute.
-   * 
-   * @param attributes the attributes, this should contain an attribute of type {@link #RFC_3369_MESSAGE_DIGEST_OID}
-   * @param digAlg the digest algorithm
-   * @param contentBytes the contents
-   * 
-   * @throws NoSuchAlgorithmException if the digest algorithm is unsupported
-   */
-  private static void checkEContent(Collection<Attribute> attributes, String digAlg, byte[] contentBytes) throws NoSuchAlgorithmException {
-    for (Attribute attribute: attributes) {
-      if (!RFC_3369_MESSAGE_DIGEST_OID.equals(attribute.getAttrType().getId())) {
-        continue;
-      }
-
-      ASN1Set attrValuesSet = attribute.getAttrValues();
-      if (attrValuesSet.size() != 1) {
-        LOGGER.warning("Expected only one attribute value in signedAttribute message digest in eContent!");
-      }
-      byte[] storedDigestedContent = ((DEROctetString)attrValuesSet.getObjectAt(0)).getOctets();
-
-      if (storedDigestedContent == null) {
-        LOGGER.warning("Error extracting signedAttribute message digest in eContent!");
-      } 
-
-      MessageDigest dig = MessageDigest.getInstance(digAlg);
-      byte[] computedDigestedContent = dig.digest(contentBytes);
-      if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
-        LOGGER.warning("Error checking signedAttribute message digest in eContent!");
-      }
-    }    
-  }
-
-  private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
-    List<ASN1Sequence> attributeObjects = Collections.list(signedAttributesSet.getObjects());
-    List<Attribute> attributes = new ArrayList(attributeObjects.size());
-    for (ASN1Sequence attributeObject: attributeObjects) {
-      Attribute attribute = Attribute.getInstance(attributeObject);
-      attributes.add(attribute);
-    }
-    return attributes;
-  }
-
   /**
    * Gets the stored signature of the security object.
    *
@@ -339,18 +328,6 @@ import org.jmrtd.JMRTDSecurityProvider;
     X500Name issuer = issuerAndSerialNumber.getName();
     BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
     return new IssuerAndSerialNumber(issuer, serialNumber);
-  }
-
-  private static SignerInfo getSignerInfo(SignedData signedData)  {
-    ASN1Set signerInfos = signedData.getSignerInfos();
-    if (signerInfos.size() > 1) {
-      LOGGER.warning("Found " + signerInfos.size() + " signerInfos");
-    }
-    for (int i = 0; i < signerInfos.size(); i++) {
-      SignerInfo info = new SignerInfo((ASN1Sequence)signerInfos.getObjectAt(i));
-      return info;
-    }
-    return null;
   }
 
   public static X509Certificate getDocSigningCertificate(SignedData signedData) throws CertificateException {
@@ -466,10 +443,6 @@ import org.jmrtd.JMRTDSecurityProvider;
     return encryptedDigest;
   }
 
-  private static ASN1Set createSingletonSet(ASN1Object e) {
-    return new DLSet(new ASN1Encodable[] { e });
-  }
-
   /**
    * Gets the common mnemonic string (such as "SHA1", "SHA256withRSA") given an OID.
    *
@@ -506,7 +479,7 @@ import org.jmrtd.JMRTDSecurityProvider;
     if (oid.equals(PKCS1_SHA224_WITH_RSA_OID)) { return "SHA224withRSA"; }
     if (oid.equals(IEEE_P1363_SHA1_OID)) { return "SHA-1"; }
     if (oid.equals(PKCS1_RSASSA_PSS_OID)) { return "SSAwithRSA/PSS"; }
-    if (oid.equals(PKCS1_SHA256_WITH_RSA_AND_MGF1)) { return "SHA256withRSAandMGF1"; }
+    if (oid.equals(PKCS1_MGF1)) { return "MGF1"; }
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 
@@ -539,7 +512,102 @@ import org.jmrtd.JMRTDSecurityProvider;
     if (name.equalsIgnoreCase("SAwithRSA/PSS")) { return PKCS1_RSASSA_PSS_OID; }
     if (name.equalsIgnoreCase("SSAwithRSA/PSS")) { return PKCS1_RSASSA_PSS_OID; }
     if (name.equalsIgnoreCase("RSASSA-PSS")) { return PKCS1_RSASSA_PSS_OID; }
-    if (name.equalsIgnoreCase("SHA256withRSAandMGF1")) { return PKCS1_SHA256_WITH_RSA_AND_MGF1; }
+    if (name.equalsIgnoreCase("MGF1")) { return PKCS1_MGF1; }
+    if (name.equalsIgnoreCase("SHA256withRSAandMGF1")) { return PKCS1_MGF1; }
+    if (name.equalsIgnoreCase("SHA512withRSAandMGF1")) { return PKCS1_MGF1; }
     throw new NoSuchAlgorithmException("Unknown name " + name);
+  }
+
+  /* PRIVATE BELOW */
+
+  /* FIXME: Move this from lds package to verifier. -- MO */
+  /* FIXME: This only warns on logger. */
+  /**
+   * Checks that the content actually digests to the hash value contained in the message digest attribute.
+   * 
+   * @param attributes the attributes, this should contain an attribute of type {@link #RFC_3369_MESSAGE_DIGEST_OID}
+   * @param digAlg the digest algorithm
+   * @param contentBytes the contents
+   * 
+   * @throws NoSuchAlgorithmException if the digest algorithm is unsupported
+   */
+  private static void checkEContent(Collection<Attribute> attributes, String digAlg, byte[] contentBytes) throws NoSuchAlgorithmException {
+    for (Attribute attribute: attributes) {
+      if (!RFC_3369_MESSAGE_DIGEST_OID.equals(attribute.getAttrType().getId())) {
+        continue;
+      }
+
+      ASN1Set attrValuesSet = attribute.getAttrValues();
+      if (attrValuesSet.size() != 1) {
+        LOGGER.warning("Expected only one attribute value in signedAttribute message digest in eContent!");
+      }
+      byte[] storedDigestedContent = ((DEROctetString)attrValuesSet.getObjectAt(0)).getOctets();
+
+      if (storedDigestedContent == null) {
+        LOGGER.warning("Error extracting signedAttribute message digest in eContent!");
+      } 
+
+      MessageDigest dig = MessageDigest.getInstance(digAlg);
+      byte[] computedDigestedContent = dig.digest(contentBytes);
+      if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
+        LOGGER.warning("Error checking signedAttribute message digest in eContent!");
+      }
+    }    
+  }
+
+  private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
+    List<ASN1Sequence> attributeObjects = Collections.list(signedAttributesSet.getObjects());
+    List<Attribute> attributes = new ArrayList(attributeObjects.size());
+    for (ASN1Sequence attributeObject: attributeObjects) {
+      Attribute attribute = Attribute.getInstance(attributeObject);
+      attributes.add(attribute);
+    }
+    return attributes;
+  }
+
+  private static AlgorithmParameterSpec toAlgorithmParameterSpec(RSASSAPSSparams rsaSSAParams) throws NoSuchAlgorithmException {
+    String hashAlgorithmOID = rsaSSAParams.getHashAlgorithm().getAlgorithm().getId();
+    AlgorithmIdentifier maskGenAlgorithm = rsaSSAParams.getMaskGenAlgorithm();
+    String maskGenAlgorithmOID = maskGenAlgorithm.getAlgorithm().getId();
+
+    String hashAlgorithmName = lookupMnemonicByOID(hashAlgorithmOID);
+    String maskGenAlgorithmName = lookupMnemonicByOID(maskGenAlgorithmOID);
+
+    int saltLength = rsaSSAParams.getSaltLength().intValue();
+    int trailerField = rsaSSAParams.getTrailerField().intValue();
+
+    return new PSSParameterSpec(hashAlgorithmName, maskGenAlgorithmName, toMaskGenAlgorithmParameterSpec(maskGenAlgorithm), saltLength, trailerField);
+  }
+
+  private static AlgorithmParameterSpec toMaskGenAlgorithmParameterSpec(AlgorithmIdentifier maskGenAlgorithm) {
+    try {
+      ASN1Encodable maskGenParams = maskGenAlgorithm.getParameters();
+      if (maskGenParams != null) {
+        AlgorithmIdentifier hashIdentifier = AlgorithmIdentifier.getInstance(maskGenParams);
+        String hashOID = hashIdentifier.getAlgorithm().getId();
+        String hashName = lookupMnemonicByOID(hashOID);
+        return new MGF1ParameterSpec(hashName);
+      }
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }    
+    /* Default to SHA-1. */
+    return new MGF1ParameterSpec("SHA-1");
+  }
+
+  private static SignerInfo getSignerInfo(SignedData signedData)  {
+    ASN1Set signerInfos = signedData.getSignerInfos();
+    if (signerInfos.size() > 1) {
+      LOGGER.warning("Found " + signerInfos.size() + " signerInfos");
+    }
+    for (int i = 0; i < signerInfos.size(); i++) {
+      SignerInfo info = new SignerInfo((ASN1Sequence)signerInfos.getObjectAt(i));
+      return info;
+    }
+    return null;
+  }
+
+  private static ASN1Set createSingletonSet(ASN1Object e) {
+    return new DLSet(new ASN1Encodable[] { e });
   }
 }
