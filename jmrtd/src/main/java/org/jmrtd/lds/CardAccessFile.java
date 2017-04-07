@@ -26,10 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -113,28 +111,15 @@ public class CardAccessFile implements Serializable {
   }
 
   /**
-   * Gets the PACE infos embedded in this card access file.
-   * If no infos are present, an empty list is returned.
-   *
-   * @return a list of PACE infos
-   */
-  public Collection<PACEInfo> getPACEInfos() {
-    List<PACEInfo> paceInfos = new ArrayList<PACEInfo>(securityInfos.size());
-    for (SecurityInfo securityInfo: securityInfos) {
-      if (securityInfo instanceof PACEInfo) {
-        paceInfos.add((PACEInfo)securityInfo);
-      }
-    }
-    return paceInfos;
-  }
-
-  /**
    * Gets the signature algorithm object identifier.
    *
    * @return signature algorithm OID
    */
   public String toString() {
-    return "CardAccessFile [" + securityInfos.toString() + "]";
+    return (new StringBuilder())
+        .append("CardAccessFile [")
+        .append(securityInfos.toString())
+        .append("]").toString();
   }
 
   /**
@@ -145,11 +130,22 @@ public class CardAccessFile implements Serializable {
    * @return whether this object equals the other object
    */
   public boolean equals(Object otherObj) {
-    if (otherObj == null) { return false; }
-    if (!(otherObj.getClass().equals(this.getClass()))) { return false; }
+    if (otherObj == null) {
+      return false;
+    }
+    
+    if (!(otherObj.getClass().equals(this.getClass()))) {
+      return false;
+    }
+    
     CardAccessFile other = (CardAccessFile)otherObj;
-    if (securityInfos == null) { return  other.securityInfos == null; }
-    if (other.securityInfos == null) { return securityInfos == null; }
+    if (securityInfos == null) {
+      return  other.securityInfos == null;
+    }
+    if (other.securityInfos == null) {
+      return securityInfos == null;
+    }
+    
     return securityInfos.equals(other.securityInfos);
   }
 

@@ -122,7 +122,10 @@ public class DG14File extends DataGroup {
    * Gets Terminal Authentication infos.
    *
    * @return the Terminal Authentication infos.
+   * 
+   * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
+  @Deprecated
   public List<TerminalAuthenticationInfo> getTerminalAuthenticationInfos() {
     List<TerminalAuthenticationInfo> terminalAuthenticationInfos = new ArrayList<TerminalAuthenticationInfo>();
     for (SecurityInfo securityInfo : securityInfos) {
@@ -133,12 +136,14 @@ public class DG14File extends DataGroup {
     return terminalAuthenticationInfos;
   }
 
-
   /**
-   * Gets the Chip Authentication infos.
+   * Returns the Chip Authentication infos.
    *
    * @return the Chip Authentication infos
+   * 
+   * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
+  @Deprecated
   public List<ChipAuthenticationInfo> getChipAuthenticationInfos() {
     List<ChipAuthenticationInfo> map = new ArrayList<ChipAuthenticationInfo>();
     for (SecurityInfo securityInfo : securityInfos) {
@@ -154,11 +159,14 @@ public class DG14File extends DataGroup {
   }
 
   /**
-   * Gets the mapping of key identifiers to public keys. The key identifier
-   * may be -1 if there is only one key.
+   * Gets the mapping of key identifiers to public keys.
+   * The key identifier may be -1 if there is only one key.
    *
    * @return the mapping of key identifiers to public keys
+   * 
+   * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
+  @Deprecated
   public List<ChipAuthenticationPublicKeyInfo> getChipAuthenticationPublicKeyInfos() {
     List<ChipAuthenticationPublicKeyInfo> publicKeys = new ArrayList<ChipAuthenticationPublicKeyInfo>();
     for (SecurityInfo securityInfo: securityInfos) {
@@ -169,6 +177,14 @@ public class DG14File extends DataGroup {
     return publicKeys;
   }
 
+  /**
+   * Returns the Active Authentication security infos.
+   * 
+   * @return the Active Authentication security infos
+   * 
+   * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
+   */
+  @Deprecated
   public List<ActiveAuthenticationInfo> getActiveAuthenticationInfos() {
     List<ActiveAuthenticationInfo> resultList = new ArrayList<ActiveAuthenticationInfo>();
     for (SecurityInfo securityInfo : securityInfos) {
