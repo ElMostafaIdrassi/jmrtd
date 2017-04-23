@@ -37,7 +37,7 @@ public interface ISO781611 {
   static final int BIOMETRIC_INFORMATION_TEMPLATE_TAG = 0x7F60;
 
   static final int BIOMETRIC_INFO_COUNT_TAG = 0x02;
-  static final int BIOMETRIC_HEADER_TEMPLATE_BASE_TAG = (byte) 0xA1;
+  static final int BIOMETRIC_HEADER_TEMPLATE_BASE_TAG = (byte)0xA1;
   static final int BIOMETRIC_DATA_BLOCK_TAG = 0x5F2E;
   static final int BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG = 0x7F2E;
 

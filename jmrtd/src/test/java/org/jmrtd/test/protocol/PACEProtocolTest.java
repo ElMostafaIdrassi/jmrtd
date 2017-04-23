@@ -9,8 +9,6 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECField;
 import java.security.spec.ECFieldF2m;
@@ -20,7 +18,6 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
-import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -649,6 +646,95 @@ public class PACEProtocolTest extends TestCase {
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.WARNING, "Exception", gse);
       fail(gse.getMessage());
+    }
+  }
+
+  /**
+   * Example from
+   * Appendix H to Part 11: Worked Example: PACE - Integerated Mapping (Informative).
+   * 
+   * This example is based on the BrainpoolP256r1 elliptic curve.
+   * The block cipher used in this example is AES-128.
+   */
+  /*
+   * Pseudorandom R(s,t) =
+   *    E4447E2D FB3586BA C05DDB00 156B57FB
+   *    B2179A39 49294C97 25418980 0C517BAA
+   *    8DA0FF39 7ED8C445 D3E421E4 FEB57322 
+   * 
+   * Expected R_p(s,t) =
+   *    A2F8FF2D F50E52C6 599F386A DCB595D2
+   *    29F6A167 ADE2BE5F 2C3296AD D5B7430E 
+   */
+  public void testPseudoRandomFunctionWorkedExampleH1() {
+    try {
+      ECParameterSpec params = (ECParameterSpec)PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
+      BigInteger p = Util.getPrime(params);
+      byte[] s = Hex.hexStringToBytes("2923BE84 E16CD6AE 529049F1 F1BBE9EB");
+      byte[] t = Hex.hexStringToBytes("5DD4CBFC 96F5453B 130D890A 1CDBAE32");
+
+      byte[] expectedX = Hex.hexStringToBytes("A2F8FF2D F50E52C6 599F386A DCB595D2" + "29F6A167 ADE2BE5F 2C3296AD D5B7430E");
+
+      byte[] x = PACEProtocol.pseudoRandomFunction(s, t, p, "AES");
+
+      assertTrue(Arrays.equals(expectedX, x));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
+      fail(e.getMessage());
+    }
+  }
+
+  /*
+   * Pseudo-random R(s,t) =
+   *    EAB98D13 E0905295 2AA72990 7C3C9461
+   *    84DEA0FE 74AD2B3A F506F0A8 3018459C
+   *    38099CD1 F7FF4EA0 A078DB1F AC136550
+   *    5E3DC855 00EF95E2 0B4EEF2E 88489233
+   *    BEE0546B 472F994B 618D1687 02406791
+   *    DEEF3CB4 810932EC 278F3533 FDB860EB
+   *    4835C36F A4F1BF3F A0B828A7 18C96BDE
+   *    88FBA38A 3E6C35AA A1095925 1EB5FC71
+   *    0FC18725 8995944C 0F926E24 9373F485
+   *
+   * Rp(s,t) =
+   *    A0C7C50C 002061A5 1CC87D25 4EF38068
+   *    607417B6 EE1B3647 3CFB800D 2D2E5FA2
+   *    B6980F01 105D24FA B22ACD1B FA5C8A4C
+   *    093ECDFA FE6D7125 D42A843E 33860383
+   *    5CF19AFA FF75EFE2 1DC5F6AA 1F9AE46C
+   *    25087E73 68166FB0 8C1E4627 AFED7D93
+   *    570417B7 90FF7F74 7E57F432 B04E1236
+   *    819E0DFE F5B6E77C A4999925 328182D2 
+   */
+  public void testPseudoRandomFunctionWorkedExampleH2() {
+    try {
+      BigInteger p = new BigInteger(("B10B8F96 A080E01D DE92DE5E AE5D54EC"
+          + "52C99FBC FB06A3C6 9A6A9DCA 52D23B61"
+          + "6073E286 75A23D18 9838EF1E 2EE652C0"
+          + "13ECB4AE A9061123 24975C3C D49B83BF"
+          + "ACCBDD7D 90C4BD70 98488E9C 219A7372"
+          + "4EFFD6FA E5644738 FAA31A4F F55BCCC0"
+          + "A151AF5F 0DC8B4BD 45BF37DF 365C1A65"
+          + "E68CFDA7 6D4DA708 DF1FB2BC 2E4A4371").replace(" ", ""), 16);
+
+      byte[] s = Hex.hexStringToBytes("FA5B7E3E 49753A0D B9178B7B 9BD898C8");
+      byte[] t = Hex.hexStringToBytes("B3A6DB3C 870C3E99 245E0D1C 06B747DE");
+
+      byte[] expectedX = Hex.hexStringToBytes("A0C7C50C 002061A5 1CC87D25 4EF38068"
+          + "607417B6 EE1B3647 3CFB800D 2D2E5FA2"
+          +" B6980F01 105D24FA B22ACD1B FA5C8A4C"
+          + "093ECDFA FE6D7125 D42A843E 33860383"
+          + "5CF19AFA FF75EFE2 1DC5F6AA 1F9AE46C"
+          + "25087E73 68166FB0 8C1E4627 AFED7D93"
+          + "570417B7 90FF7F74 7E57F432 B04E1236"
+          + "819E0DFE F5B6E77C A4999925 328182D2");
+
+      byte[] x = PACEProtocol.pseudoRandomFunction(s, t, p, "AES");
+
+      assertTrue(Arrays.equals(expectedX, x));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
+      fail(e.getMessage());
     }
   }
 }
