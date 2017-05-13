@@ -51,7 +51,7 @@ public class JJ2000Decoder {
 		{ "res", "", "", null },
 		{ "i", "", "", null },
 		{ "o", "", "", null },
-		{ "rate", "", "", "1.0" },
+		{ "rate", "", "", "-1" },
 		{ "nbytes", "", "", "-1" },
 		{ "parsing", null, "", "on" },
 		{ "ncb_quit", "", "", "-1" },
