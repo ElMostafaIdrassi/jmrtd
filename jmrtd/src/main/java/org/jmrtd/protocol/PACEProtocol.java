@@ -441,7 +441,7 @@ public class PACEProtocol {
 
   /**
    * The second step in the PACE protocol computes ephemeral domain parameters
-   * by performing a key agreement protocol with the PICC nonce as
+   * by performing a key agreement protocol with the PICC and PCD nonces as
    * input.
    * 
    * @param agreementAlg the agreement algorithm, either DH or ECDH
@@ -462,7 +462,7 @@ public class PACEProtocol {
    * The pseudo-random function R_p() is described in Section 3.4.2.2.3.
    * The function f_G() is defined in [4] and [25].
    * 
-   * [4]: Brier, Eric; Coron, Jean-Sébastien; Icart, Thomas; Madore, David; Randriam, Hugues; and
+   * [4]: Brier, Eric; Coron, Jean-S&eacute;́bastien; Icart, Thomas; Madore, David; Randriam, Hugues; and
    *      Tibouch, Mehdi, Efficient Indifferentiable Hashing into Ordinary Elliptic Curves, Advances in
    *      Cryptology – CRYPTO 2010, Springer-Verlag, 2010.
    * [25]: Sagem, MorphoMapping Patents FR09-54043 and FR09-54053, 2009

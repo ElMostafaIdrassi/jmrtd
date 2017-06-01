@@ -184,7 +184,7 @@ public class ISO781611Decoder implements ISO781611 {
    * Described in ISO7816-11 Annex D.
    *
    * @param inputStream source to read from
-   * @param tag should be <code>0x7D</code>
+   * @param tag should be {@code 0x7D}
    * @param length the length of the BIT
    * @param index index of the template
    *

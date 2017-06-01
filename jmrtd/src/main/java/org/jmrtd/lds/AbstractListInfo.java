@@ -45,29 +45,45 @@ public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
   private List<R> subRecords;
 
   protected List<R> getSubRecords() {
-    if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
+    if (this.subRecords == null) {
+      this.subRecords = new ArrayList<R>();
+    }
+    
     return new ArrayList<R>(this.subRecords);
   }
 
   protected void add(R subRecord) {
-    if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
+    if (this.subRecords == null) {
+      this.subRecords = new ArrayList<R>();
+    }
     this.subRecords.add(subRecord);
   }
 
   protected void addAll(List<R> subRecords) {
-    if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
+    if (this.subRecords == null) {
+      this.subRecords = new ArrayList<R>();
+    }
     this.subRecords.addAll(subRecords);
   }
 
   protected void remove(int index) {
-    if (this.subRecords == null) { this.subRecords = new ArrayList<R>(); }
+    if (this.subRecords == null) {
+      this.subRecords = new ArrayList<R>();
+    }    
     this.subRecords.remove(index);
   }
 
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!(other instanceof AbstractListInfo<?>)) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!(other instanceof AbstractListInfo<?>)) {
+      return false;
+    }
+    
     try {
       @SuppressWarnings("unchecked")
       AbstractListInfo<R> otherRecord = (AbstractListInfo<R>)other;

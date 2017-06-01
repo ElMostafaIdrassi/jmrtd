@@ -803,10 +803,10 @@ public class PassportApduService extends CardService {
    * Sends a General Authenticate command.
    *
    * @param wrapper secure messaging wrapper
-   * @param data data to be sent, without the <code>0x7C</code> prefix (this method will add it)
+   * @param data data to be sent, without the {@code 0x7C} prefix (this method will add it)
    * @param isLast indicates whether this is the last command in the chain
    *
-   * @return dynamic authentication data without the <code>0x7C</code> prefix (this method will remove it)
+   * @return dynamic authentication data without the {@code 0x7C} prefix (this method will remove it)
    *
    * @throws CardServiceException on error
    */

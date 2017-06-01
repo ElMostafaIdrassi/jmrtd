@@ -38,7 +38,7 @@ import org.jmrtd.lds.DataGroup;
 
 /**
  * File structure for the EF_DG15 file.
- * Datagroup 15 contains the public key used in AA.
+ * Datagroup 15 contains the public key used in Active Authentication.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
