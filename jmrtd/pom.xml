@@ -5,7 +5,7 @@
 
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.5.14</version>
+  <version>0.5.15-SNAPSHOT</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -54,7 +54,7 @@
       <version>1.4.3</version>
       <exclusions>
         <exclusion>
-          <groupId>bouncycastle</groupId>
+          <groupId>org.bouncycastle</groupId>
           <artifactId>bcprov-jdk15on</artifactId>
         </exclusion>
       </exclusions>

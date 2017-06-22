@@ -362,6 +362,14 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  public void testArnjlotMalaysia() {
+    String anonymizedSample =
+        "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
+        + "A984726053MYS8709125M2204134880811055050<<52";
+    
+//    MRZInfo mrzInfo = new MRZInfo(anonymizedSample);
+  }
+
   public static MRZInfo createTestObject() {
     String documentCode = "P<";
     Country issuingState = ISOCountry.NL;

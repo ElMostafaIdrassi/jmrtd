@@ -80,6 +80,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
    *
    * @throws IOException if reading fails
    */
+  @Override
   protected void readObject(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
 
@@ -98,6 +99,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     readImage(tlvIn, imageLength);
   }
 
+  @Override
   protected void writeObject(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(getDisplayedImageTagFromType(getType()));
@@ -109,6 +111,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     return displayedImageTag;
   }
 
+  @Override
   public long getRecordLength() {
     long length = 0;
     int imageLength = getImageLength();
