@@ -710,7 +710,10 @@ public class MRZInfo extends AbstractLDSInfo {
   private void readNameIdentifiers(String mrzNameString) {
     int delimIndex = mrzNameString.indexOf("<<");
     if (delimIndex < 0) {
-      throw new IllegalArgumentException("Input does not contain primary identifier!");
+      /* Only a primary identifier. */
+      primaryIdentifier = trimFillerChars(mrzNameString);
+      this.secondaryIdentifier = ""; /* FIXME: Or would null be a better value in case there is no secondary identifier? -- MO */
+      return;
     }
     primaryIdentifier = trimFillerChars(mrzNameString.substring(0, delimIndex));
     String rest = mrzNameString.substring(mrzNameString.indexOf("<<") + 2);

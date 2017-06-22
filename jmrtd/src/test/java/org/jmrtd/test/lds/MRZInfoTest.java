@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.jmrtd.lds.icao.MRZInfo;
@@ -38,6 +39,8 @@ import net.sf.scuba.data.TestCountry;
 
 public class MRZInfoTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   /* ID 1 samples. */
 
   private static final String MRZ_SUSANNA_SAMPLE_3LINE_ID1 = "IRGBRZU12345673<<<<<<<<<<<<<<<"
@@ -367,7 +370,9 @@ public class MRZInfoTest extends TestCase {
         "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
         + "A984726053MYS8709125M2204134880811055050<<52";
     
-//    MRZInfo mrzInfo = new MRZInfo(anonymizedSample);
+    MRZInfo mrzInfo = new MRZInfo(anonymizedSample);
+    assertEquals("ABC DEFG HIJKLMNOP QRS TUV XYZABCDEFGHI", mrzInfo.getPrimaryIdentifier());
+    assertEquals("", mrzInfo.getSecondaryIdentifier());
   }
 
   public static MRZInfo createTestObject() {
