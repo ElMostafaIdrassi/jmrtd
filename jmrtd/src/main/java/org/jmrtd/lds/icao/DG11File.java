@@ -102,7 +102,7 @@ public class DG11File extends DataGroup {
   private String nameOfHolder;
   private List<String> otherNames;
   private String personalNumber;
-  private Date fullDateOfBirth;
+  private String fullDateOfBirth;
   private List<String> placeOfBirth;
   private List<String> permanentAddress;
   private String telephone;
@@ -136,6 +136,38 @@ public class DG11File extends DataGroup {
   public DG11File(String nameOfHolder,
       List<String> otherNames, String personalNumber,
       Date fullDateOfBirth, List<String> placeOfBirth, List<String> permanentAddress,
+      String telephone, String profession, String title,
+      String personalSummary, byte[] proofOfCitizenship,
+      List<String> otherValidTDNumbers, String custodyInformation) {
+    this(nameOfHolder,
+        otherNames, personalNumber,
+        SDF.format(fullDateOfBirth), placeOfBirth, permanentAddress,
+        telephone, profession, title,
+        personalSummary, proofOfCitizenship,
+        otherValidTDNumbers, custodyInformation);
+  }
+
+  /**
+   * Constructs a new file. Use <code>null</code> if data element is not present.
+   * Use <code>&#39;&lt;&#39;</code> as separator.
+   *
+   * @param nameOfHolder data element
+   * @param otherNames data element
+   * @param personalNumber data element
+   * @param fullDateOfBirth data element
+   * @param placeOfBirth data element
+   * @param permanentAddress data element
+   * @param telephone data element
+   * @param profession data element
+   * @param title data element
+   * @param personalSummary data element
+   * @param proofOfCitizenship data element
+   * @param otherValidTDNumbers data element
+   * @param custodyInformation data element
+   */
+  public DG11File(String nameOfHolder,
+      List<String> otherNames, String personalNumber,
+      String fullDateOfBirth, List<String> placeOfBirth, List<String> permanentAddress,
       String telephone, String profession, String title,
       String personalSummary, byte[] proofOfCitizenship,
       List<String> otherValidTDNumbers, String custodyInformation) {
@@ -342,24 +374,19 @@ public class DG11File extends DataGroup {
   }
 
   private void parseFullDateOfBirth(byte[] value) {
-    try {
-      String field = null;
-      if (value.length == 4) {
-        /* Either France or Belgium uses this encoding for dates. */
-        field = Hex.bytesToHexString(value);
-      } else {
-        field = new String(value);
-        try {
-          field = new String(value, "UTF-8");
-        } catch (UnsupportedEncodingException usee) {
-          LOGGER.severe("Exception: " + usee.getMessage());
-        }
+    String field = null;
+    if (value.length == 4) {
+      /* Either France or Belgium uses this encoding for dates. */
+      field = Hex.bytesToHexString(value);
+    } else {
+      field = new String(value);
+      try {
+        field = new String(value, "UTF-8");
+      } catch (UnsupportedEncodingException usee) {
+        LOGGER.severe("Exception: " + usee.getMessage());
       }
-      // in = in.replace("<", " ").trim();
-      fullDateOfBirth = SDF.parse(field);
-    } catch (ParseException pe) {
-      throw new IllegalArgumentException(pe.toString());
     }
+    fullDateOfBirth = field;
   }
 
   private synchronized void parseOtherName(byte[] value) {
@@ -481,7 +508,7 @@ public class DG11File extends DataGroup {
    *
    * @return the full date of birth
    */
-  public Date getFullDateOfBirth() {
+  public String getFullDateOfBirth() {
     return fullDateOfBirth;
   }
 
@@ -577,7 +604,7 @@ public class DG11File extends DataGroup {
     result.append(nameOfHolder == null ? "" : nameOfHolder); result.append(", ");
     result.append(otherNames == null || otherNames.size() == 0 ? "[]" : otherNames); result.append(", ");
     result.append(personalNumber == null ? "" : personalNumber); result.append(", ");
-    result.append(fullDateOfBirth == null ? "" : SDF.format(fullDateOfBirth)); result.append(", ");
+    result.append(fullDateOfBirth == null ? "" : fullDateOfBirth); result.append(", ");
     result.append(placeOfBirth == null || placeOfBirth.size() == 0 ? "[]" : placeOfBirth.toString()); result.append(", ");
     result.append(permanentAddress == null || permanentAddress.size() == 0 ? "[]" : permanentAddress.toString()); result.append(", ");
     result.append(telephone == null ? "" : telephone); result.append(", ");
@@ -637,7 +664,7 @@ public class DG11File extends DataGroup {
           break;
         case FULL_DATE_OF_BIRTH_TAG:
           tlvOut.writeTag(tag);
-          String fullDateOfBirthString = SDF.format(fullDateOfBirth);
+          String fullDateOfBirthString = fullDateOfBirth;
           // the following 2 commented lines  write date of birth field incorrectly
           // (also see that during parsing field in incorrect case of BCD encoding is
           // handled but JMRTD itself uses incorrect way of writing field)
