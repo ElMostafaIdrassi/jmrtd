@@ -675,8 +675,13 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return a boolean
    */
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (!(obj.getClass().equals(this.getClass()))) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj.getClass().equals(this.getClass()))) {
+      return false;
+    }
+    
     MRZInfo other = (MRZInfo)obj;
 
     return
@@ -690,8 +695,7 @@ public class MRZInfo extends AbstractLDSInfo {
         && ((dateOfBirth == null && other.dateOfBirth == null) || dateOfBirth != null && dateOfBirth.equals(other.dateOfBirth))
         && ((gender == null && other.gender == null) || gender != null && gender.equals(other.gender))
         && ((dateOfExpiry == null && other.dateOfExpiry == null) || dateOfExpiry != null && dateOfExpiry.equals(other.dateOfExpiry))
-        && ((optionalData2 == null && other.optionalData2 == null) || optionalData2 != null && equalsModuloFillerChars(optionalData2, other.optionalData2))
-        ;
+        && ((optionalData2 == null && other.optionalData2 == null) || optionalData2 != null && equalsModuloFillerChars(optionalData2, other.optionalData2));
   }
 
   /**

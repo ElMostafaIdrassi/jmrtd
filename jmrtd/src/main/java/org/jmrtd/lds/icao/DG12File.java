@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.DataGroup;
@@ -73,13 +74,13 @@ public class DG12File extends DataGroup {
   private static final SimpleDateFormat SDTF = new SimpleDateFormat("yyyyMMddhhmmss");
 
   private String issuingAuthority;
-  private Date dateOfIssue;
+  private String dateOfIssue;
   private List<String> namesOfOtherPersons;
   private String endorsementsAndObservations;
   private String taxOrExitRequirements;
   private byte[] imageOfFront;
   private byte[] imageOfRear;
-  private Date dateAndTimeOfPersonalization;
+  private String dateAndTimeOfPersonalization;
   private String personalizationSystemSerialNumber;
 
   private List<Integer> tagPresenceList;
@@ -103,6 +104,31 @@ public class DG12File extends DataGroup {
       List<String> namesOfOtherPersons, String endorsementsAndObservations,
       String taxOrExitRequirements, byte[] imageOfFront,
       byte[] imageOfRear, Date dateAndTimeOfPersonalization,
+      String personalizationSystemSerialNumber) {
+    this(issuingAuthority, SDF.format(dateOfIssue),
+        namesOfOtherPersons,  endorsementsAndObservations,
+        taxOrExitRequirements, imageOfFront,
+        imageOfRear, SDTF.format(dateAndTimeOfPersonalization),
+        personalizationSystemSerialNumber);
+  }
+
+  /**
+   * Constructs a new file.
+   *
+   * @param issuingAuthority the issuing authority
+   * @param dateOfIssue the date of issue
+   * @param namesOfOtherPersons names of other persons
+   * @param endorsementsAndObservations endorsements and observations
+   * @param taxOrExitRequirements tax or exit requirements
+   * @param imageOfFront image of front
+   * @param imageOfRear image of rear
+   * @param dateAndTimeOfPersonalization date and time of personalization
+   * @param personalizationSystemSerialNumber personalization system serial number
+   */
+  public DG12File(String issuingAuthority, String dateOfIssue,
+      List<String> namesOfOtherPersons, String endorsementsAndObservations,
+      String taxOrExitRequirements, byte[] imageOfFront,
+      byte[] imageOfRear, String dateAndTimeOfPersonalization,
       String personalizationSystemSerialNumber) {
     super(EF_DG12_TAG);
     this.issuingAuthority = issuingAuthority;
@@ -230,12 +256,10 @@ public class DG12File extends DataGroup {
       // the following commented line causes invalid parsing of date and time of personalisation field
       //String field = Hex.bytesToHexString(value);
       String field = new String(value, "UTF-8");
-      dateAndTimeOfPersonalization = SDTF.parse(field.trim());
+      dateAndTimeOfPersonalization = field.trim();
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: never happens, UTF-8 is supported. */
-      LOGGER.severe("Exception: " + usee.getMessage());
-    } catch (ParseException pe) {
-      throw new IllegalArgumentException(pe.toString());
+      LOGGER.log(Level.WARNING, "Exception", usee.getMessage());
     }
   }
 
@@ -288,28 +312,20 @@ public class DG12File extends DataGroup {
     if (value.length == 8) {
       try {
         String dateString = new String(value, "UTF-8");
-        dateOfIssue = SDF.parse(dateString.trim());
+        dateOfIssue = dateString.trim();
         return;
       } catch (UnsupportedEncodingException usee) {
         /* NOTE: never happens, UTF-8 is supported. */
         LOGGER.severe("Exception: " + usee.getMessage());
-      } catch (ParseException e) {
-        /* NOTE: ok, something went wrong here, it's not the date format that we expect. */
-        LOGGER.severe("Exception: " + e.getMessage());
       }
     }
     LOGGER.warning("DG12 date of issue is not in expected ccyymmdd ASCII format");
 
     /* Some live French MRTDs encode the date as ccyymmdd but in BCD, not in ASCII. */
     if (value.length == 4) {
-      try {
-        String dateString = Hex.bytesToHexString(value);
-        dateOfIssue = SDF.parse(dateString.trim());
-        return;
-      } catch (ParseException e) {
-        /* NOTE: ok, something went wrong here, it's not the date format that we expect. */
-        LOGGER.severe("Exception: " + e.getMessage());
-      }
+      String dateString = Hex.bytesToHexString(value);
+      dateOfIssue = dateString.trim();
+      return;
     }
 
     /* Giving up... we can't parse this date. */
@@ -343,7 +359,7 @@ public class DG12File extends DataGroup {
    *
    * @return the dateOfIssue
    */
-  public Date getDateOfIssue() {
+  public String getDateOfIssue() {
     return dateOfIssue;
   }
 
@@ -397,7 +413,7 @@ public class DG12File extends DataGroup {
    *
    * @return the dateAndTimeOfPersonalization
    */
-  public Date getDateAndTimeOfPersonalization() {
+  public String getDateAndTimeOfPersonalization() {
     return dateAndTimeOfPersonalization;
   }
 
@@ -423,13 +439,13 @@ public class DG12File extends DataGroup {
     StringBuffer result = new StringBuffer();
     result.append("DG12File [");
     result.append(issuingAuthority == null ? "" : issuingAuthority); result.append(", ");
-    result.append(dateOfIssue == null ? "" : SDF.format(dateOfIssue)); result.append(", ");
+    result.append(dateOfIssue == null ? "" : dateOfIssue); result.append(", ");
     result.append(namesOfOtherPersons == null || namesOfOtherPersons.size() == 0 ? "" : namesOfOtherPersons); result.append(", ");
     result.append(endorsementsAndObservations == null ? "" : endorsementsAndObservations); result.append(", ");
     result.append(taxOrExitRequirements == null ? "" : taxOrExitRequirements); result.append(", ");
     result.append(imageOfFront == null ? "" : "image (" + imageOfFront.length + ")"); result.append(", ");
     result.append(imageOfRear == null ? "" : "image (" + imageOfRear.length + ")"); result.append(", ");
-    result.append(dateAndTimeOfPersonalization == null ? "" : SDF.format(dateAndTimeOfPersonalization)); result.append(", ");
+    result.append(dateAndTimeOfPersonalization == null ? "" : dateAndTimeOfPersonalization); result.append(", ");
     result.append(personalizationSystemSerialNumber== null ? "" : personalizationSystemSerialNumber);
     result.append("]");
     return result.toString();
@@ -465,7 +481,7 @@ public class DG12File extends DataGroup {
           break;
         case DATE_OF_ISSUE_TAG:
           tlvOut.writeTag(tag);
-          tlvOut.writeValue(new String(SDF.format(dateOfIssue)).getBytes("UTF-8"));
+          tlvOut.writeValue(dateOfIssue.getBytes("UTF-8"));
           break;
         case NAME_OF_OTHER_PERSON_TAG:
           if (namesOfOtherPersons == null) { namesOfOtherPersons = new ArrayList<String>(); }
@@ -499,7 +515,7 @@ public class DG12File extends DataGroup {
           tlvOut.writeTag(tag);
           // the following commented line  writes date and time of personalisation field incorrectly
           //tlvOut.writeValue(Hex.hexStringToBytes(SDTF.format(dateAndTimeOfPersonalization)));
-          tlvOut.writeValue(new String(SDTF.format(dateAndTimeOfPersonalization)).getBytes("UTF-8"));
+          tlvOut.writeValue(dateAndTimeOfPersonalization.getBytes("UTF-8"));
           break;
         case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
           tlvOut.writeTag(tag);
