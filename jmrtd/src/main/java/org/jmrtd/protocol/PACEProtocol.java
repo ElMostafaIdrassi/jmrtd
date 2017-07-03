@@ -353,6 +353,7 @@ public class PACEProtocol {
    * @param agreementAlg the agreement algorithm, either DH or ECDH
    * @param params the static domain parameters
    * @param piccNonce the nonce received from the PICC
+   * @param staticPACECipher the cipher to use in IM
    * 
    * @return the computed ephemeral domain parameters
    * 
@@ -447,6 +448,7 @@ public class PACEProtocol {
    * @param agreementAlg the agreement algorithm, either DH or ECDH
    * @param params the static domain parameters
    * @param piccNonce the received nonce from the PICC
+   * @param staticPACECipher the cipher to use for IM
    * 
    * @return the computed ephemeral domain parameters
    * 
