@@ -148,7 +148,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2 + ", found " + version);
       }
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Exception", e);
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
       throw new IllegalArgumentException("Malformed ChipAuthenticationInfo.");
     }
   }

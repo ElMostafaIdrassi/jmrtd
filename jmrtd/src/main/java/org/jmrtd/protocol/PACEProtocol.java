@@ -240,7 +240,7 @@ public class PACEProtocol {
       encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
       macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.SEVERE, "Security exception during secure messaging key derivation", gse);
+      LOGGER.log(Level.WARNING, "Security exception during secure messaging key derivation", gse);
       throw new PACEException("Security exception during secure messaging key derivation: " + gse.getMessage());
     }
 
@@ -291,7 +291,7 @@ public class PACEProtocol {
         LOGGER.info("DEBUG: Including Chip Authentication data in PACE result");
 
       } catch (GeneralSecurityException gse) {
-        LOGGER.log(Level.SEVERE, "Could not decrypt Chip Authentication data", gse);
+        LOGGER.log(Level.WARNING, "Could not decrypt Chip Authentication data", gse);
       }
     }
 
@@ -622,7 +622,7 @@ public class PACEProtocol {
       keyAgreement.doPhase(updateParameterSpec(piccPublicKey, pcdPrivateKey), true);
       return keyAgreement.generateSecret();
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.SEVERE, "PCD side error during key agreement", gse);
+      LOGGER.log(Level.WARNING, "PCD side error during key agreement", gse);
       throw new PACEException("PCD side error during key agreement");
     }
   }

@@ -245,7 +245,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
       LOGGER.warning("Unsupported SecurityInfo, oid = " + oid);
       return null;
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Exception", e);
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
       throw new IllegalArgumentException("Malformed input stream.");
     }
   }  

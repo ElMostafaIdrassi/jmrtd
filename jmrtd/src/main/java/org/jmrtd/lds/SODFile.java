@@ -184,7 +184,7 @@ public class SODFile extends AbstractTaggedLDSFile {
           ICAO_LDS_SOD_OID, contentInfo,
           encryptedDigest, docSigningCertificate);      
     } catch (IOException ioe) {
-      LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Error creating signedData", ioe);
       throw new IllegalArgumentException(ioe.getMessage());
     }
   }

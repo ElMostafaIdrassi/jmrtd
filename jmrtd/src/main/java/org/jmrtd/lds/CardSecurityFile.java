@@ -165,7 +165,7 @@ public class CardSecurityFile implements Serializable {
     try {
       this.certificate = SignedDataUtil.getDocSigningCertificate(signedData);
     } catch (CertificateException ce) {
-      LOGGER.log(Level.SEVERE, "Exceptiong while extracting document signing certificate", ce);
+      LOGGER.log(Level.WARNING, "Exceptiong while extracting document signing certificate", ce);
     }
 
     this.securityInfos = getSecurityInfos(signedData);
@@ -179,10 +179,10 @@ public class CardSecurityFile implements Serializable {
       SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, CONTENT_TYPE_OID, contentInfo, encryptedDigest, certificate);
       SignedDataUtil.writeData(signedData, outputStream);
     } catch (CertificateException ce) {
-      LOGGER.log(Level.SEVERE, "Certificate exception during SignedData creation", ce);
+      LOGGER.log(Level.WARNING, "Certificate exception during SignedData creation", ce);
       throw new IOException(ce.getMessage());
     } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.log(Level.SEVERE, "Unsupported algorithm", nsae);
+      LOGGER.log(Level.WARNING, "Unsupported algorithm", nsae);
       throw new IOException(nsae.getMessage());
     }
   }
@@ -313,7 +313,7 @@ public class CardSecurityFile implements Serializable {
 
       return new ContentInfo(new ASN1ObjectIdentifier(contentTypeOID), new DEROctetString(derSet));
     } catch (IOException ioe) {
-      LOGGER.log(Level.SEVERE, "Error creating signedData: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Error creating signedData", ioe);
       throw new IllegalArgumentException("Error DER encoding the security infos");
     }
   }

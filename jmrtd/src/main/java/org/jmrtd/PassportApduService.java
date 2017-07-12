@@ -130,7 +130,7 @@ public class PassportApduService extends CardService {
       mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
       cipher = Cipher.getInstance("DESede/CBC/NoPadding");
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.SEVERE, "Unexpected security exception during initialization", gse);
+      LOGGER.log(Level.WARNING, "Unexpected security exception during initialization", gse);
       throw new CardServiceException(gse.toString());
     }
   }
@@ -763,7 +763,7 @@ public class PassportApduService extends CardService {
       }
     } catch (IOException ioe) {
       /* NOTE: should never happen. */
-      LOGGER.log(Level.SEVERE, "Error while copying data", ioe);
+      LOGGER.log(Level.WARNING, "Error while copying data", ioe);
       throw new IllegalStateException("Error while copying data");
     }
     byte[] data = dataOutputStream.toByteArray();

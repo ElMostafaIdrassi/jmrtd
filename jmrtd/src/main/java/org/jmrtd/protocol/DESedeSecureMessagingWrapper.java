@@ -169,10 +169,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     try {
       return wrapCommandAPDU(commandAPDU, ssc);
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.SEVERE, "Exception", gse);
+      LOGGER.log(Level.WARNING, "Unexpected exception", gse);
       throw new IllegalStateException(gse.getMessage());
     } catch (IOException ioe) {
-      LOGGER.log(Level.SEVERE, "Exception", ioe);
+      LOGGER.log(Level.WARNING, "Unexpected exception", ioe);
       throw new IllegalStateException(ioe.getMessage());
     }
   }
@@ -195,10 +195,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       }
       return unwrapResponseAPDU(responseAPDU, ssc);
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.SEVERE, "Exception", gse);
+      LOGGER.log(Level.WARNING, "Unexpected exception", gse);
       throw new IllegalStateException(gse.getMessage());
     } catch (IOException ioe) {
-      LOGGER.log(Level.SEVERE, "Exception", ioe);
+      LOGGER.log(Level.WARNING, "Unexpected exception", ioe);
       throw new IllegalStateException(ioe.getMessage());
     }
   }

@@ -963,7 +963,7 @@ public class Util {
       BigInteger y = Util.os2i(yCoordBytes);
       return new ECPoint(x, y);
     } catch (IOException ioe) {
-      LOGGER.log(Level.SEVERE, "Exception", ioe);
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       throw new IllegalArgumentException(ioe.getMessage());
     }
   }
