@@ -68,7 +68,7 @@ public class CertificateUtil {
       certificateFactory = CertificateFactory.getInstance("X.509");
       return (X509Certificate)certificateFactory.generateCertificate(new ByteArrayInputStream(certBytes));
     } catch (Exception  e) {
-      LOGGER.log(Level.SEVERE, "Unexpected exception", e);
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
       throw new IllegalStateException(e.getMessage());
     } finally {
       JMRTDSecurityProvider.endPreferBouncyCastleProvider(n);

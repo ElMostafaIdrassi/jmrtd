@@ -171,7 +171,7 @@ public class CardSecurityFileTest extends TestCase {
       /* Create the card security file. */
       return new CardSecurityFile(digestAlgorithm, digestEncryptionAlgorithm, securityInfos, dsKeyPair.getPrivate(), dsCert, "BC");
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Exception during construction of sample", e);
+      LOGGER.log(Level.WARNING, "Exception during construction of sample", e);
       fail(e.getMessage());
       return null;
     }
