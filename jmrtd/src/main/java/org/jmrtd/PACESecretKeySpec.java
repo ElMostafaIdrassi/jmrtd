@@ -17,39 +17,40 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: BACKey.java 1633 2016-09-16 14:52:25Z martijno $
+ * $Id: $
  */
 
 package org.jmrtd;
 
-import java.security.spec.KeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
- * An access key specification for a card access number.
+ * A key for PACE.
  *
- * @author The JMRTD team (info@jmrtd.org)
+ * @author The JMRTD Team (info@jmrtd.org)
  *
- * @version $Revision: 1633 $
+ * @version $Revision: $
+ *
+ * (Contributions by g.giorkhelidze.)
  */
-public class CANKey implements KeySpec {
+public class PACESecretKeySpec extends SecretKeySpec {
+  
+  private static final long serialVersionUID = 1L;
 
-  private String cardAccessNumber;
+  private byte keyReference;
 
-  /**
-   * Constructs a key specification.
-   * 
-   * @param cardAccessNumber the card access number
-   */
-  public CANKey(String cardAccessNumber) {
-    this.cardAccessNumber = cardAccessNumber;
+  public PACESecretKeySpec(byte[] key, int offset, int len, String algorithm, byte paceKeyReference) {
+    super(key, offset, len, algorithm);
+    this.keyReference = paceKeyReference;
   }
 
-  /**
-   * Gets the card access number.
-   * 
-   * @return the card access number
-   */
-  public String getCardAccessNumber() {
-    return cardAccessNumber;
+  public PACESecretKeySpec(byte[] key, String algorithm, byte paceKeyReference) {
+    super(key, algorithm);
+    this.keyReference = paceKeyReference;
+  }
+
+  public byte getKeyReference() {
+    return keyReference;
   }
 }
+

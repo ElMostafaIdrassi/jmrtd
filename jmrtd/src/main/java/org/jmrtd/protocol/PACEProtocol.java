@@ -57,9 +57,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.CANKey;
 import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.PACEException;
+import org.jmrtd.PACEKeySpec;
+import org.jmrtd.PACESecretKeySpec;
 import org.jmrtd.PassportApduService;
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
@@ -197,7 +198,12 @@ public class PACEProtocol {
       byte[] referencePrivateKeyOrForComputingSessionKey = null;
 
       /* Send to the PICC. */
-      service.sendMSESetATMutualAuth(wrapper, oid, PassportApduService.MRZ_PACE_KEY_REFERENCE, referencePrivateKeyOrForComputingSessionKey);
+      byte paceKeyReference = PassportApduService.MRZ_PACE_KEY_REFERENCE;
+      if (staticPACEKey instanceof PACESecretKeySpec) {
+        paceKeyReference = ((PACESecretKeySpec)staticPACEKey).getKeyReference();
+      }
+      
+      service.sendMSESetATMutualAuth(wrapper, oid, paceKeyReference, referencePrivateKeyOrForComputingSessionKey);
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side error in static PACE key derivation step", cse.getSW());
     }
@@ -673,7 +679,13 @@ public class PACEProtocol {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
     byte[] keySeed = computeKeySeedForPACE(keySpec);
-    return Util.deriveKey(keySeed, cipherAlg, keyLength, Util.PACE_MODE);
+    
+    byte paceKeyReference = 0;
+    if (keySpec instanceof PACEKeySpec) {
+      paceKeyReference = ((PACEKeySpec)keySpec).getKeyReference();
+    }
+
+    return Util.deriveKey(keySeed, cipherAlg, keyLength, null, Util.PACE_MODE, paceKeyReference);
   }
 
   public static byte[] computeKeySeedForPACE(KeySpec accessKey) throws GeneralSecurityException {
@@ -702,11 +714,9 @@ public class PACEProtocol {
 
       return computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
     }
-
-    /* CAN based key. */
-    if (accessKey instanceof CANKey) {
-      String cardAccessNumber = ((CANKey)accessKey).getCardAccessNumber();
-      return computeKeySeedForPACE(cardAccessNumber);
+    
+    if (accessKey instanceof PACEKeySpec) {
+      return ((PACEKeySpec)accessKey).getKey();
     }
 
     throw new IllegalArgumentException("Unsupported access key, was expecting BAC or CAN key specification, found " + accessKey.getClass().getSimpleName());

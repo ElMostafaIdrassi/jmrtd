@@ -401,11 +401,11 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * <pre>
    * The following sequence of commands SHALL be used to implement Terminal Authentication:
-   * 	1. MSE:Set DST
-   * 	2. PSO:Verify Certificate
-   * 	3. MSE:Set AT
-   * 	4. Get Challenge
-   * 	5. External Authenticate
+   *   1. MSE:Set DST
+   *   2. PSO:Verify Certificate
+   *   3. MSE:Set AT
+   *   4. Get Challenge
+   *   5. External Authenticate
    * Steps 1 and 2 are repeated for every CV certificate to be verified
    * (CVCA Link Certificates, DV Certificate, IS Certificate).
    * </pre>
@@ -434,6 +434,32 @@ public class PassportService extends PassportApduService implements Serializable
     TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
     state = State.TA_AUTHENTICATED_STATE;
     return taResult;
+  }
+
+  /**
+   * Performs <i>Terminal Authentication</i> (TA) part of EAC (version 1). For details see
+   * TR-03110 ver. 1.11.
+   * 
+   * In short, we feed the sequence of terminal certificates to the card for verification,
+   * get a challenge from the card, sign it with the terminal private key, and send the result
+   * back to the card for verification.
+   *
+   * @param caReference reference issuer
+   * @param terminalCertificates terminal certificate chain
+   * @param terminalKey terminal private key
+   * @param taAlg algorithm
+   * @param chipAuthenticationResult the chip authentication result
+   * @param paceResult the PACE result
+   *
+   * @return the challenge from the card
+   *
+   * @throws CardServiceException on error
+   */
+  public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
+        PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
+      TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
+      state = State.TA_AUTHENTICATED_STATE;
+      return taResult;
   }
 
   /**

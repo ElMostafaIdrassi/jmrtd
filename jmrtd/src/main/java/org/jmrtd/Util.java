@@ -32,6 +32,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
@@ -85,7 +86,6 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.icao.MRZInfo;
-
 import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;
 
@@ -140,8 +140,8 @@ public class Util {
    * @return the key.
    *
    * @throws GeneralSecurityException on security error
-   */	
-  public static SecretKey deriveKey(byte[] keySeed, String cipherAlgName, int keyLength, int mode) throws GeneralSecurityException {	
+   */
+  public static SecretKey deriveKey(byte[] keySeed, String cipherAlgName, int keyLength, int mode) throws GeneralSecurityException {
     return deriveKey(keySeed, cipherAlgName, keyLength, null, mode);
   }
 
@@ -159,6 +159,24 @@ public class Util {
    * @throws GeneralSecurityException if something went wrong
    */
   public static SecretKey deriveKey(byte[] keySeed, String cipherAlg, int keyLength, byte[] nonce, int counter) throws GeneralSecurityException {
+    return deriveKey(keySeed, cipherAlg, keyLength, nonce, counter, (byte)0);
+  }
+
+  /**
+   * Derives a shared key.
+   *
+   * @param keySeed the shared secret, as octets
+   * @param cipherAlg in Java mnemonic notation (for example "DESede", "AES")
+   * @param keyLength length in bits
+   * @param nonce optional nonce or <code>null</code>
+   * @param counter counter or mode
+   * @param paceKeyReference Key Reference For Pace Protocol
+   *
+   * @return the derived key
+   *
+   * @throws GeneralSecurityException if something went wrong
+   */
+  public static SecretKey deriveKey(byte[] keySeed, String cipherAlg, int keyLength, byte[] nonce, int counter, byte paceKeyReference) throws GeneralSecurityException {
     String digestAlg = inferDigestAlgorithmFromCipherAlgorithmForKeyDerivation(cipherAlg, keyLength);
     MessageDigest digest = MessageDigest.getInstance(digestAlg);
     digest.reset();
@@ -201,7 +219,12 @@ public class Util {
           throw new IllegalArgumentException("KDF can only use AES with 128-bit, 192-bit key or 256-bit length, found: " + keyLength + "-bit key length");
       }
     }
-    return new SecretKeySpec(keyBytes, cipherAlg);
+
+    if (paceKeyReference == 0) {
+      return new SecretKeySpec(keyBytes, cipherAlg);
+    } else {
+      return new PACESecretKeySpec(keyBytes, cipherAlg, paceKeyReference);
+    }
   }
 
   /**
@@ -433,7 +456,7 @@ public class Util {
   public static byte[] i2os(BigInteger val, int length) {
     BigInteger base = BigInteger.valueOf(256);
     byte[] result = new byte[length];
-    for (int i = 0; i < length; i++) {	
+    for (int i = 0; i < length; i++) {
       BigInteger remainder = val.mod(base);
       val = val.divide(base);
       result[length - 1 - i] = (byte)remainder.intValue();
@@ -675,7 +698,7 @@ public class Util {
       }
     }
     if (namedSpecs.size() == 0) {
-      //			throw new IllegalArgumentException("No named curve found");
+      // throw new IllegalArgumentException("No named curve found");
       return null;
     } else if (namedSpecs.size() == 1) {
       return namedSpecs.get(0);
@@ -871,7 +894,7 @@ public class Util {
           tlvOut.writeTag(0x83); tlvOut.writeValue(i2os(generator)); /* Generator */
         }
         tlvOut.writeTag(0x84); tlvOut.writeValue(i2os(y)); /* y: Public value */
-      } else if (publicKey instanceof ECPublicKey) {				
+      } else if (publicKey instanceof ECPublicKey) {
         ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
         ECParameterSpec params = ecPublicKey.getParams();
         BigInteger p = getPrime(params);
@@ -893,9 +916,9 @@ public class Util {
           tlvOut.writeTag(0x84); tlvOut.write(i2os(affineX)); tlvOut.write(i2os(affineY)); tlvOut.writeValueEnd(); /* Base point, FIXME: correct encoding? */
           tlvOut.writeTag(0x85); tlvOut.writeValue(i2os(order)); /* Order of the base point */
         }
-        tlvOut.writeTag(0x86); tlvOut.writeValue(ecPoint2OS(publicPoint)); /* Public point */				
+        tlvOut.writeTag(0x86); tlvOut.writeValue(ecPoint2OS(publicPoint)); /* Public point */
         if (!isContextKnown) {
-          tlvOut.writeTag(0x87); tlvOut.writeValue(i2os(BigInteger.valueOf(coFactor))); /* Cofactor */			
+          tlvOut.writeTag(0x87); tlvOut.writeValue(i2os(BigInteger.valueOf(coFactor))); /* Cofactor */
         }
       } else {
         throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
@@ -1122,7 +1145,7 @@ public class Util {
     return fromBouncyCastleECPoint(bcProd);
   }
 
-  private static byte[] getBytes(String str) {
+  public static byte[] getBytes(String str) {
     byte[] bytes = str.getBytes();
     try {
       bytes = str.getBytes("UTF-8");
@@ -1262,4 +1285,32 @@ public class Util {
     byte[] seed = params.getCurve().getSeed();
     return new ECDomainParameters(curve, g, n, h, seed);
   }
+  
+  public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
+    if ("DH".equals(agreementAlg)) {
+      /* TODO: this is probably wrong, what should be hashed? */
+      MessageDigest md = MessageDigest.getInstance("SHA-1");
+      md = MessageDigest.getInstance("SHA-1");
+      return md.digest(getKeyData(agreementAlg, pcdPublicKey));
+    } else if ("ECDH".equals(agreementAlg)) {
+      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
+      byte[] t = Util.i2os(pcdECPublicKey.getQ().getX().toBigInteger());
+      return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
+    }
+
+    throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
+  }
+
+  public static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
+    if ("DH".equals(agreementAlg)) {
+      DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
+      return pcdDHPublicKey.getY().toByteArray();
+    } else if ("ECDH".equals(agreementAlg)) {
+      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
+      return pcdECPublicKey.getQ().getEncoded();
+    }
+
+    throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
+  }
 }
+
