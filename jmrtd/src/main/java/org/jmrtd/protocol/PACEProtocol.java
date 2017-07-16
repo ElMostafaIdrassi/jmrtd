@@ -57,7 +57,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.PACEException;
 import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PACESecretKeySpec;
@@ -82,7 +81,7 @@ public class PACEProtocol {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /**
    * Used in the last step of PACE-CAM.

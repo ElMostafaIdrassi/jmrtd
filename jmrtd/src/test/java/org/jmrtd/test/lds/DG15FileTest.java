@@ -33,7 +33,7 @@ import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 
-import org.jmrtd.JMRTDSecurityProvider;
+import org.jmrtd.Util;
 import org.jmrtd.lds.icao.DG15File;
 
 import junit.framework.TestCase;
@@ -41,7 +41,7 @@ import net.sf.scuba.util.Hex;
 
 public class DG15FileTest extends TestCase {
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
   private static final String BC_PROVIDER_NAME = BC_PROVIDER == null ? null : BC_PROVIDER.getName();
 
   public DG15FileTest(String name) {

@@ -48,7 +48,7 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.jmrtd.JMRTDSecurityProvider;
+import org.jmrtd.Util;
 import org.jmrtd.lds.LDSFile;
 import org.jmrtd.lds.SODFile;
 import org.jmrtd.lds.icao.COMFile;
@@ -64,7 +64,7 @@ public class SODFileTest extends TestCase {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** We need this for SHA-256 (and probably more). */
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
   private static final String BC_PROVIDER_NAME = BC_PROVIDER == null ? null : BC_PROVIDER.getName();
 
   public SODFileTest(String name) {

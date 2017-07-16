@@ -84,7 +84,7 @@ public class PassportApduService extends CardService {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /** The applet we select when we start a session. */
   protected static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };

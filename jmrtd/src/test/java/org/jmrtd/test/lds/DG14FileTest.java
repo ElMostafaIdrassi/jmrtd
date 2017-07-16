@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 
-import org.jmrtd.JMRTDSecurityProvider;
+import org.jmrtd.Util;
 import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
 import org.jmrtd.lds.PACEInfo;
@@ -64,7 +64,7 @@ public class DG14FileTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
   static {
     Security.addProvider(BC_PROVIDER);
   }

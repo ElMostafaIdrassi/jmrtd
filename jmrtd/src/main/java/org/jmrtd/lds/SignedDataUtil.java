@@ -30,7 +30,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.Signature;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -75,7 +74,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-import org.jmrtd.JMRTDSecurityProvider;
 
 /**
  * Utility class for helping with CMS SignedData in security object document and
@@ -92,8 +90,6 @@ import org.jmrtd.JMRTDSecurityProvider;
 /* package-visible */ class SignedDataUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
 
   /** SignedData related object identifier. */
   public static final String

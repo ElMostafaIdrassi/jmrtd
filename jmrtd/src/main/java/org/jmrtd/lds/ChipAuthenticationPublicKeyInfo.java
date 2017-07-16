@@ -34,7 +34,6 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DLSequence;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.Util;
 
 /**
@@ -65,7 +64,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
   
   private String oid;
   private SubjectPublicKeyInfo subjectPublicKeyInfo; // TODO: just store a public key here, instead of BC object

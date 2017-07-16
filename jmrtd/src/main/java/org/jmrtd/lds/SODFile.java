@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
@@ -54,7 +53,6 @@ import org.bouncycastle.asn1.icao.LDSSecurityObject;
 import org.bouncycastle.asn1.icao.LDSVersionInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.jmrtd.JMRTDSecurityProvider;
 
 /**
  * File structure for the EF_SOD file (the Document Security Object).
@@ -108,8 +106,6 @@ public class SODFile extends AbstractTaggedLDSFile {
    * </pre>
    */
   private static final String SDU_LDS_SOD_OID = "1.2.528.1.1006.1.20.1";
-
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 

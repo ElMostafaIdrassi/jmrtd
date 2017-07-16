@@ -81,11 +81,13 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.icao.MRZInfo;
+
 import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;
 
@@ -110,11 +112,20 @@ public class Util {
   MAC_MODE = 2,
   PACE_MODE = 3;
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = new BouncyCastleProvider();
 
   private Util() {
   }
 
+  /**
+   * Gets the BC provider, if present.
+   * 
+   * @return the BC provider, the SC provider, or <code>null</code>
+   */
+  public static Provider getBouncyCastleProvider() {
+    return BC_PROVIDER;
+  }
+  
   /**
    * Derives the ENC or MAC key for BAC from the keySeed.
    *

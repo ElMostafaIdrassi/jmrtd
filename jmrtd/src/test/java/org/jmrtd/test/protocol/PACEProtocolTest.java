@@ -31,7 +31,6 @@ import javax.crypto.spec.DHPrivateKeySpec;
 import javax.crypto.spec.DHPublicKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jmrtd.JMRTDSecurityProvider;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.protocol.PACEProtocol;
@@ -41,7 +40,7 @@ import net.sf.scuba.util.Hex;
 
 public class PACEProtocolTest extends TestCase {
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 

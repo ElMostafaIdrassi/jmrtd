@@ -8,14 +8,14 @@ import java.util.logging.Logger;
 
 import javax.crypto.spec.DHParameterSpec;
 
-import org.jmrtd.JMRTDSecurityProvider;
+import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 
 import junit.framework.TestCase;
 
 public class PACEInfoTest extends TestCase {
 
-  private static final Provider BC_PROVIDER = JMRTDSecurityProvider.getBouncyCastleProvider();
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
