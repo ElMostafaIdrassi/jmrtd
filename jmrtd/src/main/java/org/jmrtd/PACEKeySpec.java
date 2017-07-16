@@ -44,7 +44,7 @@ public class PACEKeySpec implements KeySpec {
   /**
    * Constructs a PACE key from a string value.
    * 
-   * @param the string value containing CAN, PIN or PUK
+   * @param key the string value containing CAN, PIN or PUK
    * @param keyReference indicates the type of key, valid values are
    *                     {@code MRZ_PACE_KEY_REFERENCE}, {@code CAN_PACE_KEY_REFERENCE},
    *                     {@code PIN_PACE_KEY_REFERENCE}, {@code PUK_PACE_KEY_REFERENCE}
