@@ -142,16 +142,27 @@ public class JMRTDSecurityProvider extends Provider {
    */
   public static int beginPreferBouncyCastleProvider() {
     Provider bcProvider = getBouncyCastleProvider();
-    if (bcProvider == null) { return -1; }
+    if (bcProvider == null) {
+      return -1;
+    }
+    
     Provider[] providers = Security.getProviders();
     for (int i = 0; i < providers.length; i++) {
       Provider provider = providers[i];
       if (bcProvider.getClass().getCanonicalName().equals(provider.getClass().getCanonicalName())) {
+        if (i == 0) {
+          /* Top position (slot 1), don't remove. */
+          LOGGER.info("DEBUG: bcProvider = " + bcProvider);
+          return 0;
+        }
+        
         Security.removeProvider(provider.getName());
         Security.insertProviderAt(bcProvider, 1);
+        
         return i + 1;
       }
     }
+    
     return -1;
   }
 
@@ -165,10 +176,15 @@ public class JMRTDSecurityProvider extends Provider {
    */
   public static void endPreferBouncyCastleProvider(int i) {
     Provider bcProvider = getBouncyCastleProvider();
-    Security.removeProvider(bcProvider.getName());
     if (i > 0) {
+      Security.removeProvider(bcProvider.getName());
       Security.insertProviderAt(bcProvider, i);
     }
+    
+    /* NOTE:
+     * - if i == 0, BC was already preferred and beginPreferBouncyCastleProvider was NOP.
+     * - if i == -1, BC could not be inserted and beginPreferBouncyCastleProvider was NOP.
+     */
   }
 
   /**
