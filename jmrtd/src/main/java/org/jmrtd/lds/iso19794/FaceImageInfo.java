@@ -769,6 +769,7 @@ public class FaceImageInfo extends AbstractImageInfo {
    * @version $Revision$
    */
   public static class FeaturePoint {
+    
     private int type;
     private int majorCode;
     private int minorCode;
