@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
@@ -275,8 +276,10 @@ public class SODFile extends AbstractTaggedLDSFile {
    * Gets the e-content inside the signed data structure.
    *
    * @return the e-content
+   * 
+   * @throws SignatureException if the contents do not check out
    */
-  public byte[] getEContent() {    
+  public byte[] getEContent() throws SignatureException {    
     return SignedDataUtil.getEContent(signedData);
   }
 

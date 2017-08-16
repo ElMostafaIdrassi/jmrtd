@@ -31,6 +31,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -273,8 +274,10 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
    *
    * @return the contents of the security object over which the
    *         signature is to be computed
+   *         
+   * @throws SignatureException if the contents do not check out
    */
-  public static byte[] getEContent(SignedData signedData) {
+  public static byte[] getEContent(SignedData signedData) throws SignatureException{
     SignerInfo signerInfo = getSignerInfo(signedData);
     ASN1Set signedAttributesSet = signerInfo.getAuthenticatedAttributes();
 
@@ -516,8 +519,6 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 
   /* PRIVATE BELOW */
 
-  /* FIXME: Move this from lds package to verifier. -- MO */
-  /* FIXME: This only warns on logger. */
   /**
    * Checks that the content actually digests to the hash value contained in the message digest attribute.
    * 
@@ -526,8 +527,9 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
    * @param contentBytes the contents
    * 
    * @throws NoSuchAlgorithmException if the digest algorithm is unsupported
+   * @throws SignatureException if the reported digest does not correspond to the computed digest
    */
-  private static void checkEContent(Collection<Attribute> attributes, String digAlg, byte[] contentBytes) throws NoSuchAlgorithmException {
+  private static void checkEContent(Collection<Attribute> attributes, String digAlg, byte[] contentBytes) throws NoSuchAlgorithmException, SignatureException {
     for (Attribute attribute: attributes) {
       if (!RFC_3369_MESSAGE_DIGEST_OID.equals(attribute.getAttrType().getId())) {
         continue;
@@ -546,7 +548,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
       MessageDigest dig = MessageDigest.getInstance(digAlg);
       byte[] computedDigestedContent = dig.digest(contentBytes);
       if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
-        LOGGER.warning("Error checking signedAttribute message digest in eContent!");
+        throw new SignatureException("Error checking signedAttribute message digest in eContent!"); /* HIER */
       }
     }    
   }
