@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG2File;
@@ -228,6 +229,19 @@ public class DG2FileTest extends TestCase {
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
+    }
+  }
+
+  public void testTruncate() {
+    try {
+      DG2File dg2File = getDefaultTestObject();
+      byte[] dg2Bytes = dg2File.getEncoded();
+      byte[] partialBytes = new byte[(int)(0.8 * dg2Bytes.length)];
+      System.arraycopy(dg2Bytes, 0, partialBytes, 0, partialBytes.length);
+      DG2File partialDG2File = new DG2File(new ByteArrayInputStream(partialBytes));
+      fail("Should be exception");
+    } catch (Exception expected) {
+      LOGGER.log(Level.INFO, "Exception", expected);
     }
   }
 

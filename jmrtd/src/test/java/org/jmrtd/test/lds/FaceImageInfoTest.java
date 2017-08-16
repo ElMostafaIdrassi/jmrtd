@@ -142,7 +142,6 @@ public class FaceImageInfoTest extends TestCase {
   }
 
   public void testCreateAndExtract() {
-
     try {
       FaceImageInfo imageInfo = createNonEmptyTestObject();
       DataInputStream imageInputStream = new DataInputStream(imageInfo.getImageInputStream());

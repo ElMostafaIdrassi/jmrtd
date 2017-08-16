@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.ISO781611;
@@ -120,6 +121,19 @@ public class FaceInfoTest extends TestCase {
     Set<Integer> tags = sbh.getElements().keySet();
     for (int tag: tags) {
       assertTrue(possibleTags.contains(tag));
+    }
+  }
+
+  public void testTruncate() {
+    try {
+      FaceInfo faceInfo = createTestObject();
+      byte[] bytes = faceInfo.getEncoded();
+      byte[] partialBytes = new byte[(int)(0.8 * bytes.length)];
+      System.arraycopy(bytes, 0, partialBytes, 0, partialBytes.length);
+      FaceInfo partialFaceInfo = new FaceInfo(new ByteArrayInputStream(partialBytes));
+      fail("Should be exception");
+    } catch (Exception expected) {
+      LOGGER.log(Level.INFO, "Expected", expected);
     }
   }
 

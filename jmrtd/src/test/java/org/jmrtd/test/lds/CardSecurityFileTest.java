@@ -24,33 +24,15 @@ package org.jmrtd.test.lds;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.security.spec.ECParameterSpec;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.jce.spec.ECNamedCurveSpec;
-import org.jmrtd.Util;
 import org.jmrtd.lds.CardSecurityFile;
-import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.SecurityInfo;
-import org.jmrtd.lds.TerminalAuthenticationInfo;
-import org.jmrtd.test.CertificateUtil;
 import org.jmrtd.test.ResourceUtil;
 
 import junit.framework.TestCase;
-import net.sf.scuba.util.Hex;
 
 /**
  * Tests for the CardSecurity file.

@@ -242,27 +242,28 @@ public abstract class AbstractImageInfo implements ImageInfo {
    * @param inputStream input stream
    * @param imageLength image length
    *
-   * @throws IOException on error reading the input stream
+   * @throws IOException on error reading the input stream, for example at EOF
    */
   protected void readImage(InputStream inputStream, long imageLength) throws IOException {
     /* DEBUG: START */
-    if (inputStream instanceof SplittableInputStream) {
-      this.imageBytes = null;
-      this.splittableInputStream = (SplittableInputStream)inputStream;
-      this.imagePositionInInputStream = splittableInputStream.getPosition();
-
-      this.imageLength = (int)imageLength;
-      long skippedBytes = 0;
-      while (skippedBytes < imageLength) {
-        skippedBytes += splittableInputStream.skip(imageLength - skippedBytes);
-      }
-    } else {
+//    if (inputStream instanceof SplittableInputStream) {
+//      this.imageBytes = null;
+//      this.splittableInputStream = (SplittableInputStream)inputStream;
+//      this.imagePositionInInputStream = splittableInputStream.getPosition();
+//
+//      this.imageLength = (int)imageLength;
+//      long totalSkippedBytes = 0;
+//      while (totalSkippedBytes < imageLength) {
+//        long currentlySkippedBytes = splittableInputStream.skip(imageLength - totalSkippedBytes);
+//        totalSkippedBytes += currentlySkippedBytes;
+//      }
+//    } else {
       /* DEBUG: END */
       this.splittableInputStream = null;
       this.imageBytes = new byte[(int)imageLength];
       DataInputStream dataIn = new DataInputStream(inputStream);
       dataIn.readFully(this.imageBytes);
-    }
+//    }
   }
 
   protected void writeImage(OutputStream outputStream) throws IOException {
