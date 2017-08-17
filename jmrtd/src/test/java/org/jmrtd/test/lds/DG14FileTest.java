@@ -22,6 +22,9 @@
 package org.jmrtd.test.lds;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -44,6 +47,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.interfaces.DHPublicKey;
@@ -167,6 +171,40 @@ public class DG14FileTest extends TestCase {
       assert(Arrays.equals(encoded, copyEncoded));
     } catch (Exception e) {
       e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+
+  public void testSerializable() {
+    try {
+      DG14File dg14 = getSampleObject();
+      Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
+      assertNotNull(securityInfos);
+
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+
+      objectOutputStream.writeObject(dg14);
+
+      for (SecurityInfo securityInfo: securityInfos) {
+        LOGGER.info("Writing object: " + securityInfo);
+        objectOutputStream.writeObject(securityInfo);
+      }
+      
+      byte[] dg14Encoded = dg14.getEncoded();
+      
+      objectOutputStream.flush();
+      objectOutputStream.close();
+      
+      ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+      ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+      Object dg14Object = objectInputStream.readObject();
+      assertTrue(dg14Object instanceof DG14File);
+      DG14File deserializedDG14 = (DG14File)dg14Object;
+      byte[] deserializedEncoded = deserializedDG14.getEncoded();
+      assertTrue(Arrays.equals(dg14Encoded, deserializedEncoded));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
     }
   }
@@ -495,7 +533,6 @@ public class DG14FileTest extends TestCase {
       return null;
     }
   }
-
 
   /** Sanity check. */
   public void showSecurityInfos(DG14File dg14) {

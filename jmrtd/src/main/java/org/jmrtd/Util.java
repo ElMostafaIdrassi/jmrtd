@@ -800,7 +800,7 @@ public class Util {
         throw new IllegalArgumentException("Unrecognized key type, found " + publicKey.getAlgorithm() + ", should be DH or ECDH");
       }
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", e);
       return null;
     }
   }
@@ -817,10 +817,10 @@ public class Util {
         return factory.generatePublic(keySpec);
       }
     } catch (GeneralSecurityException gse2) {
-      LOGGER.severe("Exception: " + gse2.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", gse2);
       return null;
-    } catch (Exception ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
       return null;
     }
   }
@@ -938,7 +938,7 @@ public class Util {
       tlvOut.flush();
       tlvOut.close();
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       throw new IllegalStateException("Error in encoding public key");
     }
     return bOut.toByteArray();
@@ -1053,11 +1053,11 @@ public class Util {
       }
       throw new IllegalArgumentException("Expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
-      throw new IllegalArgumentException(ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ioe);
+      throw new IllegalArgumentException(ioe);
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
-      throw new IllegalArgumentException(gse.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", gse);
+      throw new IllegalArgumentException(gse);
     }
   }
 
@@ -1162,7 +1162,7 @@ public class Util {
       bytes = str.getBytes("UTF-8");
     } catch (UnsupportedEncodingException use) {
       /* NOTE: unlikely. */
-      LOGGER.severe("Exception: " + use.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", use);
     }
     return bytes;
   }

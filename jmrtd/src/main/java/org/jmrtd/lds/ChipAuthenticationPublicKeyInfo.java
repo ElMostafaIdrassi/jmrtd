@@ -33,7 +33,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DLSequence;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.jmrtd.Util;
 
 /**
@@ -51,29 +50,33 @@ import org.jmrtd.Util;
  *     Authentication.</li>
  * </ul>
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
+ * @author The JMRTD team (info@jmrtd.org)
  * 
  * @version $Revision$
- *
- * FIXME: interface dependency on BC classes?
- * FIXME: maybe clean up some of these constructors...
  */
 public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
-  
+
   private static final long serialVersionUID = 5687291829854501771L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-  
+
   private String oid;
-  private SubjectPublicKeyInfo subjectPublicKeyInfo; // TODO: just store a public key here, instead of BC object
-  private BigInteger keyId; /* Optional, use null if implicit. */
-  
-  ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo) {
-    this(oid, publicKeyInfo, null);
+
+  private BigInteger keyId; /* Optional, use null if implicit. */  
+
+  private PublicKey publicKey;
+
+  /**
+   * Creates a public key info structure with implicit key identifier.
+   *
+   * @param publicKey Either a DH public key or an EC public key
+   */
+  public ChipAuthenticationPublicKeyInfo(PublicKey publicKey) {
+    this(publicKey, null);
   }
-  
+
   /**
    * Creates a public key info structure.
    *
@@ -81,47 +84,48 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
    * @param keyId key identifier
    */
   public ChipAuthenticationPublicKeyInfo(PublicKey publicKey, BigInteger keyId) {
-    this(Util.inferProtocolIdentifier(publicKey), Util.toSubjectPublicKeyInfo(Util.reconstructPublicKey(publicKey)), keyId);
+    this(Util.inferProtocolIdentifier(publicKey), publicKey, keyId);
   }
-  
+
+  /**
+   * Creates a public key info structure with implicit key identifier.
+   *
+   * @param oid a proper public key identifier
+   * @param publicKey appropriate public key
+   */
+  public ChipAuthenticationPublicKeyInfo(String oid, PublicKey publicKey) {
+    this(oid, publicKey, null);
+  }
+
   /**
    * Creates a public key info structure.
    *
-   * @param publicKey Either a DH public key or an EC public key
-   */
-  public ChipAuthenticationPublicKeyInfo(PublicKey publicKey) {
-    this(publicKey, null);
-  }
-  
-  /**
-   * Constructs a new object.
-   *
    * @param oid a proper public key identifier
-   * @param publicKeyInfo appropriate SubjectPublicKeyInfo structure
-   * @param keyId the key identifier or -1 if not present
+   * @param publicKey appropriate public key
+   * @param keyId the key identifier or {@code null} if not present
    */
-  ChipAuthenticationPublicKeyInfo(String oid, SubjectPublicKeyInfo publicKeyInfo, BigInteger keyId) {
+  public ChipAuthenticationPublicKeyInfo(String oid, PublicKey publicKey, BigInteger keyId) {
     this.oid = oid;
-    this.subjectPublicKeyInfo = publicKeyInfo;
+    this.publicKey = Util.reconstructPublicKey(publicKey);
     this.keyId = keyId;
     checkFields();
   }
-  
+
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new ASN1ObjectIdentifier(oid));
-    vector.add((ASN1Sequence)subjectPublicKeyInfo.toASN1Primitive());
+    vector.add((ASN1Sequence)(Util.toSubjectPublicKeyInfo(publicKey).toASN1Primitive()));
     if (keyId != null) {
       vector.add(new ASN1Integer(keyId));
     }
     return new DLSequence(vector);
   }
-  
+
   public String getObjectIdentifier() {
     return oid;
   }
-  
+
   /**
    * Gets the protocol object identifier as a human readable string.
    * 
@@ -130,7 +134,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
-  
+
   /**
    * Returns a key identifier stored in this ChipAuthenticationPublicKeyInfo
    * structure, {@code null} if not present.
@@ -140,7 +144,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   public BigInteger getKeyId() {
     return keyId;
   }
-  
+
   /**
    * Returns a SubjectPublicKeyInfo contained in this
    * ChipAuthenticationPublicKeyInfo structure.
@@ -149,9 +153,9 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
    *         ChipAuthenticationPublicKeyInfo structure
    */
   public PublicKey getSubjectPublicKey() {
-    return Util.toPublicKey(subjectPublicKeyInfo);
+    return publicKey;
   }
-  
+
   /**
    * Checks the correctness of the data for this instance of SecurityInfo
    */
@@ -166,7 +170,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
       throw new IllegalArgumentException("Malformed ChipAuthenticationInfo.");
     }
   }
-  
+
   /**
    * Checks whether the given object identifier identifies a
    * ChipAuthenticationPublicKeyInfo structure.
@@ -178,7 +182,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   public static boolean checkRequiredIdentifier(String oid) {
     return ID_PK_DH.equals(oid) || ID_PK_ECDH.equals(oid);
   }
-  
+
   @Override
   public String toString() {
     return "ChipAuthenticationPublicKeyInfo ["
@@ -187,12 +191,12 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
         + "keyId: " + (keyId == null ? "-" : keyId.toString())
         + "]";
   }
-  
+
   @Override
   public int hashCode() {
-    return 	123 + 1337 * (oid.hashCode() + (keyId == null ? 111 : keyId.hashCode()) + (subjectPublicKeyInfo == null ? 111 : subjectPublicKeyInfo.hashCode()));
+    return 	123 + 1337 * (oid.hashCode() + (keyId == null ? 111 : keyId.hashCode()) + (publicKey == null ? 111 : publicKey.hashCode()));
   }
-  
+
   @Override
   public boolean equals(Object other) {
     if (other == null) { return false; }
@@ -201,9 +205,9 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     ChipAuthenticationPublicKeyInfo otherInfo = (ChipAuthenticationPublicKeyInfo)other;
     return oid.equals(otherInfo.oid)
         && (keyId == null && otherInfo.keyId == null || keyId != null && keyId.equals(otherInfo.keyId))
-        && subjectPublicKeyInfo.equals(otherInfo.subjectPublicKeyInfo);
+        && publicKey.equals(otherInfo.publicKey);
   }
-  
+
   private static String toProtocolOIDString(String oid) {
     if (ID_PK_DH.equals(oid)) { return "id-PK-DH"; }
     if (ID_PK_ECDH.equals(oid)) { return "id-PK-ECDH"; }
