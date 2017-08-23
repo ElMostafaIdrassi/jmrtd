@@ -1110,12 +1110,7 @@ public class Util {
       throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
     }
   }
-
-  public static AlgorithmParameterSpec mapNonceIM(byte[] nonceS, byte[] nonceT, byte[] sharedSecretH, AlgorithmParameterSpec params) {
-    /* FIXME: work in progress. */
-    return null;
-  }
-
+  
   public static ECParameterSpec mapNonceGMWithECDH(BigInteger nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
     /*
      * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
