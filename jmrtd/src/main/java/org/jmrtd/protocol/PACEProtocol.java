@@ -159,7 +159,7 @@ public class PACEProtocol {
       throw new PACEException("PCD side error in key derivation step");
     }
   }
-  
+
   /**
    * Performs the PACE 2.0 / SAC protocol.
    *
@@ -178,12 +178,12 @@ public class PACEProtocol {
     String digestAlg = PACEInfo.toDigestAlgorithm(oid); /* Either SHA-1 or SHA-256. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
 
-//    LOGGER.info("DEBUG: PACE: oid = " + oid
-//        + " -> mappingType = " + mappingType
-//        + ", agreementAlg = " + agreementAlg
-//        + ", cipherAlg = " + cipherAlg
-//        + ", digestAlg = " + digestAlg
-//        + ", keyLength = " + keyLength);
+    //    LOGGER.info("DEBUG: PACE: oid = " + oid
+    //        + " -> mappingType = " + mappingType
+    //        + ", agreementAlg = " + agreementAlg
+    //        + ", cipherAlg = " + cipherAlg
+    //        + ", digestAlg = " + digestAlg
+    //        + ", keyLength = " + keyLength);
 
     checkConsistency(agreementAlg, cipherAlg, digestAlg, keyLength, params);
 
@@ -204,7 +204,7 @@ public class PACEProtocol {
       if (staticPACEKey instanceof PACESecretKeySpec) {
         paceKeyReference = ((PACESecretKeySpec)staticPACEKey).getKeyReference();
       }
-      
+
       service.sendMSESetATMutualAuth(wrapper, oid, paceKeyReference, referencePrivateKeyOrForComputingSessionKey);
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side error in static PACE key derivation step", cse.getSW());
@@ -409,30 +409,25 @@ public class PACEProtocol {
       KeyPair kp = keyPairGenerator.generateKeyPair();
       PublicKey pcdMappingPublicKey = kp.getPublic();
       PrivateKey pcdMappingPrivateKey = kp.getPrivate();
-      KeyAgreement mappingAgreement = KeyAgreement.getInstance(agreementAlg);
-      mappingAgreement.init(pcdMappingPrivateKey);
-
-      MyECDHKeyAgreement myECDHKeyAgreement = null;
-      if ("ECDH".equals(agreementAlg)) {
-        myECDHKeyAgreement = new MyECDHKeyAgreement();
-        myECDHKeyAgreement.init((ECPrivateKey)pcdMappingPrivateKey);
-      }
 
       byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);            
       byte[] step2Data = Util.wrapDO((byte)0x81, pcdMappingEncodedPublicKey);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
       byte[] piccMappingEncodedPublicKey = Util.unwrapDO((byte)0x82, step2Response);
       PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
-      mappingAgreement.doPhase(piccMappingPublicKey, true);
 
-      byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
-
-      if ("ECDH".equals(agreementAlg) && myECDHKeyAgreement != null) {
+      if ("ECDH".equals(agreementAlg)) {
         /* Treat shared secret as an ECPoint. */
-        ECPoint sharedSecretPointH = myECDHKeyAgreement.doPhase((ECPublicKey)piccMappingPublicKey);
-        return Util.mapNonceGMWithECDH(Util.os2i(piccNonce), sharedSecretPointH, (ECParameterSpec)params);
+        PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();
+        mappingAgreement.init((ECPrivateKey)pcdMappingPrivateKey);
+        ECPoint sharedSecretPointH = mappingAgreement.doPhase((ECPublicKey)piccMappingPublicKey);
+        return mapNonceGMWithECDH(piccNonce, sharedSecretPointH, (ECParameterSpec)params);
       } else if ("DH".equals(agreementAlg)) {
-        return Util.mapNonceGMWithDH(Util.os2i(piccNonce), Util.os2i(mappingSharedSecretBytes), (DHParameterSpec)params);
+        KeyAgreement mappingAgreement = KeyAgreement.getInstance(agreementAlg);
+        mappingAgreement.init(pcdMappingPrivateKey);
+        mappingAgreement.doPhase(piccMappingPublicKey, true);
+        byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
+        return mapNonceGMWithDH(piccNonce, Util.os2i(mappingSharedSecretBytes), (DHParameterSpec)params);
       } else {
         throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
       }
@@ -441,6 +436,33 @@ public class PACEProtocol {
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side exception in mapping nonce step", cse.getSW());
     }
+  }
+
+  public static ECParameterSpec mapNonceGMWithECDH(byte[] nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
+    /*
+     * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
+     */
+    ECPoint generator = params.getGenerator();
+    EllipticCurve curve = params.getCurve();
+    BigInteger a = curve.getA();
+    BigInteger b = curve.getB();
+    ECFieldFp field = (ECFieldFp)curve.getField();
+    BigInteger p = field.getP();
+    BigInteger order = params.getOrder();
+    int cofactor = params.getCofactor();
+    ECPoint ephemeralGenerator = Util.add(Util.multiply(Util.os2i(nonceS), generator, params), sharedSecretPointH, params);
+    if (!Util.toBouncyCastleECPoint(ephemeralGenerator, params).isValid()) {
+      LOGGER.info("ephemeralGenerator is not a valid point");
+    }
+    return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
+  }
+
+  public static DHParameterSpec mapNonceGMWithDH(byte[] nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
+    // g~ = g^s * h
+    BigInteger p = params.getP();
+    BigInteger generator = params.getG();
+    BigInteger mappedGenerator = generator.modPow(Util.os2i(nonceS), p).multiply(sharedSecretH).mod(p);
+    return new DHParameterSpec(p, mappedGenerator, params.getL());
   }
 
   /**
@@ -474,29 +496,29 @@ public class PACEProtocol {
    */
   public AlgorithmParameterSpec doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
     try {
-      
+
       byte[] pcdNonce = new byte[piccNonce.length];
       random.nextBytes(pcdNonce);
-      
+
       byte[] step2Data = Util.wrapDO((byte)0x81, pcdNonce);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
 
       /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */      
-      
+
       LOGGER.info("DEBUG: step2Response = " + Hex.bytesToHexString(step2Response));
 
       if ("ECDH".equals(agreementAlg)) {
         /* Treat shared secret as an ECPoint. */
-        
+
         return mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
-        
-        
+
+
       } else if ("DH".equals(agreementAlg)) {
         return mapNonceIMWithDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (DHParameterSpec)params);
       } else {
         throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
       }
-            
+
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {
@@ -521,120 +543,13 @@ public class PACEProtocol {
 
     BigInteger t = Util.os2i(pseudoRandomFunction(nonceS, nonceT, p, cipherAlgorithm));
 
-    ECPoint mappedGenerator = pointEncoding(t, params);
+    ECPoint mappedGenerator = icartPointEncode(t, params);
     return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), mappedGenerator, order, cofactor);
-  }
-
-  /**
-   * Icart's point encoding.
-   *
-   * @param t the field element to encode
-   * @param params the curve's parameters
-   * 
-   * @return the point on the curve that the input is mapped to
-   */
-  private static ECPoint pointEncoding(BigInteger t, ECParameterSpec params) {
-    BigInteger p = Util.getPrime(params);
-    BigInteger order = params.getOrder();
-    int cofactor = params.getCofactor();
-    BigInteger a = params.getCurve().getA();
-    BigInteger b = params.getCurve().getB();
-    
-    BigInteger alpha = t.pow(2).negate().mod(p);
-    
-    BigInteger alphaSq = alpha.multiply(alpha).mod(p);
-    BigInteger alphaPlusAlphaSq = alpha.add(alphaSq);
-    BigInteger pMinus2 = p.subtract(BigInteger.ONE).subtract(BigInteger.ONE);
-    BigInteger x2 = b.negate().multiply(BigInteger.ONE.add(alphaPlusAlphaSq)).multiply((alpha.multiply(alphaPlusAlphaSq)).modPow(pMinus2, p));
-    
-    /* WORK IN PROGRESS... */
-    
-    return null; // FIXME
   }
 
   public static AlgorithmParameterSpec mapNonceIMWithDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, DHParameterSpec params) {
     /* FIXME: work in progress. */
     return null;
-  }
-  
-  /*
-   * The function R_p(s,t) is a function that maps octet strings s (of bit length l) and t (of bit length k)
-   * to an element int(x_1 || x_2 || ... || x_n) mod p of GF(p).
-   * The function R(s,t) is specified in Figure 2.
-   * The construction is based on the respective block cipher E() in CBC mode according to ISO/IEC 10116 [12]
-   * with IV=0, where k is the key size (in bits) of E().
-   * Where required, the output k_i MUST be truncated to key size k.
-   * The value n SHALL be selected as smallest number, such that n*l >= log2 p + 64.
-   */
-  /**
-   * Pseudo random number function as specified in Doc 9303 - Part 11, 4.4.3.3.2 used in integrated mapping.
-   * 
-   * @param s the nonce that was sent by the ICC
-   * @param t the nonce that was generated by the PCD
-   * @param p the order of the prime field
-   * @param algorithm the algorithm for block cipher E (either {@code "AES"} or {@code "DESede"})
-   * 
-   * @return the resulting x
-   * 
-   * @throws GeneralSecurityException on cryptographic error
-   */
-  public static byte[] pseudoRandomFunction(byte[] s, byte[] t, BigInteger p, String algorithm) throws GeneralSecurityException {
-    if (s == null || t == null) {
-      throw new IllegalArgumentException("Null nonce");
-    }
-
-    int l = s.length * 8;
-    int k = t.length * 8; /* Key size in bits. */
-
-    byte[] c0 = null;
-    byte[] c1 = null;
-    switch (l) {
-      case 128:
-        c0 = C0_LENGTH_128;
-        c1 = C1_LENGTH_128;
-        break;
-      case 192: // Fall through
-      case 256:
-        c0 = C0_LENGTH_256;
-        c1 = C1_LENGTH_256;
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown length " + l + ", was expecting 128, 192, or 256");
-    }
-
-    Cipher cipher = Cipher.getInstance(algorithm + (algorithm.endsWith("/CBC/NoPadding") ? "" : "/CBC/NoPadding"));
-    int blockSize = cipher.getBlockSize(); /* in bytes */
-
-    IvParameterSpec zeroIV = new IvParameterSpec(new byte[blockSize]);
-
-    cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(t, algorithm), zeroIV);
-    byte[] key = cipher.doFinal(s);
-
-    ByteArrayOutputStream x = new ByteArrayOutputStream();
-
-    try {
-      int n = 0;
-      while (n * l < p.bitLength() + 64) {
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, 0, k / 8, algorithm), zeroIV);
-        key = cipher.doFinal(c0);
-        x.write(cipher.doFinal(c1));
-        n++;
-      }
-
-      byte[] xBytes = x.toByteArray();
-      return Util.i2os(Util.os2i(xBytes).mod(p));
-    } catch (Exception ioe) {
-      /* NOTE: Never happens, writing to byte array output stream. */
-      LOGGER.log(Level.WARNING, "Could not write to stream", ioe);
-
-      return Util.i2os(Util.os2i(x.toByteArray()).mod(p));
-    } finally {
-      try {
-        x.close();
-      } catch (IOException ioe) {
-        LOGGER.log(Level.FINE, "Could not close stream", ioe);
-      }
-    }
   }
 
   /* Choose random ephemeral key pair (SK_PCD~, PK_PCD~, D~). */
@@ -736,7 +651,7 @@ public class PACEProtocol {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
     byte[] keySeed = computeKeySeedForPACE(keySpec);
-    
+
     byte paceKeyReference = 0;
     if (keySpec instanceof PACEKeySpec) {
       paceKeyReference = ((PACEKeySpec)keySpec).getKeyReference();
@@ -771,12 +686,151 @@ public class PACEProtocol {
 
       return computeKeySeedForPACE(documentNumber, dateOfBirth, dateOfExpiry);
     }
-    
+
     if (accessKey instanceof PACEKeySpec) {
       return ((PACEKeySpec)accessKey).getKey();
     }
 
     throw new IllegalArgumentException("Unsupported access key, was expecting BAC or CAN key specification, found " + accessKey.getClass().getSimpleName());
+  }
+
+  /*
+   * The function R_p(s,t) is a function that maps octet strings s (of bit length l) and t (of bit length k)
+   * to an element int(x_1 || x_2 || ... || x_n) mod p of GF(p).
+   * The function R(s,t) is specified in Figure 2.
+   * The construction is based on the respective block cipher E() in CBC mode according to ISO/IEC 10116 [12]
+   * with IV=0, where k is the key size (in bits) of E().
+   * Where required, the output k_i MUST be truncated to key size k.
+   * The value n SHALL be selected as smallest number, such that n*l >= log2 p + 64.
+   */
+  /**
+   * Pseudo random number function as specified in Doc 9303 - Part 11, 4.4.3.3.2 used in integrated mapping.
+   * 
+   * @param s the nonce that was sent by the ICC
+   * @param t the nonce that was generated by the PCD
+   * @param p the order of the prime field
+   * @param algorithm the algorithm for block cipher E (either {@code "AES"} or {@code "DESede"})
+   * 
+   * @return the resulting x
+   * 
+   * @throws GeneralSecurityException on cryptographic error
+   */
+  public static byte[] pseudoRandomFunction(byte[] s, byte[] t, BigInteger p, String algorithm) throws GeneralSecurityException {
+    if (s == null || t == null) {
+      throw new IllegalArgumentException("Null nonce");
+    }
+
+    int l = s.length * 8;
+    int k = t.length * 8; /* Key size in bits. */
+
+    byte[] c0 = null;
+    byte[] c1 = null;
+    switch (l) {
+      case 128:
+        c0 = C0_LENGTH_128;
+        c1 = C1_LENGTH_128;
+        break;
+      case 192: // Fall through
+      case 256:
+        c0 = C0_LENGTH_256;
+        c1 = C1_LENGTH_256;
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown length " + l + ", was expecting 128, 192, or 256");
+    }
+
+    Cipher cipher = Cipher.getInstance(algorithm + (algorithm.endsWith("/CBC/NoPadding") ? "" : "/CBC/NoPadding"));
+    int blockSize = cipher.getBlockSize(); /* in bytes */
+
+    IvParameterSpec zeroIV = new IvParameterSpec(new byte[blockSize]);
+
+    cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(t, algorithm), zeroIV);
+    byte[] key = cipher.doFinal(s);
+
+    ByteArrayOutputStream x = new ByteArrayOutputStream();
+
+    try {
+      int n = 0;
+      while (n * l < p.bitLength() + 64) {
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, 0, k / 8, algorithm), zeroIV);
+        key = cipher.doFinal(c0);
+        x.write(cipher.doFinal(c1));
+        n++;
+      }
+
+      byte[] xBytes = x.toByteArray();
+      return Util.i2os(Util.os2i(xBytes).mod(p));
+    } catch (Exception ioe) {
+      /* NOTE: Never happens, writing to byte array output stream. */
+      LOGGER.log(Level.WARNING, "Could not write to stream", ioe);
+
+      return Util.i2os(Util.os2i(x.toByteArray()).mod(p));
+    } finally {
+      try {
+        x.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Could not close stream", ioe);
+      }
+    }
+  }
+
+  /*
+   * Icart's point encoding.
+   * For now this is based on the implementation for affine coordinates
+   * as described in ICAO SAC TR 2010, Section 5.2.
+   */
+  /**
+   * Icart's point encoding for Elliptic Curve over a prime field.
+   * This maps a field element to a point on the curve.
+   * Used in PACE IM ECDH.
+   *
+   * @param t the field element to encode
+   * @param params the parameters describing the curve and field
+   * 
+   * @return the point on the curve that the input is mapped to
+   */
+  public static ECPoint icartPointEncode(BigInteger t, ECParameterSpec params) {
+    BigInteger p = Util.getPrime(params);
+    int cofactor = params.getCofactor();
+    BigInteger a = params.getCurve().getA();
+    BigInteger b = params.getCurve().getB();
+
+    /* 1. */
+    BigInteger alpha = t.pow(2).negate().mod(p);
+
+    /* 2. (Using implementation note 5.2.2). */
+    BigInteger alphaSq = alpha.multiply(alpha).mod(p);
+    BigInteger alphaPlusAlphaSq = alpha.add(alphaSq).mod(p);
+    BigInteger pMinus2 = p.subtract(BigInteger.ONE).subtract(BigInteger.ONE);
+    BigInteger x2 = b.negate().multiply(BigInteger.ONE.add(alphaPlusAlphaSq)).multiply((a.multiply(alphaPlusAlphaSq)).modPow(pMinus2, p));
+
+    /* 3. */
+    BigInteger x3 = a.multiply(x2).mod(p);
+
+    /* 4. */
+    BigInteger h2 = x2.modPow(BigInteger.valueOf(3), p).add(a.multiply(x2)).add(b).mod(p);
+
+    /* 5. */
+    BigInteger h3 = x3.modPow(BigInteger.valueOf(3), p).add(a.multiply(x3)).add(b).mod(p);
+
+    /* 6. */
+    BigInteger u = t.modPow(BigInteger.valueOf(3), p).multiply(h3);
+
+    /* 7. */
+    BigInteger aaExp = p.subtract(BigInteger.ONE).subtract((p.add(BigInteger.ONE)).modPow(p.subtract(BigInteger.valueOf(4)), p));
+    BigInteger aa = h2.modPow(aaExp, p);
+
+    BigInteger aaSqTimesH2 = aa.modPow(BigInteger.valueOf(2), p).multiply(h2).mod(p);
+
+    ECPoint xy = aaSqTimesH2.equals(BigInteger.ONE) ? new ECPoint(x2, aa.multiply(h2).mod(p)) : new ECPoint(x3, aa.multiply(u).mod(p));
+
+    if (cofactor == 1) {
+      return Util.normalize(xy, params);
+    } else {
+      org.bouncycastle.math.ec.ECPoint bcPoint = Util.toBouncyCastleECPoint(xy, params);
+      bcPoint.multiply(BigInteger.valueOf(cofactor));
+      return Util.fromBouncyCastleECPoint(bcPoint);
+    }
   }
 
   /**
@@ -797,6 +851,34 @@ public class PACEProtocol {
     KeyFactory keyFactory = KeyFactory.getInstance("EC");    
     KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
     return keyFactory.generatePublic(keySpec);
+  }
+  
+  /**
+   * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
+   * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
+   * received ephemeral public key (i.e. excluding the domain parameters, cf. Section 4.5.3)
+   * using an authentication code and the key KS MAC derived from the key agreement.
+   *
+   * @param oid the object identifier as indicated in MSE Set AT
+   * @param macKey the KS MAC key derived from the key agreement
+   * @param publicKey the received public key
+   *
+   * @return the authentication code
+   *
+   * @throws GeneralSecurityException on error while performing the MAC operation
+   */
+  public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
+    String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
+    String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
+    Mac mac = Mac.getInstance(macAlg, BC_PROVIDER);
+    byte[] encodedPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, publicKey);
+    mac.init(macKey);
+    byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
+
+    /* Output length needs to be 64 bits, copy first 8 bytes. */
+    byte[] authenticationToken = new byte[8];
+    System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
+    return authenticationToken;
   }
 
   /**
@@ -828,34 +910,6 @@ public class PACEProtocol {
 
   public static byte[] computeKeySeedForPACE(String cardAccessNumber) throws GeneralSecurityException {
     return Util.computeKeySeed(cardAccessNumber,  "SHA-1", false);
-  }
-
-  /**
-   * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
-   * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
-   * received ephemeral public key (i.e. excluding the domain parameters, cf. Section 4.5.3)
-   * using an authentication code and the key KS MAC derived from the key agreement.
-   *
-   * @param oid the object identifier as indicated in MSE Set AT
-   * @param macKey the KS MAC key derived from the key agreement
-   * @param publicKey the received public key
-   *
-   * @return the authentication code
-   *
-   * @throws GeneralSecurityException on error while performing the MAC operation
-   */
-  public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
-    String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
-    String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
-    Mac mac = Mac.getInstance(macAlg, BC_PROVIDER);
-    byte[] encodedPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, publicKey);
-    mac.init(macKey);
-    byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
-
-    /* Output length needs to be 64 bits, copy first 8 bytes. */
-    byte[] authenticationToken = new byte[8];
-    System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
-    return authenticationToken;
   }
 
   /**
@@ -916,25 +970,6 @@ public class PACEProtocol {
       return "AESCMAC";
     } else {
       throw new InvalidAlgorithmParameterException("Cannot infer MAC algorithm from cipher algorithm \"" + cipherAlg + "\"");
-    }
-  }
-
-  public class MyECDHKeyAgreement {
-
-    private ECPrivateKey privateKey;
-
-    public void init(ECPrivateKey privateKey) {
-      this.privateKey = privateKey;
-    }
-
-    public ECPoint doPhase(ECPublicKey publicKey) {
-      ECPublicKeyParameters pub = Util.toBouncyECPublicKeyParameters(publicKey);
-
-      org.bouncycastle.math.ec.ECPoint p = pub.getQ().multiply(Util.toBouncyECPrivateKeyParameters(privateKey).getD()).normalize();
-      if (p.isInfinity()) {
-        throw new IllegalStateException("Infinity");
-      }
-      return Util.fromBouncyCastleECPoint(p);
     }
   }
 }

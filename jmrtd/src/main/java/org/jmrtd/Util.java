@@ -1080,71 +1080,30 @@ public class Util {
   }
 
   /**
-   * Maps nonce for generic mapping case.
+   * EC point addition.
+   *
+   * @param x an EC point
+   * @param y another EC point
+   * @param params the domain parameters
    * 
-   * @param nonceS the nonce
-   * @param sharedSecretH the shared secret as opaque byte array
-   * @param params the key agreement algorithm parameter specification
-   * 
-   * @return the new algorithm parameters
-   * 
-   * @deprecated Looks like computing Y coord in ECDH case is buggy. Use DH or ECDH variant directly.
+   * @return the resulting EC point
    */
-  public static AlgorithmParameterSpec mapNonceGM(byte[] nonceS, byte[] sharedSecretH, AlgorithmParameterSpec params) {
-    if (params == null) {
-      throw new IllegalArgumentException("Unsupported parameters for mapping nonce");
-    }
-
-    if (params instanceof ECParameterSpec) {
-      ECParameterSpec ecParams = (ECParameterSpec)params;
-
-      BigInteger affineX = os2i(sharedSecretH);
-      BigInteger affineY = computeAffineY(affineX, ecParams); /* FIXME: Y coord is wrong about 50% of the time (when tested against Morpho applet). */
-
-      ECPoint sharedSecretPointH = new ECPoint(affineX, affineY);
-      return mapNonceGMWithECDH(os2i(nonceS), sharedSecretPointH, ecParams);
-    } else if (params instanceof DHParameterSpec) {
-      DHParameterSpec dhParams = (DHParameterSpec)params;
-      return mapNonceGMWithDH(os2i(nonceS), os2i(sharedSecretH), dhParams);
-    } else {
-      throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
-    }
-  }
-  
-  public static ECParameterSpec mapNonceGMWithECDH(BigInteger nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
-    /*
-     * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
-     */
-    ECPoint generator = params.getGenerator();
-    EllipticCurve curve = params.getCurve();
-    BigInteger a = curve.getA();
-    BigInteger b = curve.getB();
-    ECFieldFp field = (ECFieldFp)curve.getField();
-    BigInteger p = field.getP();
-    BigInteger order = params.getOrder();
-    int cofactor = params.getCofactor();
-    ECPoint ephemeralGenerator = add(multiply(nonceS, generator, params), sharedSecretPointH, params);
-    if (!toBouncyCastleECPoint(ephemeralGenerator, params).isValid()) {
-      LOGGER.info("ephemeralGenerator is not a valid point");
-    }
-    return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
-  }
-
-  public static DHParameterSpec mapNonceGMWithDH(BigInteger nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
-    // g~ = g^s * h
-    BigInteger p = params.getP();
-    BigInteger generator = params.getG();
-    BigInteger ephemeralGenerator = generator.modPow(nonceS, p).multiply(sharedSecretH).mod(p);
-    return new DHParameterSpec(p, ephemeralGenerator, params.getL());
-  }
-
-  private static ECPoint add(ECPoint x, ECPoint y, ECParameterSpec params) {
+  public static ECPoint add(ECPoint x, ECPoint y, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcX = toBouncyCastleECPoint(x, params);
     org.bouncycastle.math.ec.ECPoint bcY = toBouncyCastleECPoint(y, params);
     org.bouncycastle.math.ec.ECPoint bcSum = bcX.add(bcY);
     return fromBouncyCastleECPoint(bcSum);
   }
 
+  /**
+   * EC point scalar multiplication.
+   * 
+   * @param s the scalar
+   * @param point an EC point
+   * @param params the domain parameters
+   * 
+   * @return the resulting EC point
+   */
   public static ECPoint multiply(BigInteger s, ECPoint point, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(point, params);
     org.bouncycastle.math.ec.ECPoint bcProd = bcPoint.multiply(s);
@@ -1234,15 +1193,16 @@ public class Util {
     return y.toBigInteger();
   }
 
-  private static org.bouncycastle.math.ec.ECPoint toBouncyCastleECPoint(ECPoint point, ECParameterSpec params) {
+  public static org.bouncycastle.math.ec.ECPoint toBouncyCastleECPoint(ECPoint point, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECCurve bcCurve = toBouncyCastleECCurve(params);
     return bcCurve.createPoint(point.getAffineX(), point.getAffineY(), false);
-    // return new org.bouncycastle.math.ec.ECPoint.Fp(bcCurve, bcCurve.fromBigInteger(point.getAffineX()), bcCurve.fromBigInteger(point.getAffineY()));
   }
 
   public static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
     point = point.normalize();
-    if (!point.isValid()) { LOGGER.warning("point not valid"); }
+    if (!point.isValid()) {
+      LOGGER.warning("point not valid");
+    }
     return new ECPoint(point.getAffineXCoord().toBigInteger(), point.getAffineYCoord().toBigInteger());
   }
 

@@ -33,6 +33,7 @@ import javax.crypto.spec.DHPublicKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
+import org.jmrtd.protocol.PACEGMWithECDHAgreement;
 import org.jmrtd.protocol.PACEProtocol;
 
 import junit.framework.TestCase;
@@ -102,6 +103,7 @@ public class PACEProtocolTest extends TestCase {
    * (see RFC 5639).
    */
   public void testSupplementSampleECDHGM() {
+    Security.insertProviderAt(BC_PROVIDER, 1);
     try {
 
       String serialNumber = "T22000129"; /* Check digit 3 */
@@ -185,27 +187,32 @@ public class PACEProtocolTest extends TestCase {
           Util.os2i(Hex.hexStringToBytes("60332EF2 450B5D24 7EF6D386 8397D398 852ED6E8 CAF6FFEE F6BF85CA 57057FD5")),
           Util.os2i(Hex.hexStringToBytes("0840CA74 15BAF3E4 3BD414D3 5AA4608B 93A2CAF3 A4E3EA4E 82C9C13D 03EB7181")));
 
-      KeyAgreement mappingAgreement = KeyAgreement.getInstance("ECDHC");
+      //      KeyAgreement mappingAgreement = KeyAgreement.getInstance("ECDH");
+      //      mappingAgreement.init(pcdMappingPrivateKey);
+      //
+      //      mappingAgreement.doPhase(piccMappingPublicKey, true);
+      //      byte[] sharedSecretH = mappingAgreement.generateSecret();
+
+      PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();      
       mappingAgreement.init(pcdMappingPrivateKey);
+      ECPoint sharedSecretH = mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey));
 
-      mappingAgreement.doPhase(piccMappingPublicKey, true);
-      byte[] sharedSecretH = mappingAgreement.generateSecret();
 
-      ECParameterSpec ephemeralParams = (ECParameterSpec)Util.mapNonceGM(nonceS, sharedSecretH, ecParams);
+      ECParameterSpec ephemeralParams = (ECParameterSpec)PACEProtocol.mapNonceGMWithECDH(nonceS, sharedSecretH, ecParams);
 
       KeyPairGenerator keyPairGenerator = null;
       KeyPair kp = null;
       PrivateKey pcdPrivateKey = null;
       KeyAgreement keyAgreement = null;
 
-      keyPairGenerator = KeyPairGenerator.getInstance("ECDHC", BC_PROVIDER);
+      keyPairGenerator = KeyPairGenerator.getInstance("EC", BC_PROVIDER);
       keyPairGenerator.initialize(ephemeralParams);
       kp = keyPairGenerator.generateKeyPair();
       pcdPrivateKey = kp.getPrivate();
-      keyAgreement = KeyAgreement.getInstance("ECDHC");
+
+      keyAgreement = KeyAgreement.getInstance("ECDH", BC_PROVIDER);
       keyAgreement.init(pcdPrivateKey);
 
-      //      keyAgreement.doPhase(piccMappingPublicKey, true);
       keyAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdPrivateKey), true);
 
       byte[] generatedSharedSecretBytesH = keyAgreement.generateSecret();
@@ -216,7 +223,7 @@ public class PACEProtocolTest extends TestCase {
 
       BigInteger s = Util.os2i(nonceS);
 
-      ECParameterSpec ephemeralECParams = (ECParameterSpec)Util.mapNonceGM(nonceS, sharedSecretH, ecParams);
+      ECParameterSpec ephemeralECParams = (ECParameterSpec)PACEProtocol.mapNonceGMWithECDH(nonceS, sharedSecretH, ecParams);
 
       ECPoint ephemeralGenerator = ephemeralECParams.getGenerator();
       byte[] ephemeralGeneratorX = Util.i2os(ephemeralGenerator.getAffineX());
@@ -252,7 +259,7 @@ public class PACEProtocolTest extends TestCase {
       PublicKey pcdPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(pcdPublicKeyPoint, ephemeralECParams));
       PublicKey piccPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccPublicKeyPoint, ephemeralECParams));
 
-      keyAgreement = KeyAgreement.getInstance("ECDHC", BC_PROVIDER);
+      keyAgreement = KeyAgreement.getInstance("ECDH", BC_PROVIDER);
       assertNotNull(keyAgreement);
       keyAgreement.init(pcdPrivateKey);
 
@@ -450,7 +457,7 @@ public class PACEProtocolTest extends TestCase {
 
       BigInteger sharedSecretH = Util.os2i(sharedSecretHBytes);
 
-      AlgorithmParameterSpec ephemeralParams = Util.mapNonceGM(nonceSBytes, sharedSecretHBytes, dhParams);
+      AlgorithmParameterSpec ephemeralParams = PACEProtocol.mapNonceGMWithDH(nonceSBytes, Util.os2i(sharedSecretHBytes), dhParams);
       assertTrue(ephemeralParams instanceof DHParameterSpec);
       DHParameterSpec ephemeralDHParams = (DHParameterSpec)ephemeralParams;
 
@@ -612,19 +619,15 @@ public class PACEProtocolTest extends TestCase {
       //			PublicKey piccMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccMappingPublicKeyPoint, ecParams));
       PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
 
-      KeyAgreement mappingAgreement = KeyAgreement.getInstance("ECDHC");
+      PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();      
       mappingAgreement.init(pcdMappingPrivateKey);
+      ECPoint mappingSharedSecret = mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey));
 
-      //      mappingAgreement.doPhase(piccMappingPublicKey, true);
-      mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey), true);
+      LOGGER.info("DEBUG: mappingSharedSecret = " + mappingSharedSecret);
 
-      byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
+      ECParameterSpec ephemeralParams = PACEProtocol.mapNonceGMWithECDH(nonceS, mappingSharedSecret, ecParams);
 
-      LOGGER.info("DEBUG: mappingSharedSecretBytes = " + Hex.bytesToHexString(mappingSharedSecretBytes));
-
-      ECParameterSpec ephemeralParams = (ECParameterSpec)Util.mapNonceGM(nonceS, mappingSharedSecretBytes, ecParams);
-
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDHC", BC_PROVIDER);
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", BC_PROVIDER);
       keyPairGenerator.initialize(ephemeralParams);
       KeyPair kp = keyPairGenerator.generateKeyPair();
       PrivateKey pcdPrivateKey = kp.getPrivate();
