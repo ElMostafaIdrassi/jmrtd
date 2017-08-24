@@ -69,7 +69,6 @@ import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.smartcards.CardServiceException;
-import net.sf.scuba.util.Hex;
 
 /**
  * The Password Authenticated Connection Establishment protocol.
