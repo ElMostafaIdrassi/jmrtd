@@ -33,6 +33,7 @@ import javax.crypto.spec.DHPublicKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
+import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.protocol.PACEGMWithECDHAgreement;
 import org.jmrtd.protocol.PACEProtocol;
 
@@ -686,6 +687,38 @@ public class PACEProtocolTest extends TestCase {
     }
   }
 
+  /**
+   * Example from
+   * Appendix H to Part 11: Worked Example: PACE - Integrated Mapping (Informative).
+   * 
+   * This example is based on the BrainpoolP256r1 elliptic curve.
+   */
+  public void testSpecSamplePACEIMWithECDHPointEncodingExampleH1() {
+    try {
+      byte[] expectedMappedGeneratorX = Hex.hexStringToBytes("8E82D315 59ED0FDE 92A4D049 8ADD3C23"
+          + "BABA94FB 77691E31 E90AEA77 FB17D427");
+
+      byte[] expectedMappedGeneratorY = Hex.hexStringToBytes("4C1AE14B D0C3DBAC 0C871B7F 36081693"
+          + "64437CA3 0AC243A0 89D3F266 C1E60FAD");
+
+      ECParameterSpec staticParameters = (ECParameterSpec)PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
+
+      byte[] decryptedNonceS = Hex.hexStringToBytes("2923BE84 E16CD6AE 529049F1 F1BBE9EB");
+      byte[] nonceT = Hex.hexStringToBytes("5DD4CBFC 96F5453B 130D890A 1CDBAE32");
+
+      byte[] pseudRandomFunctionResult = Hex.hexStringToBytes("A2F8FF2D F50E52C6 599F386A DCB595D2"
+          + "29F6A167 ADE2BE5F 2C3296AD D5B7430E");
+
+      ECPoint mappedGenerator  = PACEProtocol.icartPointEncode(Util.os2i(pseudRandomFunctionResult), staticParameters);
+
+      assertEquals(Util.os2i(expectedMappedGeneratorX), mappedGenerator.getAffineX());
+      assertEquals(Util.os2i(expectedMappedGeneratorY), mappedGenerator.getAffineY());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
   /*
    * Pseudo-random R(s,t) =
    *    EAB98D13 E0905295 2AA72990 7C3C9461
@@ -708,7 +741,7 @@ public class PACEProtocolTest extends TestCase {
    *    570417B7 90FF7F74 7E57F432 B04E1236
    *    819E0DFE F5B6E77C A4999925 328182D2 
    */
-  public void testPseudoRandomFunctionWorkedExampleH2() {
+  public void testPACEIMWithDHWorkedExampleH2() {
     try {
       BigInteger p = new BigInteger(("B10B8F96 A080E01D DE92DE5E AE5D54EC"
           + "52C99FBC FB06A3C6 9A6A9DCA 52D23B61"
@@ -734,6 +767,38 @@ public class PACEProtocolTest extends TestCase {
       byte[] x = PACEProtocol.pseudoRandomFunction(s, t, p, "AES");
 
       assertTrue(Arrays.equals(expectedX, x));
+
+      BigInteger expectedMappedGenerator = Util.os2i(Hex.hexStringToBytes("1D7D767F 11E333BC D6DBAEF4 0E799E7A"
+          + "926B9697 3550656F F3C83072 6D118D61"
+          + "C276CDCC 61D475CF 03A98E0C 0E79CAEB"
+          + "A5BE2557 8BD4551D 0B109032 36F0B0F9"
+          + "76852FA7 8EEA14EA 0ACA87D1 E91F688F"
+          + "E0DFF897 BBE35A47 2621D343 564B262F"
+          + "34223AE8 FC59B664 BFEDFA2B FE7516CA"
+          + "5510A6BB B633D517 EC25D4E0 BBAA16C2"));
+
+      BigInteger g = Util.os2i(Hex.hexStringToBytes("A4D1CBD5 C3FD3412 6765A442 EFB99905"
+          + "F8104DD2 58AC507F D6406CFF 14266D31"
+          + "266FEA1E 5C41564B 777E690F 5504F213"
+          + "160217B4 B01B886A 5E91547F 9E2749F4"
+          + "D7FBD7D3 B9A92EE1 909D0D22 63F80A76"
+          + "A6A24C08 7A091F53 1DBF0A01 69B6A28A"
+          + "D662A4D1 8E73AFA3 2D779D59 18D08BC8"
+          + "858F4DCE F97C2A24 855E6EEB 22B3B2E5"));
+
+      BigInteger q = Util.os2i(Hex.hexStringToBytes("F518AA87 81A8DF27 8ABA4E7D 64B7CB9D"
+          + "49462353"));
+
+      org.bouncycastle.crypto.params.DHParameters bcParams = new org.bouncycastle.crypto.params.DHParameters(p, g, q);
+
+      DHCParameterSpec params = new DHCParameterSpec(p, g, q);
+
+      DHParameterSpec mappedParams = (DHParameterSpec)PACEProtocol.mapNonceIMWithDH(s, t, "AES", params);
+
+      BigInteger mappedGenerator = mappedParams.getG();
+
+      assertEquals(expectedMappedGenerator, mappedGenerator);
+
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());

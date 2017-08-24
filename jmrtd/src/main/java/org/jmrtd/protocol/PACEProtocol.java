@@ -65,6 +65,7 @@ import org.jmrtd.PassportApduService;
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
+import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.smartcards.CardServiceException;
@@ -176,13 +177,6 @@ public class PACEProtocol {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     String digestAlg = PACEInfo.toDigestAlgorithm(oid); /* Either SHA-1 or SHA-256. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
-
-    //    LOGGER.info("DEBUG: PACE: oid = " + oid
-    //        + " -> mappingType = " + mappingType
-    //        + ", agreementAlg = " + agreementAlg
-    //        + ", cipherAlg = " + cipherAlg
-    //        + ", digestAlg = " + digestAlg
-    //        + ", keyLength = " + keyLength);
 
     checkConsistency(agreementAlg, cipherAlg, digestAlg, keyLength, params);
 
@@ -477,11 +471,10 @@ public class PACEProtocol {
 
       /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */      
 
-      LOGGER.info("DEBUG: step2Response = " + Hex.bytesToHexString(step2Response));
-
       if ("ECDH".equals(agreementAlg)) {
         return mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
       } else if ("DH".equals(agreementAlg)) {
+        BigInteger q = BigInteger.ONE;
         return mapNonceIMWithDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (DHParameterSpec)params);
       } else {
         throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
@@ -719,13 +712,16 @@ public class PACEProtocol {
     if (g == null || g.equals(BigInteger.ONE)) {
       throw new IllegalArgumentException("Invalid generator: " + g);
     }
-    
+
     BigInteger p = params.getP();
-    BigInteger q = BigInteger.ONE; // cofactor, FIXME: if cofactor is 1, then mapping is essentially x.modInverse(p)?!?
+
+    BigInteger q = params instanceof DHCParameterSpec ? ((DHCParameterSpec)params).getQ() : BigInteger.ONE; // FIXME: What if q not available? We use 1 here? Should be p-1? -- MO
 
     BigInteger x = Util.os2i(pseudoRandomFunction(nonceS, nonceT, p, cipherAlgorithm));
-    
-    BigInteger mappedGenerator = x.modPow(p.subtract(BigInteger.ONE).multiply(q.modInverse(p)), p);
+
+    BigInteger a = p.subtract(BigInteger.ONE).divide(q);
+
+    BigInteger mappedGenerator = x.modPow(a, p);
     return new DHParameterSpec(p, mappedGenerator, params.getL());
   }
 
@@ -835,7 +831,7 @@ public class PACEProtocol {
     BigInteger alpha = t.modPow(BigInteger.valueOf(2), p).negate().mod(p);
 
     /* 2. (Using implementation note 5.2.2). */
-    BigInteger alphaSq = alpha.multiply(alpha).mod(p);
+    BigInteger alphaSq = alpha.modPow(BigInteger.valueOf(2), p);
     BigInteger alphaPlusAlphaSq = alpha.add(alphaSq).mod(p);
     BigInteger onePlusAlphaPlusAlphaSq = BigInteger.ONE.add(alphaPlusAlphaSq);
     BigInteger pMinus2 = p.subtract(BigInteger.ONE).subtract(BigInteger.ONE);
@@ -854,14 +850,14 @@ public class PACEProtocol {
     BigInteger u = t.modPow(BigInteger.valueOf(3), p).multiply(h2).mod(p);
 
     /* 7. */
-    BigInteger pPlusOneOverFour = p.add(BigInteger.ONE).modPow(BigInteger.valueOf(4).modInverse(p), p);
+    BigInteger pPlusOneOverFour = p.add(BigInteger.ONE).multiply(BigInteger.valueOf(4).modInverse(p)).mod(p);
     BigInteger pMinusOneMinusPPlusOneOverFour = p.subtract(BigInteger.ONE).subtract(pPlusOneOverFour);
     BigInteger aa = h2.modPow(pMinusOneMinusPPlusOneOverFour, p);
 
     BigInteger aaSqTimesH2 = aa.modPow(BigInteger.valueOf(2), p).multiply(h2).mod(p);
 
     ECPoint xy = aaSqTimesH2.equals(BigInteger.ONE) ? new ECPoint(x2, aa.multiply(h2).mod(p)) : new ECPoint(x3, aa.multiply(u).mod(p));
-    
+
     if (cofactor == 1) {
       return Util.normalize(xy, params);
     } else {

@@ -85,6 +85,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
+import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.icao.MRZInfo;
 
@@ -125,7 +126,7 @@ public class Util {
   public static Provider getBouncyCastleProvider() {
     return BC_PROVIDER;
   }
-  
+
   /**
    * Derives the ENC or MAC key for BAC from the keySeed.
    *
@@ -584,10 +585,15 @@ public class Util {
   public static DHParameterSpec toExplicitDHParameterSpec(DHParameters params) {
     BigInteger p = params.getP();
     BigInteger generator = params.getG();
+    BigInteger q = params.getQ();
     int order = (int)params.getL();
-    return new DHParameterSpec(p, generator, order);
+    if (q == null) {
+      return new DHParameterSpec(p, generator, order);
+    } else {
+      return new PACEInfo.DHCParameterSpec(p, generator, q);
+    }
   }
-
+  
   /**
    * The public key algorithm (like RSA or) with some extra information (like 1024 bits).
    *
@@ -1251,7 +1257,7 @@ public class Util {
     byte[] seed = params.getCurve().getSeed();
     return new ECDomainParameters(curve, g, n, h, seed);
   }
-  
+
   public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
     if ("DH".equals(agreementAlg)) {
       /* TODO: this is probably wrong, what should be hashed? */
