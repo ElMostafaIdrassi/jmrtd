@@ -653,7 +653,7 @@ public class PACEProtocolTest extends TestCase {
 
   /**
    * Example from
-   * Appendix H to Part 11: Worked Example: PACE - Integerated Mapping (Informative).
+   * Appendix H to Part 11: Worked Example: PACE - Integrated Mapping (Informative).
    * 
    * This example is based on the BrainpoolP256r1 elliptic curve.
    * The block cipher used in this example is AES-128.

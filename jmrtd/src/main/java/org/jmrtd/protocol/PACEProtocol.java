@@ -57,7 +57,6 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.PACEException;
 import org.jmrtd.PACEKeySpec;
@@ -354,8 +353,8 @@ public class PACEProtocol {
 
   /**
    * The second step in the PACE protocol computes ephemeral domain parameters
-   * by performing a key agreement protocol with the PICC nonce as
-   * input.
+   * by mapping the PICC generated nonce (and optionally the PCD generated nonce,
+   * which will be exchanged, in case of Integrated Mapping).
    * 
    * @param mappingType either CAM, GM, or IM
    * @param agreementAlg the agreement algorithm, either DH or ECDH
@@ -363,7 +362,7 @@ public class PACEProtocol {
    * @param piccNonce the nonce received from the PICC
    * @param staticPACECipher the cipher to use in IM
    * 
-   * @return the computed ephemeral domain parameters
+   * @return the newly computed ephemeral domain parameters
    * 
    * @throws PACEException on error
    */
@@ -438,33 +437,6 @@ public class PACEProtocol {
     }
   }
 
-  public static ECParameterSpec mapNonceGMWithECDH(byte[] nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
-    /*
-     * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
-     */
-    ECPoint generator = params.getGenerator();
-    EllipticCurve curve = params.getCurve();
-    BigInteger a = curve.getA();
-    BigInteger b = curve.getB();
-    ECFieldFp field = (ECFieldFp)curve.getField();
-    BigInteger p = field.getP();
-    BigInteger order = params.getOrder();
-    int cofactor = params.getCofactor();
-    ECPoint ephemeralGenerator = Util.add(Util.multiply(Util.os2i(nonceS), generator, params), sharedSecretPointH, params);
-    if (!Util.toBouncyCastleECPoint(ephemeralGenerator, params).isValid()) {
-      LOGGER.info("ephemeralGenerator is not a valid point");
-    }
-    return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
-  }
-
-  public static DHParameterSpec mapNonceGMWithDH(byte[] nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
-    // g~ = g^s * h
-    BigInteger p = params.getP();
-    BigInteger generator = params.getG();
-    BigInteger mappedGenerator = generator.modPow(Util.os2i(nonceS), p).multiply(sharedSecretH).mod(p);
-    return new DHParameterSpec(p, mappedGenerator, params.getL());
-  }
-
   /**
    * The second step in the PACE protocol computes ephemeral domain parameters
    * by performing a key agreement protocol with the PICC and PCD nonces as
@@ -508,11 +480,7 @@ public class PACEProtocol {
       LOGGER.info("DEBUG: step2Response = " + Hex.bytesToHexString(step2Response));
 
       if ("ECDH".equals(agreementAlg)) {
-        /* Treat shared secret as an ECPoint. */
-
         return mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
-
-
       } else if ("DH".equals(agreementAlg)) {
         return mapNonceIMWithDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (DHParameterSpec)params);
       } else {
@@ -524,32 +492,6 @@ public class PACEProtocol {
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side exception in mapping nonce step", cse.getSW());
     }
-  }
-
-  /**
-   * @param nonceS
-   * @param nonceT
-   * @param cipherAlgorithm
-   * @param params
-   * @return
-   * @throws GeneralSecurityException
-   */
-  public static AlgorithmParameterSpec mapNonceIMWithECDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, ECParameterSpec params) throws GeneralSecurityException {
-    BigInteger p = Util.getPrime(params);
-    BigInteger order = params.getOrder();
-    int cofactor = params.getCofactor();
-    BigInteger a = params.getCurve().getA();
-    BigInteger b = params.getCurve().getB();
-
-    BigInteger t = Util.os2i(pseudoRandomFunction(nonceS, nonceT, p, cipherAlgorithm));
-
-    ECPoint mappedGenerator = icartPointEncode(t, params);
-    return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), mappedGenerator, order, cofactor);
-  }
-
-  public static AlgorithmParameterSpec mapNonceIMWithDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, DHParameterSpec params) {
-    /* FIXME: work in progress. */
-    return null;
   }
 
   /* Choose random ephemeral key pair (SK_PCD~, PK_PCD~, D~). */
@@ -694,6 +636,99 @@ public class PACEProtocol {
     throw new IllegalArgumentException("Unsupported access key, was expecting BAC or CAN key specification, found " + accessKey.getClass().getSimpleName());
   }
 
+  /* Generic Mapping. */
+
+  public static ECParameterSpec mapNonceGMWithECDH(byte[] nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
+    /*
+     * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
+     */
+    ECPoint generator = params.getGenerator();
+    EllipticCurve curve = params.getCurve();
+    BigInteger a = curve.getA();
+    BigInteger b = curve.getB();
+    ECFieldFp field = (ECFieldFp)curve.getField();
+    BigInteger p = field.getP();
+    BigInteger order = params.getOrder();
+    int cofactor = params.getCofactor();
+    ECPoint ephemeralGenerator = Util.add(Util.multiply(Util.os2i(nonceS), generator, params), sharedSecretPointH, params);
+    if (!Util.toBouncyCastleECPoint(ephemeralGenerator, params).isValid()) {
+      LOGGER.info("ephemeralGenerator is not a valid point");
+    }
+    return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
+  }
+
+  public static DHParameterSpec mapNonceGMWithDH(byte[] nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
+    // g~ = g^s * h
+    BigInteger p = params.getP();
+    BigInteger generator = params.getG();
+    BigInteger mappedGenerator = generator.modPow(Util.os2i(nonceS), p).multiply(sharedSecretH).mod(p);
+    return new DHParameterSpec(p, mappedGenerator, params.getL());
+  }
+
+  /* Integrated Mapping. */
+
+  /**
+   * Transforms the nonces using a pseudo random number function and maps the resulting value to a point on the curve.
+   * The resulting point is used as a generator as part of the returned domain parameters.
+   * 
+   * @param nonceS the nonce from the PICC
+   * @param nonceT the nonce from the PCD
+   * @param cipherAlgorithm the cipher algorithm to be used by the pseudo random function (either {@code "AES"} or {@code "DESede"})
+   * @param params the static domain parameters
+   * 
+   * @return the newly computed domain parameters
+   * 
+   * @throws GeneralSecurityException on error
+   */
+  public static AlgorithmParameterSpec mapNonceIMWithECDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, ECParameterSpec params) throws GeneralSecurityException {
+    BigInteger p = Util.getPrime(params);
+    BigInteger order = params.getOrder();
+    int cofactor = params.getCofactor();
+    BigInteger a = params.getCurve().getA();
+    BigInteger b = params.getCurve().getB();
+
+    BigInteger t = Util.os2i(pseudoRandomFunction(nonceS, nonceT, p, cipherAlgorithm));
+
+    ECPoint mappedGenerator = icartPointEncode(t, params);
+    return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), mappedGenerator, order, cofactor);
+  }
+
+  /*
+   * The function Map: g -> g~ is defined as g~ = f_g(R_p(s, t)), where R_p() is the pseudo-random function
+   * that maps octet strings to elements of GF(p) and f_g() is a function that maps elements of GF(p) to
+   * <g>. The random nonce t SHALL be chosen randomly by the inspection system and sent to the MRTD
+   * chip. The pseudo-random function R_p() is descibed in Section 4.3.3. The function f_g() is defined as
+   * f_g(x) = x^a mod p, and a = (p-1)/q is the cofactor. Implementations MUST check that g~ != 1.
+   * 
+   * NOTE: The public key validation method described in RFC 2631 MUST be used to
+   * prevent smallsubgroup attacks.
+   */
+  /**
+   * Transforms the nonces using a pseudo random number function and maps the resulting value to a field element.
+   * The resulting field element is used as a generator as part of the returned domain parameters.
+   * 
+   * @param nonceS the nonce from the PICC
+   * @param nonceT the nonce from the PCD
+   * @param cipherAlgorithm the cipher algorithm to be used by the pseudo random function (either {@code "AES"} or {@code "DESede"})
+   * @param params the static domain parameters
+   * 
+   * @throws GeneralSecurityException on error
+   */
+  public static AlgorithmParameterSpec mapNonceIMWithDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, DHParameterSpec params) throws GeneralSecurityException {
+    BigInteger g = params.getG();
+    if (g == null || g.equals(BigInteger.ONE)) {
+      throw new IllegalArgumentException("Invalid generator: " + g);
+    }
+    
+    BigInteger p = params.getP();
+    BigInteger q = BigInteger.ONE; // cofactor, FIXME: if cofactor is 1, then mapping is essentially x.modInverse(p)?!?
+
+    BigInteger x = Util.os2i(pseudoRandomFunction(nonceS, nonceT, p, cipherAlgorithm));
+    
+    BigInteger mappedGenerator = x.modPow(p.subtract(BigInteger.ONE).multiply(q.modInverse(p)), p);
+    return new DHParameterSpec(p, mappedGenerator, params.getL());
+  }
+
   /*
    * The function R_p(s,t) is a function that maps octet strings s (of bit length l) and t (of bit length k)
    * to an element int(x_1 || x_2 || ... || x_n) mod p of GF(p).
@@ -704,7 +739,8 @@ public class PACEProtocol {
    * The value n SHALL be selected as smallest number, such that n*l >= log2 p + 64.
    */
   /**
-   * Pseudo random number function as specified in Doc 9303 - Part 11, 4.4.3.3.2 used in integrated mapping.
+   * Pseudo random number function as specified in Doc 9303 - Part 11, 4.4.3.3.2.
+   * Used in PACE IM.
    * 
    * @param s the nonce that was sent by the ICC
    * @param t the nonce that was generated by the PCD
@@ -796,16 +832,17 @@ public class PACEProtocol {
     BigInteger b = params.getCurve().getB();
 
     /* 1. */
-    BigInteger alpha = t.pow(2).negate().mod(p);
+    BigInteger alpha = t.modPow(BigInteger.valueOf(2), p).negate().mod(p);
 
     /* 2. (Using implementation note 5.2.2). */
     BigInteger alphaSq = alpha.multiply(alpha).mod(p);
     BigInteger alphaPlusAlphaSq = alpha.add(alphaSq).mod(p);
+    BigInteger onePlusAlphaPlusAlphaSq = BigInteger.ONE.add(alphaPlusAlphaSq);
     BigInteger pMinus2 = p.subtract(BigInteger.ONE).subtract(BigInteger.ONE);
-    BigInteger x2 = b.negate().multiply(BigInteger.ONE.add(alphaPlusAlphaSq)).multiply((a.multiply(alphaPlusAlphaSq)).modPow(pMinus2, p));
+    BigInteger x2 = b.negate().multiply(onePlusAlphaPlusAlphaSq).multiply(a.multiply(alphaPlusAlphaSq).modPow(pMinus2, p)).mod(p);
 
     /* 3. */
-    BigInteger x3 = a.multiply(x2).mod(p);
+    BigInteger x3 = alpha.multiply(x2).mod(p);
 
     /* 4. */
     BigInteger h2 = x2.modPow(BigInteger.valueOf(3), p).add(a.multiply(x2)).add(b).mod(p);
@@ -814,16 +851,17 @@ public class PACEProtocol {
     BigInteger h3 = x3.modPow(BigInteger.valueOf(3), p).add(a.multiply(x3)).add(b).mod(p);
 
     /* 6. */
-    BigInteger u = t.modPow(BigInteger.valueOf(3), p).multiply(h3);
+    BigInteger u = t.modPow(BigInteger.valueOf(3), p).multiply(h2).mod(p);
 
     /* 7. */
-    BigInteger aaExp = p.subtract(BigInteger.ONE).subtract((p.add(BigInteger.ONE)).modPow(p.subtract(BigInteger.valueOf(4)), p));
-    BigInteger aa = h2.modPow(aaExp, p);
+    BigInteger pPlusOneOverFour = p.add(BigInteger.ONE).modPow(BigInteger.valueOf(4).modInverse(p), p);
+    BigInteger pMinusOneMinusPPlusOneOverFour = p.subtract(BigInteger.ONE).subtract(pPlusOneOverFour);
+    BigInteger aa = h2.modPow(pMinusOneMinusPPlusOneOverFour, p);
 
     BigInteger aaSqTimesH2 = aa.modPow(BigInteger.valueOf(2), p).multiply(h2).mod(p);
 
     ECPoint xy = aaSqTimesH2.equals(BigInteger.ONE) ? new ECPoint(x2, aa.multiply(h2).mod(p)) : new ECPoint(x3, aa.multiply(u).mod(p));
-
+    
     if (cofactor == 1) {
       return Util.normalize(xy, params);
     } else {
@@ -852,7 +890,7 @@ public class PACEProtocol {
     KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
     return keyFactory.generatePublic(keySpec);
   }
-  
+
   /**
    * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
    * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
