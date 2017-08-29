@@ -548,14 +548,14 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
       MessageDigest dig = MessageDigest.getInstance(digAlg);
       byte[] computedDigestedContent = dig.digest(contentBytes);
       if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
-        throw new SignatureException("Error checking signedAttribute message digest in eContent!"); /* HIER */
+        throw new SignatureException("Error checking signedAttribute message digest in eContent!");
       }
     }    
   }
 
   private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
     List<ASN1Sequence> attributeObjects = Collections.list(signedAttributesSet.getObjects());
-    List<Attribute> attributes = new ArrayList(attributeObjects.size());
+    List<Attribute> attributes = new ArrayList<Attribute>(attributeObjects.size());
     for (ASN1Sequence attributeObject: attributeObjects) {
       Attribute attribute = Attribute.getInstance(attributeObject);
       attributes.add(attribute);

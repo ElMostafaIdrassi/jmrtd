@@ -43,6 +43,10 @@ public class PACEException extends CardServiceException {
   public PACEException(String msg) {
     super(msg);
   }
+  
+  public PACEException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 
   /**
    * Creates a PACEException with a specific status word.

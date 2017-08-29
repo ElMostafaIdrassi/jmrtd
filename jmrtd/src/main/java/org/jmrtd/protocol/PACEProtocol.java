@@ -22,6 +22,7 @@
 
 package org.jmrtd.protocol;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -69,6 +70,8 @@ import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.smartcards.CardServiceException;
+import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.util.Hex;
 
 /**
  * The Password Authenticated Connection Establishment protocol.
@@ -98,7 +101,7 @@ public class PACEProtocol {
       (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
       (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
       (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
-      (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+      (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF
   };
 
   /** Constant used in IM pseudo random number mapping, see Doc 9303 - Part 11, 4.4.3.3.2. */
@@ -215,7 +218,8 @@ public class PACEProtocol {
     byte[] piccNonce = doPACEStep1(staticPACEKey, staticPACECipher);
 
     /*
-     * Receive additional data required for map (i.e. a public key from PICC, and (conditionally) a nonce t).
+     * Receive additional data required for map, i.e.,
+     * a public key from PICC, and (conditionally) a nonce t.
      * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
      */
     AlgorithmParameterSpec ephemeralParams = doPACEStep2(mappingType, agreementAlg, params, piccNonce, staticPACECipher);
@@ -253,7 +257,6 @@ public class PACEProtocol {
      */
     byte[] encryptedChipAuthenticationData = doPACEStep4(oid, mappingType, pcdKeyPair, piccPublicKey, macKey);
     byte[] chipAuthenticationData = null;
-
     /*
      * Start secure messaging.
      *
@@ -269,6 +272,8 @@ public class PACEProtocol {
       } else if (cipherAlg.startsWith("AES")) {
         long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
         wrapper = new AESSecureMessagingWrapper(encKey, macKey, ssc);
+      } else {
+        LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }
     } catch (GeneralSecurityException gse) {
       LOGGER.severe("Exception: " + gse.getMessage());
@@ -283,12 +288,13 @@ public class PACEProtocol {
 
       /* Decrypt A_PICC to recover CA_PICC. */
       try {
-        SecretKey secretKey = encKey; // new SecretKeySpec(sharedSecretBytes, "AES");
         Cipher decryptCipher = Cipher.getInstance("AES/CBC/NoPadding");
-        decryptCipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(IV_FOR_PACE_CAM_DECRYPTION));
-        chipAuthenticationData = Util.unpad(decryptCipher.doFinal(encryptedChipAuthenticationData));
+        decryptCipher.init(Cipher.DECRYPT_MODE, encKey, new IvParameterSpec(IV_FOR_PACE_CAM_DECRYPTION));
+        byte[] paddedChipAuthenticationData = decryptCipher.doFinal(encryptedChipAuthenticationData);
+        LOGGER.info("DEBUG: paddedChipAuthenticationData = " + Hex.bytesToHexString(paddedChipAuthenticationData));
+        chipAuthenticationData = Util.unpad(paddedChipAuthenticationData);
 
-        LOGGER.info("DEBUG: Including Chip Authentication data in PACE result");
+        LOGGER.info("DEBUG: chipAuthenticationData = " + Hex.bytesToHexString(chipAuthenticationData));
 
       } catch (GeneralSecurityException gse) {
         LOGGER.log(Level.WARNING, "Could not decrypt Chip Authentication data", gse);
@@ -297,7 +303,9 @@ public class PACEProtocol {
 
     return new PACEResult(mappingType, agreementAlg, cipherAlg, digestAlg, keyLength,
         params,
-        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes, encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
+        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes,
+        encryptedChipAuthenticationData, chipAuthenticationData,
+        wrapper);
   }
 
   /**
@@ -329,9 +337,6 @@ public class PACEProtocol {
       byte[] step1EncryptedNonce = Util.unwrapDO((byte)0x80, step1Response);
 
       /* (Re)initialize the K_pi cipher for decryption. */
-
-      //      staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[16])); /* FIXME: iv length 16 is independent of keylength? */
-      //      staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[step1EncryptedNonce.length])); // Fix proposed by Dorian ALADEL (dorian.aladel@gemalto.com)
       staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[staticPACECipher.getBlockSize()])); // Fix proposed by Halvdan Grelland (halvdanhg@gmail.com)
 
       piccNonce = staticPACECipher.doFinal(step1EncryptedNonce);
@@ -553,19 +558,48 @@ public class PACEProtocol {
       byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] step4Data = Util.wrapDO((byte)0x85, pcdToken);
       byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, true);
-      byte[] piccToken = Util.unwrapDO((byte)0x86, step4Response);
-      byte[] expectedPICCToken = generateAuthenticationToken(oid, macKey, pcdKeyPair.getPublic());
-      if (!Arrays.equals(expectedPICCToken, piccToken)) {
-        throw new GeneralSecurityException("PICC authentication token mismatch");
+      LOGGER.info("DEBUG: step4Response = " + Hex.bytesToHexString(step4Response));
+      TLVInputStream step4ResponseInputStream = new TLVInputStream(new ByteArrayInputStream(step4Response));
+      try {
+        int tag86 = step4ResponseInputStream.readTag();
+        if (tag86 != 0x86) {
+          LOGGER.warning("Was expecting tag 0x86, found: " + Integer.toHexString(tag86));
+        }
+        /* int piccTokenLength = */ step4ResponseInputStream.readLength();
+        byte[] piccToken = step4ResponseInputStream.readValue();
+
+        byte[] expectedPICCToken = generateAuthenticationToken(oid, macKey, pcdKeyPair.getPublic());
+        if (!Arrays.equals(expectedPICCToken, piccToken)) {
+          throw new GeneralSecurityException("PICC authentication token mismatch"
+              + ", expectedPICCToken = " + Hex.bytesToHexString(expectedPICCToken)
+              + ", piccToken = " + Hex.bytesToHexString(piccToken)
+              );
+        }
+
+        if (mappingType == MappingType.CAM) {
+          int tag8A = step4ResponseInputStream.readTag();
+          if (tag8A != 0x8A) {
+            LOGGER.warning("Was expecting tag 0x8A, found: " + Integer.toHexString(tag8A));
+          }
+          /* int encryptedChipAuthenticationDataLength = */ step4ResponseInputStream.readLength();
+          byte[] encryptedChipAuthenticationResponse = step4ResponseInputStream.readValue();
+          LOGGER.info("DEBUG: encryptedChipAuthenticationResponse = " + Hex.bytesToHexString(encryptedChipAuthenticationResponse));
+          
+          return encryptedChipAuthenticationResponse;
+        }
+      } catch (IOException ioe) {
+        LOGGER.log(Level.WARNING, "Could not parse step 4 response");
+      } finally {
+        try {
+          step4ResponseInputStream.close();
+        } catch (IOException ioe) {
+          LOGGER.log(Level.FINE, "Exception closing stream", ioe);
+        }
       }
 
-      if (mappingType == MappingType.CAM) {
-        return Util.unwrapDO((byte)0x8A, step4Data);
-      } else {
-        return null;
-      }
+      return null;
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side exception in authentication token generation step: " + gse.getMessage());
+      throw new PACEException("PCD side exception in authentication token generation step" + gse.getMessage());
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side exception in authentication token generation step", cse.getSW());
     }
@@ -703,6 +737,8 @@ public class PACEProtocol {
    * @param nonceT the nonce from the PCD
    * @param cipherAlgorithm the cipher algorithm to be used by the pseudo random function (either {@code "AES"} or {@code "DESede"})
    * @param params the static domain parameters
+   * 
+   * @return the newly computed domain parameters
    * 
    * @throws GeneralSecurityException on error
    */
