@@ -259,7 +259,9 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
      * 
      * @return file identifier
      */
-    public short getFID() { return fid; }
+    public short getFID() {
+      return fid;
+    }
 
     /**
      * Gets the length of the file.

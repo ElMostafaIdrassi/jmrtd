@@ -203,7 +203,10 @@ public class PassportService extends PassportApduService implements Serializable
    */
   protected SecureMessagingWrapper wrapper;
 
-  private MRTDFileSystem fs;
+  private boolean isICAOAppletSelected;
+
+  private MRTDFileSystem rootFileSystem;
+  private MRTDFileSystem icaoFileSystem;
 
   /**
    * Creates a new passport service for accessing the passport.
@@ -239,7 +242,9 @@ public class PassportService extends PassportApduService implements Serializable
   public PassportService(CardService service, int maxBlockSize) throws CardServiceException {
     super(service);
     this.maxBlockSize = maxBlockSize;
-    fs = new MRTDFileSystem(this);
+    rootFileSystem = new MRTDFileSystem(this);
+    icaoFileSystem = new MRTDFileSystem(this);
+    isICAOAppletSelected = false;
 
     state = State.SESSION_STOPPED_STATE;
     LOGGER.info("DEBUG: isExtendedAPDULengthSupported: " + isExtendedAPDULengthSupported());
@@ -271,6 +276,10 @@ public class PassportService extends PassportApduService implements Serializable
    * @throws CardServiceException on error
    */
   public void sendSelectApplet(boolean hasPACESucceeded) throws CardServiceException {
+    if (isICAOAppletSelected) {
+      LOGGER.info("Re-selecting ICAO applet");
+    }
+
     if (hasPACESucceeded) {
       /* Use SM as set up by doPACE() */
       sendSelectApplet(wrapper, APPLET_AID);
@@ -278,6 +287,8 @@ public class PassportService extends PassportApduService implements Serializable
       /* Use plain messaging to select the applet, caller will have to do doBAC. */
       sendSelectApplet(null, APPLET_AID);
     }
+
+    isICAOAppletSelected = true;
   }
 
   /**
@@ -456,10 +467,10 @@ public class PassportService extends PassportApduService implements Serializable
    * @throws CardServiceException on error
    */
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-        PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
-      TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
-      state = State.TA_AUTHENTICATED_STATE;
-      return taResult;
+      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
+    TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
+    state = State.TA_AUTHENTICATED_STATE;
+    return taResult;
   }
 
   /**
@@ -522,9 +533,16 @@ public class PassportService extends PassportApduService implements Serializable
    * @throws CardServiceException if the file cannot be read
    */
   public synchronized CardFileInputStream getInputStream(short fid) throws CardServiceException {
-    synchronized(fs) {
-      fs.selectFile(fid);
-      return new CardFileInputStream(maxBlockSize, fs);
+    if (!isICAOAppletSelected) {
+      synchronized(rootFileSystem) {
+        rootFileSystem.selectFile(fid);
+        return new CardFileInputStream(maxBlockSize, rootFileSystem);
+      }
+    } else {
+      synchronized(icaoFileSystem) {
+        icaoFileSystem.selectFile(fid);
+        return new CardFileInputStream(maxBlockSize, icaoFileSystem);
+      }
     }
   }
 }

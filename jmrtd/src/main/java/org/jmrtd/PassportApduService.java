@@ -287,6 +287,9 @@ public class PassportApduService extends CardService {
    * @throws CardServiceException on tranceive error
    */
   public synchronized void sendSelectApplet(APDUWrapper wrapper, byte[] aid) throws CardServiceException {
+    if (aid == null) {
+      throw new IllegalArgumentException("AID cannot be null");
+    }
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816,ISO7816.INS_SELECT_FILE, (byte) 0x04, (byte) 0x0C, aid);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
 
