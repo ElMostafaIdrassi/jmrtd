@@ -593,7 +593,7 @@ public class Util {
       return new PACEInfo.DHCParameterSpec(p, generator, q);
     }
   }
-  
+
   /**
    * The public key algorithm (like RSA or) with some extra information (like 1024 bits).
    *
@@ -796,12 +796,20 @@ public class Util {
           return subjectPublicKeyInfo;
         }
       } else if ("DH".equals(algorithm) || (publicKey instanceof DHPublicKey)) {
-        DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
-        DHParameterSpec dhSpec = dhPublicKey.getParams();
-        return new SubjectPublicKeyInfo(
-            new AlgorithmIdentifier(EACObjectIdentifiers.id_PK_DH,
-                new DHParameter(dhSpec.getP(), dhSpec.getG(), dhSpec.getL()).toASN1Primitive()),
-            new ASN1Integer(dhPublicKey.getY()));
+        ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
+        try {
+          SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(((ASN1Sequence)asn1In.readObject()));
+          AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
+
+          DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+          DHParameterSpec dhSpec = dhPublicKey.getParams();
+          return new SubjectPublicKeyInfo(
+              new AlgorithmIdentifier(algorithmIdentifier.getAlgorithm(),
+                  new DHParameter(dhSpec.getP(), dhSpec.getG(), dhSpec.getL()).toASN1Primitive()),
+              new ASN1Integer(dhPublicKey.getY()));
+        } finally {
+          asn1In.close();
+        }
       } else {
         throw new IllegalArgumentException("Unrecognized key type, found " + publicKey.getAlgorithm() + ", should be DH or ECDH");
       }
