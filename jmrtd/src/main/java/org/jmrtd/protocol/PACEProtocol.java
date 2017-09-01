@@ -68,6 +68,11 @@ import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
+import org.jmrtd.protocol.PACEResult.PACEGMMappingResult;
+import org.jmrtd.protocol.PACEResult.PACEGMWithDHMappingResult;
+import org.jmrtd.protocol.PACEResult.PACEGMWithECDHMappingResult;
+import org.jmrtd.protocol.PACEResult.PACEIMMappingResult;
+import org.jmrtd.protocol.PACEResult.PACEMappingResult;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVInputStream;
@@ -167,20 +172,20 @@ public class PACEProtocol {
    *
    * @param staticPACEKey the password key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
-   * @param params explicit static domain parameters the domain params for DH or ECDH
+   * @param staticParameters explicit static domain parameters the domain params for DH or ECDH
    * 
    * @return a PACE result
    *
    * @throws PACEException if authentication failed
    */
-  public PACEResult doPACE(SecretKey staticPACEKey, String oid, AlgorithmParameterSpec params) throws PACEException {
+  public PACEResult doPACE(SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws PACEException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     String digestAlg = PACEInfo.toDigestAlgorithm(oid); /* Either SHA-1 or SHA-256. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
 
-    checkConsistency(agreementAlg, cipherAlg, digestAlg, keyLength, params);
+    checkConsistency(agreementAlg, cipherAlg, digestAlg, keyLength, staticParameters);
 
     Cipher staticPACECipher = null;
     try {
@@ -222,19 +227,21 @@ public class PACEProtocol {
      * a public key from PICC, and (conditionally) a nonce t.
      * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
      */
-    AlgorithmParameterSpec ephemeralParams = doPACEStep2(mappingType, agreementAlg, params, piccNonce, staticPACECipher);
+
+    PACEMappingResult mappingResult = doPACEStep2(mappingType, agreementAlg, staticParameters, piccNonce, staticPACECipher);
+    AlgorithmParameterSpec ephemeralParams = mappingResult.getEphemeralParameters();
 
     /* Choose random ephemeral PCD side keys (SK_PCD~, PK_PCD~, D~). */
-    KeyPair pcdKeyPair = doPACEStep3GenerateKeyPair(agreementAlg, ephemeralParams);
+    KeyPair ephemeralPCDKeyPair = doPACEStep3GenerateKeyPair(agreementAlg, ephemeralParams);
 
     /*
      * Exchange PK_PCD~ and PK_PICC~ with PICC.
      * Check that PK_PCD~ and PK_PICC~ differ.
      */
-    PublicKey piccPublicKey = doPACEStep3ExchangePublicKeys(pcdKeyPair.getPublic(), ephemeralParams);
+    PublicKey ephemeralPICCPublicKey = doPACEStep3ExchangePublicKeys(ephemeralPCDKeyPair.getPublic(), ephemeralParams);
 
     /* Key agreement K = KA(SK_PCD~, PK_PICC~, D~). */
-    byte[] sharedSecretBytes = doPACEStep3KeyAgreement(agreementAlg, pcdKeyPair.getPrivate(), piccPublicKey);
+    byte[] sharedSecretBytes = doPACEStep3KeyAgreement(agreementAlg, ephemeralPCDKeyPair.getPrivate(), ephemeralPICCPublicKey);
 
     /* Derive secure messaging keys. */
     /* Compute session keys K_mac = KDF_mac(K), K_enc = KDF_enc(K). */    
@@ -255,7 +262,7 @@ public class PACEProtocol {
      * 
      * Extract encryptedChipAuthenticationData, if mapping is CAM.
      */
-    byte[] encryptedChipAuthenticationData = doPACEStep4(oid, mappingType, pcdKeyPair, piccPublicKey, macKey);
+    byte[] encryptedChipAuthenticationData = doPACEStep4(oid, mappingType, ephemeralPCDKeyPair, ephemeralPICCPublicKey, macKey);
     byte[] chipAuthenticationData = null;
     /*
      * Start secure messaging.
@@ -299,13 +306,16 @@ public class PACEProtocol {
       } catch (GeneralSecurityException gse) {
         LOGGER.log(Level.WARNING, "Could not decrypt Chip Authentication data", gse);
       }
+
+      /* CAM result. Include Chip Authentication data. */
+      return new PACECAMResult(agreementAlg, cipherAlg, digestAlg, keyLength,
+          mappingResult, ephemeralPCDKeyPair, ephemeralPICCPublicKey,
+          encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
     }
 
+    /* GM or IM result. */
     return new PACEResult(mappingType, agreementAlg, cipherAlg, digestAlg, keyLength,
-        params,
-        piccNonce, ephemeralParams, pcdKeyPair, piccPublicKey, sharedSecretBytes,
-        encryptedChipAuthenticationData, chipAuthenticationData,
-        wrapper);
+        mappingResult, ephemeralPCDKeyPair, ephemeralPICCPublicKey, wrapper);
   }
 
   /**
@@ -332,7 +342,7 @@ public class PACEProtocol {
     byte[] piccNonce = null;
     try {
       byte[] step1Data = new byte[] { };
-      /* Command data is empty. this implies an empty dynamic authentication object. */
+      /* Command data is empty. This implies an empty dynamic authentication object. */
       byte[] step1Response = service.sendGeneralAuthenticate(wrapper, step1Data, false);
       byte[] step1EncryptedNonce = Util.unwrapDO((byte)0x80, step1Response);
 
@@ -373,7 +383,7 @@ public class PACEProtocol {
    * Receive additional data required for map (i.e. a public key from PICC, and (conditionally) a nonce t).
    * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
    */
-  public AlgorithmParameterSpec doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
+  public PACEMappingResult doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
     switch(mappingType) {
       case CAM:
         // Fall through to GM case.
@@ -387,7 +397,7 @@ public class PACEProtocol {
   }
 
   /**
-   * The second step in the PACE protocol computes ephemeral domain parameters
+   * The second step in the PACE protocol (GM case) computes ephemeral domain parameters
    * by performing a key agreement protocol with the PICC nonce as
    * input.
    * 
@@ -399,13 +409,13 @@ public class PACEProtocol {
    * 
    * @throws PACEException on error
    */
-  public AlgorithmParameterSpec doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
+  public PACEGMMappingResult doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(params);
-      KeyPair kp = keyPairGenerator.generateKeyPair();
-      PublicKey pcdMappingPublicKey = kp.getPublic();
-      PrivateKey pcdMappingPrivateKey = kp.getPrivate();
+      KeyPair pcdMappingKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey pcdMappingPublicKey = pcdMappingKeyPair.getPublic();
+      PrivateKey pcdMappingPrivateKey = pcdMappingKeyPair.getPrivate();
 
       byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);            
       byte[] step2Data = Util.wrapDO((byte)0x81, pcdMappingEncodedPublicKey);
@@ -417,17 +427,19 @@ public class PACEProtocol {
         /* Treat shared secret as an ECPoint. */
         PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();
         mappingAgreement.init((ECPrivateKey)pcdMappingPrivateKey);
-        ECPoint sharedSecretPointH = mappingAgreement.doPhase((ECPublicKey)piccMappingPublicKey);
-        return mapNonceGMWithECDH(piccNonce, sharedSecretPointH, (ECParameterSpec)params);
+        ECPoint mappingSharedSecretPoint = mappingAgreement.doPhase((ECPublicKey)piccMappingPublicKey);
+        AlgorithmParameterSpec ephemeralParameters = mapNonceGMWithECDH(piccNonce, mappingSharedSecretPoint, (ECParameterSpec)params);
+        return new PACEGMWithECDHMappingResult(params, piccNonce, piccMappingPublicKey, pcdMappingKeyPair, mappingSharedSecretPoint, ephemeralParameters);
       } else if ("DH".equals(agreementAlg)) {
         KeyAgreement mappingAgreement = KeyAgreement.getInstance(agreementAlg);
         mappingAgreement.init(pcdMappingPrivateKey);
         mappingAgreement.doPhase(piccMappingPublicKey, true);
         byte[] mappingSharedSecretBytes = mappingAgreement.generateSecret();
-        return mapNonceGMWithDH(piccNonce, Util.os2i(mappingSharedSecretBytes), (DHParameterSpec)params);
+        AlgorithmParameterSpec ephemeralParameters = mapNonceGMWithDH(piccNonce, Util.os2i(mappingSharedSecretBytes), (DHParameterSpec)params);
+        return new PACEGMWithDHMappingResult(params, piccNonce, piccMappingPublicKey, pcdMappingKeyPair, mappingSharedSecretBytes, ephemeralParameters);
       } else {
-        throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
-      }
+        throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected \"ECDH\" / ECParameterSpec or \"DH\" / DHParameterSpec"
+            + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());      }
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {
@@ -464,7 +476,7 @@ public class PACEProtocol {
    *      Cryptology – CRYPTO 2010, Springer-Verlag, 2010.
    * [25]: Sagem, MorphoMapping Patents FR09-54043 and FR09-54053, 2009
    */
-  public AlgorithmParameterSpec doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
+  public PACEIMMappingResult doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
     try {
 
       byte[] pcdNonce = new byte[piccNonce.length];
@@ -476,14 +488,15 @@ public class PACEProtocol {
       /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */      
 
       if ("ECDH".equals(agreementAlg)) {
-        return mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
+        AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
+        return new PACEIMMappingResult(params, piccNonce, pcdNonce, ephemeralParameters);
       } else if ("DH".equals(agreementAlg)) {
-        BigInteger q = BigInteger.ONE;
-        return mapNonceIMWithDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (DHParameterSpec)params);
+        AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (DHParameterSpec)params);
+        return new PACEIMMappingResult(params, piccNonce, pcdNonce, ephemeralParameters);
       } else {
-        throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
+        throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected \"ECDH\" / ECParameterSpec or \"DH\" / DHParameterSpec"
+            + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());
       }
-
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {
@@ -558,7 +571,6 @@ public class PACEProtocol {
       byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] step4Data = Util.wrapDO((byte)0x85, pcdToken);
       byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, true);
-      LOGGER.info("DEBUG: step4Response = " + Hex.bytesToHexString(step4Response));
       TLVInputStream step4ResponseInputStream = new TLVInputStream(new ByteArrayInputStream(step4Response));
       try {
         int tag86 = step4ResponseInputStream.readTag();
@@ -572,8 +584,7 @@ public class PACEProtocol {
         if (!Arrays.equals(expectedPICCToken, piccToken)) {
           throw new GeneralSecurityException("PICC authentication token mismatch"
               + ", expectedPICCToken = " + Hex.bytesToHexString(expectedPICCToken)
-              + ", piccToken = " + Hex.bytesToHexString(piccToken)
-              );
+              + ", piccToken = " + Hex.bytesToHexString(piccToken));
         }
 
         if (mappingType == MappingType.CAM) {
@@ -582,10 +593,7 @@ public class PACEProtocol {
             LOGGER.warning("Was expecting tag 0x8A, found: " + Integer.toHexString(tag8A));
           }
           /* int encryptedChipAuthenticationDataLength = */ step4ResponseInputStream.readLength();
-          byte[] encryptedChipAuthenticationResponse = step4ResponseInputStream.readValue();
-          LOGGER.info("DEBUG: encryptedChipAuthenticationResponse = " + Hex.bytesToHexString(encryptedChipAuthenticationResponse));
-          
-          return encryptedChipAuthenticationResponse;
+          return step4ResponseInputStream.readValue();
         }
       } catch (IOException ioe) {
         LOGGER.log(Level.WARNING, "Could not parse step 4 response");
@@ -664,20 +672,20 @@ public class PACEProtocol {
 
   /* Generic Mapping. */
 
-  public static ECParameterSpec mapNonceGMWithECDH(byte[] nonceS, ECPoint sharedSecretPointH, ECParameterSpec params) {
+  public static ECParameterSpec mapNonceGMWithECDH(byte[] nonceS, ECPoint sharedSecretPointH, ECParameterSpec staticParameters) {
     /*
      * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
      */
-    ECPoint generator = params.getGenerator();
-    EllipticCurve curve = params.getCurve();
+    ECPoint generator = staticParameters.getGenerator();
+    EllipticCurve curve = staticParameters.getCurve();
     BigInteger a = curve.getA();
     BigInteger b = curve.getB();
     ECFieldFp field = (ECFieldFp)curve.getField();
     BigInteger p = field.getP();
-    BigInteger order = params.getOrder();
-    int cofactor = params.getCofactor();
-    ECPoint ephemeralGenerator = Util.add(Util.multiply(Util.os2i(nonceS), generator, params), sharedSecretPointH, params);
-    if (!Util.toBouncyCastleECPoint(ephemeralGenerator, params).isValid()) {
+    BigInteger order = staticParameters.getOrder();
+    int cofactor = staticParameters.getCofactor();
+    ECPoint ephemeralGenerator = Util.add(Util.multiply(Util.os2i(nonceS), generator, staticParameters), sharedSecretPointH, staticParameters);
+    if (!Util.toBouncyCastleECPoint(ephemeralGenerator, staticParameters).isValid()) {
       LOGGER.info("ephemeralGenerator is not a valid point");
     }
     return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);

@@ -233,7 +233,6 @@ public class CAProtocol {
     if ("DH".equals(agreementAlg)) {
       /* TODO: this is probably wrong, what should be hashed? */
       MessageDigest md = MessageDigest.getInstance("SHA-1");
-      md = MessageDigest.getInstance("SHA-1");
       return md.digest(getKeyData(agreementAlg, pcdPublicKey));
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
