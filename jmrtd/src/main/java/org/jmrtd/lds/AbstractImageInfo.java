@@ -160,6 +160,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
    * 
    * @return a textual representation of this image info
    */
+  @Override
   public String toString() {
     StringBuffer result = new StringBuffer();
     result.append(this.getClass().getSimpleName());
@@ -170,6 +171,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     return result.toString();
   }
 
+  @Override
   public int hashCode() {
     int result = 1234567891;
     result = 3 * result + 5 * type;
@@ -178,6 +180,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     return result;
   }
 
+  @Override
   public boolean equals(Object other) {
     try {
       if (other == null) { return false; }

@@ -42,7 +42,6 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * This file contains the common data (version and
  * data group presence table) information.
  *
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$

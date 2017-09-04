@@ -100,6 +100,7 @@ public class ICAOCountry extends Country {
     this.nationality = nationality;
   }
 
+  @Override
   public int valueOf() {
     return -1;
   }
@@ -109,6 +110,7 @@ public class ICAOCountry extends Country {
    *
    * @return a country name
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -118,6 +120,7 @@ public class ICAOCountry extends Country {
    *
    * @return the nationality
    */
+  @Override
   public String getNationality() {
     return nationality;
   }
@@ -127,6 +130,7 @@ public class ICAOCountry extends Country {
    *
    * @return a two-digit country code
    */
+  @Override
   public String toAlpha2Code() {
     return alpha2Code;
   }
@@ -136,6 +140,7 @@ public class ICAOCountry extends Country {
    *
    * @return a three-digit country code
    */
+  @Override
   public String toAlpha3Code() {
     return alpha3Code;
   }

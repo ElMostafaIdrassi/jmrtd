@@ -597,38 +597,48 @@ public class DG11File extends DataGroup {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("DG11File [");
-    result.append(nameOfHolder == null ? "" : nameOfHolder); result.append(", ");
-    result.append(otherNames == null || otherNames.size() == 0 ? "[]" : otherNames); result.append(", ");
-    result.append(personalNumber == null ? "" : personalNumber); result.append(", ");
-    result.append(fullDateOfBirth == null ? "" : fullDateOfBirth); result.append(", ");
-    result.append(placeOfBirth == null || placeOfBirth.size() == 0 ? "[]" : placeOfBirth.toString()); result.append(", ");
-    result.append(permanentAddress == null || permanentAddress.size() == 0 ? "[]" : permanentAddress.toString()); result.append(", ");
-    result.append(telephone == null ? "" : telephone); result.append(", ");
-    result.append(profession == null ? "" : profession); result.append(", ");
-    result.append(title == null ? "" : title); result.append(", ");
-    result.append(personalSummary == null ? "" : personalSummary); result.append(", ");
-    result.append(proofOfCitizenship == null ? "" : "image (" + proofOfCitizenship.length + ")"); result.append(", ");
-    result.append(otherValidTDNumbers == null || otherValidTDNumbers.size() == 0 ? "[]" : otherValidTDNumbers.toString()); result.append(", ");
-    result.append(custodyInformation == null ? "" : custodyInformation);
-    result.append("]");
-    return result.toString();
+    return new StringBuilder()
+        .append("DG11File [")
+        .append(nameOfHolder == null ? "" : nameOfHolder).append(", ")
+        .append(otherNames == null || otherNames.size() == 0 ? "[]" : otherNames).append(", ")
+        .append(personalNumber == null ? "" : personalNumber).append(", ")
+        .append(fullDateOfBirth == null ? "" : fullDateOfBirth).append(", ")
+        .append(placeOfBirth == null || placeOfBirth.size() == 0 ? "[]" : placeOfBirth.toString()).append(", ")
+        .append(permanentAddress == null || permanentAddress.size() == 0 ? "[]" : permanentAddress.toString()).append(", ")
+        .append(telephone == null ? "" : telephone).append(", ")
+        .append(profession == null ? "" : profession).append(", ")
+        .append(title == null ? "" : title).append(", ")
+        .append(personalSummary == null ? "" : personalSummary).append(", ")
+        .append(proofOfCitizenship == null ? "" : "image (" + proofOfCitizenship.length + ")").append(", ")
+        .append(otherValidTDNumbers == null || otherValidTDNumbers.size() == 0 ? "[]" : otherValidTDNumbers.toString()).append(", ")
+        .append(custodyInformation == null ? "" : custodyInformation)
+        .append("]")
+        .toString();
   }
 
+  @Override
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (obj == this) { return true; }
-    if (!obj.getClass().equals(this.getClass())) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (!obj.getClass().equals(this.getClass())) {
+      return false;
+    }
     DG11File other = (DG11File)obj;
     return this.toString().equals(other.toString());
   }
 
+  @Override
   public int hashCode() {
     return 13 * toString().hashCode() + 111;
   }
 
+  @Override
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
     tlvOut.writeTag(TAG_LIST_TAG);

@@ -27,14 +27,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -46,7 +52,13 @@ import java.util.logging.Logger;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.jmrtd.Util;
 import org.jmrtd.lds.LDSFile;
@@ -215,8 +227,6 @@ public class SODFileTest extends TestCase {
 
   public static SODFile createTestObject(String digestAlgorithm, String signatureAlgorithm) {
     try {
-      Security.insertProviderAt(BC_PROVIDER, 4);
-
       Date today = Calendar.getInstance().getTime();
       DG1File dg1File = DG1FileTest.createTestObject();
       byte[] dg1Bytes = dg1File.getEncoded();
@@ -231,15 +241,15 @@ public class SODFileTest extends TestCase {
       Date dateOfIssuing = today;
       Date dateOfExpiry = today;
 
-      X509V3CertificateGenerator certGenerator = new X509V3CertificateGenerator();
-      certGenerator.setSerialNumber(BigInteger.ONE);
-      certGenerator.setIssuerDN(new X509Name("C=NL, O=State of the Netherlands, OU=Ministry of the Interior and Kingdom Relations, CN=CSCA NL"));
-      certGenerator.setSubjectDN(new X509Name("C=NL, O=State of the Netherlands, OU=Ministry of the Interior and Kingdom Relations, CN=DS-01 NL, OID.2.5.4.5=1"));
-      certGenerator.setNotBefore(dateOfIssuing);
-      certGenerator.setNotAfter(dateOfExpiry);
-      certGenerator.setPublicKey(publicKey);
-      certGenerator.setSignatureAlgorithm(signatureAlgorithm);
-      X509Certificate docSigningCert = (X509Certificate)certGenerator.generate(privateKey, BC_PROVIDER_NAME);
+      X509Certificate docSigningCert = generateDocSigningCert(BigInteger.ONE,
+          "C=NL, O=State of the Netherlands, OU=Ministry of the Interior and Kingdom Relations, CN=CSCA NL",
+          "C=NL, O=State of the Netherlands, OU=Ministry of the Interior and Kingdom Relations, CN=DS-01 NL, OID.2.5.4.5=1",
+          dateOfIssuing,
+          dateOfExpiry,
+          publicKey,
+          signatureAlgorithm,
+          privateKey);
+
       Map<Integer, byte[]> hashes = new HashMap<Integer, byte[]>();
       MessageDigest digest = MessageDigest.getInstance(digestAlgorithm);
       hashes.put(1, digest.digest(dg1Bytes));
@@ -288,6 +298,15 @@ public class SODFileTest extends TestCase {
       e.printStackTrace();
       return null;
     }
+  }
+
+  private static X509Certificate generateDocSigningCert(BigInteger serial, String issuerName, String subjectDN, Date dateOfIssuing, Date dateOfExpiry, PublicKey publicKey, String signatureAlgorithm, PrivateKey privateKey) throws InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException, OperatorCreationException, IOException, CertificateException {
+    SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+    X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(new X500Name(issuerName), serial, dateOfIssuing, dateOfExpiry, new X500Name(subjectDN), subjectPublicKeyInfo);
+    ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(BC_PROVIDER).build(privateKey);
+    byte[] certBytes = certBuilder.build(signer).getEncoded();
+    CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+    return (X509Certificate)certificateFactory.generateCertificate(new ByteArrayInputStream(certBytes));
   }
 
   public InputStream createMustermannSampleInputStream() {

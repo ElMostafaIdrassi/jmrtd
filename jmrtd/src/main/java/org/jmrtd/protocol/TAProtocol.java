@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.Signature;
 import java.util.List;
 import java.util.logging.Logger;
@@ -55,6 +56,8 @@ public class TAProtocol {
 
   private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
+  
   private PassportService service;
   private SecureMessagingWrapper wrapper;
 
@@ -242,7 +245,7 @@ public class TAProtocol {
             "ERROR: Could not determine signature algorithm for terminal certificate "
                 + terminalCert.getHolderReference().getName());
       }
-      Signature sig = Signature.getInstance(sigAlg);
+      Signature sig = Signature.getInstance(sigAlg, BC_PROVIDER);
       sig.initSign(terminalKey);
       sig.update(dtbsBytes);
       byte[] signedData = sig.sign();

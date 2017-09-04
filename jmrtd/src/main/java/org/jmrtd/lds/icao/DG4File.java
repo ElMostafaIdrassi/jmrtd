@@ -96,6 +96,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
     super(EF_DG4_TAG, inputStream);
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = DECODER.decode(inputStream);
     List<CBEFFInfo> records = cbeffInfo.getSubRecords();
@@ -114,6 +115,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
     /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
   }
 
+  @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
     List<IrisInfo> irisInfos = getSubRecords();
@@ -143,19 +145,25 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
    * 
    * @return iris infos
    */
-  public List<IrisInfo> getIrisInfos() { return getSubRecords(); }
+  public List<IrisInfo> getIrisInfos() {
+    return getSubRecords();
+  }
 
   /**
    * Adds an iris info to this file.
    * 
    * @param irisInfo an iris info
    */
-  public void addIrisInfo(IrisInfo irisInfo) { add(irisInfo); }
+  public void addIrisInfo(IrisInfo irisInfo) {
+    add(irisInfo);
+  }
 
   /**
    * Removes an iris info from this file.
    * 
    * @param index the index of the iris info to remove
    */
-  public void removeIrisInfo(int index) { remove(index); }
+  public void removeIrisInfo(int index) {
+    remove(index);
+  }
 }

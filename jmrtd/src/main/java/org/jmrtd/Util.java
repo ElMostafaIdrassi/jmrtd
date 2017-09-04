@@ -70,7 +70,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.eac.EACObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.DHParameter;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -1048,12 +1047,20 @@ public class Util {
       if (params instanceof ECParameterSpec) {
         ECPoint w = os2ECPoint(encodedPublicKey);
         ECParameterSpec ecParams = (ECParameterSpec)params;
-        KeyFactory kf = KeyFactory.getInstance("EC");
-        return kf.generatePublic(new ECPublicKeySpec(w, ecParams));
+        try {
+          KeyFactory kf = KeyFactory.getInstance("EC");
+          return kf.generatePublic(new ECPublicKeySpec(w, ecParams));
+        } catch (Exception e) {
+          LOGGER.log(Level.FINE, "Default provider could not provide this key factory, falling back to explicit BC", e);
+          KeyFactory kf = KeyFactory.getInstance("EC", BC_PROVIDER);
+          return kf.generatePublic(new ECPublicKeySpec(w, ecParams));          
+        }
       } else if (params instanceof DHParameterSpec) {
         DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
         int b = dataIn.read();
-        if (b != 0x04) { throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); }
+        if (b != 0x04) {
+          throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); 
+        }
         int length = encodedPublicKey.length - 1;
         byte[] publicValue = new byte[length];
         dataIn.readFully(publicValue);
@@ -1065,6 +1072,7 @@ public class Util {
         DHParameterSpec dhParams = (DHParameterSpec)params;
         return kf.generatePublic(new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
       }
+      
       throw new IllegalArgumentException("Expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Exception", ioe);

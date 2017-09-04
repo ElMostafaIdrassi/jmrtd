@@ -87,6 +87,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
     super(EF_DG2_TAG, inputStream);
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     ComplexCBEFFInfo complexCBEFFInfo = DECODER.decode(inputStream);
     List<CBEFFInfo> records = complexCBEFFInfo.getSubRecords();
@@ -106,6 +107,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
     /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
   }
 
+  @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
     List<FaceInfo> faceInfos = getSubRecords();
@@ -115,7 +117,6 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
     }
     ENCODER.encode(cbeffInfo, outputStream);
   }
-
 
   /**
    * Gets a textual representation of this file.
@@ -131,19 +132,25 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
    *
    * @return face infos
    */
-  public List<FaceInfo> getFaceInfos() { return getSubRecords(); }
+  public List<FaceInfo> getFaceInfos() {
+    return getSubRecords();
+  }
 
   /**
    * Adds a face info to this file.
    *
    * @param faceInfo the face info to add
    */
-  public void addFaceInfo(FaceInfo faceInfo) { add(faceInfo); }
+  public void addFaceInfo(FaceInfo faceInfo) {
+    add(faceInfo);
+  }
 
   /**
    * Removes a face info from this file.
    *
    * @param index the index of the face info to remove
    */
-  public void removeFaceInfo(int index) { remove(index); }
+  public void removeFaceInfo(int index) {
+    remove(index);
+  }
 }

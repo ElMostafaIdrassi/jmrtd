@@ -99,6 +99,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
     super(EF_DG3_TAG, inputStream);
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = DECODER.decode(inputStream);
     List<CBEFFInfo> records = cbeffInfo.getSubRecords();
@@ -117,6 +118,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
     /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
   }
 
+  @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
     List<FingerInfo> fingerInfos = getSubRecords();
@@ -146,19 +148,25 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
    * 
    * @return finger infos
    */
-  public List<FingerInfo> getFingerInfos() { return getSubRecords(); }
+  public List<FingerInfo> getFingerInfos() {
+    return getSubRecords();  
+  }
 
   /**
    * Adds a finger info to this file.
    * 
    * @param fingerInfo the finger info to add
    */
-  public void addFingerInfo(FingerInfo fingerInfo) { add(fingerInfo); }
+  public void addFingerInfo(FingerInfo fingerInfo) {
+    add(fingerInfo);
+  }
 
   /**
    * Removes a finger info from this file.
    * 
    * @param index the index of the finger info to remove
    */
-  public void removeFingerInfo(int index) { remove(index); }
+  public void removeFingerInfo(int index) {
+    remove(index);
+  }
 }

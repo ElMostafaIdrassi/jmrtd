@@ -425,6 +425,7 @@ public class DG12File extends DataGroup {
     return personalizationSystemSerialNumber;
   }
 
+  @Override
   public int getTag() {
     return EF_DG12_TAG;
   }
@@ -434,34 +435,44 @@ public class DG12File extends DataGroup {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("DG12File [");
-    result.append(issuingAuthority == null ? "" : issuingAuthority); result.append(", ");
-    result.append(dateOfIssue == null ? "" : dateOfIssue); result.append(", ");
-    result.append(namesOfOtherPersons == null || namesOfOtherPersons.size() == 0 ? "" : namesOfOtherPersons); result.append(", ");
-    result.append(endorsementsAndObservations == null ? "" : endorsementsAndObservations); result.append(", ");
-    result.append(taxOrExitRequirements == null ? "" : taxOrExitRequirements); result.append(", ");
-    result.append(imageOfFront == null ? "" : "image (" + imageOfFront.length + ")"); result.append(", ");
-    result.append(imageOfRear == null ? "" : "image (" + imageOfRear.length + ")"); result.append(", ");
-    result.append(dateAndTimeOfPersonalization == null ? "" : dateAndTimeOfPersonalization); result.append(", ");
-    result.append(personalizationSystemSerialNumber== null ? "" : personalizationSystemSerialNumber);
-    result.append("]");
-    return result.toString();
+    return new StringBuilder()
+        .append("DG12File [")
+        .append(issuingAuthority == null ? "" : issuingAuthority).append(", ")
+        .append(dateOfIssue == null ? "" : dateOfIssue).append(", ")
+        .append(namesOfOtherPersons == null || namesOfOtherPersons.size() == 0 ? "" : namesOfOtherPersons).append(", ")
+        .append(endorsementsAndObservations == null ? "" : endorsementsAndObservations).append(", ")
+        .append(taxOrExitRequirements == null ? "" : taxOrExitRequirements).append(", ")
+        .append(imageOfFront == null ? "" : "image (" + imageOfFront.length + ")").append(", ")
+        .append(imageOfRear == null ? "" : "image (" + imageOfRear.length + ")").append(", ")
+        .append(dateAndTimeOfPersonalization == null ? "" : dateAndTimeOfPersonalization).append(", ")
+        .append(personalizationSystemSerialNumber== null ? "" : personalizationSystemSerialNumber)
+        .append("]")
+        .toString();
   }
 
+  @Override
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (obj == this) { return true; }
-    if (!obj.getClass().equals(this.getClass())) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (!obj.getClass().equals(this.getClass())) {
+      return false;
+    }
     DG12File other = (DG12File)obj;
     return this.toString().equals(other.toString());
   }
 
+  @Override
   public int hashCode() {
     return 13 * toString().hashCode() + 112;
   }
 
+  @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(TAG_LIST_TAG);

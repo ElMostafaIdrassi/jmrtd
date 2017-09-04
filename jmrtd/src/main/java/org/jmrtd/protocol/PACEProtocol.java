@@ -353,9 +353,9 @@ public class PACEProtocol {
       return piccNonce;
     } catch (GeneralSecurityException gse) {
       LOGGER.severe("Exception: " + gse.getMessage());
-      throw new PACEException("PCD side exception in tranceiving nonce step: " + gse.getMessage());
+      throw new PACEException("PCD side exception in tranceiving nonce step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in tranceiving nonce step", cse.getSW());
+      throw new PACEException("PICC side exception in tranceiving nonce step", cse);
     }
   }
 
@@ -439,7 +439,8 @@ public class PACEProtocol {
         return new PACEGMWithDHMappingResult(params, piccNonce, piccMappingPublicKey, pcdMappingKeyPair, mappingSharedSecretBytes, ephemeralParameters);
       } else {
         throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected \"ECDH\" / ECParameterSpec or \"DH\" / DHParameterSpec"
-            + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());      }
+            + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());
+      }
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
     } catch (CardServiceException cse) {
@@ -925,7 +926,7 @@ public class PACEProtocol {
       throw new NoSuchAlgorithmException("Unsupported key type");
     }
 
-    KeyFactory keyFactory = KeyFactory.getInstance("EC");    
+    KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);    
     KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
     return keyFactory.generatePublic(keySpec);
   }
@@ -947,9 +948,23 @@ public class PACEProtocol {
   public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
     String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
     String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
-    Mac mac = Mac.getInstance(macAlg, BC_PROVIDER);
+    Mac mac = null;
+    try {
+      /* The default provider might have a fast 3DES or AES Mac. */
+      mac = Mac.getInstance(macAlg);
+      mac.init(macKey);
+      return generateAuthenticationToken(oid, mac, publicKey);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provider this cipher, falling back to explicit BC", e);
+      /* If that doesn't work, explicitly ask BC to create our Mac. */
+      mac = Mac.getInstance(macAlg, BC_PROVIDER);
+      mac.init(macKey);
+      return generateAuthenticationToken(oid, mac, publicKey);      
+    }
+  }
+
+  private static byte[] generateAuthenticationToken(String oid, Mac mac, PublicKey publicKey) throws GeneralSecurityException {
     byte[] encodedPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, publicKey);
-    mac.init(macKey);
     byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
 
     /* Output length needs to be 64 bits, copy first 8 bytes. */

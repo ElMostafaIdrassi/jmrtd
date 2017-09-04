@@ -29,11 +29,15 @@ import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jmrtd.Util;
 import org.jmrtd.lds.DataGroup;
 
 /**
@@ -49,6 +53,10 @@ public class DG15File extends DataGroup {
   private static final long serialVersionUID = 3834304239673755744L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
+  
+  private static final String[] PUBLIC_KEY_ALGORITHMS = { "RSA", "EC" };
 
   private PublicKey publicKey;
 
@@ -88,20 +96,20 @@ public class DG15File extends DataGroup {
   private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {
     X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
 
-    String[] algorithms = { "RSA", "EC" };
-
-    for (String algorithm: algorithms) {
+    for (String algorithm: PUBLIC_KEY_ALGORITHMS) {
       try {
-        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        KeyFactory keyFactory = getKeyFactory(algorithm);
         PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
         return publicKey;
       } catch (InvalidKeySpecException ikse) {
         /* NOTE: Ignore, try next algorithm. */
       }
     }
+    
     throw new InvalidAlgorithmParameterException();
   }
 
+  @Override
   protected void writeContent(OutputStream out) throws IOException {
     out.write(publicKey.getEncoded());
   }
@@ -115,6 +123,7 @@ public class DG15File extends DataGroup {
     return publicKey;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (obj.getClass() != this.getClass()) { return false; }
@@ -122,11 +131,22 @@ public class DG15File extends DataGroup {
     return publicKey.equals(other.publicKey);
   }
 
+  @Override
   public int hashCode() {
     return 5 * publicKey.hashCode() + 61;
   }
 
+  @Override
   public String toString() {
     return "DG15File [" + publicKey.toString() + "]";
+  }
+  
+  private static KeyFactory getKeyFactory(String algorithm) throws NoSuchAlgorithmException {
+    try {
+      return KeyFactory.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provider this key factory, falling back to explicit BC", e);
+      return KeyFactory.getInstance(algorithm, BC_PROVIDER);
+    }
   }
 }

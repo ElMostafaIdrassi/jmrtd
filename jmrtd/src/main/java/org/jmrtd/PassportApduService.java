@@ -1,5 +1,4 @@
 /*
- * JMRTD - A Java API for accessing machine readable travel documents.
  *
  * Copyright (C) 2006 - 2017  The JMRTD team
  *
@@ -128,7 +127,12 @@ public class PassportApduService extends CardService {
     plainAPDUCount = 0;
     try {
       mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
-      cipher = Cipher.getInstance("DESede/CBC/NoPadding");
+      try {
+        cipher = Cipher.getInstance("DESede/CBC/NoPadding");
+      } catch (Exception e) {
+        LOGGER.log(Level.FINE, "Default provider could not provide this cipher, falling back to explicit BC", e);
+        cipher = Cipher.getInstance("DESede/CBC/NoPadding", BC_PROVIDER);
+      }
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.WARNING, "Unexpected security exception during initialization", gse);
       throw new CardServiceException(gse.toString());
@@ -141,6 +145,7 @@ public class PassportApduService extends CardService {
    *
    * @throws CardServiceException on failure to open the service
    */
+  @Override
   public void open() throws CardServiceException {
     if (!service.isOpen()) {
       service.open();
@@ -153,6 +158,7 @@ public class PassportApduService extends CardService {
    *
    * @return a boolean
    */
+  @Override
   public synchronized boolean isOpen() {
     return service.isOpen();
   }
@@ -170,6 +176,7 @@ public class PassportApduService extends CardService {
    * 
    * @throws CardServiceException on error
    */ 
+  @Override
   public synchronized ResponseAPDU transmit(CommandAPDU capdu) throws CardServiceException {
     return service.transmit(capdu);
   }
@@ -179,6 +186,7 @@ public class PassportApduService extends CardService {
    *
    * @return the answer to reset bytes
    */
+  @Override
   public byte[] getATR() {
     return atr;
   }
@@ -186,6 +194,7 @@ public class PassportApduService extends CardService {
   /**
    * Closes the service.
    */
+  @Override
   public void close() {
     if (service != null) {
       service.close();

@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.Provider;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -59,6 +61,8 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  private static Provider BC_PROVIDER = Util.getBouncyCastleProvider();
+
   private SecretKey ksEnc, ksMac;
   private transient Cipher sscIVCipher;
   private transient Cipher cipher;
@@ -82,15 +86,31 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     this.ksMac = ksMac;
     this.ssc = ssc;
 
-    sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
-    sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
+    try {
+      sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding");
+      sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not initialize cipher, falling back to BC", e);
+      sscIVCipher = Cipher.getInstance("AES/ECB/NoPadding", BC_PROVIDER);
+      sscIVCipher.init(Cipher.ENCRYPT_MODE, ksEnc);      
+    }
 
-    cipher = Cipher.getInstance("AES/CBC/NoPadding");
     /* NOTE: We will init this cipher in wrapCommandAPDU and unwrapResponseAPDU. */
+    try {
+      cipher = Cipher.getInstance("AES/CBC/NoPadding");
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not initialize cipher, falling back to BC", e);
+      cipher = Cipher.getInstance("AES/CBC/NoPadding", BC_PROVIDER);
+    }
 
-    String macAlg = "AESCMAC";
-    mac = Mac.getInstance(macAlg);
-    mac.init(ksMac);
+    try {
+      mac = Mac.getInstance("AESCMAC");
+      mac.init(ksMac);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not initialize MAC, falling back to explicit BC", e);
+      mac = Mac.getInstance("AESCMAC", BC_PROVIDER);
+      mac.init(ksMac);
+    }
   }
 
   /**

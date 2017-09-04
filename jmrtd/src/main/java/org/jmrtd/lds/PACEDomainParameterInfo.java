@@ -109,7 +109,10 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
 
   public PACEDomainParameterInfo(String protocolOID, AlgorithmIdentifier domainParameter, BigInteger parameterId) {
-    if (!checkRequiredIdentifier(protocolOID)) { throw new IllegalArgumentException("Invalid protocol id: " + protocolOID); }
+    if (!checkRequiredIdentifier(protocolOID)) {
+      throw new IllegalArgumentException("Invalid protocol id: " + protocolOID);
+    }
+    
     this.oid = protocolOID;
     this.domainParameter = domainParameter;
     this.parameterId = parameterId;
@@ -216,7 +219,6 @@ public class PACEDomainParameterInfo extends SecurityInfo {
         || ID_PACE_ECDH_GM.equals(oid)
         || ID_PACE_DH_IM.equals(oid)
         || ID_PACE_ECDH_IM.equals(oid)
-        //        || ID_PACE_DH_CAM.equals(oid) /* FIXME: TR-SAC v1.1 page 30? */
         || ID_PACE_ECDH_CAM.equals(oid);
   }
 

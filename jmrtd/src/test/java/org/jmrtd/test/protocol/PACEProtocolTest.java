@@ -104,7 +104,7 @@ public class PACEProtocolTest extends TestCase {
    * (see RFC 5639).
    */
   public void testSupplementSampleECDHGM() {
-    Security.insertProviderAt(BC_PROVIDER, 1);
+//    Security.insertProviderAt(BC_PROVIDER, 4);
     try {
 
       String serialNumber = "T22000129"; /* Check digit 3 */

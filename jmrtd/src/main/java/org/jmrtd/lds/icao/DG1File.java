@@ -90,10 +90,12 @@ public class DG1File extends DataGroup {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     return "DG1File " + mrzInfo.toString().replaceAll("\n", "").trim();
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (!(obj.getClass().equals(this.getClass()))) { return false; }
@@ -101,10 +103,12 @@ public class DG1File extends DataGroup {
     return mrzInfo.equals(other.mrzInfo);
   }
 
+  @Override
   public int hashCode() {
     return 3 * mrzInfo.hashCode() + 57;
   }
 
+  @Override
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
     tlvOut.writeTag(MRZ_INFO_TAG);

@@ -256,6 +256,7 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @throws CardServiceException on error
    */
+  @Override
   public void open() throws CardServiceException {
     if (isOpen()) {
       return;
@@ -296,6 +297,7 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @return a boolean that indicates whether this service is open
    */
+  @Override
   public boolean isOpen() {
     return (state != State.SESSION_STOPPED_STATE);
   }
@@ -305,6 +307,7 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @param fid a file identifier
    */
+  @Override
   public synchronized void sendSelectFile(short fid) throws CardServiceException {
     sendSelectFile(wrapper, fid);
   }
@@ -494,6 +497,7 @@ public class PassportService extends PassportApduService implements Serializable
   /**
    * Closes this service.
    */
+  @Override
   public void close() {
     try {
       wrapper = null;

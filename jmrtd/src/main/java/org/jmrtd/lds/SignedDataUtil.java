@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -75,6 +76,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.jmrtd.Util;
 
 /**
  * Utility class for helping with CMS SignedData in security object document and
@@ -91,6 +93,8 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 /* package-visible */ class SignedDataUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /** SignedData related object identifier. */
   public static final String
@@ -389,8 +393,16 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 
   public static ASN1Set createAuthenticatedAttributes(String digestAlgorithm, String contentTypeOID, ContentInfo contentInfo) throws NoSuchAlgorithmException {
     /* Check bug found by Paulo Assumpco. */
-    if ("SHA256".equals(digestAlgorithm)) { digestAlgorithm = "SHA-256"; }
-    MessageDigest dig = MessageDigest.getInstance(digestAlgorithm);
+    if ("SHA256".equals(digestAlgorithm)) {
+      digestAlgorithm = "SHA-256";
+    }
+    MessageDigest dig = null;
+    try {
+      dig = MessageDigest.getInstance(digestAlgorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this digest, falling back to explicit BC", e);
+      dig = MessageDigest.getInstance(digestAlgorithm, BC_PROVIDER);
+    }
     byte[] contentBytes = ((DEROctetString)contentInfo.getContent()).getOctets();
     byte[] digestedContentBytes = dig.digest(contentBytes);
     ASN1OctetString digestedContent = new DEROctetString(digestedContentBytes);

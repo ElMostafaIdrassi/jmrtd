@@ -30,9 +30,11 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;
@@ -58,6 +60,8 @@ import net.sf.scuba.smartcards.CardServiceException;
 public class CAProtocol {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private PassportService service;
 
@@ -119,7 +123,13 @@ public class CAProtocol {
       }
 
       /* Generate the inspection system's ephemeral key pair. */
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
+      KeyPairGenerator keyPairGenerator = null;
+      try {
+        keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
+      } catch (Exception e) {
+        LOGGER.log(Level.FINE, "Default provider could not provide this generator, falling back to explicit BC");
+        keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);        
+      }
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
@@ -186,7 +196,13 @@ public class CAProtocol {
    * @throws InvalidKeyException if one of the keys is invalid
    */
   public static byte[] computeSharedSecret(String agreementAlg, PublicKey piccPublicKey, PrivateKey pcdPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
-    KeyAgreement agreement = KeyAgreement.getInstance(agreementAlg);
+    KeyAgreement agreement = null;
+    try {
+      agreement = KeyAgreement.getInstance(agreementAlg);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this key agreement, falling back to BC", e);
+      agreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
+    }
     agreement.init(pcdPrivateKey);
     agreement.doPhase(piccPublicKey, true);
     return agreement.generateSecret();
@@ -254,7 +270,7 @@ public class CAProtocol {
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
-  
+
   /**
    * Infers the Chip Authentication OID form a Chip Authentication public key OID.
    * This is a best effort.

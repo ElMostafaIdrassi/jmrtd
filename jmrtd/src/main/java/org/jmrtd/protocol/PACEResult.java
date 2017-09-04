@@ -24,7 +24,6 @@ package org.jmrtd.protocol;
 
 import java.io.Serializable;
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECPoint;
@@ -48,8 +47,6 @@ public class PACEResult implements Serializable {
   private String cipherAlg;
   private String digestAlg;
   private int keyLength;
-
-  // FIXME: these fields should go into PACEMappingResult class
 
   private PACEMappingResult mappingResult;
 

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +65,8 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   private static final long serialVersionUID = -2859033943345961793L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+
+  private static Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /** Initialization vector consisting of 8 zero bytes. */
   public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
@@ -151,8 +154,20 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     this.ksMac = ksMac;
     this.shouldCheckMAC = doCheckMAC;
     this.ssc = ssc;
-    cipher = Cipher.getInstance(cipherAlg);
-    mac = Mac.getInstance(macAlg);
+
+    try {
+      cipher = Cipher.getInstance(cipherAlg);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not initialize cipher, falling back to explicit BC", e);
+      cipher = Cipher.getInstance(cipherAlg, BC_PROVIDER);
+    }
+
+    try {
+      mac = Mac.getInstance(macAlg);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not initialize MAC, falling back to explicit BC", e);
+      mac = Mac.getInstance(macAlg, BC_PROVIDER);
+    }
   }
 
   /**

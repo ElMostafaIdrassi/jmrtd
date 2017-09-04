@@ -227,10 +227,12 @@ public class SODFile extends AbstractTaggedLDSFile {
     super(EF_SOD_TAG, inputStream);
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     this.signedData = SignedDataUtil.readSignedData(inputStream);
   }
 
+  @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     SignedDataUtil.writeData(this.signedData, outputStream);
   }
@@ -398,6 +400,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     try {
       X509Certificate cert = getDocSigningCertificate();
@@ -407,6 +410,7 @@ public class SODFile extends AbstractTaggedLDSFile {
     }
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == null) { return false; }
     if (obj == this) { return true; }
@@ -415,6 +419,7 @@ public class SODFile extends AbstractTaggedLDSFile {
     return Arrays.equals(getEncoded(), other.getEncoded());
   }
 
+  @Override
   public int hashCode() {
     return 11 * Arrays.hashCode(getEncoded()) + 111;
   }
