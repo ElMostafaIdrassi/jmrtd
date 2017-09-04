@@ -5,7 +5,7 @@
 
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.5.17-SNAPSHOT</version>
+  <version>0.5.17</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>net.sf.scuba</groupId>
       <artifactId>scuba-smartcards</artifactId>
-      <version>0.0.12-SNAPSHOT</version>
+      <version>0.0.12</version>
     </dependency>
 
     <dependency>
@@ -129,7 +129,7 @@
               <links>
                 <link>https://bouncycastle.org/docs/docs1.5on</link>
                 <link>https://docs.oracle.com/javase/8/docs/api</link>
-                <link>https://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.11</link>
+                <link>https://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.12</link>
               </links>
             </configuration>
             <executions>
