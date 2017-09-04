@@ -109,9 +109,9 @@ public class COMFile extends AbstractTaggedLDSFile {
           String.format("%02d", releaseLevelUnicode),
           tagList);
     } catch (NumberFormatException nfe) {
-      throw new IllegalArgumentException("Could not parse version number. " + nfe.getMessage());
+      throw new IllegalArgumentException("Could not parse version number", nfe);
     } catch (IllegalFormatConversionException ifce) {
-      throw new IllegalArgumentException("Could not parse version number. " + ifce.getMessage());
+      throw new IllegalArgumentException("Could not parse version number", ifce);
     }
   }
 

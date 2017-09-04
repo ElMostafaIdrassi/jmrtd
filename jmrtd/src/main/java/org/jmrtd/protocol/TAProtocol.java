@@ -211,7 +211,7 @@ public class TAProtocol {
           throw cse;
         } catch (Exception e) {
           /* FIXME: Does this mean we failed to authenticate? -- MO */
-          throw new CardServiceException(e.getMessage());
+          throw new CardServiceException("Exception", e);
         }
       }
 

@@ -168,9 +168,9 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
 
       return result;
     } catch (CardServiceException cse) {
-      throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo) + ": " + cse.getMessage(), cse.getSW());
+      throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), cse, cse.getSW());
     } catch (Exception e) {
-      throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo));
+      throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), e);
     }
   }
 
@@ -204,7 +204,7 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
        */
       byte[] prefix = service.sendReadBinary(0, READ_AHEAD_LENGTH, false);
       if (prefix == null || prefix.length != READ_AHEAD_LENGTH) {
-        LOGGER.severe("Something is wrong with prefix, prefix = " + Arrays.toString(prefix));
+        LOGGER.warning("Something is wrong with prefix, prefix = " + Arrays.toString(prefix));
         return null;
       }
       ByteArrayInputStream baInputStream = new ByteArrayInputStream(prefix);

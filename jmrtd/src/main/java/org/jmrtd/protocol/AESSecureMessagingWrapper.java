@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Provider;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -111,11 +112,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     try {
       return wrapCommandAPDU(commandAPDU);
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
-      throw new IllegalStateException(gse.toString());
+      throw new IllegalStateException("Exception", gse);
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
-      throw new IllegalStateException(ioe.toString());
+      throw new IllegalStateException("Exception", ioe);
     }
   }
 
@@ -136,11 +135,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       }
       return new ResponseAPDU(unwrapResponseAPDU(rapdu));
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
-      throw new IllegalStateException(gse.toString());
+      throw new IllegalStateException("Exception", gse);
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
-      throw new IllegalStateException(ioe.toString());
+      throw new IllegalStateException("Exception", ioe);
     }
   }
 
@@ -427,7 +424,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       dataOutputStream.close();
       return byteArrayOutputStream.toByteArray();
     } catch (IOException ioe) {
-      LOGGER.warning("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ioe);
     }
     return null;
   }

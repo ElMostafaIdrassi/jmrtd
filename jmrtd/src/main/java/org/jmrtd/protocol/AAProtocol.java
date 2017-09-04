@@ -71,8 +71,7 @@ public class AAProtocol {
       byte[] response = service.sendInternalAuthenticate(wrapper, challenge);     
       return new AAResult(publicKey, digestAlgorithm, signatureAlgorithm, challenge, response);
     } catch (IllegalArgumentException iae) {
-      LOGGER.severe("Exception: " + iae.getMessage());
-      throw new CardServiceException(iae.toString());
+      throw new CardServiceException("Exception", iae);
     }
   }
 }

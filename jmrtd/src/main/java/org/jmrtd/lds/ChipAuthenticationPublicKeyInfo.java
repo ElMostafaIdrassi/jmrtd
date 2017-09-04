@@ -166,8 +166,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong identifier: " + oid);
       }
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
-      throw new IllegalArgumentException("Malformed ChipAuthenticationInfo.");
+      throw new IllegalArgumentException("Malformed ChipAuthenticationInfo", e);
     }
   }
 

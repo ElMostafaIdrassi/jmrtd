@@ -25,6 +25,7 @@ package org.jmrtd.lds;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,7 +48,7 @@ public abstract class AbstractLDSInfo implements LDSElement {
       outputStream.flush();
       return outputStream.toByteArray();
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception: ", ioe);
       return null;
     }
   }

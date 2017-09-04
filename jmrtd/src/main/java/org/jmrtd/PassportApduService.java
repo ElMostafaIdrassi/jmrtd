@@ -129,8 +129,7 @@ public class PassportApduService extends CardService {
       mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
       cipher = Util.getCipher("DESede/CBC/NoPadding");      
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.WARNING, "Unexpected security exception during initialization", gse);
-      throw new CardServiceException(gse.toString());
+      throw new CardServiceException("Unexpected security exception during initialization", gse);
     }
   }
 
@@ -256,9 +255,7 @@ public class PassportApduService extends CardService {
           throw (CardServiceException)e;
         } else {
           throw new CardServiceException("Exception during transmission of wrapped APDU"
-              + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes())
-              + "\n" + e.getMessage()
-              , sw);
+              + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
         }
       } finally {
         notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);				
@@ -801,8 +798,7 @@ public class PassportApduService extends CardService {
       oidTLVIn.close();
       return Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
     } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Unexpected exception interpreting OID \"" + oid + "\"", ioe);
-      throw new IllegalArgumentException("Illegal OID: \"" + oid + "\" (" + ioe.getMessage() + ")");
+      throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
     }
   }
 

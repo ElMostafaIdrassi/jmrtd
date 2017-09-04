@@ -239,8 +239,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
         }
       }
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
-      throw new IllegalArgumentException("Malformed TerminalAuthenticationInfo.");
+      throw new IllegalArgumentException("Malformed TerminalAuthenticationInfo", e);
     }
   }
 

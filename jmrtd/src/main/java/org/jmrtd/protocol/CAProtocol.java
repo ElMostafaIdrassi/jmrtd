@@ -281,7 +281,7 @@ public class CAProtocol {
       LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-DH-3DES-CBC-CBC");
       return ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC;
     } else {
-      LOGGER.severe("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
+      LOGGER.warning("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
     }
 
     return null;

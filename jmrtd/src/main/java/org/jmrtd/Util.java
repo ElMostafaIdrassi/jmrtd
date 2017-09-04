@@ -991,7 +991,7 @@ public class Util {
         return encodedPublicKey;
       } catch (IOException ioe) {
         /* NOTE: Should never happen, we're writing to a ByteArrayOutputStream. */
-        throw new IllegalStateException("Internal error writing to memory: " + ioe.getMessage());
+        throw new IllegalStateException("Internal error writing to memory", ioe);
       }
     } else if (publicKey instanceof DHPublicKey) {
       DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
@@ -1018,8 +1018,7 @@ public class Util {
       BigInteger y = Util.os2i(yCoordBytes);
       return new ECPoint(x, y);
     } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Exception", ioe);
-      throw new IllegalArgumentException(ioe.getMessage());
+      throw new IllegalArgumentException("Exception", ioe);
     }
   }
 
@@ -1041,7 +1040,7 @@ public class Util {
       bOut.write(i2os(y));
       bOut.close();
     } catch (IOException ioe) {
-      throw new IllegalStateException(ioe.getMessage());
+      throw new IllegalStateException("Exception", ioe);
     }
     return bOut.toByteArray();
   }

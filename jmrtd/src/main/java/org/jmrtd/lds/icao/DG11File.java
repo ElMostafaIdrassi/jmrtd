@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.DataGroup;
@@ -274,7 +275,7 @@ public class DG11File extends DataGroup {
       //		custodyInformation = in.replace("<", " ").trim();
       custodyInformation = field.trim();
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
       custodyInformation = new String(value).trim();
     }
   }
@@ -284,7 +285,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     otherValidTDNumbers = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(field, "<");
@@ -304,7 +305,7 @@ public class DG11File extends DataGroup {
       //		personalSummary = in.replace("<", " ").trim();
       personalSummary = field.trim();
     } catch (UnsupportedEncodingException usee) {
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       personalSummary = new String(value).trim();
     }
   }
@@ -315,7 +316,7 @@ public class DG11File extends DataGroup {
       //		title = in.replace("<", " ").trim();
       title = field.trim();
     } catch (UnsupportedEncodingException usee) {
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       title = new String(value).trim();
     }
   }
@@ -325,7 +326,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     //		profession = in.replace("<", " ").trim();
     profession = field.trim();
@@ -336,7 +337,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     //		telephone = in.replace("<", " ").trim();
     telephone = field.replace("<", " ").trim();
@@ -347,7 +348,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     StringTokenizer st = new StringTokenizer(field, "<");
     permanentAddress = new ArrayList<String>();
@@ -362,7 +363,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     StringTokenizer st = new StringTokenizer(field, "<");
     placeOfBirth = new ArrayList<String>();
@@ -382,7 +383,7 @@ public class DG11File extends DataGroup {
       try {
         field = new String(value, "UTF-8");
       } catch (UnsupportedEncodingException usee) {
-        LOGGER.severe("Exception: " + usee.getMessage());
+        LOGGER.log(Level.WARNING, "Exception", usee);
       }
     }
     fullDateOfBirth = field;
@@ -394,7 +395,7 @@ public class DG11File extends DataGroup {
       String field = new String(value, "UTF-8");
       otherNames.add(field.trim());
     } catch (UnsupportedEncodingException usee) {
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       otherNames.add(new String(value).trim());
     }
   }
@@ -404,7 +405,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     personalNumber = field.trim();
   }
@@ -414,7 +415,7 @@ public class DG11File extends DataGroup {
     try {
       field = new String(value, "UTF-8");
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", uee);
     }
     nameOfHolder = field.trim();
   }

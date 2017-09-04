@@ -38,6 +38,7 @@ import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Date;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.ejbca.cvc.AccessRightEnum;
@@ -87,7 +88,7 @@ public class CardVerifiableCertificate extends Certificate {
       rsaKeyFactory = KeyFactory.getInstance("RSA");
     } catch (NoSuchAlgorithmException nsae) {
       /* NOTE: never happens, RSA will be provided. */
-      LOGGER.severe("Exception: " + nsae.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", nsae);
     }
     this.cvCertificate = cvCertificate;
   }
@@ -129,7 +130,7 @@ public class CardVerifiableCertificate extends Certificate {
       this.cvCertificate.setSignature(signatureData);
       cvCertificate.getTBS();
     } catch(ConstructionException ce) {
-      throw new IllegalArgumentException(ce.getMessage());
+      throw new IllegalArgumentException(ce);
     }
   }
 
@@ -176,7 +177,7 @@ public class CardVerifiableCertificate extends Certificate {
     try {
       return cvCertificate.getDEREncoded();
     } catch (IOException ioe) {
-      throw new CertificateEncodingException(ioe.getMessage());
+      throw new CertificateEncodingException(ioe);
     }
   }
 
@@ -193,7 +194,7 @@ public class CardVerifiableCertificate extends Certificate {
         try {
           return rsaKeyFactory.generatePublic(new RSAPublicKeySpec(rsaPublicKey.getModulus(), rsaPublicKey.getPublicExponent()));
         } catch (GeneralSecurityException gse) {
-          LOGGER.severe("Exception: " + gse.getMessage());
+          LOGGER.log(Level.WARNING, "Exception", gse);
           return publicKey;
         }
       }
@@ -201,7 +202,7 @@ public class CardVerifiableCertificate extends Certificate {
       /* It's ECDSA... */
       return publicKey;
     } catch (NoSuchFieldException nsfe) {
-      LOGGER.severe("Exception: " + nsfe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", nsfe);
       return null;
     }
   }
@@ -281,7 +282,7 @@ public class CardVerifiableCertificate extends Certificate {
     try {
       return cvCertificate.getCertificateBody().getDEREncoded();
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 
@@ -296,7 +297,7 @@ public class CardVerifiableCertificate extends Certificate {
     try {
       return cvCertificate.getCertificateBody().getValidFrom();
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 
@@ -311,7 +312,7 @@ public class CardVerifiableCertificate extends Certificate {
     try {
       return cvCertificate.getCertificateBody().getValidTo();
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 
@@ -329,7 +330,7 @@ public class CardVerifiableCertificate extends Certificate {
       Country country = Country.getInstance(countryCode);
       return new CVCPrincipal(country, rf.getMnemonic(), rf.getSequence());
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 
@@ -345,7 +346,7 @@ public class CardVerifiableCertificate extends Certificate {
       ReferenceField rf = cvCertificate.getCertificateBody().getHolderReference();
       return new CVCPrincipal(Country.getInstance(rf.getCountry().toUpperCase()), rf.getMnemonic(), rf.getSequence());
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 
@@ -361,7 +362,7 @@ public class CardVerifiableCertificate extends Certificate {
       org.ejbca.cvc.CVCAuthorizationTemplate template = cvCertificate.getCertificateBody().getAuthorizationTemplate();
       return new CVCAuthorizationTemplate(template);
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 
@@ -376,7 +377,7 @@ public class CardVerifiableCertificate extends Certificate {
     try {
       return cvCertificate.getSignature();
     } catch (NoSuchFieldException nsfe) {
-      throw new CertificateException(nsfe.getMessage());
+      throw new CertificateException("No such field", nsfe);
     }
   }
 

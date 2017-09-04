@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.io.SplittableInputStream;
@@ -154,7 +155,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
       outputStream.close();
       return outputStream.toByteArray();
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       return null;
     }
   }

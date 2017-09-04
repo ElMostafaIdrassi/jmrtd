@@ -72,8 +72,7 @@ public class SplittableInputStream extends InputStream {
       }
       return inputStream;
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
-      throw new IllegalStateException(ioe.getMessage());
+      throw new IllegalStateException(ioe);
     }
   }
 

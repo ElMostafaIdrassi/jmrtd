@@ -301,9 +301,9 @@ import org.jmrtd.Util;
       checkEContent(getAttributes(signedAttributesSet), digAlg, contentBytes);
 
     } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.warning("Error checking signedAttributes in eContent! No such algorithm: \"" + digAlg + "\": " + nsae.getMessage());
+      LOGGER.log(Level.WARNING, "Error checking signedAttributes in eContent! No such algorithm: \"" + digAlg, nsae);
     } catch (IOException ioe) {
-      LOGGER.severe("Error getting signedAttributes: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Error getting signedAttributes", ioe);
     }
 
     return attributesBytes;
@@ -439,7 +439,7 @@ import org.jmrtd.Util;
       s.update(dataToBeSigned);
       encryptedDigest = s.sign();
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", e) ;
       return null;
     }
     return encryptedDigest;

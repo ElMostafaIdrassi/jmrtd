@@ -27,6 +27,7 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
@@ -172,7 +173,7 @@ public class TAResult implements Serializable {
       }
     } catch (CertificateException ce) {
       result.append("holderReference = ???");
-      LOGGER.severe("Exception: " + ce.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ce);
     }
 
     result.append("]");

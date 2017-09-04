@@ -251,8 +251,7 @@ public class PACEProtocol {
       encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
       macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.WARNING, "Security exception during secure messaging key derivation", gse);
-      throw new PACEException("Security exception during secure messaging key derivation: " + gse.getMessage());
+      throw new PACEException("Security exception during secure messaging key derivation", gse);
     }
 
     /*
@@ -283,14 +282,13 @@ public class PACEProtocol {
         LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
-      throw new IllegalStateException("Security exception in secure messaging establishment: " + gse.getMessage());
+      throw new IllegalStateException("Security exception in secure messaging establishment", gse);
     }
 
     if (MappingType.CAM.equals(mappingType)) {
 
       if (encryptedChipAuthenticationData == null) {
-        LOGGER.severe("Encrypted Chip Authentication data is null");
+        LOGGER.warning("Encrypted Chip Authentication data is null");
       }
 
       /* Decrypt A_PICC to recover CA_PICC. */
@@ -352,7 +350,6 @@ public class PACEProtocol {
       piccNonce = staticPACECipher.doFinal(step1EncryptedNonce);
       return piccNonce;
     } catch (GeneralSecurityException gse) {
-      LOGGER.severe("Exception: " + gse.getMessage());
       throw new PACEException("PCD side exception in tranceiving nonce step", gse);
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side exception in tranceiving nonce step", cse);
@@ -442,9 +439,9 @@ public class PACEProtocol {
             + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());
       }
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
+      throw new PACEException("PCD side error in mapping nonce step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in mapping nonce step", cse.getSW());
+      throw new PACEException("PICC side exception in mapping nonce step", cse);
     }
   }
 
@@ -499,9 +496,9 @@ public class PACEProtocol {
             + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());
       }
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in mapping nonce step: " + gse.getMessage());
+      throw new PACEException("PCD side error in mapping nonce step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in mapping nonce step", cse.getSW());
+      throw new PACEException("PICC side exception in mapping nonce step", cse, cse.getSW());
     }
   }
 
@@ -537,11 +534,11 @@ public class PACEProtocol {
 
       return piccPublicKey;
     } catch (IllegalStateException ise) {
-      throw new PACEException("PCD side exception in key agreement step: " + ise.getMessage());
+      throw new PACEException("PCD side exception in key agreement step", ise);
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side exception in key agreement step: " + gse.getMessage());
+      throw new PACEException("PCD side exception in key agreement step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in key agreement step", cse.getSW());
+      throw new PACEException("PICC side exception in key agreement step", cse, cse.getSW());
     }
   }
 
@@ -608,9 +605,9 @@ public class PACEProtocol {
 
       return null;
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side exception in authentication token generation step" + gse.getMessage());
+      throw new PACEException("PCD side exception in authentication token generation step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in authentication token generation step", cse.getSW());
+      throw new PACEException("PICC side exception in authentication token generation step", cse, cse.getSW());
     }
   }
 

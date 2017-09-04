@@ -245,8 +245,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong signature algorithm OID: " + signatureAlgorithmOID);
       }
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
-      throw new IllegalArgumentException("Malformed ActiveAuthenticationInfo.");
+      throw new IllegalArgumentException("Malformed ActiveAuthenticationInfo", e);
     }
   }
 

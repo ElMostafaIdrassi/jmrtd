@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.io.SplittableInputStream;
@@ -192,7 +193,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
           && (mimeType == null && otherImageInfo.mimeType == null || mimeType != null && mimeType.equals(otherImageInfo.mimeType))
           && type == otherImageInfo.type;
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
+      LOGGER.log(Level.WARNING, "Exception" + e);
       return false;
     }
   }
@@ -207,7 +208,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     try {
       writeObject(out);
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       return null;
     }
     return out.toByteArray();
@@ -293,7 +294,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     try {
       readImage(new ByteArrayInputStream(imageBytes), imageBytes.length);
     } catch (IOException e) {
-      LOGGER.severe("Exception: " + e.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", e);
     }
   }
 

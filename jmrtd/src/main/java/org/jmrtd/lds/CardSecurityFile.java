@@ -179,11 +179,9 @@ public class CardSecurityFile implements Serializable {
       SignedData signedData = SignedDataUtil.createSignedData(digestAlgorithm, digestEncryptionAlgorithm, CONTENT_TYPE_OID, contentInfo, encryptedDigest, certificate);
       SignedDataUtil.writeData(signedData, outputStream);
     } catch (CertificateException ce) {
-      LOGGER.log(Level.WARNING, "Certificate exception during SignedData creation", ce);
-      throw new IOException(ce.getMessage());
+      throw new IOException("Certificate exception during SignedData creation", ce);
     } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.log(Level.WARNING, "Unsupported algorithm", nsae);
-      throw new IOException(nsae.getMessage());
+      throw new IOException("Unsupported algorithm", nsae);
     }
   }
 

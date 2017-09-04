@@ -79,11 +79,11 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
       CVCObject parsedObject = CertificateParser.parseCertificate(out.toByteArray());
       return new CardVerifiableCertificate((org.ejbca.cvc.CVCertificate)parsedObject);
     } catch (IOException ioe) {
-      throw new CertificateException(ioe.getMessage());
+      throw new CertificateException(ioe);
     } catch (ConstructionException ce) {
-      throw new CertificateException(ce.getMessage());
+      throw new CertificateException(ce);
     } catch (ParseException pe) {
-      throw new CertificateException(pe.getMessage());
+      throw new CertificateException(pe);
     }
   }
 

@@ -187,8 +187,7 @@ public class MRZInfo extends AbstractLDSInfo {
     try {
       readObject(inputStream, length);
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
-      throw new IllegalArgumentException(ioe.getMessage());
+      throw new IllegalArgumentException(ioe);
     }
   }
 
@@ -205,11 +204,9 @@ public class MRZInfo extends AbstractLDSInfo {
       readObject(new ByteArrayInputStream(str.getBytes("UTF-8")), str.length());
     } catch (UnsupportedEncodingException uee) {
       /* NOTE: never happens, UTF-8 is supported. */
-      LOGGER.severe("Exception: " + uee.getMessage());
-      throw new IllegalStateException(uee.getMessage());
+      throw new IllegalStateException("Exception", uee);
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
-      throw new IllegalArgumentException(ioe.getMessage());
+      throw new IllegalArgumentException("Exception", ioe);
     }
   }
 
@@ -653,8 +650,7 @@ public class MRZInfo extends AbstractLDSInfo {
           return str;
       }
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.severe("Exception: " + uee.getMessage());
-      throw new IllegalStateException(uee.getMessage());
+      throw new IllegalStateException(uee);
     }
   }
 
@@ -1027,15 +1023,12 @@ public class MRZInfo extends AbstractLDSInfo {
       return checkDigit;
     } catch (NumberFormatException nfe) {
       /* NOTE: never happens. */
-      LOGGER.severe("Exception: " + nfe.getMessage());
-      throw new IllegalStateException("Error in computing check digit.");
+      throw new IllegalStateException("Error in computing check digit", nfe);
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: never happens. */
-      LOGGER.severe("Exception: " + usee.getMessage());
-      throw new IllegalStateException("Error in computing check digit.");
+      throw new IllegalStateException("Error in computing check digit", usee);
     } catch (Exception e) {
-      LOGGER.severe("Exception: " + e.getMessage());
-      throw new IllegalArgumentException(e.toString());
+      throw new IllegalArgumentException("Error in computing check digit", e);
     }
   }
 

@@ -26,12 +26,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Base class for all files (EF_COM, EF_SOD, and data groups) in the LDS.
  *
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -63,7 +63,7 @@ abstract class AbstractLDSFile implements LDSFile {
       out.close();
       return out.toByteArray();
     } catch (IOException ioe) {
-      LOGGER.severe("Exception: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       return null;
     }
   }

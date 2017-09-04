@@ -181,8 +181,7 @@ public class SODFile extends AbstractTaggedLDSFile {
           ICAO_LDS_SOD_OID, contentInfo,
           encryptedDigest, docSigningCertificate);      
     } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Error creating signedData", ioe);
-      throw new IllegalArgumentException(ioe.getMessage());
+      throw new IllegalArgumentException("Error creating signedData", ioe);
     }
   }
 
@@ -211,8 +210,7 @@ public class SODFile extends AbstractTaggedLDSFile {
           encryptedDigest,
           docSigningCertificate);
     } catch (IOException ioe) {
-      LOGGER.severe("Error creating signedData: " + ioe.getMessage());
-      throw new IllegalArgumentException(ioe.getMessage());
+      throw new IllegalArgumentException("Error creating signedData", ioe);
     }
   }
 
@@ -379,7 +377,7 @@ public class SODFile extends AbstractTaggedLDSFile {
       X500Principal x500Principal = new X500Principal(name.getEncoded(ASN1Encoding.DER));   
       return x500Principal;
     } catch (IOException ioe) {
-      LOGGER.severe("Could not get issuer: " + ioe.getMessage());
+      LOGGER.log(Level.WARNING, "Could not get issuer", ioe);
       return null;
     }
   }

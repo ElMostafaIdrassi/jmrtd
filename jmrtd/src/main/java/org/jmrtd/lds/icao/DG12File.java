@@ -245,7 +245,7 @@ public class DG12File extends DataGroup {
       personalizationSystemSerialNumber = field.trim();
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       personalizationSystemSerialNumber = new String(value).trim();
     }
   }
@@ -258,7 +258,7 @@ public class DG12File extends DataGroup {
       dateAndTimeOfPersonalization = field.trim();
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: never happens, UTF-8 is supported. */
-      LOGGER.log(Level.WARNING, "Exception", usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
     }
   }
 
@@ -276,7 +276,7 @@ public class DG12File extends DataGroup {
       taxOrExitRequirements = field.trim();
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       taxOrExitRequirements = new String(value).trim();
     }
   }
@@ -287,7 +287,7 @@ public class DG12File extends DataGroup {
       endorsementsAndObservations = field.trim();
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       endorsementsAndObservations = new String(value).trim();
     }
   }
@@ -299,7 +299,7 @@ public class DG12File extends DataGroup {
       namesOfOtherPersons.add(field.trim());
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       namesOfOtherPersons.add(new String(value).trim());
     }
   }
@@ -315,7 +315,7 @@ public class DG12File extends DataGroup {
         return;
       } catch (UnsupportedEncodingException usee) {
         /* NOTE: never happens, UTF-8 is supported. */
-        LOGGER.severe("Exception: " + usee.getMessage());
+        LOGGER.log(Level.WARNING, "Exception", usee);
       }
     }
     LOGGER.warning("DG12 date of issue is not in expected ccyymmdd ASCII format");
@@ -337,7 +337,7 @@ public class DG12File extends DataGroup {
       issuingAuthority = field.trim();
     } catch (UnsupportedEncodingException usee) {
       /* NOTE: Default charset, wtf, UTF-8 not supported? */
-      LOGGER.severe("Exception: " + usee.getMessage());
+      LOGGER.log(Level.WARNING, "Exception", usee);
       issuingAuthority = (new String(value)).trim();
     }
   }
