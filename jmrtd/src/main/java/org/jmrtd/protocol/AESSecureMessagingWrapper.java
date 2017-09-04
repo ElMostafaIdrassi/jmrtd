@@ -85,6 +85,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     this.ksMac = ksMac;
     this.ssc = ssc;
     sscIVCipher = Util.getCipher("AES/ECB/NoPadding", Cipher.ENCRYPT_MODE, ksEnc);
+    cipher = Util.getCipher("AES/CBC/NoPadding");
     mac = Util.getMac("AESCMAC", ksMac);    
   }
 
