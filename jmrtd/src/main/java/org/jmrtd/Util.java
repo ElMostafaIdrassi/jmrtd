@@ -30,12 +30,15 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -48,6 +51,7 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
@@ -58,6 +62,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.KeyAgreement;
+import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
@@ -189,7 +197,7 @@ public class Util {
    */
   public static SecretKey deriveKey(byte[] keySeed, String cipherAlg, int keyLength, byte[] nonce, int counter, byte paceKeyReference) throws GeneralSecurityException {
     String digestAlg = inferDigestAlgorithmFromCipherAlgorithmForKeyDerivation(cipherAlg, keyLength);
-    MessageDigest digest = MessageDigest.getInstance(digestAlg);
+    MessageDigest digest = getMessageDigest(digestAlg);
     digest.reset();
     digest.update(keySeed);
     if (nonce != null) {
@@ -1046,15 +1054,8 @@ public class Util {
     try {
       if (params instanceof ECParameterSpec) {
         ECPoint w = os2ECPoint(encodedPublicKey);
-        ECParameterSpec ecParams = (ECParameterSpec)params;
-        try {
-          KeyFactory kf = KeyFactory.getInstance("EC");
-          return kf.generatePublic(new ECPublicKeySpec(w, ecParams));
-        } catch (Exception e) {
-          LOGGER.log(Level.FINE, "Default provider could not provide this key factory, falling back to explicit BC", e);
-          KeyFactory kf = KeyFactory.getInstance("EC", BC_PROVIDER);
-          return kf.generatePublic(new ECPublicKeySpec(w, ecParams));          
-        }
+        ECParameterSpec ecParams = (ECParameterSpec)params;        
+        return getPublicKey("EC", new ECPublicKeySpec(w, ecParams));
       } else if (params instanceof DHParameterSpec) {
         DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
         int b = dataIn.read();
@@ -1065,14 +1066,11 @@ public class Util {
         byte[] publicValue = new byte[length];
         dataIn.readFully(publicValue);
         dataIn.close();
-
         BigInteger y = Util.os2i(publicValue);
-
-        KeyFactory kf = KeyFactory.getInstance("DH");
         DHParameterSpec dhParams = (DHParameterSpec)params;
-        return kf.generatePublic(new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
+        return getPublicKey("DH",new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG())); 
       }
-      
+
       throw new IllegalArgumentException("Expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Exception", ioe);
@@ -1300,5 +1298,98 @@ public class Util {
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
-}
 
+
+  /* Get standard crypto primitives from default provider or (if that fails) from BC. */
+
+  public static Cipher getCipher(String algorithm) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    try {
+      return Cipher.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this cipher, falling back to explicit BC", e);
+      return Cipher.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+
+  public static Cipher getCipher(String algorithm, int mode, Key keySpec) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+    try {
+      Cipher cipher =  Cipher.getInstance(algorithm);
+      cipher.init(mode, keySpec);
+      return cipher;
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Cipher, falling back to explicit BC", e);
+      Cipher cipher =  Cipher.getInstance(algorithm, BC_PROVIDER);
+      cipher.init(mode, keySpec);
+      return cipher;
+    }
+  }
+
+  public static KeyAgreement getKeyAgreement(String algorithm) throws NoSuchAlgorithmException {
+    try {
+      return KeyAgreement.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Key Agreement, falling back to explicit BC", e);
+      return KeyAgreement.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+
+  public static KeyPairGenerator getKeyPairGenerator(String algorithm) throws NoSuchAlgorithmException {
+    try {
+      return KeyPairGenerator.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Key Pair Generator, falling back to explicit BC", e);
+      return KeyPairGenerator.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+
+  public static Mac getMac(String algorithm) throws NoSuchAlgorithmException {
+    try {
+      return Mac.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Mac, falling back to explicit BC", e);
+      return Mac.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+
+  public static Mac getMac(String algorithm, Key key) throws NoSuchAlgorithmException, InvalidKeyException {
+    try {
+      Mac mac = Mac.getInstance(algorithm);
+      mac.init(key);
+      return mac;
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Mac, falling back to explicit BC", e);
+      Mac mac = Mac.getInstance(algorithm, BC_PROVIDER);
+      mac.init(key);
+      return mac;
+    }
+  }
+
+  public static MessageDigest getMessageDigest(String algorithm) throws NoSuchAlgorithmException {
+    try {
+      return MessageDigest.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Message Digest, falling back to explicit BC", e);
+      return MessageDigest.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+
+  public static PublicKey getPublicKey(String algorithm, KeySpec keySpec) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    try {
+      KeyFactory kf = KeyFactory.getInstance(algorithm);
+      return kf.generatePublic(keySpec);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Key Factory or Public Key, falling back to explicit BC", e);
+      KeyFactory kf = KeyFactory.getInstance(algorithm, BC_PROVIDER);
+      return kf.generatePublic(keySpec);          
+    }
+  }
+
+  public static Signature getSignature(String algorithm) throws NoSuchAlgorithmException {
+    try {
+      return Signature.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Signature, falling back to explicit BC", e);
+      return Signature.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+}

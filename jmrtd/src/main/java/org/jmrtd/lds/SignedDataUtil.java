@@ -273,9 +273,6 @@ import org.jmrtd.Util;
    * FIXME: Maybe throw an exception instead of issuing warnings
    * on logger if signed attributes do not check out.
    *
-   * @see #getDocSigningCertificate()
-   * @see #getSignature()
-   *
    * @return the contents of the security object over which the
    *         signature is to be computed
    *         
@@ -396,13 +393,7 @@ import org.jmrtd.Util;
     if ("SHA256".equals(digestAlgorithm)) {
       digestAlgorithm = "SHA-256";
     }
-    MessageDigest dig = null;
-    try {
-      dig = MessageDigest.getInstance(digestAlgorithm);
-    } catch (Exception e) {
-      LOGGER.log(Level.FINE, "Default provider could not provide this digest, falling back to explicit BC", e);
-      dig = MessageDigest.getInstance(digestAlgorithm, BC_PROVIDER);
-    }
+    MessageDigest dig = Util.getMessageDigest(digestAlgorithm);
     byte[] contentBytes = ((DEROctetString)contentInfo.getContent()).getOctets();
     byte[] digestedContentBytes = dig.digest(contentBytes);
     ASN1OctetString digestedContent = new DEROctetString(digestedContentBytes);

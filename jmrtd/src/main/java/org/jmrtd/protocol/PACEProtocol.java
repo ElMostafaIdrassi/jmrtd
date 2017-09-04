@@ -948,19 +948,8 @@ public class PACEProtocol {
   public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
     String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
     String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
-    Mac mac = null;
-    try {
-      /* The default provider might have a fast 3DES or AES Mac. */
-      mac = Mac.getInstance(macAlg);
-      mac.init(macKey);
-      return generateAuthenticationToken(oid, mac, publicKey);
-    } catch (Exception e) {
-      LOGGER.log(Level.FINE, "Default provider could not provider this cipher, falling back to explicit BC", e);
-      /* If that doesn't work, explicitly ask BC to create our Mac. */
-      mac = Mac.getInstance(macAlg, BC_PROVIDER);
-      mac.init(macKey);
-      return generateAuthenticationToken(oid, mac, publicKey);      
-    }
+    Mac mac = Util.getMac(macAlg, macKey);
+    return generateAuthenticationToken(oid, mac, publicKey);
   }
 
   private static byte[] generateAuthenticationToken(String oid, Mac mac, PublicKey publicKey) throws GeneralSecurityException {

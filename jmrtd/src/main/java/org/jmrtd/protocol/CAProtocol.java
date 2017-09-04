@@ -34,7 +34,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;
@@ -123,13 +122,7 @@ public class CAProtocol {
       }
 
       /* Generate the inspection system's ephemeral key pair. */
-      KeyPairGenerator keyPairGenerator = null;
-      try {
-        keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg);
-      } catch (Exception e) {
-        LOGGER.log(Level.FINE, "Default provider could not provide this generator, falling back to explicit BC");
-        keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);        
-      }
+      KeyPairGenerator keyPairGenerator = Util.getKeyPairGenerator(agreementAlg); // FIXME: Shouldn't we use "EC" instead of "ECDH"?
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
@@ -196,13 +189,7 @@ public class CAProtocol {
    * @throws InvalidKeyException if one of the keys is invalid
    */
   public static byte[] computeSharedSecret(String agreementAlg, PublicKey piccPublicKey, PrivateKey pcdPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
-    KeyAgreement agreement = null;
-    try {
-      agreement = KeyAgreement.getInstance(agreementAlg);
-    } catch (Exception e) {
-      LOGGER.log(Level.FINE, "Default provider could not provide this key agreement, falling back to BC", e);
-      agreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
-    }
+    KeyAgreement agreement = Util.getKeyAgreement(agreementAlg);
     agreement.init(pcdPrivateKey);
     agreement.doPhase(piccPublicKey, true);
     return agreement.generateSecret();

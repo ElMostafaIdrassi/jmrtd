@@ -28,13 +28,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
@@ -97,10 +94,8 @@ public class DG15File extends DataGroup {
     X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
 
     for (String algorithm: PUBLIC_KEY_ALGORITHMS) {
-      try {
-        KeyFactory keyFactory = getKeyFactory(algorithm);
-        PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
-        return publicKey;
+      try {        
+        return Util.getPublicKey(algorithm, pubKeySpec);
       } catch (InvalidKeySpecException ikse) {
         /* NOTE: Ignore, try next algorithm. */
       }
@@ -139,14 +134,5 @@ public class DG15File extends DataGroup {
   @Override
   public String toString() {
     return "DG15File [" + publicKey.toString() + "]";
-  }
-  
-  private static KeyFactory getKeyFactory(String algorithm) throws NoSuchAlgorithmException {
-    try {
-      return KeyFactory.getInstance(algorithm);
-    } catch (Exception e) {
-      LOGGER.log(Level.FINE, "Default provider could not provider this key factory, falling back to explicit BC", e);
-      return KeyFactory.getInstance(algorithm, BC_PROVIDER);
-    }
-  }
+  }  
 }

@@ -127,12 +127,7 @@ public class PassportApduService extends CardService {
     plainAPDUCount = 0;
     try {
       mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
-      try {
-        cipher = Cipher.getInstance("DESede/CBC/NoPadding");
-      } catch (Exception e) {
-        LOGGER.log(Level.FINE, "Default provider could not provide this cipher, falling back to explicit BC", e);
-        cipher = Cipher.getInstance("DESede/CBC/NoPadding", BC_PROVIDER);
-      }
+      cipher = Util.getCipher("DESede/CBC/NoPadding");      
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.WARNING, "Unexpected security exception during initialization", gse);
       throw new CardServiceException(gse.toString());
