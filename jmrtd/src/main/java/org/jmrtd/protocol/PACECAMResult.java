@@ -4,6 +4,7 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Arrays;
 
+import org.jmrtd.PACEKeySpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.util.Hex;
@@ -15,11 +16,12 @@ public class PACECAMResult extends PACEResult {
   private byte[] encryptedChipAuthenticationData;
   private byte[] chipAuthenticationData;
 
-  public PACECAMResult(String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
+  public PACECAMResult(PACEKeySpec paceKey,
+      String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
       PACEMappingResult mappingResult,
       KeyPair pcdKeyPair, PublicKey piccPublicKey,
       byte[] encryptedChipAuthenticationData, byte[] chipAuthenticationData, SecureMessagingWrapper wrapper) {
-    super(MappingType.CAM, agreementAlg, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
+    super(paceKey, MappingType.CAM, agreementAlg, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
 
     this.encryptedChipAuthenticationData = null;
     if (encryptedChipAuthenticationData != null) {
@@ -90,17 +92,18 @@ public class PACECAMResult extends PACEResult {
   public String toString() {
     return new StringBuilder()
         .append("PACECAMResult [")
-        .append(", wrapper: ").append(getWrapper())
-        .append(", mappingType: ").append(getMappingType())
-        .append(", agreementAlg: ").append(getAgreementAlg())
-        .append(", cipherAlg: ").append(getCipherAlg())
-        .append(", digestAlg: ").append(getDigestAlg())
-        .append(", keyLength: ").append(getKeyLength())
-        .append(", mappingResult: ").append(getMappingResult())
-        .append(", pcdKeyPair: ").append(getPCDKeyPair())
-        .append(", piccPublicKey: ").append(getPICCPublicKey())
-        .append(", encryptedChipAuthenticationData: ").append(Hex.bytesToHexString(encryptedChipAuthenticationData))
-        .append(", chipAuthenticationData: ").append(Hex.bytesToHexString(chipAuthenticationData))
+        .append("paceKey: ").append(getPACEKey()).append(", ")
+        .append("mappingType: ").append(getMappingType()).append(", ")
+        .append("agreementAlg: ").append(getAgreementAlg()).append(", ")
+        .append("cipherAlg: ").append(getCipherAlg()).append(", ")
+        .append("digestAlg: ").append(getDigestAlg()).append(", ")
+        .append("keyLength: ").append(getKeyLength()).append(", ")
+        .append("mappingResult: ").append(getMappingResult()).append(", ")
+        .append("pcdKeyPair: ").append(getPCDKeyPair()).append(", ")
+        .append("piccPublicKey: ").append(getPICCPublicKey()).append(", ")
+        .append("encryptedChipAuthenticationData: ").append(Hex.bytesToHexString(encryptedChipAuthenticationData)).append(", ")
+        .append("wrapper: ").append(getWrapper()).append(", ")
+        .append("chipAuthenticationData: ").append(Hex.bytesToHexString(chipAuthenticationData))
         .append("]").toString();
   }
 }

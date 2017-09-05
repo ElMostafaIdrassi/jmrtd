@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -50,9 +49,7 @@ public class DG15File extends DataGroup {
   private static final long serialVersionUID = 3834304239673755744L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
-  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-  
+    
   private static final String[] PUBLIC_KEY_ALGORITHMS = { "RSA", "EC" };
 
   private PublicKey publicKey;
@@ -86,7 +83,6 @@ public class DG15File extends DataGroup {
 
       publicKey = getPublicKey(value);
     } catch (GeneralSecurityException e) {
-      throw new IllegalArgumentException(e.toString());
     }
   }
 

@@ -52,7 +52,7 @@ public class BACResult implements Serializable {
 
   @Override
   public String toString() {
-    return (new StringBuilder())
+    return new StringBuilder()
         .append("BACResult [bacKey: " + bacKey)
         .append(", wrapper: " + wrapper)
         .append("]")

@@ -223,7 +223,7 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
       fileInfos.put(selectedFID, fileInfo);
       return fileInfo;
     } catch (IOException ioe) {
-      throw new CardServiceException(ioe.toString() + " getting file info for " + Integer.toHexString(selectedFID));
+      throw new CardServiceException("Error getting file info for " + Integer.toHexString(selectedFID), ioe);
     }
   }
 

@@ -377,7 +377,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   }
 
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("FingerInfo [");
     List<FingerImageInfo> records = getSubRecords();
     for (FingerImageInfo record: records) {

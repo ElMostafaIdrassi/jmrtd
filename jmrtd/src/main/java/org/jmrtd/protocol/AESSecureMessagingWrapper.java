@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
-import java.security.Provider;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,8 +59,6 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   private static final long serialVersionUID = 2086301081448345496L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
-  private static Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private SecretKey ksEnc, ksMac;
   private transient Cipher sscIVCipher;

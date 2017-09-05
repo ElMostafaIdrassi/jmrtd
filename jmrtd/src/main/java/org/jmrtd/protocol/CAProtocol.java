@@ -30,7 +30,6 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -59,8 +58,6 @@ import net.sf.scuba.smartcards.CardServiceException;
 public class CAProtocol {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
-  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private PassportService service;
 
@@ -138,7 +135,7 @@ public class CAProtocol {
 
       return new CAResult(keyId, piccPublicKey, keyHash, pcdPublicKey, pcdPrivateKey, wrapper);
     } catch (GeneralSecurityException e) {
-      throw new CardServiceException(e.toString());
+      throw new CardServiceException("Security exception during Chip Authentication", e);
     }
   }
 

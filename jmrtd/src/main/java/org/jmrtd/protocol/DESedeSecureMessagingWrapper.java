@@ -30,10 +30,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -63,8 +60,6 @@ import net.sf.scuba.tlv.TLVUtil;
 public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper implements Serializable {
 
   private static final long serialVersionUID = -2859033943345961793L;
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** Initialization vector consisting of 8 zero bytes. */
   public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });

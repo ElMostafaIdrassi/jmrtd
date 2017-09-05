@@ -29,6 +29,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECPoint;
 import java.util.Arrays;
 
+import org.jmrtd.PACEKeySpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 /**
@@ -48,6 +49,8 @@ public class PACEResult implements Serializable {
   private String digestAlg;
   private int keyLength;
 
+  private PACEKeySpec paceKey;
+
   private PACEMappingResult mappingResult;
 
   private PublicKey piccPublicKey;
@@ -59,6 +62,7 @@ public class PACEResult implements Serializable {
   /**
    * The result of a PACE protocol run.
    * 
+   * @param paceKey the access key
    * @param mappingType the mapping type, {@code GM}, {@code IM}, or {@code CAM}
    * @param agreementAlg the agreement algorithm, {@code "DH"} or {@code "ECDH"}
    * @param cipherAlg the cipher algorithm
@@ -69,9 +73,11 @@ public class PACEResult implements Serializable {
    * @param piccPublicKey the public key sent by the PICC
    * @param wrapper the resulting secure messaging wrapper
    */
-  public PACEResult(MappingType mappingType, String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
+  public PACEResult(PACEKeySpec paceKey,
+      MappingType mappingType, String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
       PACEMappingResult mappingResult,
       KeyPair pcdKeyPair, PublicKey piccPublicKey, SecureMessagingWrapper wrapper) {
+    this.paceKey = paceKey;
     this.mappingType = mappingType;
     this.agreementAlg = agreementAlg;
     this.cipherAlg = cipherAlg;
@@ -81,6 +87,15 @@ public class PACEResult implements Serializable {
     this.pcdKeyPair = pcdKeyPair;
     this.piccPublicKey = piccPublicKey;
     this.wrapper = wrapper;
+  }
+
+  /**
+   * Gets the access key that was used.
+   * 
+   * @return the PACE key
+   */
+  public PACEKeySpec getPACEKey() {
+    return paceKey;
   }
 
   public PACEMappingResult getMappingResult() {
@@ -125,8 +140,10 @@ public class PACEResult implements Serializable {
 
   @Override
   public String toString() {
-    return (new StringBuilder())
-        .append("PACEResult [mappingType: ").append(mappingType)
+    return new StringBuilder()
+        .append("PACEResult [")
+        .append("paceKey: ").append(paceKey)
+        .append(", mappingType: ").append(mappingType)
         .append(", agreementAlg: " + agreementAlg)
         .append(", cipherAlg: " + cipherAlg)
         .append(", digestAlg: " + digestAlg)
@@ -141,6 +158,7 @@ public class PACEResult implements Serializable {
   public int hashCode() {
     final int prime = 1991;
     int result = 11;
+    result = prime * result + ((paceKey == null) ? 0 : paceKey.hashCode());
     result = prime * result + ((agreementAlg == null) ? 0 : agreementAlg.hashCode());
     result = prime * result + ((cipherAlg == null) ? 0 : cipherAlg.hashCode());
     result = prime * result + ((digestAlg == null) ? 0 : digestAlg.hashCode());
@@ -166,6 +184,13 @@ public class PACEResult implements Serializable {
     }
 
     PACEResult other = (PACEResult)obj;
+    if (paceKey == null) {
+      if (other.paceKey != null) {
+        return false;
+      }
+    } else if (!paceKey.equals(other.paceKey)) {
+      return false;
+    }
     if (agreementAlg == null) {
       if (other.agreementAlg != null) {
         return false;
@@ -321,7 +346,7 @@ public class PACEResult implements Serializable {
     public KeyPair getPCDMappingKeyPair() {
       return pcdMappingKeyPair;
     }
-    
+
     @Override
     public int hashCode() {
       final int prime = 31;
@@ -358,7 +383,7 @@ public class PACEResult implements Serializable {
       } else if (!pcdMappingKeyPair.equals(other.pcdMappingKeyPair)) {
         return false;
       }
-      
+
       return true;
     }
   }
@@ -492,12 +517,12 @@ public class PACEResult implements Serializable {
       if (getClass() != obj.getClass()) {
         return false;
       }
-      
+
       PACEIMMappingResult other = (PACEIMMappingResult) obj;
       if (!Arrays.equals(pcdNonce, other.pcdNonce)) {
         return false;
       }
-      
+
       return true;
     }
   }

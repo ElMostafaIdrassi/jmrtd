@@ -77,7 +77,7 @@ public class AAResult implements Serializable {
 
   @Override
   public String toString() {
-    return (new StringBuilder())
+    return new StringBuilder()
         .append("AAResult [")
         .append("publicKey: ").append(Util.getDetailedPublicKeyAlgorithm(publicKey))
         .append(", digestAlgorithm: ").append(digestAlgorithm)

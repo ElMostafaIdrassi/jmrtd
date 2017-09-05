@@ -297,7 +297,7 @@ public class SODFile extends AbstractTaggedLDSFile {
       return SignedDataUtil.lookupMnemonicByOID(ldsSecurityObject.getDigestAlgorithmIdentifier().getAlgorithm().getId());
     } catch (NoSuchAlgorithmException nsae) {
       LOGGER.log(Level.WARNING, "Exception", nsae);
-      return null; // throw new IllegalStateException(nsae.toString());
+      return null;
     }
   }
 

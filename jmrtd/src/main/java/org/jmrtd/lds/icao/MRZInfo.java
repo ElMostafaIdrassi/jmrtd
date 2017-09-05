@@ -513,11 +513,11 @@ public class MRZInfo extends AbstractLDSInfo {
     if (secondaryIdentifiers == null) {
       this.secondaryIdentifier = null;
     } else {
-      StringBuffer stringBuffer = new StringBuffer();
+      StringBuilder stringBuilder = new StringBuilder();
       for (int i = 0; i < secondaryIdentifiers.length; i++) {
-        stringBuffer.append(secondaryIdentifiers[i]);
+        stringBuilder.append(secondaryIdentifiers[i]);
         if (i < secondaryIdentifiers.length - 1) {
-          stringBuffer.append('<');
+          stringBuilder.append('<');
         }
       }
     }
@@ -768,7 +768,7 @@ public class MRZInfo extends AbstractLDSInfo {
     String[] primaryComponents = primaryIdentifier.split(" |<");
     String[] secondaryComponents = secondaryIdentifier.split(" |<");
 
-    StringBuffer name = new StringBuffer();
+    StringBuilder name = new StringBuilder();
     for (int i = 0; i < primaryComponents.length; i++) {
       String component = primaryComponents[i];
       name.append(component);
@@ -869,7 +869,7 @@ public class MRZInfo extends AbstractLDSInfo {
     if (str == null) { throw new IllegalArgumentException("Attempting to MRZ format null"); }
     if (str.length() > width) { throw new IllegalArgumentException("Argument too wide (" + str.length() + " > " + width + ")"); }
     str = str.toUpperCase().trim();
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
       char c = str.charAt(i);
       if (MRZ_CHARS.indexOf(c) == -1) {
@@ -965,7 +965,7 @@ public class MRZInfo extends AbstractLDSInfo {
       char personalNumberCheckDigit = checkDigit(mrzFormat(optionalData1, 14), true); /* FIXME: Uses '<' over '0'. Where specified? */
       optionalData1 = personalNumber + personalNumberCheckDigit;
     }
-    StringBuffer composite = new StringBuffer();
+    StringBuilder composite = new StringBuilder();
     if (documentType == DOC_TYPE_ID1) {
       /*
        * Based on 6.6 in Part V of Doc 9303 Part 3 Vol 1.

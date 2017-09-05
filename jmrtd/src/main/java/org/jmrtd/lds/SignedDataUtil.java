@@ -217,7 +217,7 @@ import org.jmrtd.Util;
       return SignedDataUtil.lookupMnemonicByOID(digestAlgOID);
     } catch (NoSuchAlgorithmException nsae) {
       LOGGER.log(Level.WARNING, "No such algorithm" + nsae);
-      return null; // throw new IllegalStateException(nsae.toString());
+      return null;
     }
   }
 
@@ -259,7 +259,7 @@ import org.jmrtd.Util;
       return SignedDataUtil.lookupMnemonicByOID(digestEncryptionAlgorithmOID);
     } catch (NoSuchAlgorithmException nsae) {
       LOGGER.log(Level.WARNING, "No such algorithm", nsae);
-      return null; // throw new IllegalStateException(nsae.toString());
+      return null;
     }
   }
 

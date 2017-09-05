@@ -858,7 +858,7 @@ public class FaceImageInfo extends AbstractImageInfo {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-      return (new StringBuilder())
+      return new StringBuilder()
           .append("( point: ").append(getMajorCode()).append(".").append(getMinorCode())
           .append(", ")
           .append("type: ").append(Integer.toHexString(type)).append(", ")

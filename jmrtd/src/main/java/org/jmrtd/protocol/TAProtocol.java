@@ -29,7 +29,6 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Signature;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
@@ -51,8 +50,6 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * @since 0.5.6
  */
 public class TAProtocol {
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
@@ -106,7 +103,8 @@ public class TAProtocol {
     try {
       System.arraycopy(documentNumber.getBytes("ISO-8859-1"), 0, idPICC, 0, documentNumber.length());
     } catch (UnsupportedEncodingException e) {
-      throw new CardServiceException(e.toString());
+      /* NOTE: Never happens, ISO-8859-1 is supported. */
+      throw new CardServiceException("Unsupported encoding", e);
     }
     idPICC[idPICC.length - 1] = (byte) MRZInfo.checkDigit(documentNumber);
     return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
@@ -115,22 +113,19 @@ public class TAProtocol {
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult)
       throws CardServiceException {
-    byte[] idPICC;
     try {
-      idPICC = Util.getKeyHash(paceResult.getAgreementAlg(), paceResult.getPICCPublicKey());
+      byte[] idPICC = Util.getKeyHash(paceResult.getAgreementAlg(), paceResult.getPICCPublicKey());
+      return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
     } catch (NoSuchAlgorithmException e) {
-      throw new CardServiceException(e.toString());
+      throw new CardServiceException("No such algorithm", e);
     }
-    return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
   }
 
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, byte[] idPICC)
-      throws CardServiceException {
+      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, byte[] idPICC) throws CardServiceException {
     try {
       if (terminalCertificates == null || terminalCertificates.isEmpty()) {
-        throw new IllegalArgumentException(
-            "Need at least 1 certificate to perform TA, found: " + terminalCertificates);
+        throw new IllegalArgumentException("Need at least 1 certificate to perform TA, found: " + terminalCertificates);
       }
 
       byte[] caKeyHash = chipAuthenticationResult.getKeyHash();
@@ -189,8 +184,7 @@ public class TAProtocol {
            * Manage Security Environment: Set for verification: Digital Signature
            * Template, indicate authority of cert to check.
            */
-          byte[] authorityRefBytes = Util.wrapDO((byte) 0x83,
-              authorityReference.getName().getBytes("ISO-8859-1"));
+          byte[] authorityRefBytes = Util.wrapDO((byte) 0x83, authorityReference.getName().getBytes("ISO-8859-1"));
           service.sendMSESetDST(wrapper, authorityRefBytes);
 
           /* Cert body is already in TLV format. */
@@ -260,7 +254,7 @@ public class TAProtocol {
     } catch (CardServiceException cse) {
       throw cse;
     } catch (Exception e) {
-      throw new CardServiceException(e.toString());
+      throw new CardServiceException("Exception", e);
     }
   }
 }

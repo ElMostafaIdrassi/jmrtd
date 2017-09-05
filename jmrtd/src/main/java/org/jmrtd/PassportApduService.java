@@ -584,7 +584,7 @@ public class PassportApduService extends CardService {
       }
       return result;
     } catch (GeneralSecurityException gse) {
-      throw new CardServiceException(gse.toString());
+      throw new CardServiceException("Security exception during mutual auth", gse);
     }
   }
 

@@ -188,15 +188,15 @@ public class IrisImageInfo extends AbstractImageInfo {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("IrisImageInfo [");
-    result.append("image number: " + imageNumber + ", ");
-    result.append("quality: " + quality + ", ");
-    result.append("image: ");
-    result.append(getWidth() + " x " + getHeight());
-    result.append("mime-type: " + getMimeTypeFromImageFormat(imageFormat));
-    result.append("]");
-    return result.toString();
+    return new StringBuilder()
+        .append("IrisImageInfo [")
+        .append("image number: ").append(imageNumber).append(", ")
+        .append("quality: ").append(quality).append(", ")
+        .append("image: ")
+        .append(getWidth()).append(" x ").append(getHeight())
+        .append("mime-type: ").append(getMimeTypeFromImageFormat(imageFormat))
+        .append("]")
+        .toString();
   }
 
   protected void readObject(InputStream inputStream) throws IOException {

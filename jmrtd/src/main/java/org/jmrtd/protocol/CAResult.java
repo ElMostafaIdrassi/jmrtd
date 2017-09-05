@@ -93,7 +93,7 @@ public class CAResult implements Serializable {
 
   @Override
   public String toString() {
-    return (new StringBuilder())
+    return new StringBuilder()
         .append("CAResult [keyId: ").append(keyId)
         .append(", PICC public key: ").append(piccPublicKey)
         .append(", wrapper: ").append(wrapper)

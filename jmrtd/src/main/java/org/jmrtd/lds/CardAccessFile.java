@@ -116,7 +116,7 @@ public class CardAccessFile implements Serializable {
    * @return signature algorithm OID
    */
   public String toString() {
-    return (new StringBuilder())
+    return new StringBuilder()
         .append("CardAccessFile [")
         .append(securityInfos.toString())
         .append("]").toString();

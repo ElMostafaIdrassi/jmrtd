@@ -260,7 +260,7 @@ public class Util {
    * @throws GeneralSecurityException on security error
    */
   public static byte[] computeKeySeed(String documentNumber, String dateOfBirth, String dateOfExpiry, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
-    String text = (new StringBuilder())
+    String text = new StringBuilder()
         .append(documentNumber)
         .append(MRZInfo.checkDigit(documentNumber))
         .append(dateOfBirth)
@@ -1283,7 +1283,7 @@ public class Util {
       return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
     }
 
-    throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
+    throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + agreementAlg);
   }
 
   public static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {

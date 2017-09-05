@@ -163,13 +163,13 @@ public abstract class AbstractImageInfo implements ImageInfo {
    */
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append(this.getClass().getSimpleName());
-    result.append(" [");
-    result.append("type: " + typeToString(type) + ", ");
-    result.append("size: " + getImageLength());
-    result.append("]");
-    return result.toString();
+    return new StringBuilder()
+        .append(this.getClass().getSimpleName())
+        .append(" [")
+        .append("type: ").append(typeToString(type) + ", ")
+        .append("size: ").append(getImageLength())
+        .append("]")
+        .toString();
   }
 
   @Override
@@ -184,9 +184,16 @@ public abstract class AbstractImageInfo implements ImageInfo {
   @Override
   public boolean equals(Object other) {
     try {
-      if (other == null) { return false; }
-      if (other == this) { return true; }
-      if (!other.getClass().equals(this.getClass())) { return false; }
+      if (other == null) {
+        return false;
+      }
+      if (other == this) {
+        return true;
+      }
+      if (!other.getClass().equals(this.getClass())) {
+        return false;
+      }
+      
       AbstractImageInfo otherImageInfo = (AbstractImageInfo)other;
       return (Arrays.equals(getImageBytes(), otherImageInfo.getImageBytes()))
           // && getImageLength() == otherImageInfo.getImageLength()
@@ -316,11 +323,16 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   private static String typeToString(int type) {
     switch (type) {
-      case TYPE_PORTRAIT: return "Portrait";
-      case TYPE_SIGNATURE_OR_MARK: return "Signature or usual mark";
-      case TYPE_FINGER: return "Finger";
-      case TYPE_IRIS: return "Iris";
-      default: throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
+      case TYPE_PORTRAIT:
+        return "Portrait";
+      case TYPE_SIGNATURE_OR_MARK:
+        return "Signature or usual mark";
+      case TYPE_FINGER:
+        return "Finger";
+      case TYPE_IRIS:
+        return "Iris";
+      default:
+        throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }
   }	
 }

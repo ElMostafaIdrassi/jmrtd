@@ -85,8 +85,7 @@ public class BACProtocol {
       LOGGER.log(Level.WARNING, "BAC failed", cse);
       throw cse;
     } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.WARNING, "Error during BAC", gse);
-      throw new CardServiceException(gse.toString());
+      throw new CardServiceException("Error during BAC", gse);
     }
   }
 

@@ -273,7 +273,7 @@ public class COMFile extends AbstractTaggedLDSFile {
    * @return a textual representation of this file
    */
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("COMFile ");
     result.append("LDS " + versionLDS + "." + updateLevelLDS);
     result.append(", ");
