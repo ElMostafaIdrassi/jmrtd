@@ -2,9 +2,9 @@ package org.jmrtd.protocol;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 
-import org.jmrtd.PACEKeySpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 import net.sf.scuba.util.Hex;
@@ -16,7 +16,7 @@ public class PACECAMResult extends PACEResult {
   private byte[] encryptedChipAuthenticationData;
   private byte[] chipAuthenticationData;
 
-  public PACECAMResult(PACEKeySpec paceKey,
+  public PACECAMResult(KeySpec paceKey,
       String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
       PACEMappingResult mappingResult,
       KeyPair pcdKeyPair, PublicKey piccPublicKey,

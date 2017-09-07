@@ -161,7 +161,7 @@ public class PACEProtocol {
    */
   public PACEResult doPACE(KeySpec accessKey, String oid, AlgorithmParameterSpec params) throws PACEException {
     try {
-      return doPACE((PACEKeySpec)accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
+      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in key derivation step");
     }
@@ -179,7 +179,7 @@ public class PACEProtocol {
    *
    * @throws PACEException if authentication failed
    */
-  private PACEResult doPACE(PACEKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws PACEException {
+  private PACEResult doPACE(KeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws PACEException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */

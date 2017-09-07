@@ -27,6 +27,7 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECPoint;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 
 import org.jmrtd.PACEKeySpec;
@@ -49,7 +50,7 @@ public class PACEResult implements Serializable {
   private String digestAlg;
   private int keyLength;
 
-  private PACEKeySpec paceKey;
+  private KeySpec paceKey;
 
   private PACEMappingResult mappingResult;
 
@@ -73,7 +74,7 @@ public class PACEResult implements Serializable {
    * @param piccPublicKey the public key sent by the PICC
    * @param wrapper the resulting secure messaging wrapper
    */
-  public PACEResult(PACEKeySpec paceKey,
+  public PACEResult(KeySpec paceKey,
       MappingType mappingType, String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
       PACEMappingResult mappingResult,
       KeyPair pcdKeyPair, PublicKey piccPublicKey, SecureMessagingWrapper wrapper) {
@@ -94,7 +95,7 @@ public class PACEResult implements Serializable {
    * 
    * @return the PACE key
    */
-  public PACEKeySpec getPACEKey() {
+  public KeySpec getPACEKey() {
     return paceKey;
   }
 
