@@ -81,22 +81,30 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   }
 
   public void add(R record) {
-    if (subRecords == null) { subRecords = new ArrayList<R>(); }
+    if (subRecords == null) {
+      subRecords = new ArrayList<R>();
+    }
     subRecords.add(record);
   }
 
   public void addAll(List<R> records) {
-    if (subRecords == null) { subRecords = new ArrayList<R>(); }
+    if (subRecords == null) {
+      subRecords = new ArrayList<R>();
+    }
     subRecords.addAll(records);
   }
 
   public void remove(int index) {
-    if (subRecords == null) { subRecords = new ArrayList<R>(); }
+    if (subRecords == null) {
+      subRecords = new ArrayList<R>();
+    }
     subRecords.remove(index);		
   }
 
   public List<R> getSubRecords() {
-    if (subRecords == null) { subRecords = new ArrayList<R>(); }
+    if (subRecords == null) {
+      subRecords = new ArrayList<R>();
+    }
     return new ArrayList<R>(subRecords);
   }
 

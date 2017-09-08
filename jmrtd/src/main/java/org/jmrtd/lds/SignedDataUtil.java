@@ -93,7 +93,7 @@ import org.jmrtd.Util;
 /* package-visible */ class SignedDataUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /** SignedData related object identifier. */
@@ -339,7 +339,7 @@ import org.jmrtd.Util;
     if (certs.size() != 1) {
       LOGGER.warning("Found " + certs.size() + " certificates");
     }
-    
+
     X509CertificateObject certObject = null;
     for (int i = 0; i < certs.size(); i++) {
       org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance((ASN1Sequence)certs.getObjectAt(i));
@@ -543,7 +543,7 @@ import org.jmrtd.Util;
     if (oid.equals(PKCS1_MGF1)) {
       return "MGF1";
     }
-    
+
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 
@@ -641,7 +641,7 @@ import org.jmrtd.Util;
     if (name.equalsIgnoreCase("SHA512withRSAandMGF1")) {
       return PKCS1_MGF1;
     }
-    
+
     throw new NoSuchAlgorithmException("Unknown name " + name);
   }
 
@@ -723,14 +723,15 @@ import org.jmrtd.Util;
 
   private static SignerInfo getSignerInfo(SignedData signedData)  {
     ASN1Set signerInfos = signedData.getSignerInfos();
+    if (signerInfos == null || signerInfos.size() <= 0) {
+      throw new IllegalArgumentException("No signer info in signed data");
+    }
+    
     if (signerInfos.size() > 1) {
       LOGGER.warning("Found " + signerInfos.size() + " signerInfos");
     }
-    for (int i = 0; i < signerInfos.size(); i++) {
-      SignerInfo info = new SignerInfo((ASN1Sequence)signerInfos.getObjectAt(i));
-      return info;
-    }
-    return null;
+
+    return SignerInfo.getInstance((ASN1Sequence)signerInfos.getObjectAt(0));
   }
 
   private static ASN1Set createSingletonSet(ASN1Object e) {

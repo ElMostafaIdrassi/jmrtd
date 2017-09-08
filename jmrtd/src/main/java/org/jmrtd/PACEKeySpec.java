@@ -22,6 +22,7 @@
 
 package org.jmrtd;
 
+import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.spec.KeySpec;
 
@@ -36,11 +37,13 @@ import org.jmrtd.protocol.PACEProtocol;
  *
  * (Contributions by g.giorkhelidze.)
  */
-public class PACEKeySpec implements KeySpec {
+public class PACEKeySpec implements KeySpec, Serializable {
+
+  private static final long serialVersionUID = -7113246293247012560L;
 
   private byte[] key;
   private byte keyReference;
-  
+
   /**
    * Constructs a PACE key from a string value.
    * 
@@ -52,7 +55,7 @@ public class PACEKeySpec implements KeySpec {
   public PACEKeySpec(String key, byte keyReference) {
     this(Util.getBytes(key), keyReference);
   }
-  
+
   /**
    * Constructs a key.
    * 
@@ -79,7 +82,7 @@ public class PACEKeySpec implements KeySpec {
   public static PACEKeySpec createMRZKey(BACKeySpec mrz) throws GeneralSecurityException {
     return new PACEKeySpec(PACEProtocol.computeKeySeedForPACE(mrz), PassportApduService.MRZ_PACE_KEY_REFERENCE);
   }
-  
+
   /**
    * Creates a PACE key from a Card Access Number.
    * 
@@ -90,7 +93,7 @@ public class PACEKeySpec implements KeySpec {
   public static PACEKeySpec createCANKey(String can) {
     return new PACEKeySpec(can, PassportApduService.CAN_PACE_KEY_REFERENCE);
   }
-  
+
   /**
    * Creates a PACE key from a PIN.
    * 
@@ -101,7 +104,7 @@ public class PACEKeySpec implements KeySpec {
   public static PACEKeySpec createPINKey(String pin) {
     return new PACEKeySpec(pin, PassportApduService.PIN_PACE_KEY_REFERENCE);
   }
-  
+
   /**
    * Creates a PACE key from a PUK.
    * 
@@ -112,7 +115,7 @@ public class PACEKeySpec implements KeySpec {
   public static PACEKeySpec createPUKKey(String puk) {
     return new PACEKeySpec(puk, PassportApduService.PUK_PACE_KEY_REFERENCE);
   }
-  
+
   /**
    * Returns the type of key, valid values are
    *                     {@code MRZ_PACE_KEY_REFERENCE}, {@code CAN_PACE_KEY_REFERENCE},

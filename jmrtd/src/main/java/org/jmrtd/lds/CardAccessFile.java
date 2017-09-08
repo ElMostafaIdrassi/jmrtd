@@ -88,7 +88,10 @@ public class CardAccessFile implements Serializable {
     for (int i = 0; i < set.size(); i++) {
       ASN1Primitive object = set.getObjectAt(i).toASN1Primitive();
       SecurityInfo securityInfo = SecurityInfo.getInstance(object);
-      if (securityInfo == null) { continue; } /* NOTE: skipping this unsupported SecurityInfo */
+      if (securityInfo == null) {
+        /* NOTE: skipping this unsupported SecurityInfo */
+        continue;
+      }
       securityInfos.add(securityInfo);
     }
   }
@@ -135,11 +138,11 @@ public class CardAccessFile implements Serializable {
     if (otherObj == null) {
       return false;
     }
-    
+
     if (!(otherObj.getClass().equals(this.getClass()))) {
       return false;
     }
-    
+
     CardAccessFile other = (CardAccessFile)otherObj;
     if (securityInfos == null) {
       return  other.securityInfos == null;
@@ -147,7 +150,7 @@ public class CardAccessFile implements Serializable {
     if (other.securityInfos == null) {
       return securityInfos == null;
     }
-    
+
     return securityInfos.equals(other.securityInfos);
   }
 

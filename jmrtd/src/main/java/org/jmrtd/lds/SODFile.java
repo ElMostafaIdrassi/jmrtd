@@ -471,17 +471,20 @@ public class SODFile extends AbstractTaggedLDSFile {
         LOGGER.warning("SignedData does not appear to contain an LDS SOd. (content type is " + contentType + ", was expecting " + ICAO_LDS_SOD_OID + ")");
       }
       ASN1InputStream inputStream = new ASN1InputStream(new ByteArrayInputStream(eContent.getOctets()));
-
-      Object firstObject = inputStream.readObject();
-      if (!(firstObject instanceof ASN1Sequence)) {
-        throw new IllegalStateException("Expected ASN1Sequence, found " + firstObject.getClass().getSimpleName());
+      try {
+        Object firstObject = inputStream.readObject();
+        if (!(firstObject instanceof ASN1Sequence)) {
+          throw new IllegalStateException("Expected ASN1Sequence, found " + firstObject.getClass().getSimpleName());
+        }
+        LDSSecurityObject sod = LDSSecurityObject.getInstance(firstObject);
+        Object nextObject = inputStream.readObject();
+        if (nextObject != null) {
+          LOGGER.warning("Ignoring extra object found after LDSSecurityObject...");
+        }
+        return sod;
+      } finally {
+        inputStream.close();
       }
-      LDSSecurityObject sod = LDSSecurityObject.getInstance(firstObject);
-      Object nextObject = inputStream.readObject();
-      if (nextObject != null) {
-        LOGGER.warning("Ignoring extra object found after LDSSecurityObject...");
-      }
-      return sod;
     } catch (IOException ioe) {
       throw new IllegalStateException("Could not read security object in signedData");
     }

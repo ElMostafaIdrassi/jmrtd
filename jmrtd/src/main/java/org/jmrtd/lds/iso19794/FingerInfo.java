@@ -318,7 +318,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
      */
     /* int RFU = */ dataIn.readUnsignedShort(); /* Should be 0x0000 */
 
-    long headerLength = 4 + 4 + 6 + 2 + 2 + 1 + 1 + 2 + 2 + 2 + 2 + 1 + 1 + 2;
+    long headerLength = 4L + 4L + 6L + 2L + 2L + 1L + 1L + 2L + 2L + 2L + 2L + 1L + 1L + 2L;
     long dataLength = recordLength - headerLength;
 
     long constructedDataLength = 0L;

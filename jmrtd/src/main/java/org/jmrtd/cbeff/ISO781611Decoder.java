@@ -192,11 +192,15 @@ public class ISO781611Decoder implements ISO781611 {
    */
   private void readStaticallyProtectedBIT(InputStream inputStream, int tag, int length, int index) throws IOException {
     TLVInputStream tlvBHTIn = new TLVInputStream(new ByteArrayInputStream(decodeSMTValue(inputStream)));
-    int headerTemplateTag = tlvBHTIn.readTag();
-    int headerTemplateLength = tlvBHTIn.readLength();
-    StandardBiometricHeader sbh = readBHT(tlvBHTIn, headerTemplateTag, headerTemplateLength, index);
-    InputStream biometricDataBlockIn = new ByteArrayInputStream(decodeSMTValue(inputStream));
-    readBiometricDataBlock(biometricDataBlockIn, sbh, index);
+    try {
+      int headerTemplateTag = tlvBHTIn.readTag();
+      int headerTemplateLength = tlvBHTIn.readLength();
+      StandardBiometricHeader sbh = readBHT(tlvBHTIn, headerTemplateTag, headerTemplateLength, index);
+      InputStream biometricDataBlockIn = new ByteArrayInputStream(decodeSMTValue(inputStream));
+      readBiometricDataBlock(biometricDataBlockIn, sbh, index);
+    } finally {
+      tlvBHTIn.close();
+    }
   } /* FIXME: return type??? */
 
   private byte[] decodeSMTValue(InputStream inputStream) throws IOException {

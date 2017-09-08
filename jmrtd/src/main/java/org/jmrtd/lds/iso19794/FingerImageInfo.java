@@ -140,7 +140,7 @@ public class FingerImageInfo extends AbstractImageInfo {
     this.quality = quality;
     this.impressionType = impressionType;
     this.compressionAlgorithm = compressionAlgorithm;
-    this.recordLength = imageLength + 14;
+    this.recordLength = imageLength + 14L;
   }
   
   /**
@@ -258,7 +258,7 @@ public class FingerImageInfo extends AbstractImageInfo {
     byte[] imageBytes = imageOut.toByteArray();
     imageOut.close();
     
-    long fingerDataBlockLength = imageBytes.length + 14;
+    long fingerDataBlockLength = imageBytes.length + 14L;
     
     DataOutputStream dataOut = out instanceof DataOutputStream ? (DataOutputStream)out : new DataOutputStream(out);
     

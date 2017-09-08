@@ -189,7 +189,7 @@ public class IrisImageInfo extends AbstractImageInfo {
    * @return the record length
    */
   public long getRecordLength() {
-    return 11 + getImageLength();
+    return 11L + getImageLength();
   }
 
   /**

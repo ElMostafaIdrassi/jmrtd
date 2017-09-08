@@ -183,7 +183,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     ssc++;
     try {
       byte[] data = responseAPDU.getData();
-      if (data == null || data.length <= 0) {        
+      if (data == null || data.length <= 0) {  
         // no sense in unwrapping - card indicates some kind of error
         throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
         /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
@@ -260,7 +260,9 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       bOut.reset();
       bOut.write(hasDO85 ? (byte)0x85 : (byte)0x87);
       bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
-      if (!hasDO85) { bOut.write(0x01); };
+      if (!hasDO85) {
+        bOut.write(0x01);
+      }
       bOut.write(ciphertext, 0, ciphertext.length);
       do8587 = bOut.toByteArray();
     }
@@ -319,19 +321,24 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       throw new IllegalArgumentException("Invalid response APDU");
     }
     cipher.init(Cipher.DECRYPT_MODE, ksEnc, ZERO_IV_PARAM_SPEC);
-    DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
+
     byte[] data = new byte[0];
-    short sw = 0;
-    boolean isFinished = false;
     byte[] cc = null;
-    while (!isFinished) {
-      int tag = inputStream.readByte();
-      switch (tag) {
-        case (byte)0x87: data = readDO87(inputStream, false); break;
-        case (byte)0x85: data = readDO87(inputStream, true); break;
-        case (byte)0x99: sw = readDO99(inputStream); break;
-        case (byte)0x8E: cc = readDO8E(inputStream); isFinished = true; break;
+    short sw = 0;
+    DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
+    try {
+      boolean isFinished = false;
+      while (!isFinished) {
+        int tag = inputStream.readByte();
+        switch (tag) {
+          case (byte)0x87: data = readDO87(inputStream, false); break;
+          case (byte)0x85: data = readDO87(inputStream, true); break;
+          case (byte)0x99: sw = readDO99(inputStream); break;
+          case (byte)0x8E: cc = readDO8E(inputStream); isFinished = true; break;
+        }
       }
+    } finally {
+      inputStream.close();
     }
     if (shouldCheckMAC && !checkMac(rapdu, cc, ssc)) {
       throw new IllegalStateException("Invalid MAC");

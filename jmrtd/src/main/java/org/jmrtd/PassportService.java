@@ -29,7 +29,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -206,9 +205,6 @@ public class PassportService extends PassportApduService implements Serializable
 
   /** Short file identifier for file. */
   public static final byte SF_CVCA = 0x1C;
-
-  /** YYMMDD format. */
-  public static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
 
   /** The default maximal blocksize used for unencrypted APDUs. */
   public static final int DEFAULT_MAX_BLOCKSIZE = 224;

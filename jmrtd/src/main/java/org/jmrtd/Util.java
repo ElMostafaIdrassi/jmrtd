@@ -790,45 +790,48 @@ public class Util {
       String algorithm = publicKey.getAlgorithm();
       if ("EC".equals(algorithm) || "ECDH".equals(algorithm) || (publicKey instanceof ECPublicKey)) {
         ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
-        SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo((ASN1Sequence)asn1In.readObject());
-        asn1In.close();
-        AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
-        String algOID = algorithmIdentifier.getAlgorithm().getId();
-        if (!SecurityInfo.ID_EC_PUBLIC_KEY.equals(algOID)) {
-          throw new IllegalStateException("Was expecting id-ecPublicKey (" + SecurityInfo.ID_EC_PUBLIC_KEY_TYPE + "), found " + algOID);
-        }
-        ASN1Primitive derEncodedParams = algorithmIdentifier.getParameters().toASN1Primitive();
-        X9ECParameters params = null;
-        if (derEncodedParams instanceof ASN1ObjectIdentifier) {
-          ASN1ObjectIdentifier paramsOID = (ASN1ObjectIdentifier)derEncodedParams;
+        try {
+          SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo((ASN1Sequence)asn1In.readObject());
+          AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
+          String algOID = algorithmIdentifier.getAlgorithm().getId();
+          if (!SecurityInfo.ID_EC_PUBLIC_KEY.equals(algOID)) {
+            throw new IllegalStateException("Was expecting id-ecPublicKey (" + SecurityInfo.ID_EC_PUBLIC_KEY_TYPE + "), found " + algOID);
+          }
+          ASN1Primitive derEncodedParams = algorithmIdentifier.getParameters().toASN1Primitive();
+          X9ECParameters params = null;
+          if (derEncodedParams instanceof ASN1ObjectIdentifier) {
+            ASN1ObjectIdentifier paramsOID = (ASN1ObjectIdentifier)derEncodedParams;
 
-          /* It's a named curve from X9.62. */
-          params = X962NamedCurves.getByOID(paramsOID);
-          if (params == null) {
-            throw new IllegalStateException("Could not find X9.62 named curve for OID " + paramsOID.getId());
+            /* It's a named curve from X9.62. */
+            params = X962NamedCurves.getByOID(paramsOID);
+            if (params == null) {
+              throw new IllegalStateException("Could not find X9.62 named curve for OID " + paramsOID.getId());
+            }
+
+            /* Reconstruct the parameters. */
+            org.bouncycastle.math.ec.ECPoint generator = params.getG();
+            org.bouncycastle.math.ec.ECCurve curve = generator.getCurve();
+            generator = curve.createPoint(generator.getX().toBigInteger(), generator.getY().toBigInteger(), false);
+            params = new X9ECParameters(params.getCurve(), generator, params.getN(), params.getH(), params.getSeed());
+          } else {
+            /* It's not a named curve, we can just return the decoded public key info. */
+            return subjectPublicKeyInfo;
           }
 
-          /* Reconstruct the parameters. */
-          org.bouncycastle.math.ec.ECPoint generator = params.getG();
-          org.bouncycastle.math.ec.ECCurve curve = generator.getCurve();
-          generator = curve.createPoint(generator.getX().toBigInteger(), generator.getY().toBigInteger(), false);
-          params = new X9ECParameters(params.getCurve(), generator, params.getN(), params.getH(), params.getSeed());
-        } else {
-          /* It's not a named curve, we can just return the decoded public key info. */
-          return subjectPublicKeyInfo;
-        }
-
-        if (publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
-          org.bouncycastle.jce.interfaces.ECPublicKey ecPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)publicKey;
-          AlgorithmIdentifier id = new AlgorithmIdentifier(subjectPublicKeyInfo.getAlgorithm().getAlgorithm(), params.toASN1Primitive());
-          org.bouncycastle.math.ec.ECPoint q = ecPublicKey.getQ();
-          /* FIXME: investigate the compressed versus uncompressed point issue. What is allowed in TR03110? -- MO */
-          // In case we would like to compress the point:
-          // p = p.getCurve().createPoint(p.getX().toBigInteger(), p.getY().toBigInteger(), true);
-          subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded());
-          return subjectPublicKeyInfo;
-        } else {
-          return subjectPublicKeyInfo;
+          if (publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
+            org.bouncycastle.jce.interfaces.ECPublicKey ecPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)publicKey;
+            AlgorithmIdentifier id = new AlgorithmIdentifier(subjectPublicKeyInfo.getAlgorithm().getAlgorithm(), params.toASN1Primitive());
+            org.bouncycastle.math.ec.ECPoint q = ecPublicKey.getQ();
+            /* FIXME: investigate the compressed versus uncompressed point issue. What is allowed in TR03110? -- MO */
+            // In case we would like to compress the point:
+            // p = p.getCurve().createPoint(p.getX().toBigInteger(), p.getY().toBigInteger(), true);
+            subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded());
+            return subjectPublicKeyInfo;
+          } else {
+            return subjectPublicKeyInfo;
+          }
+        } finally {
+          asn1In.close();
         }
       } else if ("DH".equals(algorithm) || (publicKey instanceof DHPublicKey)) {
         ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
@@ -1054,8 +1057,8 @@ public class Util {
   }
 
   public static ECPoint os2ECPoint(byte[] encodedECPoint) {
+    DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedECPoint));
     try {
-      DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedECPoint));
       int b = dataIn.read();
       if (b != 0x04) {
         throw new IllegalArgumentException("Expected encoded ECPoint to start with 0x04");
@@ -1071,6 +1074,12 @@ public class Util {
       return new ECPoint(x, y);
     } catch (IOException ioe) {
       throw new IllegalArgumentException("Exception", ioe);
+    } finally {
+      try {
+        dataIn.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
     }
   }
 
@@ -1109,17 +1118,20 @@ public class Util {
         return getPublicKey("EC", new ECPublicKeySpec(w, ecParams));
       } else if (params instanceof DHParameterSpec) {
         DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
-        int b = dataIn.read();
-        if (b != 0x04) {
-          throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); 
+        try {
+          int b = dataIn.read();
+          if (b != 0x04) {
+            throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); 
+          }
+          int length = encodedPublicKey.length - 1;
+          byte[] publicValue = new byte[length];
+          dataIn.readFully(publicValue);
+          BigInteger y = Util.os2i(publicValue);
+          DHParameterSpec dhParams = (DHParameterSpec)params;
+          return getPublicKey("DH",new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
+        } finally {
+          dataIn.close();
         }
-        int length = encodedPublicKey.length - 1;
-        byte[] publicValue = new byte[length];
-        dataIn.readFully(publicValue);
-        dataIn.close();
-        BigInteger y = Util.os2i(publicValue);
-        DHParameterSpec dhParams = (DHParameterSpec)params;
-        return getPublicKey("DH",new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG())); 
       }
 
       throw new IllegalArgumentException("Expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());

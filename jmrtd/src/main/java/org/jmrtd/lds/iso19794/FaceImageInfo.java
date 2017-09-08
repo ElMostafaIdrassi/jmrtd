@@ -299,7 +299,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     this.poseAngleUncertainty = new int[3];
     System.arraycopy(poseAngleUncertainty, 0, this.poseAngleUncertainty, 0, 3);
     this.imageDataType = imageDataType;
-    this.recordLength = 20 + 8 * featurePointCount + 12 + imageLength;
+    this.recordLength = 20L + 8 * featurePointCount + 12L + imageLength;
 
     this.faceImageType = faceImageType;
     this.colorSpace = colorSpace;
@@ -397,7 +397,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     ByteArrayOutputStream recordOut = new ByteArrayOutputStream();
     writeFacialRecordData(recordOut);
     byte[] facialRecordData = recordOut.toByteArray();
-    long faceImageBlockLength = facialRecordData.length + 4;		
+    long faceImageBlockLength = facialRecordData.length + 4L;		
     DataOutputStream dataOut = new DataOutputStream(outputStream);
     dataOut.writeInt((int)faceImageBlockLength);
     dataOut.write(facialRecordData);

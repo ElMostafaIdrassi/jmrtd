@@ -36,8 +36,8 @@ public class BACKey implements BACKeySpec {
 
   private static final long serialVersionUID = -1059774581180524710L;
 
-  private static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
-
+  private static final String SDF = "yyMMdd";
+  
   private String documentNumber;
   private String dateOfBirth;
   private String dateOfExpiry;
@@ -191,6 +191,6 @@ public class BACKey implements BACKeySpec {
   }
 
   private static synchronized String toString(Date date) {
-    return SDF.format(date);
+    return new SimpleDateFormat(SDF).format(date);
   }
 }

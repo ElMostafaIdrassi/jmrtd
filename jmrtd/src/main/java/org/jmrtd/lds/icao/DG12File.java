@@ -69,8 +69,8 @@ public class DG12File extends DataGroup {
       CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0, // 5F1A is always used inside A0 constructed object
       COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
 
-  private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
-  private static final SimpleDateFormat SDTF = new SimpleDateFormat("yyyyMMddhhmmss");
+  private static final String SDF = "yyyyMMdd";
+  private static final String SDTF = "yyyyMMddhhmmss";
 
   private String issuingAuthority;
   private String dateOfIssue;
@@ -104,10 +104,10 @@ public class DG12File extends DataGroup {
       String taxOrExitRequirements, byte[] imageOfFront,
       byte[] imageOfRear, Date dateAndTimeOfPersonalization,
       String personalizationSystemSerialNumber) {
-    this(issuingAuthority, SDF.format(dateOfIssue),
+    this(issuingAuthority, new SimpleDateFormat(SDF).format(dateOfIssue),
         namesOfOtherPersons,  endorsementsAndObservations,
         taxOrExitRequirements, imageOfFront,
-        imageOfRear, SDTF.format(dateAndTimeOfPersonalization),
+        imageOfRear, new SimpleDateFormat(SDTF).format(dateAndTimeOfPersonalization),
         personalizationSystemSerialNumber);
   }
 
@@ -344,7 +344,9 @@ public class DG12File extends DataGroup {
   }
 
   private synchronized void parseNameOfOtherPerson(byte[] value) {
-    if (namesOfOtherPersons == null) { namesOfOtherPersons = new ArrayList<String>(); }
+    if (namesOfOtherPersons == null) {
+      namesOfOtherPersons = new ArrayList<String>();
+    }
     try {
       String field = new String(value, "UTF-8");
       namesOfOtherPersons.add(field.trim());
@@ -547,7 +549,9 @@ public class DG12File extends DataGroup {
           tlvOut.writeValue(dateOfIssue.getBytes("UTF-8"));
           break;
         case NAME_OF_OTHER_PERSON_TAG:
-          if (namesOfOtherPersons == null) { namesOfOtherPersons = new ArrayList<String>(); }
+          if (namesOfOtherPersons == null) {
+            namesOfOtherPersons = new ArrayList<String>();
+          }
           tlvOut.writeTag(CONTENT_SPECIFIC_CONSTRUCTED_TAG);
           tlvOut.writeTag(COUNT_TAG);
           tlvOut.write(namesOfOtherPersons.size());

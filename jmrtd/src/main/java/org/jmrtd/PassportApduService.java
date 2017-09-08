@@ -327,7 +327,7 @@ public class PassportApduService extends CardService {
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte) 0x02, (byte) 0x0c, fiddle, 0);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
 
-    if( rapdu == null ) {
+    if ( rapdu == null ) {
       return;
     }
 
@@ -380,7 +380,9 @@ public class PassportApduService extends CardService {
       } else if (le < 256) {
         le += 3;
       }
-      if (le > 256) { le = 256; }
+      if (le > 256) {
+        le = 256;
+      }
     }
     byte offsetHi = (byte)((offset & 0xFF00) >> 8);
     byte offsetLo = (byte)(offset & 0xFF);
@@ -427,15 +429,19 @@ public class PassportApduService extends CardService {
     //		} while (retrySending);
 
     byte[] rapduBytes = rapdu == null ? null : rapdu.getData();
+
     //		short sw = (short)rapdu.getSW(); /* NOTE: Update the SW to the last resent APDU. */
     if (isExtendedLength && sw == ISO7816.SW_NO_ERROR) {
       /* Strip the response off the tag 0x53 and the length field. */
       byte[] data = rapduBytes;
+      if (data == null) {
+        throw new CardServiceException("Malformed read binary long response data");
+      }
       int index = 0;
-      if(data[index++] != (byte)0x53) {
+      if (data[index++] != (byte)0x53) { // FIXME: Constant for 0x53.
         throw new CardServiceException("Malformed read binary long response data", sw);
       }
-      if((byte)(data[index] & 0x80) == (byte)0x80) {
+      if ((byte)(data[index] & 0x80) == (byte)0x80) {
         index += (data[index] & 0xF);
       }
       index ++;
@@ -810,10 +816,13 @@ public class PassportApduService extends CardService {
     byte[] oidBytes = null;
     try {
       TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
-      oidTLVIn.readTag(); /* Should be 0x06 */
-      oidTLVIn.readLength();
-      oidBytes = oidTLVIn.readValue();
-      oidTLVIn.close();
+      try {
+        oidTLVIn.readTag(); /* Should be 0x06 */
+        oidTLVIn.readLength();
+        oidBytes = oidTLVIn.readValue();
+      } finally {
+        oidTLVIn.close();
+      }
       return Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
     } catch (IOException ioe) {
       throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
@@ -919,7 +928,9 @@ public class PassportApduService extends CardService {
    * @param l a listener
    */
   public void addPlainTextAPDUListener(APDUListener l) {
-    if (plainTextAPDUListeners != null) { plainTextAPDUListeners.add(l); }
+    if (plainTextAPDUListeners != null) {
+      plainTextAPDUListeners.add(l);
+    }
   }
 
   /**
@@ -928,7 +939,9 @@ public class PassportApduService extends CardService {
    * @param l a listener
    */
   public void removePlainTextAPDUListener(APDUListener l) {
-    if (plainTextAPDUListeners != null) { plainTextAPDUListeners.remove(l); }
+    if (plainTextAPDUListeners != null) {
+      plainTextAPDUListeners.remove(l);
+    }
   }
 
   /**
@@ -942,7 +955,7 @@ public class PassportApduService extends CardService {
     if (plainTextAPDUListeners == null || plainTextAPDUListeners.size() < 1) {
       return;
     }
-    
+
     APDUEvent event = new APDUEvent(this, "PLAINTEXT", count, capdu, rapdu);
     for (APDUListener listener: plainTextAPDUListeners) {
       listener.exchangedAPDU(event);

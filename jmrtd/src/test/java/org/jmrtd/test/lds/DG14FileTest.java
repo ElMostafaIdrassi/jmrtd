@@ -388,7 +388,7 @@ public class DG14FileTest extends TestCase {
    *       - curve parameter 0 <= a < p
    *       - curve parameter 0 <= b < p
    *       - 4*a^3 + 27*b^2 != 0
-   *       - base point G is on the curve, with both coordinates in range 0 ... p � 1 
+   *       - base point G is on the curve, with both coordinates in range 0 ... p - 1 
    *       - Cofactor f > 0 
    *       - order r of base point r > 0 , r != p 
    *       - r * f <= 2p 

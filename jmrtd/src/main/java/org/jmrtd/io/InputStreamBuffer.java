@@ -39,7 +39,7 @@ import org.jmrtd.io.FragmentBuffer.Fragment;
 public class InputStreamBuffer {
 
   private PositionInputStream carrier;
-  public FragmentBuffer buffer;
+  private FragmentBuffer buffer;
 
   /**
    * Creates an input stream buffer.
@@ -271,7 +271,7 @@ public class InputStreamBuffer {
       carrier.reset();
       int bytesSkipped = 0;
       while (bytesSkipped < position) {
-        bytesSkipped += carrier.skip(position - bytesSkipped);
+        bytesSkipped += carrier.skip((long)position - bytesSkipped);
       }
     }
   }

@@ -199,7 +199,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       bOut.reset();
       bOut.write(hasDO85 ? (byte)0x85 : (byte)0x87);
       bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
-      if (!hasDO85) { bOut.write(0x01); };
+      if (!hasDO85) {
+        bOut.write(0x01);
+      };
       bOut.write(ciphertext);
       do8587 = bOut.toByteArray();
     }
@@ -259,19 +261,23 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       }
       ssc++;
       cipher.init(Cipher.DECRYPT_MODE, ksEnc, getIV(ssc));
-      DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
+      byte[] cc = null;
       byte[] data = new byte[0];
       short sw = 0;
-      boolean finished = false;
-      byte[] cc = null;
-      while (!finished) {
-        int tag = inputStream.readByte();
-        switch (tag) {
-          case (byte) 0x87: data = readDO87(inputStream, false); break;
-          case (byte) 0x85: data = readDO87(inputStream, true); break;
-          case (byte) 0x99: sw = readDO99(inputStream); break;
-          case (byte) 0x8E: cc = readDO8E(inputStream); finished = true; break;
+      DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(rapdu));
+      try {
+        boolean finished = false;
+        while (!finished) {
+          int tag = inputStream.readByte();
+          switch (tag) {
+            case (byte) 0x87: data = readDO87(inputStream, false); break;
+            case (byte) 0x85: data = readDO87(inputStream, true); break;
+            case (byte) 0x99: sw = readDO99(inputStream); break;
+            case (byte) 0x8E: cc = readDO8E(inputStream); finished = true; break;
+          }
         }
+      } finally {
+        inputStream.close();
       }
       if (!checkMac(rapdu, cc)) {
         throw new IllegalStateException("Invalid MAC");
@@ -305,7 +311,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     if ((buf & 0x00000080) != 0x00000080) {
       /* Short form */
       length = buf;
-      if(!do85) {
+      if (!do85) {
         buf = inputStream.readUnsignedByte(); /* should be 0x01... */
         if (buf != 0x01) {
           throw new IllegalStateException("DO'87 expected 0x01 marker, found " + Integer.toHexString(buf & 0xFF));
@@ -317,14 +323,14 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       for (int i = 0; i < lengthBytesCount; i++) {
         length = (length << 8) | inputStream.readUnsignedByte();
       }
-      if(!do85) {
+      if (!do85) {
         buf = inputStream.readUnsignedByte(); /* should be 0x01... */
         if (buf != 0x01) {
           throw new IllegalStateException("DO'87 expected 0x01 marker");
         }
       }
     }
-    if(!do85) {
+    if (!do85) {
       length--; /* takes care of the extra 0x01 marker... */
     }
     /* Read, decrypt, unpad the data... */

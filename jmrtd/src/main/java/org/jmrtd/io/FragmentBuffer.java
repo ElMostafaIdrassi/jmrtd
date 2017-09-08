@@ -189,13 +189,15 @@ public class FragmentBuffer implements Serializable {
     if (index >= buffer.length) {
       return 0;
     }
-    
+
     for (Fragment fragment: fragments) {
       int left = fragment.getOffset();
       int right = fragment.getOffset() + fragment.getLength();
       if (left <= index && index < right) {
         int newResult = right - index;
-        if (newResult > result) { result = newResult; }
+        if (newResult > result) {
+          result = newResult;
+        }
       }
     }
     return result;
@@ -209,8 +211,10 @@ public class FragmentBuffer implements Serializable {
     return buffer;
   }
 
-  public int getLength() {
-    return buffer.length;
+  public  int getLength() {
+    synchronized(this) {
+      return buffer.length;
+    }
   }
 
   /**
@@ -296,7 +300,7 @@ public class FragmentBuffer implements Serializable {
     if (otherBuffer.fragments != null && this.fragments == null) {
       return false;
     }
-    
+
     return Arrays.equals(otherBuffer.buffer, this.buffer) && otherBuffer.fragments.equals(this.fragments);
   }
 
@@ -305,14 +309,16 @@ public class FragmentBuffer implements Serializable {
     return 3 * Arrays.hashCode(buffer) + 2 * fragments.hashCode() + 7;
   }
 
-  private synchronized void setLength(int length) {
-    if (length <= buffer.length) {
-      return;
+  private void setLength(int length) {
+    synchronized(this) {
+      if (length <= buffer.length) {
+        return;
+      }
+
+      byte[] newBuffer = new byte[length];
+      System.arraycopy(this.buffer, 0, newBuffer, 0, this.buffer.length);
+      this.buffer = newBuffer;
     }
-    
-    byte[] newBuffer = new byte[length];
-    System.arraycopy(this.buffer, 0, newBuffer, 0, this.buffer.length);
-    this.buffer = newBuffer;
   }
 
   /**
@@ -355,7 +361,7 @@ public class FragmentBuffer implements Serializable {
       if (!otherObject.getClass().equals(Fragment.class)) {
         return false;
       }
-      
+
       Fragment otherFragment = (Fragment)otherObject;
       return otherFragment.offset == offset && otherFragment.length == length;
     }

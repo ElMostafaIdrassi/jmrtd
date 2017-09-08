@@ -960,7 +960,9 @@ public class MRZInfo extends AbstractLDSInfo {
   private static String trimFillerChars(String str) {
     byte[] chars = str.trim().getBytes();
     for (int i = 0; i < chars.length; i++) {
-      if (chars[i] == '<') { chars[i] = ' '; }
+      if (chars[i] == '<') {
+        chars[i] = ' ';
+      }
     }
     return (new String(chars)).trim();
   }
@@ -1023,7 +1025,7 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   private static char checkDigit(String str, boolean preferFillerOverZero) {
     try {
-      byte[] chars = str == null ? new byte[]{ } : str.getBytes("UTF-8");
+      byte[] chars = str == null ? new byte[] { } : str.getBytes("UTF-8");
       int[] weights = { 7, 3, 1 };
       int result = 0;
       for (int i = 0; i < chars.length; i++) {
@@ -1034,7 +1036,9 @@ public class MRZInfo extends AbstractLDSInfo {
         throw new IllegalStateException("Error in computing check digit."); /* NOTE: Never happens. */
       }
       char checkDigit = (char)checkDigitString.getBytes("UTF-8")[0];
-      if (preferFillerOverZero && checkDigit == '0') { checkDigit = '<'; }
+      if (preferFillerOverZero && checkDigit == '0') {
+        checkDigit = '<';
+      }
       return checkDigit;
     } catch (NumberFormatException nfe) {
       /* NOTE: never happens. */

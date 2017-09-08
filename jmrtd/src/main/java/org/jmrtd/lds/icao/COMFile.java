@@ -301,7 +301,9 @@ public class COMFile extends AbstractTaggedLDSFile {
     int dgCount = tagList.size();
     for (int tag: tagList) {
       result.append("DG" + LDSFileUtil.lookupDataGroupNumberByTag(tag));
-      if (i < dgCount - 1) { result.append(", "); }
+      if (i < dgCount - 1) {
+        result.append(", ");
+      }
       i++;
     }
     result.append("]");

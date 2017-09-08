@@ -94,11 +94,15 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   protected void writeObject(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     int ourTag = getTag();
-    if (tag != ourTag) { tag = ourTag; }
+    if (tag != ourTag) {
+      tag = ourTag;
+    }
     tlvOut.writeTag(ourTag);
     byte[] value = getContent();
-    int ourLength = value.length;
-    if (length != ourLength) { length = ourLength; }
+    int ourLength = value == null ? 0 : value.length;
+    if (length != ourLength) {
+      length = ourLength;
+    }
     tlvOut.writeValue(value);
   }
 
@@ -148,15 +152,19 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
    * @return the value as byte array
    */
   private byte[] getContent() {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try {
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       writeContent(outputStream);
       outputStream.flush();
-      outputStream.close();
       return outputStream.toByteArray();
     } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Exception", ioe);
-      return null;
+      throw new IllegalStateException("Could not get DG content", ioe);
+    } finally {
+      try {
+        outputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
     }
   }
 

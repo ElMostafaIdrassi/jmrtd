@@ -75,7 +75,9 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
    */
   public DisplayedImageDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
     super(dataGroupTag, inputStream);
-    if (this.imageInfos == null) { this.imageInfos = new ArrayList<DisplayedImageInfo>(); }
+    if (this.imageInfos == null) {
+      this.imageInfos = new ArrayList<DisplayedImageInfo>();
+    }
     checkTypesConsistentWithTag();
   }
 
@@ -119,9 +121,12 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     if (imageInfos == null) {
       throw new IllegalStateException("imageInfos cannot be null");	
     }
-    // result.append("size: " + imageInfos.size());
     for (DisplayedImageInfo info: imageInfos) {
-      if (isFirst) { isFirst = false; } else { result.append(", "); }
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        result.append(", ");
+      }
       result.append(info.toString());
     }
     result.append("]");

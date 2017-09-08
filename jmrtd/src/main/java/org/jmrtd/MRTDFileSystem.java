@@ -88,7 +88,7 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
    */
   public synchronized FileInfo[] getSelectedPath() throws CardServiceException {
     MRTDFileInfo fileInfo = getFileInfo();
-    if(fileInfo == null) {
+    if (fileInfo == null) {
       return null;
     } else {
       return new MRTDFileInfo[] { fileInfo };
@@ -110,7 +110,7 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
     if (selectedFID == fid) {
       return;
     }
-    
+
     selectedFID = fid;
     isSelected = false;
   }
@@ -129,7 +129,7 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
       if (selectedFID <= 0) {
         throw new CardServiceException("No file selected");
       }
-      
+
       boolean isExtendedLength = (offset > 0x7FFF);
       if (!isSelected) {
         service.sendSelectFile(selectedFID);

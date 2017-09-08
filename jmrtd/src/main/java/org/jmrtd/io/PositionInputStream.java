@@ -53,7 +53,9 @@ public class PositionInputStream extends InputStream {
   @Override
   public int read() throws IOException {
     int b = carrier.read();
-    if (b >= 0) { position++; }
+    if (b >= 0) {
+      position++;
+    }
     return b;
   }
 

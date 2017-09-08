@@ -95,7 +95,7 @@ public class DG11File extends DataGroup {
   CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0, // 5F0F is always used inside A0 constructed object
   COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
 
-  private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
+  private static final String SDF = "yyyyMMdd";
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -141,7 +141,7 @@ public class DG11File extends DataGroup {
       List<String> otherValidTDNumbers, String custodyInformation) {
     this(nameOfHolder,
         otherNames, personalNumber,
-        SDF.format(fullDateOfBirth), placeOfBirth, permanentAddress,
+        new SimpleDateFormat(SDF).format(fullDateOfBirth), placeOfBirth, permanentAddress,
         telephone, profession, title,
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
@@ -429,7 +429,9 @@ public class DG11File extends DataGroup {
   }
 
   private synchronized void parseOtherName(byte[] value) {
-    if (otherNames == null) { otherNames = new ArrayList<String>(); }
+    if (otherNames == null) {
+      otherNames = new ArrayList<String>();
+    }
     try {
       String field = new String(value, "UTF-8");
       otherNames.add(field.trim());
@@ -698,7 +700,9 @@ public class DG11File extends DataGroup {
           tlvOut.writeValue(nameOfHolder.trim().getBytes("UTF-8"));
           break;
         case OTHER_NAME_TAG:
-          if (otherNames == null) { otherNames = new ArrayList<String>(); }
+          if (otherNames == null) {
+            otherNames = new ArrayList<String>();
+          }
           tlvOut.writeTag(CONTENT_SPECIFIC_CONSTRUCTED_TAG);
           tlvOut.writeTag(COUNT_TAG);
           tlvOut.write(otherNames.size());
@@ -728,7 +732,11 @@ public class DG11File extends DataGroup {
           boolean isFirstOne = true;
           for (String detail: placeOfBirth) {
             if (detail != null) {
-              if (isFirstOne) { isFirstOne = false; } else { tlvOut.write('<'); }
+              if (isFirstOne) {
+                isFirstOne = false;
+              } else {
+                tlvOut.write('<');
+              }
               tlvOut.write(detail.trim().getBytes("UTF-8"));
             }
           }
@@ -739,7 +747,11 @@ public class DG11File extends DataGroup {
           isFirstOne = true;
           for (String detail: permanentAddress) {
             if (detail != null) {
-              if (isFirstOne) { isFirstOne = false; } else { tlvOut.write('<'); }
+              if (isFirstOne) {
+                isFirstOne = false;
+              } else {
+                tlvOut.write('<');
+              }
               tlvOut.write(detail.trim().getBytes("UTF-8"));
             }
           }
@@ -770,7 +782,11 @@ public class DG11File extends DataGroup {
           isFirstOne = true;
           for (String detail: otherValidTDNumbers) {
             if (detail != null) {
-              if (isFirstOne) { isFirstOne = false; } else { tlvOut.write('<'); }
+              if (isFirstOne) {
+                isFirstOne = false;
+              } else {
+                tlvOut.write('<');
+              }
               tlvOut.write(detail.trim().replace(' ', '<').getBytes("UTF-8"));
             }
           }
