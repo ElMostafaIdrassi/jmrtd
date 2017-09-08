@@ -65,7 +65,9 @@ public class BACKey implements BACKeySpec {
     if (dateOfExpiry == null || dateOfExpiry.length() != 6) {
       throw new IllegalArgumentException("Illegal date: " + dateOfExpiry);
     }
-    while (documentNumber.length() < 9) { documentNumber += "<"; }
+    while (documentNumber.length() < 9) {
+      documentNumber += "<";
+    }
     this.documentNumber = documentNumber.trim();
     this.dateOfBirth = dateOfBirth;
     this.dateOfExpiry = dateOfExpiry;
@@ -142,9 +144,15 @@ public class BACKey implements BACKeySpec {
    * @return whether this BAC key equals another object
    */
   public boolean equals(Object o) {
-    if (o == null) { return false; }
-    if (!o.getClass().equals(this.getClass())) { return false; }
-    if (o == this) { return true; }
+    if (o == null) {
+      return false;
+    }
+    if (!o.getClass().equals(this.getClass())) {
+      return false;
+    }
+    if (o == this) {
+      return true;
+    }
     BACKey previous = (BACKey)o;
     return documentNumber.equals(previous.documentNumber) &&
         dateOfBirth.equals(previous.dateOfBirth) &&

@@ -73,7 +73,9 @@ public class DG14File extends DataGroup {
    */
   public DG14File(Collection<SecurityInfo> securityInfos) {
     super(EF_DG14_TAG);
-    if (securityInfos == null) { throw new IllegalArgumentException("Null securityInfos"); }
+    if (securityInfos == null) {
+      throw new IllegalArgumentException("Null securityInfos");
+    }
     this.securityInfos = new HashSet<SecurityInfo>(securityInfos);
   }
 

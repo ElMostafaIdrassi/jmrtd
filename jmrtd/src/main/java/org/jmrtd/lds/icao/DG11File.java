@@ -201,7 +201,9 @@ public class DG11File extends DataGroup {
   protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tagListTag = tlvInputStream.readTag();
-    if (tagListTag != TAG_LIST_TAG) { throw new IllegalArgumentException("Expected tag list in DG11"); }
+    if (tagListTag != TAG_LIST_TAG) {
+      throw new IllegalArgumentException("Expected tag list in DG11");
+    }
 
     int tagListLength = tlvInputStream.readLength();
     int tagListBytesRead = 0;
@@ -231,38 +233,75 @@ public class DG11File extends DataGroup {
     if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
       /* int contentSpecificLength = */ tlvIn.readLength();
       int countTag = tlvIn.readTag();
-      if (countTag != COUNT_TAG) { throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag)); }
+      if (countTag != COUNT_TAG) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
+      }
       int countLength = tlvIn.readLength();
-      if (countLength != 1) { throw new IllegalArgumentException("Expected length 1 count length, found " + countLength); }
+      if (countLength != 1) {
+        throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
+      }
       byte[] countValue = tlvIn.readValue();
-      if (countValue == null || countValue.length != 1) { throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue)); }
+      if (countValue == null || countValue.length != 1) {
+        throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
+      }
       int count = countValue[0] & 0xFF;
       for (int i = 0; i < count; i++) {
         tag = tlvIn.readTag();
-        if (tag != OTHER_NAME_TAG) { throw new IllegalArgumentException("Expected " + Integer.toHexString(OTHER_NAME_TAG) + ", found " + Integer.toHexString(tag)); }
+        if (tag != OTHER_NAME_TAG) {
+          throw new IllegalArgumentException("Expected " + Integer.toHexString(OTHER_NAME_TAG) + ", found " + Integer.toHexString(tag));
+        }
         /* int otherNameLength = */ tlvIn.readLength();
         byte[] value = tlvIn.readValue();
         parseOtherName(value);
       }
     } else {
-      if (tag != fieldTag) { throw new IllegalArgumentException("Expected " + Integer.toHexString(fieldTag) + ", but found " + Integer.toHexString(tag)); }
+      if (tag != fieldTag) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(fieldTag) + ", but found " + Integer.toHexString(tag));
+      }
       tlvIn.readLength();
       byte[] value = tlvIn.readValue();
       switch (tag) {
-        case FULL_NAME_TAG: parseNameOfHolder(value); break;
-        case OTHER_NAME_TAG: parseOtherName(value); break;
-        case PERSONAL_NUMBER_TAG: parsePersonalNumber(value); break;
-        case FULL_DATE_OF_BIRTH_TAG: parseFullDateOfBirth(value); break;
-        case PLACE_OF_BIRTH_TAG: parsePlaceOfBirth(value); break;
-        case PERMANENT_ADDRESS_TAG:  parsePermanentAddress(value); break;
-        case TELEPHONE_TAG: parseTelephone(value); break;
-        case PROFESSION_TAG: parseProfession(value); break;
-        case TITLE_TAG: parseTitle(value); break;
-        case PERSONAL_SUMMARY_TAG: parsePersonalSummary(value); break;
-        case PROOF_OF_CITIZENSHIP_TAG: parseProofOfCitizenShip(value); break;
-        case OTHER_VALID_TD_NUMBERS_TAG: parseOtherValidTDNumbers(value); break;
-        case CUSTODY_INFORMATION_TAG: parseCustodyInformation(value); break;
-        default: throw new IllegalArgumentException("Unknown field tag in DG11: " + Integer.toHexString(tag));
+        case FULL_NAME_TAG:
+          parseNameOfHolder(value);
+          break;
+        case OTHER_NAME_TAG:
+          parseOtherName(value);
+          break;
+        case PERSONAL_NUMBER_TAG:
+          parsePersonalNumber(value);
+          break;
+        case FULL_DATE_OF_BIRTH_TAG:
+          parseFullDateOfBirth(value);
+          break;
+        case PLACE_OF_BIRTH_TAG:
+          parsePlaceOfBirth(value);
+          break;
+        case PERMANENT_ADDRESS_TAG: 
+          parsePermanentAddress(value);
+          break;
+        case TELEPHONE_TAG:
+          parseTelephone(value);
+          break;
+        case PROFESSION_TAG:
+          parseProfession(value);
+          break;
+        case TITLE_TAG:
+          parseTitle(value);
+          break;
+        case PERSONAL_SUMMARY_TAG:
+          parsePersonalSummary(value);
+          break;
+        case PROOF_OF_CITIZENSHIP_TAG:
+          parseProofOfCitizenShip(value);
+          break;
+        case OTHER_VALID_TD_NUMBERS_TAG:
+          parseOtherValidTDNumbers(value);
+          break;
+        case CUSTODY_INFORMATION_TAG:
+          parseCustodyInformation(value);
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown field tag in DG11: " + Integer.toHexString(tag));
       }
     }
   }
@@ -432,7 +471,9 @@ public class DG11File extends DataGroup {
    * @return list of tags
    */
   public List<Integer> getTagPresenceList() {
-    if (tagPresenceList != null) { return tagPresenceList; }
+    if (tagPresenceList != null) {
+      return tagPresenceList;
+    }
     tagPresenceList = new ArrayList<Integer>(12);
     if (nameOfHolder != null) {
       tagPresenceList.add(FULL_NAME_TAG);

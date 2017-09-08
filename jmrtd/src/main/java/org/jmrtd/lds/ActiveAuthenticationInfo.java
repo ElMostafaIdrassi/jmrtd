@@ -204,12 +204,25 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    * @throws NoSuchAlgorithmException if the OID was not recognized
    */
   public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {		
-    if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "SHA1withECDSA"; }
-    if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "SHA224withECDSA"; }
-    if (ECDSA_PLAIN_SHA256_OID.equals(oid)) { return "SHA256withECDSA"; }
-    if (ECDSA_PLAIN_SHA384_OID.equals(oid)) { return "SHA384withECDSA"; }
-    if (ECDSA_PLAIN_SHA512_OID.equals(oid)) { return "SHA512withECDSA"; }
-    if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) { return "RIPEMD160withECDSA"; }
+    if (ECDSA_PLAIN_SHA1_OID.equals(oid)) {
+      return "SHA1withECDSA";
+    }
+    if (ECDSA_PLAIN_SHA224_OID.equals(oid)) {
+      return "SHA224withECDSA";
+    }
+    if (ECDSA_PLAIN_SHA256_OID.equals(oid)) {
+      return "SHA256withECDSA";
+    }
+    if (ECDSA_PLAIN_SHA384_OID.equals(oid)) {
+      return "SHA384withECDSA";
+    }
+    if (ECDSA_PLAIN_SHA512_OID.equals(oid)) {
+      return "SHA512withECDSA";
+    }
+    if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) {
+      return "RIPEMD160withECDSA";
+    }
+    
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 
@@ -232,8 +245,13 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    */
   private void checkFields() {
     try {
-      if (!checkRequiredIdentifier(oid)) { throw new IllegalArgumentException("Wrong identifier: " + oid); }
-      if (version != VERSION_1) { throw new IllegalArgumentException("Wrong version: " + version); }
+      if (!checkRequiredIdentifier(oid)) {
+        throw new IllegalArgumentException("Wrong identifier: " + oid);
+      }
+      if (version != VERSION_1) {
+        throw new IllegalArgumentException("Wrong version: " + version);
+      }
+      
       /* FIXME check to see if signatureAlgorithmOID is valid. */
 
       if (!ECDSA_PLAIN_SHA1_OID.equals(signatureAlgorithmOID)
@@ -258,12 +276,25 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   public static String toSignatureAlgorithmOIDString(String oid) {
-    if (ECDSA_PLAIN_SHA1_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }    
-    if (ECDSA_PLAIN_SHA224_OID.equals(oid)) { return "ecdsa-plain-SHA224"; }
-    if (ECDSA_PLAIN_SHA256_OID.equals(oid)) { return "ecdsa-plain-SHA256"; }
-    if (ECDSA_PLAIN_SHA384_OID.equals(oid)) { return "ecdsa-plain-SHA384"; }
-    if (ECDSA_PLAIN_SHA512_OID.equals(oid)) { return "ecdsa-plain-SHA512"; }
-    if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) { return "ecdsa-plain-RIPEMD160"; }
+    if (ECDSA_PLAIN_SHA1_OID.equals(oid)) {
+      return "ecdsa-plain-SHA224";
+    }    
+    if (ECDSA_PLAIN_SHA224_OID.equals(oid)) {
+      return "ecdsa-plain-SHA224";
+    }
+    if (ECDSA_PLAIN_SHA256_OID.equals(oid)) {
+      return "ecdsa-plain-SHA256";
+    }
+    if (ECDSA_PLAIN_SHA384_OID.equals(oid)) {
+      return "ecdsa-plain-SHA384";
+    }
+    if (ECDSA_PLAIN_SHA512_OID.equals(oid)) {
+      return "ecdsa-plain-SHA512";
+    }
+    if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) {
+      return "ecdsa-plain-RIPEMD160";
+    }
+    
     return oid;
   }
 }

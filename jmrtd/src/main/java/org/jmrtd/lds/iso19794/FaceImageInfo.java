@@ -54,21 +54,66 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /** Eye color code based on Section 5.5.4 of ISO 19794-5. */
   public enum EyeColor {
-    UNSPECIFIED { public int toInt() { return EYE_COLOR_UNSPECIFIED; } },
-    BLACK { public int toInt() { return EYE_COLOR_BLACK; } },
-    BLUE { public int toInt() { return EYE_COLOR_BLUE; } },
-    BROWN{ public int toInt() { return EYE_COLOR_BROWN; } },
-    GRAY{ public int toInt() { return EYE_COLOR_GRAY; } },
-    GREEN { public int toInt() { return EYE_COLOR_GREEN; } },
-    MULTI_COLORED { public int toInt() { return EYE_COLOR_MULTI_COLORED; } },
-    PINK { public int toInt() { return EYE_COLOR_PINK; } },
-    UNKNOWN { public int toInt() { return EYE_COLOR_UNKNOWN; } };
+    UNSPECIFIED {
+
+      public int toInt() {
+        return EYE_COLOR_UNSPECIFIED;
+      }
+    },
+    BLACK {
+
+      public int toInt() {
+        return EYE_COLOR_BLACK;
+      }
+    },
+    BLUE {
+
+      public int toInt() {
+        return EYE_COLOR_BLUE;
+      }
+    },
+    BROWN {
+
+      public int toInt() {
+        return EYE_COLOR_BROWN;
+      }
+    },
+    GRAY {
+
+      public int toInt() {
+        return EYE_COLOR_GRAY;
+      }
+    },
+    GREEN {
+
+      public int toInt() {
+        return EYE_COLOR_GREEN;
+      }
+    },
+    MULTI_COLORED {
+
+      public int toInt() {
+        return EYE_COLOR_MULTI_COLORED;
+      }
+    },
+    PINK {
+
+      public int toInt() {
+        return EYE_COLOR_PINK;
+      }
+    },
+    UNKNOWN {
+
+      public int toInt() {
+        return EYE_COLOR_UNKNOWN;
+      }
+    };
 
     public abstract int toInt();
 
     static EyeColor toEyeColor(int i) {
-      for(EyeColor c: EyeColor.values()) {
-        if(c.toInt() == i) {
+      for (EyeColor c : EyeColor.values()) {
+        if (c.toInt() == i) {
           return c;
         }
       }
@@ -76,19 +121,31 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
-  public static final int
-  EYE_COLOR_UNSPECIFIED = 0x00,
-  EYE_COLOR_BLACK = 0x01,
-  EYE_COLOR_BLUE = 0x02,
-  EYE_COLOR_BROWN = 0x03,
-  EYE_COLOR_GRAY = 0x04,
-  EYE_COLOR_GREEN = 0x05,
-  EYE_COLOR_MULTI_COLORED = 0x06,
-  EYE_COLOR_PINK = 0x07,
-  EYE_COLOR_UNKNOWN = 0x08;
+  public static final int EYE_COLOR_UNSPECIFIED = 0x00;
+  public static final int EYE_COLOR_BLACK = 0x01;
+  public static final int EYE_COLOR_BLUE = 0x02;
+  public static final int EYE_COLOR_BROWN = 0x03;
+  public static final int EYE_COLOR_GRAY = 0x04;
+  public static final int EYE_COLOR_GREEN = 0x05;
+  public static final int EYE_COLOR_MULTI_COLORED = 0x06;
+  public static final int EYE_COLOR_PINK = 0x07;
+  public static final int EYE_COLOR_UNKNOWN = 0x08;
 
   /** Hair color code based on Section 5.5.5 of ISO 19794-5. */
-  public enum HairColor { UNSPECIFIED, BALD, BLACK, BLONDE, BROWN, GRAY, WHITE, RED, GREEN, BLUE, UNKNOWN };
+  public enum HairColor {
+    UNSPECIFIED,
+    BALD,
+    BLACK,
+    BLONDE,
+    BROWN,
+    GRAY,
+    WHITE,
+    RED,
+    GREEN,
+    BLUE,
+    UNKNOWN
+  };
+
   public static final int
   HAIR_COLOR_UNSPECIFIED = 0x00,
   HAIR_COLOR_BALD = 0x01,
@@ -221,7 +278,9 @@ public class FaceImageInfo extends AbstractImageInfo {
       int width, int height,
       InputStream imageInputStream, int imageLength, int imageDataType) throws IOException {
     super(TYPE_PORTRAIT, width, height, imageInputStream, imageLength, toMimeType(imageDataType));
-    if (imageInputStream == null) { throw new IllegalArgumentException("Null image"); }
+    if (imageInputStream == null) {
+      throw new IllegalArgumentException("Null image");
+    }
     this.gender = gender == null ? Gender.UNSPECIFIED : gender;
     this.eyeColor = eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor;
     this.featureMask = featureMask;
@@ -593,7 +652,9 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   private String featureMaskToString() {
-    if ((featureMask & FEATURE_FEATURES_ARE_SPECIFIED_FLAG) == 0) { return ""; }
+    if ((featureMask & FEATURE_FEATURES_ARE_SPECIFIED_FLAG) == 0) {
+      return "";
+    }
     Collection<String> features = new ArrayList<String>();
     if ((featureMask & FEATURE_GLASSES_FLAG) != 0) {
       features.add("glasses");

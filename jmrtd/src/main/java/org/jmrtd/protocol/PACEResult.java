@@ -30,7 +30,6 @@ import java.security.spec.ECPoint;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
-import org.jmrtd.PACEKeySpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 /**

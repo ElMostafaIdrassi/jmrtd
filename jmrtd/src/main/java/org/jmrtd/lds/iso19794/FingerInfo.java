@@ -290,10 +290,14 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     DataInputStream dataIn = (inputStream instanceof DataInputStream) ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     int fir0 = dataIn.readInt(); /* header (e.g. "FIR", 0x00) (4) */
-    if (fir0 != FORMAT_IDENTIFIER) { throw new IllegalArgumentException("'FIR' marker expected! Found " + Integer.toHexString(fir0)); }
+    if (fir0 != FORMAT_IDENTIFIER) {
+      throw new IllegalArgumentException("'FIR' marker expected! Found " + Integer.toHexString(fir0));
+    }
 
     int version = dataIn.readInt(); /* version in ASCII (e.g. "010" 0x00) (4) */
-    if (version != VERSION_NUMBER) { throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version)); }
+    if (version != VERSION_NUMBER) {
+      throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version));
+    }
 
     long recordLength = readUnsignedLong(dataIn, 6); // & 0xFFFFFFFFFFFFL;
     captureDeviceId = dataIn.readUnsignedShort(); /* all zeros means 'unreported', only lower 12-bits used, see 7.1.4 ISO/IEC 19794-4. */
@@ -415,7 +419,9 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * 
    * @return the embedded finger image infos
    */
-  public List<FingerImageInfo> getFingerImageInfos() { return getSubRecords(); }
+  public List<FingerImageInfo> getFingerImageInfos() {
+    return getSubRecords();
+  }
 
   /**
    * Adds a finger image info to this finger info.
@@ -446,7 +452,10 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   }
 
   private static void writeLong(long value, OutputStream out, int byteCount) throws IOException {
-    if (byteCount <= 0) { return; }
+    if (byteCount <= 0) {
+      return;
+    }
+    
     for (int i = 0; i < (byteCount - 8); i++) {
       out.write(0);
     }
@@ -485,10 +494,19 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   }
 
   static int fromMimeType(String mimeType) {
-    if ("image/x-wsq".equals(mimeType)) { return FingerInfo.COMPRESSION_WSQ; }
-    if ("image/jpeg".equals(mimeType)) { return FingerInfo.COMPRESSION_JPEG; }
-    if ("image/jpeg2000".equals(mimeType)) { return FingerInfo.COMPRESSION_JPEG2000; }
-    if ("images/png".equals(mimeType)) { return FingerInfo.COMPRESSION_PNG; }
+    if ("image/x-wsq".equals(mimeType)) {
+      return FingerInfo.COMPRESSION_WSQ;
+    }
+    if ("image/jpeg".equals(mimeType)) {
+      return FingerInfo.COMPRESSION_JPEG;
+    }
+    if ("image/jpeg2000".equals(mimeType)) {
+      return FingerInfo.COMPRESSION_JPEG2000;
+    }
+    if ("images/png".equals(mimeType)) {
+      return FingerInfo.COMPRESSION_PNG;
+    }
+    
     throw new IllegalArgumentException("Did not recognize mimeType");
   }
 

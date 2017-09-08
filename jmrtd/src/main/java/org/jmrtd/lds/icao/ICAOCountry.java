@@ -22,6 +22,9 @@
 
 package org.jmrtd.lds.icao;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.scuba.data.Country;
 
 /**
@@ -34,6 +37,8 @@ import net.sf.scuba.data.Country;
  */
 public class ICAOCountry extends Country {
 
+  private static final Logger LOGGER = Logger.getLogger("nl.innovalor");
+  
   public static final ICAOCountry
   DE = new ICAOCountry("DE", "D<<", "Germany", "German"),
   GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen"),
@@ -73,12 +78,15 @@ public class ICAOCountry extends Country {
    */
   public static Country getInstance(String alpha3Code) {
     for (ICAOCountry country: VALUES) {
-      if (country.alpha3Code.equals(alpha3Code)) { return country; }
+      if (country.alpha3Code.equals(alpha3Code)) {
+        return country;
+      }
     }
     try {
       return Country.getInstance(alpha3Code);
     } catch (Exception e) {
       /* NOTE: ignore this exception if it's not a legal 3 digit code. */
+      LOGGER.log(Level.FINE, "Unknown country", e);
     }
     throw new IllegalArgumentException("Illegal ICAO country alpha 3 code " + alpha3Code);
   }

@@ -389,10 +389,17 @@ public class CardVerifiableCertificate extends Certificate {
    * @return whether this certificate equals the other object
    */
   public boolean equals(Object otherObj) {
-    if (otherObj == null) { return false; }
-    if (this == otherObj) { return true; }
-    if (!this.getClass().equals(otherObj.getClass())) { return false; }
-    return this.cvCertificate.equals(((CardVerifiableCertificate)otherObj).cvCertificate);
+    if (otherObj == null) {
+      return false;
+    }
+    if (this == otherObj) {
+      return true;
+    }
+    if (!this.getClass().equals(otherObj.getClass())) {
+      return false;
+    }
+    
+    return this.cvCertificate.equals(((CardVerifiableCertificate) otherObj).cvCertificate);
   }
 
   /**

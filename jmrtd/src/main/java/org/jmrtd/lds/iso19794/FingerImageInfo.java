@@ -128,8 +128,12 @@ public class FingerImageInfo extends AbstractImageInfo {
       int viewCount, int viewNumber, int quality, int impressionType,
       int width, int height, InputStream imageBytes, int imageLength, int compressionAlgorithm) throws IOException {
     super(TYPE_FINGER, width, height, imageBytes, imageLength, FingerInfo.toMimeType(compressionAlgorithm));
-    if (0 > quality || quality > 100) { throw new IllegalArgumentException("Quality needs to be a number between 0 and 100"); }
-    if (imageBytes == null) { throw new IllegalArgumentException("Null image"); }
+    if (0 > quality || quality > 100) {
+      throw new IllegalArgumentException("Quality needs to be a number between 0 and 100");
+    }
+    if (imageBytes == null) {
+      throw new IllegalArgumentException("Null image");
+    }
     this.position = position;
     this.viewCount = viewCount;
     this.viewNumber = viewNumber;

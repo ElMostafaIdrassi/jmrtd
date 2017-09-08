@@ -107,6 +107,7 @@ public class InputStreamBuffer {
       return buffer;
     }
 
+    @Override
     public int read() throws IOException {
       synchronized(syncObject) {
         if (position >= buffer.getLength()) {
@@ -122,7 +123,10 @@ public class InputStreamBuffer {
           }
           try {
             int result = carrier.read();
-            if (result < 0) { return -1; }
+            if (result < 0) {
+              return -1;
+            }
+            
             buffer.addFragment(position++, (byte)result);
             return result;
           } catch (IOException ioe) {
@@ -137,12 +141,14 @@ public class InputStreamBuffer {
       }
     }
 
+    @Override
     public int read(byte[] b) throws IOException {
       synchronized(syncObject) {
         return read(b, 0, b.length);
       }
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
       synchronized(syncObject) {
         if (b == null) {
@@ -194,6 +200,7 @@ public class InputStreamBuffer {
       }
     }
 
+    @Override
     public long skip(long n) throws IOException {
       synchronized(syncObject) {
         int leftInBuffer = buffer.getBufferedLength(position);
@@ -220,22 +227,29 @@ public class InputStreamBuffer {
       }
     }
 
+    @Override
     public int available() throws IOException {
       return buffer.getBufferedLength(position);
     }
 
+    @Override
     public void close() throws IOException {
     }
 
+    @Override
     public synchronized void mark(int readLimit) {
       markedPosition = position;
     }
 
+    @Override
     public synchronized void reset() throws IOException {
-      if (markedPosition < 0) { throw new IOException("Invalid reset, was mark() called?"); }
+      if (markedPosition < 0) {
+        throw new IOException("Invalid reset, was mark() called?");
+      }
       position = markedPosition;
     }
 
+    @Override
     public boolean markSupported() {
       return true;
     }

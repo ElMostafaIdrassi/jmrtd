@@ -151,26 +151,61 @@ public class PassportService extends PassportApduService implements Serializable
   public static final short EF_CVCA = 0x011C;
 
   /** Short file identifier for file. */
-  public static final byte
-  SF_DG1 = 0x01,
-  SF_DG2 = 0x02,
-  SF_DG3 = 0x03,
-  SF_DG4 = 0x04,
-  SF_DG5 = 0x05,
-  SF_DG6 = 0x06,
-  SF_DG7 = 0x07,
-  SF_DG8 = 0x08,
-  SF_DG9 = 0x09,
-  SF_DG10 = 0x0A,
-  SF_DG11 = 0x0B,
-  SF_DG12 = 0x0C,
-  SF_DG13 = 0x0D,
-  SF_DG14 = 0x0E,
-  SF_DG15 = 0x0F,
-  SF_DG16 = 0x10,
-  SF_COM = 0x1E,
-  SF_SOD = 0x1D,
-  SF_CVCA = 0x1C;
+  public static final byte SF_DG1 = 0x01;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG2 = 0x02;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG3 = 0x03;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG4 = 0x04;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG5 = 0x05;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG6 = 0x06;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG7 = 0x07;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG8 = 0x08;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG9 = 0x09;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG10 = 0x0A;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG11 = 0x0B;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG12 = 0x0C;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG13 = 0x0D;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG14 = 0x0E;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG15 = 0x0F;
+
+  /** Short file identifier for file. */
+  public static final byte SF_DG16 = 0x10;
+
+  /** Short file identifier for file. */
+  public static final byte SF_COM = 0x1E;
+
+  /** Short file identifier for file. */
+  public static final byte SF_SOD = 0x1D;
+
+  /** Short file identifier for file. */
+  public static final byte SF_CVCA = 0x1C;
 
   /** YYMMDD format. */
   public static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
@@ -183,6 +218,7 @@ public class PassportService extends PassportApduService implements Serializable
    *
    * @deprecated hack
    */
+  @Deprecated
   public int maxBlockSize;
 
   enum State {

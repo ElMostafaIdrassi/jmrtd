@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Logger;
 
 import org.jmrtd.lds.AbstractLDSInfo;
 
@@ -46,8 +45,6 @@ import net.sf.scuba.data.Gender;
 public class MRZInfo extends AbstractLDSInfo {
 
   private static final long serialVersionUID = 7054965914471297804L;
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** Unspecified document type (do not use, choose ID1 or ID3). */
   public static final int DOC_TYPE_UNSPECIFIED = 0;
@@ -171,7 +168,9 @@ public class MRZInfo extends AbstractLDSInfo {
     this.dateOfBirth = dateOfBirth;
     this.gender = gender;
     this.dateOfExpiry = dateOfExpiry;
-    if (optionalData1 == null || optionalData1.length() > 15) { throw new IllegalArgumentException("Wrong optional data 1: " + (optionalData1 == null ? "null" : "\"" + optionalData1 + "\"")); }
+    if (optionalData1 == null || optionalData1.length() > 15) {
+      throw new IllegalArgumentException("Wrong optional data 1: " + (optionalData1 == null ? "null" : "\"" + optionalData1 + "\""));
+    }
     this.optionalData1 = optionalData1;
     this.optionalData2 = optionalData2;
     checkDigit();
@@ -198,7 +197,9 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param str input text
    */
   public MRZInfo(String str) {
-    if (str == null) { throw new IllegalArgumentException("Null string"); }
+    if (str == null) {
+      throw new IllegalArgumentException("Null string");
+    }
     str = str.trim().replace("\n", "");
     try {
       readObject(new ByteArrayInputStream(str.getBytes("UTF-8")), str.length());
@@ -572,7 +573,9 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param personalNumber new personal number
    */
   public void setPersonalNumber(String personalNumber) {
-    if (personalNumber == null || personalNumber.length() > 14) { throw new IllegalArgumentException("Wrong personal number"); }
+    if (personalNumber == null || personalNumber.length() > 14) {
+      throw new IllegalArgumentException("Wrong personal number");
+    }
     this.optionalData1 = mrzFormat(personalNumber, 14) + checkDigit(personalNumber, true);
   }
 
@@ -866,8 +869,12 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return the reformatted string
    */
   private static String mrzFormat(String str, int width) {
-    if (str == null) { throw new IllegalArgumentException("Attempting to MRZ format null"); }
-    if (str.length() > width) { throw new IllegalArgumentException("Argument too wide (" + str.length() + " > " + width + ")"); }
+    if (str == null) {
+      throw new IllegalArgumentException("Attempting to MRZ format null");
+    }
+    if (str.length() > width) {
+      throw new IllegalArgumentException("Argument too wide (" + str.length() + " > " + width + ")");
+    }
     str = str.toUpperCase().trim();
     StringBuilder result = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
@@ -893,9 +900,15 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return a boolean indicating whether the strings are equal modulo filler characters
    */
   public static boolean equalsModuloFillerChars(String str1, String str2) {
-    if (str1 == str2) { return true; }
-    if (str1 == null) { str1 = ""; }
-    if (str2 == null) { str2 = ""; }
+    if (str1 == str2) {
+      return true;
+    }
+    if (str1 == null) {
+      str1 = "";
+    }
+    if (str2 == null) {
+      str2 = "";
+    }
     int length = Math.max(str1.length(), str2.length());
     return mrzFormat(str1, length).equals(mrzFormat(str2, length));
   }
@@ -1017,7 +1030,9 @@ public class MRZInfo extends AbstractLDSInfo {
         result = (result + weights[i % 3] * decodeMRZDigit(chars[i])) % 10;
       }
       String checkDigitString = Integer.toString(result);
-      if (checkDigitString.length() != 1) { throw new IllegalStateException("Error in computing check digit."); /* NOTE: Never happens. */ }
+      if (checkDigitString.length() != 1) {
+        throw new IllegalStateException("Error in computing check digit."); /* NOTE: Never happens. */
+      }
       char checkDigit = (char)checkDigitString.getBytes("UTF-8")[0];
       if (preferFillerOverZero && checkDigit == '0') { checkDigit = '<'; }
       return checkDigit;

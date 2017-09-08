@@ -97,8 +97,13 @@ public class DG1File extends DataGroup {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (!(obj.getClass().equals(this.getClass()))) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj.getClass().equals(this.getClass()))) {
+      return false;
+    }
+    
     DG1File other = (DG1File)obj;
     return mrzInfo.equals(other.mrzInfo);
   }

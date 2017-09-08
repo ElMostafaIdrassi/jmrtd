@@ -410,9 +410,16 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (obj == this) { return true; }
-    if (!obj.getClass().equals(this.getClass())) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (!obj.getClass().equals(this.getClass())) {
+      return false;
+    }
+
     SODFile other = (SODFile)obj;
     return Arrays.equals(getEncoded(), other.getEncoded());
   }

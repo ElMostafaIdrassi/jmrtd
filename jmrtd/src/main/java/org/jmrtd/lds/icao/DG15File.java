@@ -116,8 +116,13 @@ public class DG15File extends DataGroup {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) { return false; }
-    if (obj.getClass() != this.getClass()) { return false; }
+    if (obj == null) {
+      return false;
+    }
+    if (obj.getClass() != this.getClass()) {
+      return false;
+    }
+    
     DG15File other = (DG15File)obj;
     return publicKey.equals(other.publicKey);
   }
@@ -129,6 +134,6 @@ public class DG15File extends DataGroup {
 
   @Override
   public String toString() {
-    return "DG15File [" + publicKey.toString() + "]";
+    return "DG15File [" + Util.getDetailedPublicKeyAlgorithm(publicKey) + "]";
   }  
 }

@@ -184,12 +184,16 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
    * @throws CardServiceException on error
    */
   private synchronized MRTDFileInfo getFileInfo() throws CardServiceException {
-    if (selectedFID <= 0) { throw new CardServiceException("No file selected"); }
+    if (selectedFID <= 0) {
+      throw new CardServiceException("No file selected");
+    }
 
     MRTDFileInfo fileInfo = fileInfos.get(selectedFID);
 
     /* If known file, use file info from cache. */
-    if (fileInfo != null) { return fileInfo; }
+    if (fileInfo != null) {
+      return fileInfo;
+    }
 
     /* Not cached, actually read some bytes to determine file info. */
     try {
@@ -268,13 +272,16 @@ class MRTDFileSystem implements FileSystemStructured, Serializable {
      * 
      * @return the length of the file
      */
-    public int getFileLength() { return buffer.getLength(); }
+    public int getFileLength() {
+      return buffer.getLength();
+    }
 
     /**
      * Gets a textual representation of this file info.
      * 
      * @return a textual representation of this file info
      */
+    @Override
     public String toString() {
       return Integer.toHexString(fid);
     }

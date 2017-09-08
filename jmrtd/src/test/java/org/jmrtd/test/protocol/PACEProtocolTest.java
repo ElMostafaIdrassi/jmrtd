@@ -264,7 +264,9 @@ public class PACEProtocolTest extends TestCase {
       assertNotNull(keyAgreement);
       keyAgreement.init(pcdPrivateKey);
 
-      if (pcdPublicKey.equals(piccPublicKey)) { throw new GeneralSecurityException("pcdPublicKey and piccPublicKey are the same!"); }
+      if (pcdPublicKey.equals(piccPublicKey)) {
+        throw new GeneralSecurityException("pcdPublicKey and piccPublicKey are the same!");
+      }
       keyAgreement.doPhase(piccPublicKey, true);
       byte[] sharedSecretBytes = keyAgreement.generateSecret();
       assertNotNull(sharedSecretBytes);
@@ -515,7 +517,9 @@ public class PACEProtocolTest extends TestCase {
       assertNotNull(keyAgreement);
       keyAgreement.init(pcdPrivateKey);
 
-      if (pcdPublicKey.equals(piccPublicKey)) { throw new GeneralSecurityException("pcdPublicKey and piccPublicKey are the same!"); }
+      if (pcdPublicKey.equals(piccPublicKey)) {
+        throw new GeneralSecurityException("pcdPublicKey and piccPublicKey are the same!");
+      }
       keyAgreement.doPhase(piccPublicKey, true);
       byte[] sharedSecretBytes = keyAgreement.generateSecret();
       assertNotNull(sharedSecretBytes);

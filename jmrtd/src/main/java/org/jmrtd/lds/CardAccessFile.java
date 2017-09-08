@@ -64,7 +64,9 @@ public class CardAccessFile implements Serializable {
    * @param securityInfos a non-empty list of security infos
    */
   public CardAccessFile(Collection<SecurityInfo> securityInfos) {
-    if (securityInfos == null) { throw new IllegalArgumentException("Null securityInfos"); }
+    if (securityInfos == null) {
+      throw new IllegalArgumentException("Null securityInfos");
+    }
     this.securityInfos = new HashSet<SecurityInfo>(securityInfos);
   }
 

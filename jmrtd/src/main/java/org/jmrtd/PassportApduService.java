@@ -73,11 +73,16 @@ import net.sf.scuba.util.Hex;
 public class PassportApduService extends CardService {
 
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
-  public static final byte
-  MRZ_PACE_KEY_REFERENCE = 0x01,
-  CAN_PACE_KEY_REFERENCE = 0x02,
-  PIN_PACE_KEY_REFERENCE = 0x03,
-  PUK_PACE_KEY_REFERENCE = 0x04;
+  public static final byte MRZ_PACE_KEY_REFERENCE = 0x01;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte CAN_PACE_KEY_REFERENCE = 0x02;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte PIN_PACE_KEY_REFERENCE = 0x03;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte PUK_PACE_KEY_REFERENCE = 0x04;
 
   private static final long serialVersionUID = 2451509825132976178L;
 
@@ -212,6 +217,7 @@ public class PassportApduService extends CardService {
    *
    * @param l a listener
    */
+  @Override
   public void addAPDUListener(APDUListener l) {
     service.addAPDUListener(l);
   }
@@ -221,6 +227,7 @@ public class PassportApduService extends CardService {
    *
    * @param l a listener
    */
+  @Override
   public void removeAPDUListener(APDUListener l) {
     service.removeAPDUListener(l);
   }
@@ -250,13 +257,11 @@ public class PassportApduService extends CardService {
         } else {
           rapdu = wrapper.unwrap(rapdu);
         }
+      } catch (CardServiceException cse) {
+        throw cse;
       } catch (Exception e) {
-        if (e instanceof CardServiceException) {
-          throw (CardServiceException)e;
-        } else {
-          throw new CardServiceException("Exception during transmission of wrapped APDU"
-              + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
-        }
+        throw new CardServiceException("Exception during transmission of wrapped APDU"
+            + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
       } finally {
         notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);				
       }
@@ -391,6 +396,7 @@ public class PassportApduService extends CardService {
       rapdu = transmit(wrapper, capdu);
       sw = (short)rapdu.getSW();
     } catch (CardServiceException cse) {
+      LOGGER.log(Level.FINE, "Exception during READ BINARY", cse);
       sw = (short)cse.getSW();
     }
 
@@ -483,7 +489,9 @@ public class PassportApduService extends CardService {
    * @throws CardServiceException on tranceive error
    */
   public synchronized byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException {
-    if (rndIFD == null || rndIFD.length != 8) { throw new IllegalArgumentException("rndIFD wrong length"); }
+    if (rndIFD == null || rndIFD.length != 8) {
+      throw new IllegalArgumentException("rndIFD wrong length");
+    }
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 256);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
     return rapdu.getData();
@@ -510,11 +518,21 @@ public class PassportApduService extends CardService {
    */
   public synchronized byte[] sendMutualAuth(byte[] rndIFD, byte[] rndICC, byte[] kIFD, SecretKey kEnc, SecretKey kMac) throws CardServiceException {
     try {
-      if (rndIFD == null || rndIFD.length != 8) { throw new IllegalArgumentException("rndIFD wrong length"); }
-      if (rndICC == null || rndICC.length != 8) { rndICC = new byte[8]; }
-      if (kIFD == null || kIFD.length != 16) { throw new IllegalArgumentException("kIFD wrong length"); }
-      if (kEnc == null) { throw new IllegalArgumentException("kEnc == null"); }
-      if (kMac == null) { throw new IllegalArgumentException("kMac == null"); }
+      if (rndIFD == null || rndIFD.length != 8) {
+        throw new IllegalArgumentException("rndIFD wrong length");
+      }
+      if (rndICC == null || rndICC.length != 8) {
+        rndICC = new byte[8];
+      }
+      if (kIFD == null || kIFD.length != 16) {
+        throw new IllegalArgumentException("kIFD wrong length");
+      }
+      if (kEnc == null) {
+        throw new IllegalArgumentException("kEnc == null");
+      }
+      if (kMac == null) {
+        throw new IllegalArgumentException("kMac == null");
+      }
 
       cipher.init(Cipher.ENCRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);
       /*
@@ -847,7 +865,9 @@ public class PassportApduService extends CardService {
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_PSO, 0, 0xBE, certData);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
     short sw = (short)rapdu.getSW();
-    if (sw != ISO7816.SW_NO_ERROR) { throw new CardServiceException("Sending PSO failed", sw); }
+    if (sw != ISO7816.SW_NO_ERROR) {
+      throw new CardServiceException("Sending PSO failed", sw);
+    }
   }
 
   /**
@@ -919,7 +939,10 @@ public class PassportApduService extends CardService {
    * @param rapdu response APDU
    */
   protected void notifyExchangedPlainTextAPDU(int count, CommandAPDU capdu, ResponseAPDU rapdu) {
-    if (plainTextAPDUListeners == null || plainTextAPDUListeners.size() < 1) { return; }
+    if (plainTextAPDUListeners == null || plainTextAPDUListeners.size() < 1) {
+      return;
+    }
+    
     APDUEvent event = new APDUEvent(this, "PLAINTEXT", count, capdu, rapdu);
     for (APDUListener listener: plainTextAPDUListeners) {
       listener.exchangedAPDU(event);
@@ -938,7 +961,8 @@ public class PassportApduService extends CardService {
       case ISO7816.SW_CONDITIONS_NOT_SATISFIED: /* NOTE: fall through. */
       case ISO7816.SW_COMMAND_NOT_ALLOWED:
         throw new CardServiceException("Access to file denied, " + commandResponseMessage, sw);
+      default:
+        throw new CardServiceException("Error occured, " + commandResponseMessage, sw);        
     }
-    throw new CardServiceException("Error occured, " + commandResponseMessage, sw);
   }
 }

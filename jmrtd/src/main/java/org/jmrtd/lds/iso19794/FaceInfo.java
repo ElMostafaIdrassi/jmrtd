@@ -126,10 +126,14 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
     /* Facial Record Header (14) */
 
     int fac0 = dataInputStream.readInt(); // header (e.g. "FAC", 0x00)						/* 4 */
-    if (fac0 != FORMAT_IDENTIFIER) { throw new IllegalArgumentException("'FAC' marker expected! Found " + Integer.toHexString(fac0)); }
+    if (fac0 != FORMAT_IDENTIFIER) {
+      throw new IllegalArgumentException("'FAC' marker expected! Found " + Integer.toHexString(fac0));
+    }
 
     int version = dataInputStream.readInt(); // version in ASCII (e.g. "010" 0x00)			/* + 4 = 8 */
-    if (version != VERSION_NUMBER) { throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version)); }
+    if (version != VERSION_NUMBER) {
+      throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version));
+    }
 
     long recordLength = dataInputStream.readInt() & 0xFFFFFFFFL;	 						/* + 4 = 12 */
     long headerLength = 14; /* 4 + 4 + 4 + 2 */
@@ -145,8 +149,9 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
       add(imageInfo);
     }
     if (dataLength != constructedDataLength) {
-      LOGGER.warning("DEBUG: constructedDataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
-      //			throw new IllegalStateException("DEBUG: constructed DataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
+      LOGGER.warning("DEBUG: constructedDataLength and dataLength differ: "
+          + "dataLength = " + dataLength
+          + ", constructedDataLength = " + constructedDataLength);
     }
   }
 
@@ -215,19 +220,25 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
    * 
    * @return the embedded face image infos
    */
-  public List<FaceImageInfo> getFaceImageInfos() { return getSubRecords(); }
+  public List<FaceImageInfo> getFaceImageInfos() {
+    return getSubRecords();
+  }
 
   /**
    * Adds a face image info to this face info.
    * 
    * @param faceImageInfo the face image info to add
    */
-  public void addFaceImageInfo(FaceImageInfo faceImageInfo) { add(faceImageInfo); }
+  public void addFaceImageInfo(FaceImageInfo faceImageInfo) {
+    add(faceImageInfo);
+  }
 
   /**
    * Removes a face image info from this face info.
    * 
    * @param index the index of the face image info to remove
    */
-  public void removeFaceImageInfo(int index) { remove(index); }
+  public void removeFaceImageInfo(int index) {
+    remove(index);
+  }
 }

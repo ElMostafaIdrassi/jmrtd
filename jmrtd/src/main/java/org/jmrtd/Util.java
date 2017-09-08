@@ -110,15 +110,15 @@ import net.sf.scuba.util.Hex;
  *
  * @version $Revision$
  */
+@Deprecated
 public class Util {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** Mode for KDF. */
-  public static final int
-  ENC_MODE = 1,
-  MAC_MODE = 2,
-  PACE_MODE = 3;
+  public static final int ENC_MODE = 1;
+  public static final int MAC_MODE = 2;
+  public static final int PACE_MODE = 3;
 
   private static final Provider BC_PROVIDER = new BouncyCastleProvider();
 
@@ -571,21 +571,43 @@ public class Util {
       String[] components = signatureAlgorithmToUppercase.split("WITH");
       digestAlgorithm = components[0];
     }
-    if ("SHA1".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-1"; }
-    if ("SHA224".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-224"; }
-    if ("SHA256".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-256"; }
-    if ("SHA384".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-384"; }
-    if ("SHA512".equalsIgnoreCase(digestAlgorithm)) { digestAlgorithm = "SHA-512"; }
+
+    if ("SHA1".equalsIgnoreCase(digestAlgorithm)) {
+      return "SHA-1";
+    }
+    if ("SHA224".equalsIgnoreCase(digestAlgorithm)) {
+      return "SHA-224";
+    }
+    if ("SHA256".equalsIgnoreCase(digestAlgorithm)) {
+      return "SHA-256";
+    }
+    if ("SHA384".equalsIgnoreCase(digestAlgorithm)) {
+      return "SHA-384";
+    }
+    if ("SHA512".equalsIgnoreCase(digestAlgorithm)) {
+      return "SHA-512";
+    }
 
     return digestAlgorithm;
   }
 
   public static String inferDigestAlgorithmFromCipherAlgorithmForKeyDerivation(String cipherAlg, int keyLength) {
-    if (cipherAlg == null) { throw new IllegalArgumentException(); }
-    if ("DESede".equals(cipherAlg) || "AES-128".equals(cipherAlg)) { return "SHA-1"; }
-    if ("AES".equals(cipherAlg) && keyLength == 128) { return "SHA-1"; }
-    if ("AES-256".equals(cipherAlg) || "AES-192".equals(cipherAlg)) { return "SHA-256"; }
-    if ("AES".equals(cipherAlg) && (keyLength == 192 || keyLength == 256)) { return "SHA-256"; }
+    if (cipherAlg == null) {
+      throw new IllegalArgumentException();
+    }
+    if ("DESede".equals(cipherAlg) || "AES-128".equals(cipherAlg)) {
+      return "SHA-1";
+    }
+    if ("AES".equals(cipherAlg) && keyLength == 128) {
+      return "SHA-1";
+    }
+    if ("AES-256".equals(cipherAlg) || "AES-192".equals(cipherAlg)) {
+      return "SHA-256";
+    }
+    if ("AES".equals(cipherAlg) && (keyLength == 192 || keyLength == 256)) {
+      return "SHA-256";
+    }
+
     throw new IllegalArgumentException("Unsupported cipher algorithm or key length \"" + cipherAlg + "\", " + keyLength);
   }
 
@@ -593,7 +615,7 @@ public class Util {
     BigInteger p = params.getP();
     BigInteger generator = params.getG();
     BigInteger q = params.getQ();
-    int order = (int)params.getL();
+    int order = params.getL();
     if (q == null) {
       return new DHParameterSpec(p, generator, order);
     } else {
@@ -660,7 +682,10 @@ public class Util {
    */
   public static String getCurveName(ECParameterSpec params) {
     org.bouncycastle.jce.spec.ECNamedCurveSpec namedECParams = toNamedCurveSpec(params);
-    if (namedECParams == null) { return null; }
+    if (namedECParams == null) {
+      return null;
+    }
+
     return namedECParams.getName();
   }
 
@@ -688,27 +713,30 @@ public class Util {
         BigInteger p = ((ECFieldFp)field).getP();
         ECField resultField = new ECFieldFp(p);
         EllipticCurve resultCurve = new EllipticCurve(resultField, a, b);
-        ECParameterSpec resultParams = new ECParameterSpec(resultCurve, g, n, h);
-        return resultParams;
+        return new ECParameterSpec(resultCurve, g, n, h);
       } else if (field instanceof ECFieldF2m) {
         int m = ((ECFieldF2m)field).getM();
         ECField resultField = new ECFieldF2m(m);
         EllipticCurve resultCurve = new EllipticCurve(resultField, a, b);
-        ECParameterSpec resultParams = new ECParameterSpec(resultCurve, g, n, h);
-        return resultParams;
+        return new ECParameterSpec(resultCurve, g, n, h);
       } else {
         LOGGER.warning("Could not make named EC param spec explicit");
         return params;
       }
     } catch (Exception e) {
-      LOGGER.warning("Could not make named EC param spec explicit");
+      LOGGER.log(Level.WARNING, "Could not make named EC param spec explicit", e);
       return params;
     }
   }
 
   private static org.bouncycastle.jce.spec.ECNamedCurveSpec toNamedCurveSpec(ECParameterSpec ecParamSpec) {
-    if (ecParamSpec == null) { return null; }
-    if (ecParamSpec instanceof org.bouncycastle.jce.spec.ECNamedCurveSpec) { return (org.bouncycastle.jce.spec.ECNamedCurveSpec)ecParamSpec; }
+    if (ecParamSpec == null) {
+      return null;
+    }
+    if (ecParamSpec instanceof org.bouncycastle.jce.spec.ECNamedCurveSpec) {
+      return (org.bouncycastle.jce.spec.ECNamedCurveSpec)ecParamSpec;
+    }
+
     @SuppressWarnings("unchecked")
     List<String> names = (List<String>)Collections.list(ECNamedCurveTable.getNames());
     List<org.bouncycastle.jce.spec.ECNamedCurveSpec> namedSpecs = new ArrayList<org.bouncycastle.jce.spec.ECNamedCurveSpec>();
@@ -871,7 +899,7 @@ public class Util {
 
       return KeyFactory.getInstance("EC", BC_PROVIDER).generatePublic(explicitPublicKeySpec);
     } catch (Exception e) {
-      LOGGER.warning("Could not make public key param spec explicit");
+      LOGGER.log(Level.WARNING, "Could not make public key param spec explicit", e);
       return publicKey;
     }
   }
@@ -907,10 +935,10 @@ public class Util {
    * @throws InvalidKeyException when public key is not DH or EC
    */
   public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey, boolean isContextKnown) throws InvalidKeyException {
-    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-    TLVOutputStream tlvOut = new TLVOutputStream(bOut);
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
     try {
-      tlvOut.writeTag(0x7F49); // FIXME: constant for 7F49 */
+      tlvOutputStream.writeTag(0x7F49); // FIXME: constant for 7F49 */
       if (publicKey instanceof DHPublicKey) {
         DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
         DHParameterSpec params = dhPublicKey.getParams();
@@ -919,13 +947,18 @@ public class Util {
         BigInteger generator = params.getG();
         BigInteger y = dhPublicKey.getY();
 
-        tlvOut.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag  */
+        tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag  */
         if (!isContextKnown) {
-          tlvOut.writeTag(0x81); tlvOut.writeValue(i2os(p)); /* p: Prime modulus */
-          tlvOut.writeTag(0x82); tlvOut.writeValue(i2os(BigInteger.valueOf(l))); /* q: Order of the subgroup */
-          tlvOut.writeTag(0x83); tlvOut.writeValue(i2os(generator)); /* Generator */
+          tlvOutputStream.writeTag(0x81);
+          tlvOutputStream.writeValue(i2os(p)); /* p: Prime modulus */
+
+          tlvOutputStream.writeTag(0x82);
+          tlvOutputStream.writeValue(i2os(BigInteger.valueOf(l))); /* q: Order of the subgroup */
+
+          tlvOutputStream.writeTag(0x83);
+          tlvOutputStream.writeValue(i2os(generator)); /* Generator */
         }
-        tlvOut.writeTag(0x84); tlvOut.writeValue(i2os(y)); /* y: Public value */
+        tlvOutputStream.writeTag(0x84); tlvOutputStream.writeValue(i2os(y)); /* y: Public value */
       } else if (publicKey instanceof ECPublicKey) {
         ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
         ECParameterSpec params = ecPublicKey.getParams();
@@ -938,31 +971,50 @@ public class Util {
         int coFactor = params.getCofactor();
         ECPoint publicPoint = ecPublicKey.getW();
 
-        tlvOut.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag */
+        tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag */
         if (!isContextKnown) {
-          tlvOut.writeTag(0x81); tlvOut.writeValue(i2os(p)); /* Prime modulus */
-          tlvOut.writeTag(0x82); tlvOut.writeValue(i2os(a)); /* First coefficient */
-          tlvOut.writeTag(0x83); tlvOut.writeValue(i2os(b)); /* Second coefficient */
+          tlvOutputStream.writeTag(0x81);
+          tlvOutputStream.writeValue(i2os(p)); /* Prime modulus */
+
+          tlvOutputStream.writeTag(0x82);
+          tlvOutputStream.writeValue(i2os(a)); /* First coefficient */
+
+          tlvOutputStream.writeTag(0x83);
+          tlvOutputStream.writeValue(i2os(b)); /* Second coefficient */
           BigInteger affineX = generator.getAffineX();
           BigInteger affineY = generator.getAffineY();
-          tlvOut.writeTag(0x84); tlvOut.write(i2os(affineX)); tlvOut.write(i2os(affineY)); tlvOut.writeValueEnd(); /* Base point, FIXME: correct encoding? */
-          tlvOut.writeTag(0x85); tlvOut.writeValue(i2os(order)); /* Order of the base point */
+
+          tlvOutputStream.writeTag(0x84);
+          tlvOutputStream.write(i2os(affineX));
+          tlvOutputStream.write(i2os(affineY));
+          tlvOutputStream.writeValueEnd(); /* Base point, FIXME: correct encoding? */
+
+          tlvOutputStream.writeTag(0x85);
+          tlvOutputStream.writeValue(i2os(order)); /* Order of the base point */
         }
-        tlvOut.writeTag(0x86); tlvOut.writeValue(ecPoint2OS(publicPoint)); /* Public point */
+        tlvOutputStream.writeTag(0x86);
+        tlvOutputStream.writeValue(ecPoint2OS(publicPoint)); /* Public point */
+
         if (!isContextKnown) {
-          tlvOut.writeTag(0x87); tlvOut.writeValue(i2os(BigInteger.valueOf(coFactor))); /* Cofactor */
+          tlvOutputStream.writeTag(0x87);
+          tlvOutputStream.writeValue(i2os(BigInteger.valueOf(coFactor))); /* Cofactor */
         }
       } else {
         throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
       }
-      tlvOut.writeValueEnd(); /* 7F49 */
-      tlvOut.flush();
-      tlvOut.close();
+      tlvOutputStream.writeValueEnd(); /* 7F49 */
+      tlvOutputStream.flush();
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Exception", ioe);
       throw new IllegalStateException("Error in encoding public key");
+    } finally {
+      try {
+        tlvOutputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
     }
-    return bOut.toByteArray();
+    return byteArrayOutputStream.toByteArray();
   }
 
   /*

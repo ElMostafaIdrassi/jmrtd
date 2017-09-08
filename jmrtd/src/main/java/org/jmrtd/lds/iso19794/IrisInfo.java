@@ -207,7 +207,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       byte[] deviceUniqueId,
       List<IrisBiometricSubtypeInfo> irisBiometricSubtypeInfos) {
     this.sbh = sbh;
-    if (irisBiometricSubtypeInfos == null) { throw new IllegalArgumentException("Null irisBiometricSubtypeInfos"); }
+    if (irisBiometricSubtypeInfos == null) {
+      throw new IllegalArgumentException("Null irisBiometricSubtypeInfos");
+    }
     this.captureDeviceId = captureDeviceId;
     this.horizontalOrientation = horizontalOrientation;
     this.verticalOrientation = verticalOrientation;
@@ -227,7 +229,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       dataLength += irisBiometricSubtypeInfo.getRecordLength();
       add(irisBiometricSubtypeInfo);
     }
-    if (deviceUniqueId == null || deviceUniqueId.length != 16) { throw new IllegalArgumentException("deviceUniqueId invalid"); }
+    if (deviceUniqueId == null || deviceUniqueId.length != 16) {
+      throw new IllegalArgumentException("deviceUniqueId invalid");
+    }
     this.deviceUniqueId = new byte[16];
     System.arraycopy(deviceUniqueId, 0, this.deviceUniqueId, 0, deviceUniqueId.length);
     this.recordLength = headerLength + dataLength;
@@ -271,10 +275,14 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     int iir0 = dataIn.readInt(); /* format id (e.g. "IIR" 0x00) */				/* 4 */
-    if (iir0 != FORMAT_IDENTIFIER) { throw new IllegalArgumentException("'IIR' marker expected! Found " + Integer.toHexString(iir0)); }
+    if (iir0 != FORMAT_IDENTIFIER) {
+      throw new IllegalArgumentException("'IIR' marker expected! Found " + Integer.toHexString(iir0));
+    }
 
     int version = dataIn.readInt(); /* version (e.g. "010" 0x00) */				/* + 4 = 8 */
-    if (version != VERSION_NUMBER) { throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version)); }
+    if (version != VERSION_NUMBER) {
+      throw new IllegalArgumentException("'010' version number expected! Found " + Integer.toHexString(version));
+    }
 
     this.recordLength = dataIn.readInt(); /* & 0x00000000FFFFFFFFL */			/* + 4 = 12 */
     long headerLength = 45;
@@ -284,7 +292,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     int count = dataIn.readUnsignedByte();							/* + 1 = 15 */
 
     int recordHeaderLength = dataIn.readUnsignedShort(); /* Should be 45. */	/* + 2 = 17 */
-    if (recordHeaderLength != headerLength) { throw new IllegalArgumentException("Expected header length " + headerLength + ", found " + recordHeaderLength); }
+    if (recordHeaderLength != headerLength) {
+      throw new IllegalArgumentException("Expected header length " + headerLength + ", found " + recordHeaderLength);
+    }
 
     /*
      *  16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1
@@ -561,21 +571,27 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
    * 
    * @return iris biometric subtype infos
    */
-  public List<IrisBiometricSubtypeInfo> getIrisBiometricSubtypeInfos() { return getSubRecords(); }
+  public List<IrisBiometricSubtypeInfo> getIrisBiometricSubtypeInfos() {
+    return getSubRecords();
+  }
 
   /**
    * Adds an iris biometric subtype info to this iris info.
    * 
    * @param irisBiometricSubtypeInfo an iris biometric subtype info
    */
-  public void addIrisBiometricSubtypeInfo(IrisBiometricSubtypeInfo irisBiometricSubtypeInfo) { add(irisBiometricSubtypeInfo); }
+  public void addIrisBiometricSubtypeInfo(IrisBiometricSubtypeInfo irisBiometricSubtypeInfo) {
+    add(irisBiometricSubtypeInfo);
+  }
 
   /**
    * Removes an iris biometric subtype info from this iris info.
    * 
    * @param index the index of the biometric subtype info to remove
    */
-  public void removeIrisBiometricSubtypeInfo(int index) { remove(index); }
+  public void removeIrisBiometricSubtypeInfo(int index) {
+    remove(index);
+  }
 
   /* ONLY PRIVATE METHODS BELOW */
 

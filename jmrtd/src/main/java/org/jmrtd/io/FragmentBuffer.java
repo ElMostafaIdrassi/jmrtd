@@ -170,7 +170,9 @@ public class FragmentBuffer implements Serializable {
     for (Fragment fragment: fragments) {
       int left = fragment.getOffset();
       int right = fragment.getOffset() + fragment.getLength();
-      if (left <= offset && offset + length <= right) { return true; }
+      if (left <= offset && offset + length <= right) {
+        return true;
+      }
     }
     return false;		
   }
@@ -184,7 +186,10 @@ public class FragmentBuffer implements Serializable {
    */
   public synchronized int getBufferedLength(int index) {
     int result = 0;
-    if (index >= buffer.length) { return 0; }
+    if (index >= buffer.length) {
+      return 0;
+    }
+    
     for (Fragment fragment: fragments) {
       int left = fragment.getOffset();
       int right = fragment.getOffset() + fragment.getLength();
@@ -262,28 +267,49 @@ public class FragmentBuffer implements Serializable {
     return Fragment.getInstance(thisOffset, thisLength);
   }
 
+  @Override
   public synchronized String toString() {
     return "FragmentBuffer [" + buffer.length + ", " + fragments + "]";
   }
 
+  @Override
   public synchronized boolean equals(Object otherObject) {
-    if (otherObject == null) { return false; }
-    if (otherObject == this) { return true; }
-    if (!otherObject.getClass().equals(FragmentBuffer.class)) { return false; }
-    FragmentBuffer otherBuffer = (FragmentBuffer)otherObject;
-    if (otherBuffer.buffer == null && this.buffer != null) { return false; }
-    if (otherBuffer.buffer != null && this.buffer == null) { return false; }
-    if (otherBuffer.fragments == null && this.fragments != null) { return false; }
-    if (otherBuffer.fragments != null && this.fragments == null) { return false; }
+    if (otherObject == null) {
+      return false;
+    }
+    if (otherObject == this) {
+      return true;
+    }
+    if (!otherObject.getClass().equals(FragmentBuffer.class)) {
+      return false;
+    }
+    FragmentBuffer otherBuffer = (FragmentBuffer) otherObject;
+    if (otherBuffer.buffer == null && this.buffer != null) {
+      return false;
+    }
+    if (otherBuffer.buffer != null && this.buffer == null) {
+      return false;
+    }
+    if (otherBuffer.fragments == null && this.fragments != null) {
+      return false;
+    }
+    if (otherBuffer.fragments != null && this.fragments == null) {
+      return false;
+    }
+    
     return Arrays.equals(otherBuffer.buffer, this.buffer) && otherBuffer.fragments.equals(this.fragments);
   }
 
+  @Override
   public int hashCode() {
     return 3 * Arrays.hashCode(buffer) + 2 * fragments.hashCode() + 7;
   }
 
   private synchronized void setLength(int length) {
-    if (length <= buffer.length) { return; }
+    if (length <= buffer.length) {
+      return;
+    }
+    
     byte[] newBuffer = new byte[length];
     System.arraycopy(this.buffer, 0, newBuffer, 0, this.buffer.length);
     this.buffer = newBuffer;
@@ -320,9 +346,16 @@ public class FragmentBuffer implements Serializable {
     }
 
     public boolean equals(Object otherObject) {
-      if (otherObject == null) { return false; }
-      if (otherObject == this) { return true; }
-      if (!otherObject.getClass().equals(Fragment.class)) { return false; }
+      if (otherObject == null) {
+        return false;
+      }
+      if (otherObject == this) {
+        return true;
+      }
+      if (!otherObject.getClass().equals(Fragment.class)) {
+        return false;
+      }
+      
       Fragment otherFragment = (Fragment)otherObject;
       return otherFragment.offset == offset && otherFragment.length == length;
     }

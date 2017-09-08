@@ -118,24 +118,34 @@ public class CVCAFile extends AbstractLDSFile {
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = new DataInputStream(inputStream);
     int tag = dataIn.read();
-    if (tag != CAR_TAG) { throw new IllegalArgumentException("Wrong tag, expected " + Integer.toHexString(CAR_TAG) + ", found " + Integer.toHexString(tag)); }
+    if (tag != CAR_TAG) {
+      throw new IllegalArgumentException("Wrong tag, expected " + Integer.toHexString(CAR_TAG) + ", found " + Integer.toHexString(tag));
+    }
     int length = dataIn.read();
-    if (length > 16) { throw new IllegalArgumentException("Wrong length."); }
+    if (length > 16) {
+      throw new IllegalArgumentException("Wrong length");
+    }
     byte[] data = new byte[length];
     dataIn.readFully(data);
     caReference = new String(data);
     tag = dataIn.read();
     if (tag != 0 && tag != -1) {
-      if (tag != CAR_TAG) { throw new IllegalArgumentException("Wrong tag."); }
+      if (tag != CAR_TAG) {
+        throw new IllegalArgumentException("Wrong tag");
+      }
       length = dataIn.read();
-      if (length > 16) { throw new IllegalArgumentException("Wrong length."); }
+      if (length > 16) {
+        throw new IllegalArgumentException("Wrong length");
+      }
       data = new byte[length];
       dataIn.readFully(data);
       altCaReference = new String(data);
       tag = dataIn.read();
     }
     while (tag != -1) {
-      if (tag != 0) { throw new IllegalArgumentException("Bad file padding."); }
+      if (tag != 0) {
+        throw new IllegalArgumentException("Bad file padding");
+      }
       tag = dataIn.read();
     }
   }

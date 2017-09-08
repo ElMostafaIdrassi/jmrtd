@@ -155,7 +155,9 @@ public class DG12File extends DataGroup {
   protected void readContent(InputStream inputStream) throws IOException {	
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tagListTag = tlvInputStream.readTag();
-    if (tagListTag != TAG_LIST_TAG) { throw new IllegalArgumentException("Expected tag list in DG12"); }
+    if (tagListTag != TAG_LIST_TAG) {
+      throw new IllegalArgumentException("Expected tag list in DG12");
+    }
 
     int tagListLength = tlvInputStream.readLength();
     int tagListBytesRead = 0;
@@ -186,17 +188,37 @@ public class DG12File extends DataGroup {
    * @return a list of tags
    */
   public List<Integer> getTagPresenceList() {
-    if (tagPresenceList != null) { return tagPresenceList; }
+    if (tagPresenceList != null) {
+      return tagPresenceList;
+    }
     tagPresenceList = new ArrayList<Integer>(10);
-    if(issuingAuthority != null) { tagPresenceList.add(ISSUING_AUTHORITY_TAG); }
-    if(dateOfIssue != null) { tagPresenceList.add(DATE_OF_ISSUE_TAG); }
-    if(namesOfOtherPersons != null && namesOfOtherPersons.size() > 0) { tagPresenceList.add(NAME_OF_OTHER_PERSON_TAG); }
-    if(endorsementsAndObservations != null) { tagPresenceList.add(ENDORSEMENTS_AND_OBSERVATIONS_TAG); }
-    if(taxOrExitRequirements != null) { tagPresenceList.add(TAX_OR_EXIT_REQUIREMENTS_TAG); }
-    if(imageOfFront != null) { tagPresenceList.add(IMAGE_OF_FRONT_TAG); }
-    if(imageOfRear != null) { tagPresenceList.add(IMAGE_OF_REAR_TAG); }
-    if(dateAndTimeOfPersonalization != null) { tagPresenceList.add(DATE_AND_TIME_OF_PERSONALIZATION); }
-    if(personalizationSystemSerialNumber != null) { tagPresenceList.add(PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG); }
+    if (issuingAuthority != null) {
+      tagPresenceList.add(ISSUING_AUTHORITY_TAG);
+    }
+    if (dateOfIssue != null) {
+      tagPresenceList.add(DATE_OF_ISSUE_TAG);
+    }
+    if (namesOfOtherPersons != null && namesOfOtherPersons.size() > 0) {
+      tagPresenceList.add(NAME_OF_OTHER_PERSON_TAG);
+    }
+    if (endorsementsAndObservations != null) {
+      tagPresenceList.add(ENDORSEMENTS_AND_OBSERVATIONS_TAG);
+    }
+    if (taxOrExitRequirements != null) {
+      tagPresenceList.add(TAX_OR_EXIT_REQUIREMENTS_TAG);
+    }
+    if (imageOfFront != null) {
+      tagPresenceList.add(IMAGE_OF_FRONT_TAG);
+    }
+    if (imageOfRear != null) {
+      tagPresenceList.add(IMAGE_OF_REAR_TAG);
+    }
+    if (dateAndTimeOfPersonalization != null) {
+      tagPresenceList.add(DATE_AND_TIME_OF_PERSONALIZATION);
+    }
+    if (personalizationSystemSerialNumber != null) {
+      tagPresenceList.add(PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG);
+    }
     return tagPresenceList;
   }
 
@@ -205,34 +227,63 @@ public class DG12File extends DataGroup {
     if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
       /* int contentSpecificLength = */ tlvIn.readLength();
       int countTag = tlvIn.readTag();
-      if (countTag != COUNT_TAG) { throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag)); }
+      if (countTag != COUNT_TAG) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
+      }
       int countLength = tlvIn.readLength();
-      if (countLength != 1) { throw new IllegalArgumentException("Expected length 1 count length, found " + countLength); }
+      if (countLength != 1) {
+        throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
+      }
       byte[] countValue = tlvIn.readValue();
-      if (countValue == null || countValue.length != 1) { throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue)); }
+      if (countValue == null || countValue.length != 1) {
+        throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
+      }
       int count = countValue[0] & 0xFF;
       for (int i = 0; i < count; i++) {
         tag = tlvIn.readTag();
-        if (tag != NAME_OF_OTHER_PERSON_TAG) { throw new IllegalArgumentException("Expected " + Integer.toHexString(NAME_OF_OTHER_PERSON_TAG) + ", found " + Integer.toHexString(tag)); }
+        if (tag != NAME_OF_OTHER_PERSON_TAG) {
+          throw new IllegalArgumentException("Expected " + Integer.toHexString(NAME_OF_OTHER_PERSON_TAG) + ", found " + Integer.toHexString(tag));
+        }
         /* int otherPersonFieldLength = */ tlvIn.readLength();
         byte[] value = tlvIn.readValue();
         parseNameOfOtherPerson(value);
       }
     } else {
-      if (tag != expectedFieldTag) { throw new IllegalArgumentException("Expected " + Integer.toHexString(expectedFieldTag) + ", but found " + Integer.toHexString(tag)); }
+      if (tag != expectedFieldTag) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(expectedFieldTag) + ", but found " + Integer.toHexString(tag));
+      }
       /* int length = */ tlvIn.readLength();
       byte[] value = tlvIn.readValue();
       switch (tag) {
-        case ISSUING_AUTHORITY_TAG: parseIssuingAuthority(value); break;
-        case DATE_OF_ISSUE_TAG: parseDateOfIssue(value); break;
-        case NAME_OF_OTHER_PERSON_TAG: parseNameOfOtherPerson(value); break;
-        case ENDORSEMENTS_AND_OBSERVATIONS_TAG: parseEndorsementsAndObservations(value); break;
-        case TAX_OR_EXIT_REQUIREMENTS_TAG: parseTaxOrExitRequirements(value); break;
-        case IMAGE_OF_FRONT_TAG: parseImageOfFront(value); break;
-        case IMAGE_OF_REAR_TAG: parseImageOfRear(value); break;
-        case DATE_AND_TIME_OF_PERSONALIZATION: parseDateAndTimeOfPersonalization(value); break;
-        case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG: parsePersonalizationSystemSerialNumber(value); break;
-        default: throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
+        case ISSUING_AUTHORITY_TAG:
+          parseIssuingAuthority(value);
+          break;
+        case DATE_OF_ISSUE_TAG:
+          parseDateOfIssue(value);
+          break;
+        case NAME_OF_OTHER_PERSON_TAG:
+          parseNameOfOtherPerson(value);
+          break;
+        case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
+          parseEndorsementsAndObservations(value);
+          break;
+        case TAX_OR_EXIT_REQUIREMENTS_TAG:
+          parseTaxOrExitRequirements(value);
+          break;
+        case IMAGE_OF_FRONT_TAG:
+          parseImageOfFront(value);
+          break;
+        case IMAGE_OF_REAR_TAG:
+          parseImageOfRear(value);
+          break;
+        case DATE_AND_TIME_OF_PERSONALIZATION:
+          parseDateAndTimeOfPersonalization(value);
+          break;
+        case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
+          parsePersonalizationSystemSerialNumber(value);
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
       }
     }
   }
@@ -305,7 +356,9 @@ public class DG12File extends DataGroup {
   }
 
   private void parseDateOfIssue(byte[] value) {
-    if (value == null) { throw new IllegalArgumentException("Wrong date format"); }
+    if (value == null) {
+      throw new IllegalArgumentException("Wrong date format");
+    }
 
     /* Try to interpret value as a ccyymmdd formatted date string as per Doc 9303. */
     if (value.length == 8) {

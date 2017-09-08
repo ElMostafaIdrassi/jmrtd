@@ -391,11 +391,22 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
 
   private static String toProtocolOIDString(String oid) {
-    if (ID_PACE_DH_GM.equals(oid)) { return "id-PACE-DH-GM"; }
-    if (ID_PACE_ECDH_GM.equals(oid)) { return "id-PACE-ECDH-GM"; }
-    if (ID_PACE_DH_IM.equals(oid)) { return "id-PACE-DH-IM"; }
-    if (ID_PACE_ECDH_IM.equals(oid)) { return "id-PACE-ECDH-IM"; }
-    if (ID_PACE_ECDH_CAM.equals(oid)) { return "id-PACE-ECDH-CAM"; }
+    if (ID_PACE_DH_GM.equals(oid)) {
+      return "id-PACE-DH-GM";
+    }
+    if (ID_PACE_ECDH_GM.equals(oid)) {
+      return "id-PACE-ECDH-GM";
+    }
+    if (ID_PACE_DH_IM.equals(oid)) {
+      return "id-PACE-DH-IM";
+    }
+    if (ID_PACE_ECDH_IM.equals(oid)) {
+      return "id-PACE-ECDH-IM";
+    }
+    if (ID_PACE_ECDH_CAM.equals(oid)) {
+      return "id-PACE-ECDH-CAM";
+    }
+    
     return oid;
   }
 }

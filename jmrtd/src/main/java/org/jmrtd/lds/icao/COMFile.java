@@ -90,14 +90,22 @@ public class COMFile extends AbstractTaggedLDSFile {
   public COMFile(String ldsVer, String unicodeVer, int [] tagList) {
     super(EF_COM_TAG);
     try {
-      if (ldsVer == null) { throw new IllegalArgumentException("Null versionLDS"); }
-      if (unicodeVer == null) { throw new IllegalArgumentException("Null versionUnicode"); }
+      if (ldsVer == null) {
+        throw new IllegalArgumentException("Null versionLDS");
+      }
+      if (unicodeVer == null) {
+        throw new IllegalArgumentException("Null versionUnicode");
+      }
       StringTokenizer st = new StringTokenizer(ldsVer, ".");
-      if (st.countTokens() != 2) { throw new IllegalArgumentException("Could not parse LDS version. Expecting 2 level version number x.y."); }
+      if (st.countTokens() != 2) {
+        throw new IllegalArgumentException("Could not parse LDS version. Expecting 2 level version number x.y.");
+      }
       Integer versionLDS = Integer.parseInt(st.nextToken().trim());
       Integer updateLevelLDS = Integer.parseInt(st.nextToken().trim());
       st = new StringTokenizer(unicodeVer, ".");
-      if (st.countTokens() != 3) { throw new IllegalArgumentException("Could not parse unicode version. Expecting 3 level version number x.y.z."); }
+      if (st.countTokens() != 3) {
+        throw new IllegalArgumentException("Could not parse unicode version. Expecting 3 level version number x.y.z.");
+      }
       Integer majorVersionUnicode = Integer.parseInt(st.nextToken().trim());
       Integer minorVersionUnicode = Integer.parseInt(st.nextToken().trim());
       Integer releaseLevelUnicode = Integer.parseInt(st.nextToken().trim());
@@ -118,7 +126,9 @@ public class COMFile extends AbstractTaggedLDSFile {
   private void initialize(String versionLDS, String updateLevelLDS,
       String majorVersionUnicode, String minorVersionUnicode,
       String releaseLevelUnicode, int[] tagList) {
-    if (tagList == null) { throw new IllegalArgumentException("Null tag list"); }
+    if (tagList == null) {
+      throw new IllegalArgumentException("Null tag list");
+    }
     if (versionLDS == null || versionLDS.length() != 2
         || updateLevelLDS == null || updateLevelLDS.length() != 2
         || majorVersionUnicode == null || majorVersionUnicode.length() != 2
@@ -133,7 +143,9 @@ public class COMFile extends AbstractTaggedLDSFile {
     this.minorVersionUnicode = minorVersionUnicode;
     this.releaseLevelUnicode = releaseLevelUnicode;
     this.tagList = new ArrayList<Integer>(tagList.length);
-    for (int tag: tagList) { this.tagList.add(tag); }
+    for (int tag: tagList) {
+      this.tagList.add(tag);
+    }
   }
 
   /**
@@ -183,7 +195,9 @@ public class COMFile extends AbstractTaggedLDSFile {
     /* int tagListLength = */ tlvIn.readLength();
     byte[] tagBytes = tlvIn.readValue();
     tagList = new ArrayList<Integer>();
-    for (int i = 0; i < tagBytes.length; i++) { int dgTag = (tagBytes[i] & 0xFF); tagList.add(dgTag); }
+    for (int i = 0; i < tagBytes.length; i++) {
+      int dgTag = (tagBytes[i] & 0xFF); tagList.add(dgTag);
+    }
   }
 
   /**
@@ -247,7 +261,9 @@ public class COMFile extends AbstractTaggedLDSFile {
    * @param tag tag to insert
    */
   public void insertTag(Integer tag) {
-    if(tagList.contains(tag)) { return; }
+    if (tagList.contains(tag)) {
+      return;
+    }
     tagList.add(tag);
     Collections.sort(tagList);
 
@@ -272,6 +288,7 @@ public class COMFile extends AbstractTaggedLDSFile {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("COMFile ");
@@ -296,10 +313,18 @@ public class COMFile extends AbstractTaggedLDSFile {
    *
    * @return a boolean
    */
+  @Override
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!other.getClass().equals(getClass())) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!other.getClass().equals(getClass())) {
+      return false;
+    }
+    
     COMFile otherCOMFile = (COMFile)other;
     return versionLDS.equals(otherCOMFile.versionLDS) &&
         updateLevelLDS.equals(otherCOMFile.updateLevelLDS) &&
@@ -309,6 +334,7 @@ public class COMFile extends AbstractTaggedLDSFile {
         tagList.equals(otherCOMFile.tagList);
   }
 
+  @Override
   public int hashCode() {
     return 3 * versionLDS.hashCode() +
         5 * updateLevelLDS.hashCode() +

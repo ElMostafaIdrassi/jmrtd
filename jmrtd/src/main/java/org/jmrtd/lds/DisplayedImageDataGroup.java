@@ -57,7 +57,9 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
    */
   public DisplayedImageDataGroup(int dataGroupTag, List<DisplayedImageInfo> imageInfos, int displayedImageTagToUse) {
     super(dataGroupTag);
-    if (imageInfos == null) { throw new IllegalArgumentException("imageInfos cannot be null"); }
+    if (imageInfos == null) {
+      throw new IllegalArgumentException("imageInfos cannot be null");
+    }
     this.displayedImageTagToUse = displayedImageTagToUse;
     this.imageInfos = new ArrayList<DisplayedImageInfo>(imageInfos);
     checkTypesConsistentWithTag();
@@ -108,6 +110,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     }
   }
 
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append(getClass().getSimpleName());
@@ -125,14 +128,23 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     return result.toString();
   }
 
+  @Override
   public int hashCode() {
     return 1337 + (imageInfos == null ? 1 : imageInfos.hashCode()) + 31337;
   }
 
+  @Override
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!getClass().equals(other.getClass())) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!getClass().equals(other.getClass())) {
+      return false;
+    }
+    
     DisplayedImageDataGroup otherDG = (DisplayedImageDataGroup)other;
     return this.imageInfos == otherDG.imageInfos || this.imageInfos != null && this.imageInfos.equals(otherDG.imageInfos);
   }

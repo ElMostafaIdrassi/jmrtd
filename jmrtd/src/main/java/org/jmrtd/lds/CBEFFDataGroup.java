@@ -43,7 +43,6 @@ import net.sf.scuba.tlv.TLVOutputStream;
  * The {@link DG2File}, {@link DG3File}, and {@link DG4File} datagroups
  * are based on this type.
  *
- * @author Cees-Bart Breunesse (ceesb@cs.ru.nl)
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @param <R> the type of the elements
@@ -103,16 +102,26 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
 
   @Override
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!(other instanceof CBEFFDataGroup<?>)) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!(other instanceof CBEFFDataGroup<?>)) {
+      return false;
+    }
+    
     try {
       @SuppressWarnings("unchecked")
       CBEFFDataGroup<R> otherDG = (CBEFFDataGroup<R>)other;
       List<R> subRecords = getSubRecords();
       List<R> otherSubRecords = otherDG.getSubRecords();
       int subRecordCount = subRecords.size();
-      if (subRecordCount != otherSubRecords.size()) { return false; }
+      if (subRecordCount != otherSubRecords.size()) {
+        return false;
+      }
+      
       for (int i = 0; i < subRecordCount; i++) {
         R subRecord = subRecords.get(i);
         R otherSubRecord = otherSubRecords.get(i);

@@ -193,12 +193,23 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   @Override
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!TerminalAuthenticationInfo.class.equals(other.getClass())) { return false; }
-    TerminalAuthenticationInfo otherTerminalAuthenticationInfo = (TerminalAuthenticationInfo)other;
-    if (efCVCA == null && otherTerminalAuthenticationInfo.efCVCA != null) { return false; }
-    if (efCVCA != null && otherTerminalAuthenticationInfo.efCVCA == null) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!TerminalAuthenticationInfo.class.equals(other.getClass())) {
+      return false;
+    }
+    TerminalAuthenticationInfo otherTerminalAuthenticationInfo = (TerminalAuthenticationInfo) other;
+    if (efCVCA == null && otherTerminalAuthenticationInfo.efCVCA != null) {
+      return false;
+    }
+    if (efCVCA != null && otherTerminalAuthenticationInfo.efCVCA == null) {
+      return false;
+    }
+    
     return getDERObject().equals(otherTerminalAuthenticationInfo.getDERObject());
   }
 
@@ -230,7 +241,9 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
       }
       if (efCVCA != null) {
         DEROctetString fid = (DEROctetString)efCVCA.getObjectAt(0);
-        if (fid.getOctets().length != 2) { throw new IllegalArgumentException("Malformed FID."); }
+        if (fid.getOctets().length != 2) {
+          throw new IllegalArgumentException("Malformed FID.");
+        }
         if (efCVCA.size() == 2) {
           DEROctetString sfi = (DEROctetString)efCVCA.getObjectAt(1);
           if (sfi.getOctets().length != 1) {
@@ -255,7 +268,9 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   private static short getFileId(ASN1Sequence efCVCA) {
-    if (efCVCA == null) { return -1; }
+    if (efCVCA == null) {
+      return -1;
+    }
     ASN1Sequence s = (ASN1Sequence)efCVCA;
     DEROctetString fid = (DEROctetString)s.getObjectAt(0);
     byte[] bytes = fid.getOctets();
@@ -263,22 +278,47 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   private static byte getShortFileId(ASN1Sequence efCVCA) {
-    if (efCVCA == null) { return -1; }
-    if (efCVCA.size() != 2) { return -1; }
+    if (efCVCA == null) {
+      return -1;
+    }
+    if (efCVCA.size() != 2) {
+      return -1;
+    }
     return ((DEROctetString)efCVCA.getObjectAt(1)).getOctets()[0];
   }
 
   private String toProtocolOIDString(String oid) {
-    if (ID_TA.equals(oid)) { return "id-TA"; }
-    if (ID_TA_RSA.equals(oid)) { return "id-TA-RSA"; }
-    if (ID_TA_RSA_V1_5_SHA_1.equals(oid)) { return "id-TA-RSA-v1-5-SHA-1"; }
-    if (ID_TA_RSA_V1_5_SHA_256.equals(oid)) { return "id-TA-RSA-v1-5-SHA-256"; }
-    if (ID_TA_RSA_PSS_SHA_1.equals(oid)) { return "id-TA-RSA-PSS-SHA-1"; }
-    if (ID_TA_RSA_PSS_SHA_256.equals(oid)) { return "id-TA-RSA-PSS-SHA-256"; }
-    if (ID_TA_ECDSA.equals(oid)) { return "id-TA-ECDSA"; }
-    if (ID_TA_ECDSA_SHA_1.equals(oid)) { return "id-TA-ECDSA-SHA-1"; }
-    if (ID_TA_ECDSA_SHA_224.equals(oid)) { return "id-TA-ECDSA-SHA-224"; }
-    if (ID_TA_ECDSA_SHA_256.equals(oid)) { return "id-TA-ECDSA-SHA-256"; }
+    if (ID_TA.equals(oid)) {
+      return "id-TA";
+    }
+    if (ID_TA_RSA.equals(oid)) {
+      return "id-TA-RSA";
+    }
+    if (ID_TA_RSA_V1_5_SHA_1.equals(oid)) {
+      return "id-TA-RSA-v1-5-SHA-1";
+    }
+    if (ID_TA_RSA_V1_5_SHA_256.equals(oid)) {
+      return "id-TA-RSA-v1-5-SHA-256";
+    }
+    if (ID_TA_RSA_PSS_SHA_1.equals(oid)) {
+      return "id-TA-RSA-PSS-SHA-1";
+    }
+    if (ID_TA_RSA_PSS_SHA_256.equals(oid)) {
+      return "id-TA-RSA-PSS-SHA-256";
+    }
+    if (ID_TA_ECDSA.equals(oid)) {
+      return "id-TA-ECDSA";
+    }
+    if (ID_TA_ECDSA_SHA_1.equals(oid)) {
+      return "id-TA-ECDSA-SHA-1";
+    }
+    if (ID_TA_ECDSA_SHA_224.equals(oid)) {
+      return "id-TA-ECDSA-SHA-224";
+    }
+    if (ID_TA_ECDSA_SHA_256.equals(oid)) {
+      return "id-TA-ECDSA-SHA-256";
+    }
+    
     return oid;
   }
 }

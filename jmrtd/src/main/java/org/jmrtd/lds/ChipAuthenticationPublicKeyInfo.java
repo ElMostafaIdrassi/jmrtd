@@ -198,9 +198,16 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 
   @Override
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!ChipAuthenticationPublicKeyInfo.class.equals(other.getClass())) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!ChipAuthenticationPublicKeyInfo.class.equals(other.getClass())) {
+      return false;
+    }
+    
     ChipAuthenticationPublicKeyInfo otherInfo = (ChipAuthenticationPublicKeyInfo)other;
     return oid.equals(otherInfo.oid)
         && (keyId == null && otherInfo.keyId == null || keyId != null && keyId.equals(otherInfo.keyId))
@@ -208,8 +215,13 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   }
 
   private static String toProtocolOIDString(String oid) {
-    if (ID_PK_DH.equals(oid)) { return "id-PK-DH"; }
-    if (ID_PK_ECDH.equals(oid)) { return "id-PK-ECDH"; }
+    if (ID_PK_DH.equals(oid)) {
+      return "id-PK-DH";
+    }
+    if (ID_PK_ECDH.equals(oid)) {
+      return "id-PK-ECDH";
+    }
+    
     return oid;
   }
 }

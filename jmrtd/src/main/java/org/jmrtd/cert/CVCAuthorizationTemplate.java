@@ -180,10 +180,17 @@ public class CVCAuthorizationTemplate {
    * @return whether the other object is equal to this object
    */
   public boolean equals(Object otherObj) {
-    if (otherObj == null) { return false; }
-    if (otherObj == this) { return true; }
-    if (!this.getClass().equals(otherObj.getClass())) { return false; }
-    CVCAuthorizationTemplate otherTemplate = (CVCAuthorizationTemplate)otherObj;
+    if (otherObj == null) {
+      return false;
+    }
+    if (otherObj == this) {
+      return true;
+    }
+    if (!this.getClass().equals(otherObj.getClass())) {
+      return false;
+    }
+    
+    CVCAuthorizationTemplate otherTemplate = (CVCAuthorizationTemplate) otherObj;
     return this.role == otherTemplate.role && this.accessRight == otherTemplate.accessRight;
   }
 

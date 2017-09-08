@@ -86,6 +86,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
    * 
    * @return whether the other object is equal to this complex CBEFF info
    */
+  @Override
   public boolean equals(Object other) {
     if (other == null) {
       return false;
@@ -106,6 +107,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
    * 
    * @return the hash code for this complex CBEFF info
    */
+  @Override
   public int hashCode() {
     return 7 * subRecords.hashCode() + 11;
   }

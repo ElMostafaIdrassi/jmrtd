@@ -52,5 +52,29 @@ public class PACESecretKeySpec extends SecretKeySpec {
   public byte getKeyReference() {
     return keyReference;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + keyReference;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    PACESecretKeySpec other = (PACESecretKeySpec) obj;
+    return keyReference == other.keyReference;
+  }  
 }
 

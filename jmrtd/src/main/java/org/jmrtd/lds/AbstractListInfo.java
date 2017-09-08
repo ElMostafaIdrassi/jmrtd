@@ -90,7 +90,10 @@ public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
       List<R> subRecords = getSubRecords();
       List<R> otherSubRecords = otherRecord.getSubRecords();
       int subRecordCount = subRecords.size();
-      if (subRecordCount != otherSubRecords.size()) { return false; }
+      if (subRecordCount != otherSubRecords.size()) {
+        return false;
+      }
+      
       for (int i = 0; i < subRecordCount; i++) {
         R subRecord = subRecords.get(i);
         R otherSubRecord = otherSubRecords.get(i);

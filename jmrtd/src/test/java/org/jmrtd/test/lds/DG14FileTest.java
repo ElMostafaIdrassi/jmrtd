@@ -678,7 +678,10 @@ public class DG14FileTest extends TestCase {
   }
 
   public boolean equalsDHPublicKey(DHPublicKey thisPublicKey, Object other) {
-    if (!(other instanceof DHPublicKey)) { return false; }
+    if (!(other instanceof DHPublicKey)) {
+      return false;
+    }
+    
     DHPublicKey otherPublicKey = (DHPublicKey)other;
     DHParameterSpec params1 = thisPublicKey.getParams();
     DHParameterSpec params2 = otherPublicKey.getParams();

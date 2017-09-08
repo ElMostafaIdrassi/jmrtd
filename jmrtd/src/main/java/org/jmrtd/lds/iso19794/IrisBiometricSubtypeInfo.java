@@ -170,21 +170,27 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
    * 
    * @return the embedded iris image infos
    */
-  public List<IrisImageInfo> getIrisImageInfos() { return getSubRecords(); }
+  public List<IrisImageInfo> getIrisImageInfos() {
+    return getSubRecords();
+  }
 
   /**
    * Adds an iris image info to this iris biometric subtype info.
    * 
    * @param irisImageInfo the iris image info to add
    */
-  public void addIrisImageInfo(IrisImageInfo irisImageInfo) { add(irisImageInfo); }
+  public void addIrisImageInfo(IrisImageInfo irisImageInfo) {
+    add(irisImageInfo);
+  }
 
   /**
    * Removes an iris image info from this iris biometric subtype info.
    * 
    * @param index the index of the iris image info to remove
    */
-  public void removeIrisImageInfo(int index) { remove(index); }
+  public void removeIrisImageInfo(int index) {
+    remove(index);
+  }
 
   /* ONLY PRIVATE METHODS BELOW */
 

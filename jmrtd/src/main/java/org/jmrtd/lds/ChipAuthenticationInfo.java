@@ -186,9 +186,16 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   public boolean equals(Object other) {
-    if (other == null) { return false; }
-    if (other == this) { return true; }
-    if (!ChipAuthenticationInfo.class.equals(other.getClass())) { return false; }
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+    if (!ChipAuthenticationInfo.class.equals(other.getClass())) {
+      return false;
+    }
+    
     ChipAuthenticationInfo otherChipAuthenticationInfo = (ChipAuthenticationInfo)other;
     return oid.equals(otherChipAuthenticationInfo.oid)
         && version == otherChipAuthenticationInfo.version
@@ -262,14 +269,31 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   private static String toProtocolOIDString(String oid) {
-    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)) { return "id-CA-DH-3DES-CBC-CBC"; }
-    if (ID_CA_DH_AES_CBC_CMAC_128.equals(oid)) { return "id-CA-DH-AES-CBC-CMAC-128"; }
-    if (ID_CA_DH_AES_CBC_CMAC_192.equals(oid)) { return "id-CA-DH-AES-CBC-CMAC-192"; }
-    if (ID_CA_DH_AES_CBC_CMAC_256.equals(oid)) { return "id-CA-DH-AES-CBC-CMAC-256"; }
-    if (ID_CA_ECDH_3DES_CBC_CBC.equals(oid)) { return "id-CA-ECDH-3DES-CBC-CBC"; }
-    if (ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)) { return "id-CA-ECDH-AES-CBC-CMAC-128"; }
-    if (ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)) { return "id-CA-ECDH-AES-CBC-CMAC-192"; }
-    if (ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) { return "id-CA-ECDH-AES-CBC-CMAC-256"; }
+    if (ID_CA_DH_3DES_CBC_CBC.equals(oid)) {
+      return "id-CA-DH-3DES-CBC-CBC";
+    }
+    if (ID_CA_DH_AES_CBC_CMAC_128.equals(oid)) {
+      return "id-CA-DH-AES-CBC-CMAC-128";
+    }
+    if (ID_CA_DH_AES_CBC_CMAC_192.equals(oid)) {
+      return "id-CA-DH-AES-CBC-CMAC-192";
+    }
+    if (ID_CA_DH_AES_CBC_CMAC_256.equals(oid)) {
+      return "id-CA-DH-AES-CBC-CMAC-256";
+    }
+    if (ID_CA_ECDH_3DES_CBC_CBC.equals(oid)) {
+      return "id-CA-ECDH-3DES-CBC-CBC";
+    }
+    if (ID_CA_ECDH_AES_CBC_CMAC_128.equals(oid)) {
+      return "id-CA-ECDH-AES-CBC-CMAC-128";
+    }
+    if (ID_CA_ECDH_AES_CBC_CMAC_192.equals(oid)) {
+      return "id-CA-ECDH-AES-CBC-CMAC-192";
+    }
+    if (ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
+      return "id-CA-ECDH-AES-CBC-CMAC-256";
+    }
+    
     return oid;
   }
 }

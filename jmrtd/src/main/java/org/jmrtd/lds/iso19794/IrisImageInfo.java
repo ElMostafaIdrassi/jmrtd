@@ -46,18 +46,28 @@ public class IrisImageInfo extends AbstractImageInfo {
   /* TODO: proper enums for data types */
 
   /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
-  public static int
-  IMAGE_QUAL_UNDEF = 0xFE, /* (decimal 254) */
-  IMAGE_QUAL_LOW_LO = 0x1A,
-  IMAGE_QUAL_LOW_HI = 0x32, /* (decimal 26-50) */
-  IMAGE_QUAL_MED_LO = 0x33,
-  IMAGE_QUAL_MED_HI = 0x4B, /* (decimal 51-75) */
-  IMAGE_QUAL_HIGH_LO = 0x4C,
-  IMAGE_QUAL_HIGH_HI = 0x64; /* (decimal 76-100) */
+  public static final int IMAGE_QUAL_UNDEF = 0xFE; /* (decimal 254) */
 
-  private static final int
-  ROT_ANGLE_UNDEF = 0xFFFF,
-  ROT_UNCERTAIN_UNDEF = 0xFFFF;
+  /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
+  public static final int IMAGE_QUAL_LOW_LO = 0x1A;
+
+  /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
+  public static final int IMAGE_QUAL_LOW_HI = 0x32; /* (decimal 26-50) */
+
+  /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
+  public static final int IMAGE_QUAL_MED_LO = 0x33;
+
+  /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
+  public static final int IMAGE_QUAL_MED_HI = 0x4B; /* (decimal 51-75) */
+
+  /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
+  public static final int IMAGE_QUAL_HIGH_LO = 0x4C;
+
+  /** Image quality, based on Table 3 in Section 5.5 of ISO 19794-6. */
+  public static final int IMAGE_QUAL_HIGH_HI = 0x64; /* (decimal 76-100) */
+
+  private static final int ROT_ANGLE_UNDEF = 0xFFFF;
+  private static final int ROT_UNCERTAIN_UNDEF = 0xFFFF;
 
   /** The imageFormat (is more precise than mimeType). Constants are in {@link IrisInfo}. */
   private int imageFormat;
@@ -87,7 +97,9 @@ public class IrisImageInfo extends AbstractImageInfo {
   public IrisImageInfo(int imageNumber, int quality, int rotationAngle, int rotationAngleUncertainty,
       int width, int height, InputStream imageBytes, int imageLength, int imageFormat) throws IOException {
     super(TYPE_IRIS, width, height, imageBytes, imageLength, getMimeTypeFromImageFormat(imageFormat));
-    if (imageBytes == null) { throw new IllegalArgumentException("Null image bytes"); }
+    if (imageBytes == null) {
+      throw new IllegalArgumentException("Null image bytes");
+    }
     this.imageNumber = imageNumber;
     this.quality = quality;
     this.rotationAngle = rotationAngle;

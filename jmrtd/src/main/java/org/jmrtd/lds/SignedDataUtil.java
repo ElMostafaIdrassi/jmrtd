@@ -333,10 +333,13 @@ import org.jmrtd.Util;
   public static X509Certificate getDocSigningCertificate(SignedData signedData) throws CertificateException {
     byte[] certSpec = null;
     ASN1Set certs = signedData.getCertificates();
-    if (certs == null || certs.size() <= 0) { return null; }
+    if (certs == null || certs.size() <= 0) {
+      return null;
+    }
     if (certs.size() != 1) {
       LOGGER.warning("Found " + certs.size() + " certificates");
     }
+    
     X509CertificateObject certObject = null;
     for (int i = 0; i < certs.size(); i++) {
       org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance((ASN1Sequence)certs.getObjectAt(i));
@@ -453,70 +456,192 @@ import org.jmrtd.Util;
    * @throws NoSuchAlgorithmException if the provided OID is not yet supported
    */
   public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {
-    if (oid == null) { return null; }
-    if (oid.equals(X509ObjectIdentifiers.organization.getId())) { return "O"; }
-    if (oid.equals(X509ObjectIdentifiers.organizationalUnitName.getId())) { return "OU"; }
-    if (oid.equals(X509ObjectIdentifiers.commonName.getId())) { return "CN"; }
-    if (oid.equals(X509ObjectIdentifiers.countryName.getId())) { return "C"; }
-    if (oid.equals(X509ObjectIdentifiers.stateOrProvinceName.getId())) { return "ST"; }
-    if (oid.equals(X509ObjectIdentifiers.localityName.getId())) { return "L"; }
-    if(oid.equals(X509ObjectIdentifiers.id_SHA1.getId())) { return "SHA-1"; }
-    if(oid.equals(NISTObjectIdentifiers.id_sha224.getId())) { return "SHA-224"; }
-    if(oid.equals(NISTObjectIdentifiers.id_sha256.getId())) { return "SHA-256"; }
-    if(oid.equals(NISTObjectIdentifiers.id_sha384.getId())) { return "SHA-384"; }
-    if(oid.equals(NISTObjectIdentifiers.id_sha512.getId())) { return "SHA-512"; }
-    if (oid.equals(X9_SHA1_WITH_ECDSA_OID)) { return "SHA1withECDSA"; }
-    if (oid.equals(X9_SHA224_WITH_ECDSA_OID)) { return "SHA224withECDSA"; }
-    if (oid.equals(X9_SHA256_WITH_ECDSA_OID)) { return "SHA256withECDSA"; }
-    if (oid.equals(X9_SHA384_WITH_ECDSA_OID)) { return "SHA384withECDSA"; }
-    if (oid.equals(X9_SHA512_WITH_ECDSA_OID)) { return "SHA512withECDSA"; }
-    if (oid.equals(PKCS1_RSA_OID)) { return "RSA"; }
-    if (oid.equals(PKCS1_MD2_WITH_RSA_OID)) { return "MD2withRSA"; }
-    if (oid.equals(PKCS1_MD4_WITH_RSA_OID)) { return "MD4withRSA"; }
-    if (oid.equals(PKCS1_MD5_WITH_RSA_OID)) { return "MD5withRSA"; }
-    if (oid.equals(PKCS1_SHA1_WITH_RSA_OID)) { return "SHA1withRSA"; }
-    if (oid.equals(PKCS1_SHA256_WITH_RSA_OID)) { return "SHA256withRSA"; }
-    if (oid.equals(PKCS1_SHA384_WITH_RSA_OID)) { return "SHA384withRSA"; }
-    if (oid.equals(PKCS1_SHA512_WITH_RSA_OID)) { return "SHA512withRSA"; }
-    if (oid.equals(PKCS1_SHA224_WITH_RSA_OID)) { return "SHA224withRSA"; }
-    if (oid.equals(IEEE_P1363_SHA1_OID)) { return "SHA-1"; }
-    if (oid.equals(PKCS1_RSASSA_PSS_OID)) { return "SSAwithRSA/PSS"; }
-    if (oid.equals(PKCS1_MGF1)) { return "MGF1"; }
+    if (oid == null) {
+      return null;
+    }
+    if (oid.equals(X509ObjectIdentifiers.organization.getId())) {
+      return "O";
+    }
+    if (oid.equals(X509ObjectIdentifiers.organizationalUnitName.getId())) {
+      return "OU";
+    }
+    if (oid.equals(X509ObjectIdentifiers.commonName.getId())) {
+      return "CN";
+    }
+    if (oid.equals(X509ObjectIdentifiers.countryName.getId())) {
+      return "C";
+    }
+    if (oid.equals(X509ObjectIdentifiers.stateOrProvinceName.getId())) {
+      return "ST";
+    }
+    if (oid.equals(X509ObjectIdentifiers.localityName.getId())) {
+      return "L";
+    }
+    if (oid.equals(X509ObjectIdentifiers.id_SHA1.getId())) {
+      return "SHA-1";
+    }
+    if (oid.equals(NISTObjectIdentifiers.id_sha224.getId())) {
+      return "SHA-224";
+    }
+    if (oid.equals(NISTObjectIdentifiers.id_sha256.getId())) {
+      return "SHA-256";
+    }
+    if (oid.equals(NISTObjectIdentifiers.id_sha384.getId())) {
+      return "SHA-384";
+    }
+    if (oid.equals(NISTObjectIdentifiers.id_sha512.getId())) {
+      return "SHA-512";
+    }
+    if (oid.equals(X9_SHA1_WITH_ECDSA_OID)) {
+      return "SHA1withECDSA";
+    }
+    if (oid.equals(X9_SHA224_WITH_ECDSA_OID)) {
+      return "SHA224withECDSA";
+    }
+    if (oid.equals(X9_SHA256_WITH_ECDSA_OID)) {
+      return "SHA256withECDSA";
+    }
+    if (oid.equals(X9_SHA384_WITH_ECDSA_OID)) {
+      return "SHA384withECDSA";
+    }
+    if (oid.equals(X9_SHA512_WITH_ECDSA_OID)) {
+      return "SHA512withECDSA";
+    }
+    if (oid.equals(PKCS1_RSA_OID)) {
+      return "RSA";
+    }
+    if (oid.equals(PKCS1_MD2_WITH_RSA_OID)) {
+      return "MD2withRSA";
+    }
+    if (oid.equals(PKCS1_MD4_WITH_RSA_OID)) {
+      return "MD4withRSA";
+    }
+    if (oid.equals(PKCS1_MD5_WITH_RSA_OID)) {
+      return "MD5withRSA";
+    }
+    if (oid.equals(PKCS1_SHA1_WITH_RSA_OID)) {
+      return "SHA1withRSA";
+    }
+    if (oid.equals(PKCS1_SHA256_WITH_RSA_OID)) {
+      return "SHA256withRSA";
+    }
+    if (oid.equals(PKCS1_SHA384_WITH_RSA_OID)) {
+      return "SHA384withRSA";
+    }
+    if (oid.equals(PKCS1_SHA512_WITH_RSA_OID)) {
+      return "SHA512withRSA";
+    }
+    if (oid.equals(PKCS1_SHA224_WITH_RSA_OID)) {
+      return "SHA224withRSA";
+    }
+    if (oid.equals(IEEE_P1363_SHA1_OID)) {
+      return "SHA-1";
+    }
+    if (oid.equals(PKCS1_RSASSA_PSS_OID)) {
+      return "SSAwithRSA/PSS";
+    }
+    if (oid.equals(PKCS1_MGF1)) {
+      return "MGF1";
+    }
+    
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 
   public static String lookupOIDByMnemonic(String name) throws NoSuchAlgorithmException {
-    if (name.equals("O")) { return X509ObjectIdentifiers.organization.getId(); }
-    if (name.equals("OU")) { return X509ObjectIdentifiers.organizationalUnitName.getId(); }
-    if (name.equals("CN")) { return X509ObjectIdentifiers.commonName.getId(); }
-    if (name.equals("C")) { return X509ObjectIdentifiers.countryName.getId(); }
-    if (name.equals("ST")) { return X509ObjectIdentifiers.stateOrProvinceName.getId(); }
-    if (name.equals("L")) { return X509ObjectIdentifiers.localityName.getId(); }
-    if(name.equalsIgnoreCase("SHA-1") || name.equalsIgnoreCase("SHA1")) { return X509ObjectIdentifiers.id_SHA1.getId(); }
-    if(name.equalsIgnoreCase("SHA-224") || name.equalsIgnoreCase("SHA224")) { return NISTObjectIdentifiers.id_sha224.getId(); }
-    if(name.equalsIgnoreCase("SHA-256") || name.equalsIgnoreCase("SHA256")) { return NISTObjectIdentifiers.id_sha256.getId(); }
-    if(name.equalsIgnoreCase("SHA-384") || name.equalsIgnoreCase("SHA384")) { return NISTObjectIdentifiers.id_sha384.getId(); }
-    if(name.equalsIgnoreCase("SHA-512") || name.equalsIgnoreCase("SHA512")) { return NISTObjectIdentifiers.id_sha512.getId(); }
-    if (name.equalsIgnoreCase("RSA")) { return PKCS1_RSA_OID; }
-    if (name.equalsIgnoreCase("MD2withRSA")) { return PKCS1_MD2_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("MD4withRSA")) { return PKCS1_MD4_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("MD5withRSA")) { return  PKCS1_MD5_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("SHA1withRSA")) { return  PKCS1_SHA1_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("SHA256withRSA")) { return PKCS1_SHA256_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("SHA384withRSA")) { return PKCS1_SHA384_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("SHA512withRSA")) { return PKCS1_SHA512_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("SHA224withRSA")) { return PKCS1_SHA224_WITH_RSA_OID; }
-    if (name.equalsIgnoreCase("SHA1withECDSA")) { return X9_SHA1_WITH_ECDSA_OID; }
-    if (name.equalsIgnoreCase("SHA224withECDSA")) { return X9_SHA224_WITH_ECDSA_OID; }
-    if (name.equalsIgnoreCase("SHA256withECDSA")) { return X9_SHA256_WITH_ECDSA_OID; }
-    if (name.equalsIgnoreCase("SHA384withECDSA")) { return X9_SHA384_WITH_ECDSA_OID; }
-    if (name.equalsIgnoreCase("SHA512withECDSA")) { return X9_SHA512_WITH_ECDSA_OID; }
-    if (name.equalsIgnoreCase("SAwithRSA/PSS")) { return PKCS1_RSASSA_PSS_OID; }
-    if (name.equalsIgnoreCase("SSAwithRSA/PSS")) { return PKCS1_RSASSA_PSS_OID; }
-    if (name.equalsIgnoreCase("RSASSA-PSS")) { return PKCS1_RSASSA_PSS_OID; }
-    if (name.equalsIgnoreCase("MGF1")) { return PKCS1_MGF1; }
-    if (name.equalsIgnoreCase("SHA256withRSAandMGF1")) { return PKCS1_MGF1; }
-    if (name.equalsIgnoreCase("SHA512withRSAandMGF1")) { return PKCS1_MGF1; }
+    if (name.equals("O")) {
+      return X509ObjectIdentifiers.organization.getId();
+    }
+    if (name.equals("OU")) {
+      return X509ObjectIdentifiers.organizationalUnitName.getId();
+    }
+    if (name.equals("CN")) {
+      return X509ObjectIdentifiers.commonName.getId();
+    }
+    if (name.equals("C")) {
+      return X509ObjectIdentifiers.countryName.getId();
+    }
+    if (name.equals("ST")) {
+      return X509ObjectIdentifiers.stateOrProvinceName.getId();
+    }
+    if (name.equals("L")) {
+      return X509ObjectIdentifiers.localityName.getId();
+    }
+    if (name.equalsIgnoreCase("SHA-1") || name.equalsIgnoreCase("SHA1")) {
+      return X509ObjectIdentifiers.id_SHA1.getId();
+    }
+    if (name.equalsIgnoreCase("SHA-224") || name.equalsIgnoreCase("SHA224")) {
+      return NISTObjectIdentifiers.id_sha224.getId();
+    }
+    if (name.equalsIgnoreCase("SHA-256") || name.equalsIgnoreCase("SHA256")) {
+      return NISTObjectIdentifiers.id_sha256.getId();
+    }
+    if (name.equalsIgnoreCase("SHA-384") || name.equalsIgnoreCase("SHA384")) {
+      return NISTObjectIdentifiers.id_sha384.getId();
+    }
+    if (name.equalsIgnoreCase("SHA-512") || name.equalsIgnoreCase("SHA512")) {
+      return NISTObjectIdentifiers.id_sha512.getId();
+    }
+    if (name.equalsIgnoreCase("RSA")) {
+      return PKCS1_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("MD2withRSA")) {
+      return PKCS1_MD2_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("MD4withRSA")) {
+      return PKCS1_MD4_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("MD5withRSA")) {
+      return PKCS1_MD5_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA1withRSA")) {
+      return PKCS1_SHA1_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA256withRSA")) {
+      return PKCS1_SHA256_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA384withRSA")) {
+      return PKCS1_SHA384_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA512withRSA")) {
+      return PKCS1_SHA512_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA224withRSA")) {
+      return PKCS1_SHA224_WITH_RSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA1withECDSA")) {
+      return X9_SHA1_WITH_ECDSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA224withECDSA")) {
+      return X9_SHA224_WITH_ECDSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA256withECDSA")) {
+      return X9_SHA256_WITH_ECDSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA384withECDSA")) {
+      return X9_SHA384_WITH_ECDSA_OID;
+    }
+    if (name.equalsIgnoreCase("SHA512withECDSA")) {
+      return X9_SHA512_WITH_ECDSA_OID;
+    }
+    if (name.equalsIgnoreCase("SAwithRSA/PSS")) {
+      return PKCS1_RSASSA_PSS_OID;
+    }
+    if (name.equalsIgnoreCase("SSAwithRSA/PSS")) {
+      return PKCS1_RSASSA_PSS_OID;
+    }
+    if (name.equalsIgnoreCase("RSASSA-PSS")) {
+      return PKCS1_RSASSA_PSS_OID;
+    }
+    if (name.equalsIgnoreCase("MGF1")) {
+      return PKCS1_MGF1;
+    }
+    if (name.equalsIgnoreCase("SHA256withRSAandMGF1")) {
+      return PKCS1_MGF1;
+    }
+    if (name.equalsIgnoreCase("SHA512withRSAandMGF1")) {
+      return PKCS1_MGF1;
+    }
+    
     throw new NoSuchAlgorithmException("Unknown name " + name);
   }
 
