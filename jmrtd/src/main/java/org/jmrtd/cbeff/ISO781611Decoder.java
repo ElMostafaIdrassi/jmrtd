@@ -171,9 +171,12 @@ public class ISO781611Decoder implements ISO781611 {
     Map<Integer, byte[]> elements = new HashMap<Integer, byte[]>();
     int bytesRead = 0;
     while (bytesRead < bhtLength) {
-      int tag = tlvIn.readTag(); bytesRead += TLVUtil.getTagLength(tag);
-      int length = tlvIn.readLength(); bytesRead += TLVUtil.getLengthLength(length);
-      byte[] value = tlvIn.readValue(); bytesRead += value.length;
+      int tag = tlvIn.readTag();
+      bytesRead += TLVUtil.getTagLength(tag);
+      int length = tlvIn.readLength();
+      bytesRead += TLVUtil.getLengthLength(length);
+      byte[] value = tlvIn.readValue();
+      bytesRead += value.length;
       elements.put(tag, value);
     }
     return new StandardBiometricHeader(elements);

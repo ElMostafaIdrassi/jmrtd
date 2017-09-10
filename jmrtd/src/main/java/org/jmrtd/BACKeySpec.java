@@ -22,9 +22,6 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
-import java.security.spec.KeySpec;
-
 /**
  * A BAC key.
  * 

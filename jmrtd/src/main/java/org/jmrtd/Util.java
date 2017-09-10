@@ -896,7 +896,7 @@ public class Util {
       ECParameterSpec params = ecPublicKey.getParams();
       params = toExplicitECParameterSpec(params);
       ECPublicKeySpec explicitPublicKeySpec = new ECPublicKeySpec(w, params);
-      
+
       return KeyFactory.getInstance("EC", BC_PROVIDER).generatePublic(explicitPublicKeySpec);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Could not make public key param spec explicit", e);
@@ -958,7 +958,8 @@ public class Util {
           tlvOutputStream.writeTag(0x83);
           tlvOutputStream.writeValue(i2os(generator)); /* Generator */
         }
-        tlvOutputStream.writeTag(0x84); tlvOutputStream.writeValue(i2os(y)); /* y: Public value */
+        tlvOutputStream.writeTag(0x84);
+        tlvOutputStream.writeValue(i2os(y)); /* y: Public value */
       } else if (publicKey instanceof ECPublicKey) {
         ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
         ECParameterSpec params = ecPublicKey.getParams();

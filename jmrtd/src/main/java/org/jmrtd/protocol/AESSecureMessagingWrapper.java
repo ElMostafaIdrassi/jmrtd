@@ -84,7 +84,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     this.ssc = ssc;
     sscIVCipher = Util.getCipher("AES/ECB/NoPadding", Cipher.ENCRYPT_MODE, ksEnc);
     cipher = Util.getCipher("AES/CBC/NoPadding");
-    mac = Util.getMac("AESCMAC", ksMac);    
+    mac = Util.getMac("AESCMAC", ksMac);
   }
 
   /**
@@ -270,10 +270,19 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
         while (!finished) {
           int tag = inputStream.readByte();
           switch (tag) {
-            case (byte) 0x87: data = readDO87(inputStream, false); break;
-            case (byte) 0x85: data = readDO87(inputStream, true); break;
-            case (byte) 0x99: sw = readDO99(inputStream); break;
-            case (byte) 0x8E: cc = readDO8E(inputStream); finished = true; break;
+            case (byte) 0x87:
+              data = readDO87(inputStream, false);
+              break;
+            case (byte) 0x85:
+              data = readDO87(inputStream, true);
+              break;
+            case (byte) 0x99:
+              sw = readDO99(inputStream);
+              break;
+            case (byte) 0x8E:
+              cc = readDO8E(inputStream);
+              finished = true;
+              break;
           }
         }
       } finally {

@@ -218,9 +218,15 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentCode = readStringWithFillers(dataIn, 2);
     this.documentType = getDocumentTypeFromDocumentCode(this.documentCode);
     switch (length) {
-      case 88: this.documentType = DOC_TYPE_ID3; break;
-      case 90: this.documentType = DOC_TYPE_ID1; break;
-      default: this.documentType = getDocumentTypeFromDocumentCode(this.documentCode); break;
+      case 88:
+        this.documentType = DOC_TYPE_ID3;
+        break;
+      case 90:
+        this.documentType = DOC_TYPE_ID1;
+        break;
+      default:
+        this.documentType = getDocumentTypeFromDocumentCode(this.documentCode);
+        break;
     }
     if (this.documentType == DOC_TYPE_ID1) {
       /* line 1, pos 3 to 5 Issuing State or organization */
@@ -1065,26 +1071,106 @@ public class MRZInfo extends AbstractLDSInfo {
   private static int decodeMRZDigit(byte ch) throws NumberFormatException {
     switch (ch) {
       case '<':
-      case '0': return 0; case '1': return 1; case '2': return 2;
-      case '3': return 3; case '4': return 4; case '5': return 5;
-      case '6': return 6; case '7': return 7; case '8': return 8;
-      case '9': return 9;
-      case 'a': case 'A': return 10; case 'b': case 'B': return 11;
-      case 'c': case 'C': return 12; case 'd': case 'D': return 13;
-      case 'e': case 'E': return 14; case 'f': case 'F': return 15;
-      case 'g': case 'G': return 16; case 'h': case 'H': return 17;
-      case 'i': case 'I': return 18; case 'j': case 'J': return 19;
-      case 'k': case 'K': return 20; case 'l': case 'L': return 21;
-      case 'm': case 'M': return 22; case 'n': case 'N': return 23;
-      case 'o': case 'O': return 24; case 'p': case 'P': return 25;
-      case 'q': case 'Q': return 26; case 'r': case 'R': return 27;
-      case 's': case 'S': return 28; case 't': case 'T': return 29;
-      case 'u': case 'U': return 30; case 'v': case 'V': return 31;
-      case 'w': case 'W': return 32; case 'x': case 'X': return 33;
-      case 'y': case 'Y': return 34; case 'z': case 'Z': return 35;
+      case '0':
+        return 0;
+      case '1':
+        return 1;
+      case '2':
+        return 2;
+      case '3':
+        return 3;
+      case '4':
+        return 4;
+      case '5':
+        return 5;
+      case '6':
+        return 6;
+      case '7':
+        return 7;
+      case '8':
+        return 8;
+      case '9':
+        return 9;
+      case 'a':
+      case 'A':
+        return 10;
+      case 'b':
+      case 'B':
+        return 11;
+      case 'c':
+      case 'C':
+        return 12;
+      case 'd':
+      case 'D':
+        return 13;
+      case 'e':
+      case 'E':
+        return 14;
+      case 'f':
+      case 'F':
+        return 15;
+      case 'g':
+      case 'G':
+        return 16;
+      case 'h':
+      case 'H':
+        return 17;
+      case 'i':
+      case 'I':
+        return 18;
+      case 'j':
+      case 'J':
+        return 19;
+      case 'k':
+      case 'K':
+        return 20;
+      case 'l':
+      case 'L':
+        return 21;
+      case 'm':
+      case 'M':
+        return 22;
+      case 'n':
+      case 'N':
+        return 23;
+      case 'o':
+      case 'O':
+        return 24;
+      case 'p':
+      case 'P':
+        return 25;
+      case 'q':
+      case 'Q':
+        return 26;
+      case 'r':
+      case 'R':
+        return 27;
+      case 's':
+      case 'S':
+        return 28;
+      case 't':
+      case 'T':
+        return 29;
+      case 'u':
+      case 'U':
+        return 30;
+      case 'v':
+      case 'V':
+        return 31;
+      case 'w':
+      case 'W':
+        return 32;
+      case 'x':
+      case 'X':
+        return 33;
+      case 'y':
+      case 'Y':
+        return 34;
+      case 'z':
+      case 'Z':
+        return 35;
       default:
-        throw new NumberFormatException("Could not decode MRZ character "
-            + ch + " ('" + Character.toString((char)ch) + "')");
+        throw new NumberFormatException("Could not decode MRZ character " + ch + " ('" + Character.toString((char) ch) + "')");
     }
   }
 }

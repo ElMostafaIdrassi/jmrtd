@@ -22,12 +22,9 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
 import java.security.GeneralSecurityException;
-import java.security.spec.KeySpec;
 
 import org.jmrtd.protocol.PACEProtocol;
-import org.w3c.dom.views.AbstractView;
 
 /**
  * A key for PACE, can be CAN, MRZ, PIN, or PUK.

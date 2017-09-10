@@ -28,7 +28,6 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECPoint;
-import java.security.spec.KeySpec;
 import java.util.Arrays;
 
 import org.jmrtd.AccessKeySpec;

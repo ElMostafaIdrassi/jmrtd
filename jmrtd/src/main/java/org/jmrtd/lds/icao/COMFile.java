@@ -196,7 +196,8 @@ public class COMFile extends AbstractTaggedLDSFile {
     byte[] tagBytes = tlvIn.readValue();
     tagList = new ArrayList<Integer>();
     for (int i = 0; i < tagBytes.length; i++) {
-      int dgTag = (tagBytes[i] & 0xFF); tagList.add(dgTag);
+      int dgTag = (tagBytes[i] & 0xFF);
+      tagList.add(dgTag);
     }
   }
 

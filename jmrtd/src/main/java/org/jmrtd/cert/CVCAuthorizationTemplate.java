@@ -39,10 +39,10 @@ public class CVCAuthorizationTemplate {
    * @version $Revision$
    */
   public enum Role {
-    CVCA  (0xC0),
-    DV_D  (0x80),
-    DV_F  (0x40),
-    IS    (0x00);
+    CVCA(0xC0),
+    DV_D(0x80),
+    DV_F(0x40),
+    IS(0x00);
 
     private byte value;
 
@@ -69,10 +69,10 @@ public class CVCAuthorizationTemplate {
    */
   public enum Permission
   {
-    READ_ACCESS_NONE        (0x00),
-    READ_ACCESS_DG3         (0x01),
-    READ_ACCESS_DG4         (0x02),
-    READ_ACCESS_DG3_AND_DG4 (0x03);
+    READ_ACCESS_NONE(0x00),
+    READ_ACCESS_DG3(0x01),
+    READ_ACCESS_DG4(0x02),
+    READ_ACCESS_DG3_AND_DG4(0x03);
 
     private byte value;
 
@@ -89,10 +89,14 @@ public class CVCAuthorizationTemplate {
      */
     public boolean implies(Permission other) {
       switch (this) {
-        case READ_ACCESS_NONE: return other == READ_ACCESS_NONE;
-        case READ_ACCESS_DG3: return other == READ_ACCESS_DG3;
-        case READ_ACCESS_DG4: return other == READ_ACCESS_DG4;
-        case READ_ACCESS_DG3_AND_DG4: return other == READ_ACCESS_DG3 || other == READ_ACCESS_DG4 || other == READ_ACCESS_DG3_AND_DG4;
+        case READ_ACCESS_NONE:
+          return other == READ_ACCESS_NONE;
+        case READ_ACCESS_DG3:
+          return other == READ_ACCESS_DG3;
+        case READ_ACCESS_DG4:
+          return other == READ_ACCESS_DG4;
+        case READ_ACCESS_DG3_AND_DG4:
+          return other == READ_ACCESS_DG3 || other == READ_ACCESS_DG4 || other == READ_ACCESS_DG3_AND_DG4;
       }
       return false;
     }
@@ -118,19 +122,36 @@ public class CVCAuthorizationTemplate {
   protected CVCAuthorizationTemplate(org.ejbca.cvc.CVCAuthorizationTemplate template) {
     try {
       switch(template.getAuthorizationField().getRole()) {
-        case CVCA: this.role = Role.CVCA; break;
-        case DV_D: this.role = Role.DV_D; break;
-        case DV_F: this.role = Role.DV_F; break;
-        case IS: this.role = Role.IS; break;
+        case CVCA:
+          this.role = Role.CVCA;
+          break;
+        case DV_D:
+          this.role = Role.DV_D;
+          break;
+        case DV_F:
+          this.role = Role.DV_F;
+          break;
+        case IS:
+          this.role = Role.IS;
+          break;
       }
+      
       switch(template.getAuthorizationField().getAccessRight()) {
-        case READ_ACCESS_NONE: this.accessRight = Permission.READ_ACCESS_NONE; break;
-        case READ_ACCESS_DG3: this.accessRight = Permission.READ_ACCESS_DG3; break;
-        case READ_ACCESS_DG4: this.accessRight = Permission.READ_ACCESS_DG4; break;
-        case READ_ACCESS_DG3_AND_DG4: this.accessRight = Permission.READ_ACCESS_DG3_AND_DG4; break;
+        case READ_ACCESS_NONE:
+          this.accessRight = Permission.READ_ACCESS_NONE;
+          break;
+        case READ_ACCESS_DG3:
+          this.accessRight = Permission.READ_ACCESS_DG3;
+          break;
+        case READ_ACCESS_DG4:
+          this.accessRight = Permission.READ_ACCESS_DG4;
+          break;
+        case READ_ACCESS_DG3_AND_DG4:
+          this.accessRight = Permission.READ_ACCESS_DG3_AND_DG4;
+          break;
       }
     } catch (NoSuchFieldException nsfe) {
-      throw new IllegalArgumentException("Error getting role from AuthZ template");
+      throw new IllegalArgumentException("Error getting role from AuthZ template", nsfe);
     }
   }
 
@@ -168,6 +189,7 @@ public class CVCAuthorizationTemplate {
    * 
    * @return a textual representation of this authorization template
    */
+  @Override
   public String toString() {
     return role.toString() + accessRight.toString();
   }
@@ -179,6 +201,7 @@ public class CVCAuthorizationTemplate {
    * 
    * @return whether the other object is equal to this object
    */
+  @Override
   public boolean equals(Object otherObj) {
     if (otherObj == null) {
       return false;
@@ -199,30 +222,41 @@ public class CVCAuthorizationTemplate {
    * 
    * @return the hash code
    */
+  @Override
   public int hashCode() {
     return 2 * role.value + 3 * accessRight.value + 61;
   }
 
   static org.ejbca.cvc.AccessRightEnum fromPermission(Permission thisPermission) {
     try{
-      switch(thisPermission) {
-        case READ_ACCESS_NONE: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_NONE;
-        case READ_ACCESS_DG3: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3;
-        case READ_ACCESS_DG4: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG4;
-        case READ_ACCESS_DG3_AND_DG4: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3_AND_DG4;
+      switch (thisPermission) {
+        case READ_ACCESS_NONE:
+          return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_NONE;
+        case READ_ACCESS_DG3:
+          return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3;
+        case READ_ACCESS_DG4:
+          return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG4;
+        case READ_ACCESS_DG3_AND_DG4:
+          return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3_AND_DG4;
+        default:
+          throw new IllegalArgumentException("Error getting permission for " + thisPermission);
       }
     } catch (Exception e) {
+      throw new IllegalArgumentException("Error getting permission from AuthZ template", e);
     }
-    throw new IllegalArgumentException("Error getting permission from AuthZ template");
   }
 
   static org.ejbca.cvc.AuthorizationRoleEnum fromRole(Role thisRole) {
     try {
-      switch(thisRole) {
-        case CVCA: return org.ejbca.cvc.AuthorizationRoleEnum.CVCA;
-        case DV_D: return org.ejbca.cvc.AuthorizationRoleEnum.DV_D;
-        case DV_F: return org.ejbca.cvc.AuthorizationRoleEnum.DV_F;
-        case IS: return org.ejbca.cvc.AuthorizationRoleEnum.IS;
+      switch (thisRole) {
+        case CVCA:
+          return org.ejbca.cvc.AuthorizationRoleEnum.CVCA;
+        case DV_D:
+          return org.ejbca.cvc.AuthorizationRoleEnum.DV_D;
+        case DV_F:
+          return org.ejbca.cvc.AuthorizationRoleEnum.DV_F;
+        case IS:
+          return org.ejbca.cvc.AuthorizationRoleEnum.IS;
       }
     } catch (Exception e) {
     }
