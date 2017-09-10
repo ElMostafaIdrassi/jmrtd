@@ -32,7 +32,7 @@ import java.security.spec.KeySpec;
  * 
  * @version $Revision$
  */
-public interface BACKeySpec extends KeySpec, Serializable {
+public interface BACKeySpec extends AccessKeySpec {
 
   /**
    * Gets the document number. This does not include a check digit.

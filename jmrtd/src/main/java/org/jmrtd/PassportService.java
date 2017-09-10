@@ -22,7 +22,6 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
@@ -76,9 +75,7 @@ import net.sf.scuba.smartcards.CardServiceException;
  *
  * @version $Revision:352 $
  */
-public class PassportService extends PassportApduService implements Serializable {
-
-  private static final long serialVersionUID = 1751933705552226972L;
+public class PassportService extends PassportApduService {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 

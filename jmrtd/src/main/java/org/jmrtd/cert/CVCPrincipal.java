@@ -49,9 +49,11 @@ public class CVCPrincipal implements Principal, Serializable {
    * @param name a name with format Country (2F) | Mnemonic (9V) | SeqNum (5F).
    */
   public CVCPrincipal(String name) {
-    if (name == null || name.length() < 2 + 5 || name.length() > 2 + 9 + 5) {
-      throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found "
-          + name == null ? "null" : "\"" + name + "\"");
+    if (name == null) {
+      throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found null");
+    }
+    if (name.length() < 2 + 5 || name.length() > 2 + 9 + 5) {
+      throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found \"" + name + "\""); 
     }
     country = Country.getInstance(name.substring(0, 2).toUpperCase());
     mnemonic = name.substring(2, name.length() - 5);

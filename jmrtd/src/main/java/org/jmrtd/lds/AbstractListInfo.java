@@ -25,6 +25,7 @@ package org.jmrtd.lds;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ import java.util.List;
  *
  * @param <R> the type of the elements
  */
-public abstract class AbstractListInfo<R> extends AbstractLDSInfo {
+public abstract class AbstractListInfo<R extends Serializable> extends AbstractLDSInfo {
 
   private static final long serialVersionUID = 2970076896364365191L;
 

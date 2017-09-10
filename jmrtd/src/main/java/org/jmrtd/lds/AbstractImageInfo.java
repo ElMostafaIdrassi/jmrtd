@@ -51,7 +51,8 @@ public abstract class AbstractImageInfo implements ImageInfo {
   private String mimeType;
   private byte[] imageBytes;
 
-  private SplittableInputStream splittableInputStream;
+  // FIXME: It's not clear how serialization should work if not fully read. (Clients should only serialize if imageBytes != null.)
+  private transient SplittableInputStream splittableInputStream;
   int imagePositionInInputStream;
   int imageLength;
 

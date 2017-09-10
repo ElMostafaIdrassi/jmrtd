@@ -49,9 +49,7 @@ import net.sf.scuba.tlv.TLVInputStream;
  *
  * @version $Revision$
  */
-class MRTDFileSystem implements FileSystemStructured, Serializable {
-
-  private static final long serialVersionUID = -4357282016708205020L;
+class MRTDFileSystem implements FileSystemStructured {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 

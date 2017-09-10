@@ -141,10 +141,13 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     return parameterId;
   }
 
-  //  public ASN1Encodable getParameters() {
-  //    return domainParameter.getParameters();
-  //  }
-
+  /**
+   * Gets the parameters in the form of algorithm identifier
+   * with algorithm 1.2.840.10046.2.1 (DH public number)
+   * or 1.2.840.10045.2.1 (EC public key).
+   * 
+   * @return the parameters 
+   */
   public AlgorithmParameterSpec getParameters() {
     if (ID_DH_PUBLIC_NUMBER.equals(oid)) {
       throw new IllegalStateException("DH PACEDomainParameterInfo not yet implemented"); // FIXME
@@ -173,6 +176,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     return new DLSequence(vector);
   }
 
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("PACEDomainParameterInfo");
@@ -192,6 +196,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     return result.toString();
   }
 
+  @Override
   public int hashCode() {
     return 111111111
         + 7 * oid.hashCode()
@@ -199,6 +204,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
         + 3 * (parameterId == null ? 333 : parameterId.hashCode());
   }
 
+  @Override
   public boolean equals(Object other) {
     if (other == null) {
       return false;

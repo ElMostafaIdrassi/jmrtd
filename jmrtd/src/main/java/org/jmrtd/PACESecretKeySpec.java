@@ -33,9 +33,9 @@ import javax.crypto.spec.SecretKeySpec;
  *
  * (Contributions by g.giorkhelidze.)
  */
-public class PACESecretKeySpec extends SecretKeySpec {
-  
-  private static final long serialVersionUID = 1L;
+public class PACESecretKeySpec extends SecretKeySpec implements AccessKeySpec {
+
+  private static final long serialVersionUID = -5181060361947453857L;
 
   private byte keyReference;
 

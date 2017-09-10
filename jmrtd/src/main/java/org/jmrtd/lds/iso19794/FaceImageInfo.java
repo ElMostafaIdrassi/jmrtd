@@ -28,6 +28,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -770,22 +771,6 @@ public class FaceImageInfo extends AbstractImageInfo {
     return "unknown";
   }
 
-  /*
-   private String imageColorSpaceToString() {
-      switch(imageColorSpace) {
-      case IMAGE_COLOR_SPACE_UNSPECIFIED: return "unspecified";
-      case IMAGE_COLOR_SPACE_RGB24: return "24 bit RGB";
-      case IMAGE_COLOR_SPACE_YUV422: return "YUV422";
-      case IMAGE_COLOR_SPACE_GRAY8: return "8 bit grayscale";
-      case IMAGE_COLOR_SPACE_OTHER: return "other";
-      }
-      if (imageColorSpace >= 128) {
-         return "unknown (vendor specific)";
-      }
-      return "unknown";
-   }
-   */
-
   private static String toMimeType(int compressionAlg) {
     LOGGER.info("DEBUG: Image type: " + compressionAlg);
 
@@ -800,37 +785,17 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
-  private static String toMimeType(ImageDataType imageDataType) {
-    switch(imageDataType) {
-      case TYPE_JPEG:
-        return "image/jpeg";
-      case TYPE_JPEG2000:
-        return "image/jpeg2000"; /* FIXME; Check ietf rfc3745, shouldn't this be "image/jp2"? */
-      default:
-        return null;
-    }
-  }
-
-  private static int fromMimeType(String mimeType) {
-    if ("image/jpeg".equals(mimeType)) {
-      return IMAGE_DATA_TYPE_JPEG;
-    }
-    if ("image/jpeg2000".equals(mimeType) || "image/jp2".equals(mimeType)) {
-      return IMAGE_DATA_TYPE_JPEG2000;
-    }
-    
-    throw new IllegalArgumentException("Did not recognize mimeType");
-  }
-
   /**
    * Feature points as described in Section 5.6.3 of ISO/IEC FCD 19794-5.
    *
-   * @author Martijn Oostdijk (martijn.oostdijk@gmail.com)
+   * @author The JMRTD team (info@jmrtd.org)
    *
    * @version $Revision$
    */
-  public static class FeaturePoint {
+  public static class FeaturePoint implements Serializable {
     
+    private static final long serialVersionUID = -4209679423938065215L;
+
     private int type;
     private int majorCode;
     private int minorCode;

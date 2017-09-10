@@ -23,6 +23,7 @@
 package org.jmrtd.protocol;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -30,6 +31,7 @@ import java.security.spec.ECPoint;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
+import org.jmrtd.AccessKeySpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
 
 /**
@@ -49,7 +51,7 @@ public class PACEResult implements Serializable {
   private String digestAlg;
   private int keyLength;
 
-  private KeySpec paceKey;
+  private AccessKeySpec paceKey;
 
   private PACEMappingResult mappingResult;
 
@@ -73,7 +75,7 @@ public class PACEResult implements Serializable {
    * @param piccPublicKey the public key sent by the PICC
    * @param wrapper the resulting secure messaging wrapper
    */
-  public PACEResult(KeySpec paceKey,
+  public PACEResult(AccessKeySpec paceKey,
       MappingType mappingType, String agreementAlg, String cipherAlg, String digestAlg, int keyLength,
       PACEMappingResult mappingResult,
       KeyPair pcdKeyPair, PublicKey piccPublicKey, SecureMessagingWrapper wrapper) {
@@ -94,7 +96,7 @@ public class PACEResult implements Serializable {
    * 
    * @return the PACE key
    */
-  public KeySpec getPACEKey() {
+  public AccessKeySpec getPACEKey() {
     return paceKey;
   }
 
@@ -250,11 +252,15 @@ public class PACEResult implements Serializable {
     return true;
   }
 
-  public static abstract class PACEMappingResult {
+  public static abstract class PACEMappingResult implements Serializable {
 
-    private AlgorithmParameterSpec staticParameters;
+    private static final long serialVersionUID = 2773111318950631118L;
 
-    private AlgorithmParameterSpec ephemeralParameters;
+    // FIXME: Should be serializable instead of transient.
+    private transient AlgorithmParameterSpec staticParameters;
+
+    // FIXME: Should be serializable insyead of transient.
+    private transient AlgorithmParameterSpec ephemeralParameters;
 
     private byte[] piccNonce;
 
@@ -328,6 +334,8 @@ public class PACEResult implements Serializable {
 
   public static abstract class PACEGMMappingResult extends PACEMappingResult {
 
+    private static final long serialVersionUID = -3373471956987358728L;
+
     private PublicKey piccMappingPublicKey;
     private KeyPair pcdMappingKeyPair;
 
@@ -390,24 +398,31 @@ public class PACEResult implements Serializable {
 
   public static class PACEGMWithECDHMappingResult extends PACEGMMappingResult {
 
-    private ECPoint sharedSecretPoint;
+    private static final long serialVersionUID = -3892431861957032423L;
+
+    private BigInteger sharedSecretPointX;
+    private BigInteger sharedSecretPointY;
 
     public PACEGMWithECDHMappingResult(AlgorithmParameterSpec staticParameters,
         byte[] piccNonce, PublicKey piccMappingPublicKey, KeyPair pcdMappingKeyPair, ECPoint sharedSecretPoint,
         AlgorithmParameterSpec ephemeralParameters) {
       super(staticParameters, piccNonce, piccMappingPublicKey, pcdMappingKeyPair, ephemeralParameters);
-      this.sharedSecretPoint = sharedSecretPoint;
+      this.sharedSecretPointX = sharedSecretPoint.getAffineX();
+      this.sharedSecretPointY = sharedSecretPoint.getAffineY();
     }
 
     public ECPoint getSharedSecretPoint() {
-      return sharedSecretPoint;
+      return new ECPoint(sharedSecretPointX, sharedSecretPointY);
     }
 
     @Override
     public int hashCode() {
       final int prime = 31;
       int result = super.hashCode();
-      result = prime * result + ((sharedSecretPoint == null) ? 0 : sharedSecretPoint.hashCode());
+      result = prime * result
+          + ((sharedSecretPointX == null) ? 0 : sharedSecretPointX.hashCode())
+          + ((sharedSecretPointY == null) ? 0 : sharedSecretPointY.hashCode());
+
       return result;
     }
 
@@ -424,19 +439,29 @@ public class PACEResult implements Serializable {
       }
 
       PACEGMWithECDHMappingResult other = (PACEGMWithECDHMappingResult) obj;
-      if (sharedSecretPoint == null) {
-        if (other.sharedSecretPoint != null) {
+      if (sharedSecretPointX == null) {
+        if (other.sharedSecretPointX != null) {
           return false;
         }
-      } else if (!sharedSecretPoint.equals(other.sharedSecretPoint)) {
+      } else if (!sharedSecretPointX.equals(other.sharedSecretPointX)) {
         return false;
       }
 
+      if (sharedSecretPointY == null) {
+        if (other.sharedSecretPointY != null) {
+          return false;
+        }
+      } else if (!sharedSecretPointY.equals(other.sharedSecretPointY)) {
+        return false;
+      }
+      
       return true;
     }
   }
 
   public static class PACEGMWithDHMappingResult extends PACEGMMappingResult {
+
+    private static final long serialVersionUID = -2829641255641406199L;
 
     private byte[] sharedSecret;
 
@@ -481,6 +506,8 @@ public class PACEResult implements Serializable {
   }
 
   public static class PACEIMMappingResult extends PACEMappingResult {
+
+    private static final long serialVersionUID = -6415752866407346050L;
 
     private byte[] pcdNonce;
 

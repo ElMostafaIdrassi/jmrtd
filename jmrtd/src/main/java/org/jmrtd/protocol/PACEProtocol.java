@@ -58,6 +58,7 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.PACEException;
 import org.jmrtd.PACEKeySpec;
@@ -158,8 +159,30 @@ public class PACEProtocol {
    * @return a PACE result
    *
    * @throws PACEException on error
+   * 
+   * @deprecated Use the variant of this method that takes an AccessKeySpec
    */
+  @Deprecated
   public PACEResult doPACE(KeySpec accessKey, String oid, AlgorithmParameterSpec params) throws PACEException {
+    if (!(accessKey instanceof AccessKeySpec)) {
+      throw new IllegalArgumentException("Wrong key type: " + accessKey.getClass().getSimpleName());
+    }
+    
+    return doPACE((AccessKeySpec)accessKey, oid, params);
+  }
+  
+  /**
+   * Performs the PACE 2.0 / SAC protocol.
+   *
+   * @param accessKey the MRZ or CAN based access key
+   * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
+   * @param params explicit static domain parameters the domain params for DH or ECDH
+   * 
+   * @return a PACE result
+   *
+   * @throws PACEException on error
+   */
+  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params) throws PACEException {
     try {
       return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
     } catch (GeneralSecurityException gse) {
@@ -179,7 +202,7 @@ public class PACEProtocol {
    *
    * @throws PACEException if authentication failed
    */
-  private PACEResult doPACE(KeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws PACEException {
+  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws PACEException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */

@@ -865,6 +865,7 @@ public class Util {
         KeyFactory factory = KeyFactory.getInstance("DH");
         return factory.generatePublic(keySpec);
       } catch (GeneralSecurityException gse) {
+        LOGGER.log(Level.FINE, "Not DH public key? Fine, let's try EC public key", gse);
         KeyFactory factory = KeyFactory.getInstance("EC", BC_PROVIDER);
         return factory.generatePublic(keySpec);
       }
@@ -894,12 +895,8 @@ public class Util {
       ECPoint w = ecPublicKey.getW();
       ECParameterSpec params = ecPublicKey.getParams();
       params = toExplicitECParameterSpec(params);
-      if (params == null) {
-        return publicKey;
-      }
-
       ECPublicKeySpec explicitPublicKeySpec = new ECPublicKeySpec(w, params);
-
+      
       return KeyFactory.getInstance("EC", BC_PROVIDER).generatePublic(explicitPublicKeySpec);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Could not make public key param spec explicit", e);

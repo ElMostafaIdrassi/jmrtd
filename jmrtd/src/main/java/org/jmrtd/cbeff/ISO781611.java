@@ -52,12 +52,11 @@ public interface ISO781611 {
   /**
    * From ISO7816-11: Secure Messaging Template tags.
    */
-  static final int
-  SMT_TAG = 0x7D,
-  SMT_DO_PV = 0x81,
-  SMT_DO_CG = 0x85,
-  SMT_DO_CC = 0x8E,
-  SMT_DO_DS = 0x9E;
+  static final int SMT_TAG = 0x7D;
+  static final int SMT_DO_PV = 0x81;
+  static final int SMT_DO_CG = 0x85;
+  static final int SMT_DO_CC = 0x8E;
+  static final int SMT_DO_DS = 0x9E;
 
   /**
    * ISO 7816-11, table C.1., used inside the BHT.

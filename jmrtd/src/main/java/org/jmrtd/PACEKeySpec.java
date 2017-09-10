@@ -27,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.spec.KeySpec;
 
 import org.jmrtd.protocol.PACEProtocol;
+import org.w3c.dom.views.AbstractView;
 
 /**
  * A key for PACE, can be CAN, MRZ, PIN, or PUK.
@@ -37,7 +38,7 @@ import org.jmrtd.protocol.PACEProtocol;
  *
  * (Contributions by g.giorkhelidze.)
  */
-public class PACEKeySpec implements KeySpec, Serializable {
+public class PACEKeySpec implements AccessKeySpec {
 
   private static final long serialVersionUID = -7113246293247012560L;
 

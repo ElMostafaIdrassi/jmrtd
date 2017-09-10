@@ -84,8 +84,6 @@ public class PassportApduService extends CardService {
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte PUK_PACE_KEY_REFERENCE = 0x04;
 
-  private static final long serialVersionUID = 2451509825132976178L;
-
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
@@ -105,10 +103,10 @@ public class PassportApduService extends CardService {
   private byte[] atr;
 
   /** DESede encryption/decryption cipher. */
-  private transient Cipher cipher;
+  private Cipher cipher;
 
   /** ISO9797Alg3Mac. */
-  private transient Mac mac;
+  private Mac mac;
 
   private Collection<APDUListener> plainTextAPDUListeners;
 
@@ -952,7 +950,7 @@ public class PassportApduService extends CardService {
    * @param rapdu response APDU
    */
   protected void notifyExchangedPlainTextAPDU(int count, CommandAPDU capdu, ResponseAPDU rapdu) {
-    if (plainTextAPDUListeners == null || plainTextAPDUListeners.size() < 1) {
+    if (plainTextAPDUListeners == null || plainTextAPDUListeners.isEmpty()) {
       return;
     }
 

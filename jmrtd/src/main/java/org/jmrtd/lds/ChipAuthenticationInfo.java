@@ -203,6 +203,10 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   public static String toKeyAgreementAlgorithm(String oid) {
+    if (oid == null) {
+      throw new NumberFormatException("Unknown OID: null"); 
+    }
+    
     if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
         || ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
         || ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
@@ -214,8 +218,8 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
       return "ECDH";
     }
-    //    return null;
-    throw new NumberFormatException("Unknown OID: " + oid == null ? "null" : "\"" + oid + "\"");
+    
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
   public static String toCipherAlgorithm(String oid) {

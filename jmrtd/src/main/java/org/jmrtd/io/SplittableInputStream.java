@@ -24,7 +24,6 @@ package org.jmrtd.io;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
 
 /**
  * An input stream which will wrap another input stream (and yield the same bytes) and which can
@@ -36,8 +35,6 @@ import java.util.logging.Logger;
  * @version $Revision$
  */
 public class SplittableInputStream extends InputStream {
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private InputStreamBuffer inputStreamBuffer; // FIXME should be private
   private InputStreamBuffer.SubInputStream carrier;
