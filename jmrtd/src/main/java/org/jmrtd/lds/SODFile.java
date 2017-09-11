@@ -493,7 +493,7 @@ public class SODFile extends AbstractTaggedLDSFile {
         inputStream.close();
       }
     } catch (IOException ioe) {
-      throw new IllegalStateException("Could not read security object in signedData");
+      throw new IllegalStateException("Could not read security object in signedData", ioe);
     }
   }
 }

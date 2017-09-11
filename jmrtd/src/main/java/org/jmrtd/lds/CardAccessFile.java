@@ -53,8 +53,6 @@ public class CardAccessFile implements Serializable {
 
   private static final long serialVersionUID = -3536507558193769951L;
 
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
   /** The security infos that make up this file. */
   private Set<SecurityInfo> securityInfos;
 
@@ -120,6 +118,7 @@ public class CardAccessFile implements Serializable {
    *
    * @return signature algorithm OID
    */
+  @Override
   public String toString() {
     return new StringBuilder()
         .append("CardAccessFile [")
@@ -134,6 +133,7 @@ public class CardAccessFile implements Serializable {
    *
    * @return whether this object equals the other object
    */
+  @Override
   public boolean equals(Object otherObj) {
     if (otherObj == null) {
       return false;
@@ -159,6 +159,7 @@ public class CardAccessFile implements Serializable {
    *
    * @return the hash code
    */
+  @Override
   public int hashCode() {
     return 7 * securityInfos.hashCode() + 61;
   }

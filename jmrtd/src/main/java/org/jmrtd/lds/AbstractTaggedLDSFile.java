@@ -133,6 +133,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     return "TaggedLDSFile [" + Integer.toHexString(getTag()) + " (" + getLength() + ")]";
   }

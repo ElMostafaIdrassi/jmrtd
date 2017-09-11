@@ -174,6 +174,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid);
   }
 
+  @Override
   public String toString() {
     return "ChipAuthenticationInfo ["
         + "protocol: " + toProtocolOIDString(oid)
@@ -181,10 +182,12 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         + ", keyId: " + (keyId == null ? "-" : keyId) + "]";
   }
 
+  @Override
   public int hashCode() {
     return 3 + 11 * (oid == null ? 0 : oid.hashCode()) + 61 * version + 1991 * (keyId == null ? 111 : keyId.hashCode());
   }
 
+  @Override
   public boolean equals(Object other) {
     if (other == null) {
       return false;

@@ -24,7 +24,6 @@ package org.jmrtd.lds;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
 
 /**
  * Base class for data group files.
@@ -36,8 +35,6 @@ import java.util.logging.Logger;
 public abstract class DataGroup extends AbstractTaggedLDSFile {
 
   private static final long serialVersionUID = -4761360877353069639L;
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /**
    * Constructs a data group. This constructor
@@ -68,6 +65,7 @@ public abstract class DataGroup extends AbstractTaggedLDSFile {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     return "DataGroup [" + Integer.toHexString(getTag()) + " (" + getLength() + ")]";
   }

@@ -197,6 +197,7 @@ public class CardSecurityFile implements Serializable {
       outputStream.close();
       return outputStream.toByteArray();
     } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception while encoding CardSecurityFile", ioe);
       return null;
     }
   }
@@ -263,6 +264,7 @@ public class CardSecurityFile implements Serializable {
    *
    * @return signature algorithm OID
    */
+  @Override
   public String toString() {
     return "CardSecurityFile [" + securityInfos.toString() + "]";
   }
@@ -274,6 +276,7 @@ public class CardSecurityFile implements Serializable {
    *
    * @return whether this object equals the other object
    */
+  @Override
   public boolean equals(Object otherObj) {
     if (otherObj == null) {
       return false;
@@ -296,6 +299,7 @@ public class CardSecurityFile implements Serializable {
    *
    * @return the hash code
    */
+  @Override
   public int hashCode() {
     return 3 * securityInfos.hashCode() + 63;
   }

@@ -33,18 +33,26 @@ import java.io.InputStream;
  */
 public interface ImageInfo extends LDSElement {
 
-  /** Mime-types. */
-  static String
-  JPEG_MIME_TYPE = "image/jpeg",
-  JPEG2000_MIME_TYPE = "image/jp2",
-  WSQ_MIME_TYPE = "image/x-wsq";
+  /** Mime-type. */
+  static String JPEG_MIME_TYPE = "image/jpeg";
+  
+  /** Mime-type. */
+  static String JPEG2000_MIME_TYPE = "image/jp2";
+  
+  /** Mime-type. */
+  static String WSQ_MIME_TYPE = "image/x-wsq";
 
   /** Type of image. */
-  static final int
-  TYPE_PORTRAIT = 0,
-  TYPE_SIGNATURE_OR_MARK = 1,
-  TYPE_FINGER = 2,
-  TYPE_IRIS = 3;
+  static final int TYPE_PORTRAIT = 0;
+
+  /** Type of image. */
+  static final int TYPE_SIGNATURE_OR_MARK = 1; 
+  
+  /** Type of image. */
+  static final int TYPE_FINGER = 2;
+
+  /** Type of image. */
+  static final int TYPE_IRIS = 3;
 
   /**
    * Gets the (biometric) type of the image.

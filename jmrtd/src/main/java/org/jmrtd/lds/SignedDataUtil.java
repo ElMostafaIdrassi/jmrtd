@@ -30,7 +30,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -94,32 +93,65 @@ import org.jmrtd.Util;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
+  /** SignedData related object identifier. */
+  public static final String RFC_3369_SIGNED_DATA_OID = "1.2.840.113549.1.7.2"; /* id-signedData OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 } */
 
   /** SignedData related object identifier. */
-  public static final String
-  RFC_3369_SIGNED_DATA_OID = "1.2.840.113549.1.7.2",    /* id-signedData OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 } */
-  RFC_3369_CONTENT_TYPE_OID = "1.2.840.113549.1.9.3",
-  RFC_3369_MESSAGE_DIGEST_OID = "1.2.840.113549.1.9.4",
-  PKCS1_RSA_OID = "1.2.840.113549.1.1.1",
-  PKCS1_MD2_WITH_RSA_OID = "1.2.840.113549.1.1.2",
-  PKCS1_MD4_WITH_RSA_OID = "1.2.840.113549.1.1.3",
-  PKCS1_MD5_WITH_RSA_OID = "1.2.840.113549.1.1.4",
-  PKCS1_SHA1_WITH_RSA_OID = "1.2.840.113549.1.1.5",
-  //  PKCS1_RSAOAEP_ENC_SET = "1.2.840.113549.1.1.6", // other identifier: ripemd160WithRSAEncryption
-  //  PKCS1_RSAES_OAEP = "1.2.840.113549.1.1.7",
-  PKCS1_MGF1 = "1.2.840.113549.1.1.8",
-  PKCS1_RSASSA_PSS_OID = "1.2.840.113549.1.1.10",
-  PKCS1_SHA256_WITH_RSA_OID = "1.2.840.113549.1.1.11",
-  PKCS1_SHA384_WITH_RSA_OID = "1.2.840.113549.1.1.12",
-  PKCS1_SHA512_WITH_RSA_OID = "1.2.840.113549.1.1.13",
-  PKCS1_SHA224_WITH_RSA_OID = "1.2.840.113549.1.1.14",
-  X9_SHA1_WITH_ECDSA_OID = "1.2.840.10045.4.1",
-  X9_SHA224_WITH_ECDSA_OID = "1.2.840.10045.4.3.1",
-  X9_SHA256_WITH_ECDSA_OID = "1.2.840.10045.4.3.2",
-  X9_SHA384_WITH_ECDSA_OID = "1.2.840.10045.4.3.3",
-  X9_SHA512_WITH_ECDSA_OID = "1.2.840.10045.4.3.4",
-  IEEE_P1363_SHA1_OID = "1.3.14.3.2.26";
+  public static final String RFC_3369_CONTENT_TYPE_OID = "1.2.840.113549.1.9.3";
+
+  /** SignedData related object identifier. */
+  public static final String RFC_3369_MESSAGE_DIGEST_OID = "1.2.840.113549.1.9.4";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_RSA_OID = "1.2.840.113549.1.1.1";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_MD2_WITH_RSA_OID = "1.2.840.113549.1.1.2";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_MD4_WITH_RSA_OID = "1.2.840.113549.1.1.3";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_MD5_WITH_RSA_OID = "1.2.840.113549.1.1.4";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_SHA1_WITH_RSA_OID = "1.2.840.113549.1.1.5";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_MGF1 = "1.2.840.113549.1.1.8";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_RSASSA_PSS_OID = "1.2.840.113549.1.1.10";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_SHA256_WITH_RSA_OID = "1.2.840.113549.1.1.11";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_SHA384_WITH_RSA_OID = "1.2.840.113549.1.1.12";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_SHA512_WITH_RSA_OID = "1.2.840.113549.1.1.13";
+
+  /** SignedData related object identifier. */
+  public static final String PKCS1_SHA224_WITH_RSA_OID = "1.2.840.113549.1.1.14";
+
+  /** SignedData related object identifier. */
+  public static final String X9_SHA1_WITH_ECDSA_OID = "1.2.840.10045.4.1";
+
+  /** SignedData related object identifier. */
+  public static final String X9_SHA224_WITH_ECDSA_OID = "1.2.840.10045.4.3.1";
+
+  /** SignedData related object identifier. */
+  public static final String X9_SHA256_WITH_ECDSA_OID = "1.2.840.10045.4.3.2";
+
+  /** SignedData related object identifier. */
+  public static final String X9_SHA384_WITH_ECDSA_OID = "1.2.840.10045.4.3.3";
+
+  /** SignedData related object identifier. */
+  public static final String X9_SHA512_WITH_ECDSA_OID = "1.2.840.10045.4.3.4";
+
+  /** SignedData related object identifier. */
+  public static final String IEEE_P1363_SHA1_OID = "1.3.14.3.2.26";
 
   /**
    * Prevents instantiation.

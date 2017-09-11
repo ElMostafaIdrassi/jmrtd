@@ -328,15 +328,8 @@ public class FragmentBuffer implements Serializable {
 
     private static final long serialVersionUID = -3795931618553980328L;
 
-    private int offset, length;
-
-    public int getOffset() {
-      return offset;
-    }
-
-    public int getLength() {
-      return length;
-    }
+    private int offset;
+    private int length;
 
     private Fragment(int offset, int length) {
       this.offset = offset;
@@ -346,11 +339,21 @@ public class FragmentBuffer implements Serializable {
     public static Fragment getInstance(int offset, int length) {
       return new Fragment(offset, length);
     }
+    
+    public int getOffset() {
+      return offset;
+    }
 
+    public int getLength() {
+      return length;
+    }
+
+    @Override
     public String toString() {
       return "[" + offset + " .. " + (offset + length - 1)  + " (" + length + ")]";
     }
-
+    
+    @Override
     public boolean equals(Object otherObject) {
       if (otherObject == null) {
         return false;
@@ -366,6 +369,7 @@ public class FragmentBuffer implements Serializable {
       return otherFragment.offset == offset && otherFragment.length == length;
     }
 
+    @Override
     public int hashCode() {
       return 2 * offset + 3 * length + 5;
     }

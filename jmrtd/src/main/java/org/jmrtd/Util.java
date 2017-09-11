@@ -104,13 +104,11 @@ import net.sf.scuba.util.Hex;
 /**
  * Some static helper functions. Mostly dealing with low-level crypto.
  *
- * @deprecated The visibility of this class will be changed to package.
- *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
-@Deprecated
+/* FIXME: We may want to change the visibility of this class to package. */
 public class Util {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");

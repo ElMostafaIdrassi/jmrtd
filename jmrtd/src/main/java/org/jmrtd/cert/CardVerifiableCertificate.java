@@ -212,6 +212,7 @@ public class CardVerifiableCertificate extends Certificate {
    *
    * @return a string representation of this certificate.
    */
+  @Override
   public String toString() {
     return cvCertificate.toString();
   }
@@ -240,6 +241,7 @@ public class CardVerifiableCertificate extends Certificate {
         foundProvider = true;
         break;
       } catch (NoSuchAlgorithmException nse) {
+        LOGGER.log(Level.FINE, "Trying next provider", nse);
         continue;
       }
     }
@@ -388,6 +390,7 @@ public class CardVerifiableCertificate extends Certificate {
    *
    * @return whether this certificate equals the other object
    */
+  @Override
   public boolean equals(Object otherObj) {
     if (otherObj == null) {
       return false;
@@ -398,7 +401,7 @@ public class CardVerifiableCertificate extends Certificate {
     if (!this.getClass().equals(otherObj.getClass())) {
       return false;
     }
-    
+
     return this.cvCertificate.equals(((CardVerifiableCertificate) otherObj).cvCertificate);
   }
 
@@ -407,6 +410,7 @@ public class CardVerifiableCertificate extends Certificate {
    *
    * @return a hash code for this object
    */
+  @Override
   public int hashCode() {
     return cvCertificate.hashCode() * 2 - 1030507011;
   }

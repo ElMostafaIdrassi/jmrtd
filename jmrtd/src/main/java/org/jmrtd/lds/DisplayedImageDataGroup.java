@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
@@ -42,6 +43,8 @@ import net.sf.scuba.tlv.TLVOutputStream;
 public abstract class DisplayedImageDataGroup extends DataGroup {
 
   private static final long serialVersionUID = 5994136177872308962L;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final int DISPLAYED_IMAGE_COUNT_TAG = 0x02;
 
@@ -182,6 +185,10 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
           if (displayedImageTagToUse != DisplayedImageInfo.DISPLAYED_PORTRAIT_TAG) {
             throw new IllegalArgumentException("\'Signature or usual mark\' image cannot be part of a \'Portrait\' displayed image datagroup");
           }
+          break;
+        default:
+          LOGGER.warning("Unsupported image type");
+          break;
       }
     }
   }

@@ -31,32 +31,65 @@ package org.jmrtd.lds;
  */
 public interface LDSFile extends LDSElement {
 
-  /**
-   * ICAO specific data group tag.
-   * Note that in EAC 1.11 documents there is also the CVCA file that has no tag.
-   */
-  public static final int
-  EF_COM_TAG = 0x60,
-  EF_DG1_TAG = 0x61,
-  EF_DG2_TAG = 0x75,
-  EF_DG3_TAG = 0x63,
-  EF_DG4_TAG = 0x76,
-  EF_DG5_TAG = 0x65,
-  EF_DG6_TAG = 0x66,
-  EF_DG7_TAG = 0x67,
-  EF_DG8_TAG = 0x68,
-  EF_DG9_TAG = 0x69,
-  EF_DG10_TAG = 0x6A,
-  EF_DG11_TAG = 0x6B,
-  EF_DG12_TAG = 0x6C,
-  EF_DG13_TAG = 0x6D,
-  EF_DG14_TAG = 0x6E,
-  EF_DG15_TAG = 0x6F,
-  EF_DG16_TAG = 0x70,
-  EF_SOD_TAG = 0x77;
+  
+/* NOTE: In EAC 1.11 documents there is also the CVCA file that has no tag. */
+
+  /** ICAO tag for document index (COM). */
+  public static final int EF_COM_TAG = 0x60;
+  
+  /** ICAO data group tag for DG1. */
+  public static final int EF_DG1_TAG = 0x61;
+  
+  /** ICAO data group tag for DG2. */
+  public static final int EF_DG2_TAG = 0x75;
+
+  /** ICAO data group tag for DG3. */
+  public static final int EF_DG3_TAG = 0x63;
+
+  /** ICAO data group tag for DG4. */
+  public static final int EF_DG4_TAG = 0x76;
+
+  /** ICAO data group tag for DG5. */
+  public static final int EF_DG5_TAG = 0x65;
+
+  /** ICAO data group tag for DG6. */
+  public static final int EF_DG6_TAG = 0x66;
+
+  /** ICAO data group tag for DG7. */
+  public static final int EF_DG7_TAG = 0x67;
+
+  /** ICAO data group tag for DG8. */
+  public static final int EF_DG8_TAG = 0x68;
+
+  /** ICAO data group tag for DG9. */
+  public static final int EF_DG9_TAG = 0x69;
+
+  /** ICAO data group tag for DG10. */
+  public static final int EF_DG10_TAG = 0x6A;
+
+  /** ICAO data group tag for DG11. */
+  public static final int EF_DG11_TAG = 0x6B;
+
+  /** ICAO data group tag for DG12. */
+  public static final int EF_DG12_TAG = 0x6C;
+
+  /** ICAO data group tag for DG13. */
+  public static final int EF_DG13_TAG = 0x6D;
+
+  /** ICAO data group tag for DG14. */
+  public static final int EF_DG14_TAG = 0x6E;
+
+  /** ICAO data group tag for DG15. */
+  public static final int EF_DG15_TAG = 0x6F;
+
+  /** ICAO data group tag for DG16. */
+  public static final int EF_DG16_TAG = 0x70;
+  
+  /** ICAO tag for document security index (SOd). */
+  public static final int EF_SOD_TAG = 0x77;
 
   /**
-   * Gets the length of this file.
+   * Returns the length of this file.
    * 
    * @return the length of this file
    */

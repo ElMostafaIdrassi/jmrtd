@@ -22,9 +22,6 @@
 
 package org.jmrtd.cert;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.ejbca.cvc.AccessRightEnum;
 import org.ejbca.cvc.AuthorizationRoleEnum;
 
@@ -36,8 +33,6 @@ import org.ejbca.cvc.AuthorizationRoleEnum;
  * @version $Revision$
  */
 public class CVCAuthorizationTemplate {
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /**
    * The issuing authority.
@@ -75,8 +70,7 @@ public class CVCAuthorizationTemplate {
    *
    * @version $Revision$
    */
-  public enum Permission
-  {
+  public enum Permission {
     READ_ACCESS_NONE(0x00),
     READ_ACCESS_DG3(0x01),
     READ_ACCESS_DG4(0x02),
@@ -115,7 +109,7 @@ public class CVCAuthorizationTemplate {
      * 
      * @return a bitmap
      */
-    public byte getValue(){
+    public byte getValue() {
       return value;
     }
   }
@@ -129,45 +123,9 @@ public class CVCAuthorizationTemplate {
    * @param template the authZ template to wrap
    */
   protected CVCAuthorizationTemplate(org.ejbca.cvc.CVCAuthorizationTemplate template) {
-    try {
-      AuthorizationRoleEnum role = template.getAuthorizationField().getRole();
-      switch(role) {
-        case CVCA:
-          this.role = Role.CVCA;
-          break;
-        case DV_D:
-          this.role = Role.DV_D;
-          break;
-        case DV_F:
-          this.role = Role.DV_F;
-          break;
-        case IS:
-          this.role = Role.IS;
-          break;
-        default:
-          LOGGER.log(Level.WARNING, "Unsupported role " + role);
-      }
+    this.role = toRole(template);
+    this.accessRight = toPermission(template);
 
-      AccessRightEnum accessRight = template.getAuthorizationField().getAccessRight();
-      switch(accessRight) {
-        case READ_ACCESS_NONE:
-          this.accessRight = Permission.READ_ACCESS_NONE;
-          break;
-        case READ_ACCESS_DG3:
-          this.accessRight = Permission.READ_ACCESS_DG3;
-          break;
-        case READ_ACCESS_DG4:
-          this.accessRight = Permission.READ_ACCESS_DG4;
-          break;
-        case READ_ACCESS_DG3_AND_DG4:
-          this.accessRight = Permission.READ_ACCESS_DG3_AND_DG4;
-          break;
-        default:
-          LOGGER.log(Level.WARNING, "Unsupported access right " + accessRight);
-      }
-    } catch (NoSuchFieldException nsfe) {
-      throw new IllegalArgumentException("Error getting role from AuthZ template", nsfe);
-    }
   }
 
   /**
@@ -277,6 +235,46 @@ public class CVCAuthorizationTemplate {
       }
     } catch (Exception e) {
       throw new IllegalArgumentException("Error getting role from AuthZ template", e);
+    }
+  }
+
+  private static Role toRole(org.ejbca.cvc.CVCAuthorizationTemplate template) {
+    try {
+      AuthorizationRoleEnum role = template.getAuthorizationField().getRole();
+      switch(role) {
+        case CVCA:
+          return Role.CVCA;
+        case DV_D:
+          return Role.DV_D;
+        case DV_F:
+          return Role.DV_F;
+        case IS:
+          return Role.IS;
+        default:
+          throw new IllegalArgumentException("Unsupported role " + role);
+      }
+    } catch (NoSuchFieldException nsfe) {
+      throw new IllegalArgumentException("Error getting role from AuthZ template", nsfe);
+    }
+  }
+
+  private static Permission toPermission(org.ejbca.cvc.CVCAuthorizationTemplate template) {
+    try {
+      AccessRightEnum accessRight = template.getAuthorizationField().getAccessRight();
+      switch(accessRight) {
+        case READ_ACCESS_NONE:
+          return Permission.READ_ACCESS_NONE;
+        case READ_ACCESS_DG3:
+          return Permission.READ_ACCESS_DG3;
+        case READ_ACCESS_DG4:
+          return Permission.READ_ACCESS_DG4;
+        case READ_ACCESS_DG3_AND_DG4:
+          return Permission.READ_ACCESS_DG3_AND_DG4;
+        default:
+          throw new IllegalArgumentException("Unsupported access right " + accessRight);
+      }
+    } catch (NoSuchFieldException nsfe) {
+      throw new IllegalArgumentException("Unsupported access right", nsfe);
     }
   }
 }

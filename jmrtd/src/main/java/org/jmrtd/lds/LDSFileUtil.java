@@ -61,25 +61,44 @@ public class LDSFileUtil {
    */
   public static AbstractLDSFile getLDSFile(short fid, InputStream inputStream) throws IOException {
     switch (fid) {
-      case PassportService.EF_COM: return new COMFile(inputStream);
-      case PassportService.EF_DG1: return new DG1File(inputStream);
-      case PassportService.EF_DG2: return new DG2File(inputStream);
-      case PassportService.EF_DG3: return new DG3File(inputStream);
-      case PassportService.EF_DG4: return new DG4File(inputStream);
-      case PassportService.EF_DG5: return new DG5File(inputStream);
-      case PassportService.EF_DG6: return new DG6File(inputStream);
-      case PassportService.EF_DG7: return new DG7File(inputStream);
-      case PassportService.EF_DG8: throw new IllegalArgumentException("DG8 files are not yet supported");
-      case PassportService.EF_DG9: throw new IllegalArgumentException("DG9 files are not yet supported");
-      case PassportService.EF_DG10: throw new IllegalArgumentException("DG10 files are not yet supported");
-      case PassportService.EF_DG11: return new DG11File(inputStream);
-      case PassportService.EF_DG12: return new DG12File(inputStream);
-      case PassportService.EF_DG13: throw new IllegalArgumentException("DG13 files are not yet supported");
-      case PassportService.EF_DG14: return new DG14File(inputStream);
-      case PassportService.EF_DG15: return new DG15File(inputStream);
-      case PassportService.EF_DG16: throw new IllegalArgumentException("DG16 files are not yet supported");
-      case PassportService.EF_SOD: return new SODFile(inputStream);
-      case PassportService.EF_CVCA: return new CVCAFile(inputStream);
+      case PassportService.EF_COM:
+        return new COMFile(inputStream);
+      case PassportService.EF_DG1:
+        return new DG1File(inputStream);
+      case PassportService.EF_DG2:
+        return new DG2File(inputStream);
+      case PassportService.EF_DG3:
+        return new DG3File(inputStream);
+      case PassportService.EF_DG4:
+        return new DG4File(inputStream);
+      case PassportService.EF_DG5:
+        return new DG5File(inputStream);
+      case PassportService.EF_DG6:
+        return new DG6File(inputStream);
+      case PassportService.EF_DG7:
+        return new DG7File(inputStream);
+      case PassportService.EF_DG8:
+        throw new IllegalArgumentException("DG8 files are not yet supported");
+      case PassportService.EF_DG9:
+        throw new IllegalArgumentException("DG9 files are not yet supported");
+      case PassportService.EF_DG10:
+        throw new IllegalArgumentException("DG10 files are not yet supported");
+      case PassportService.EF_DG11:
+        return new DG11File(inputStream);
+      case PassportService.EF_DG12:
+        return new DG12File(inputStream);
+      case PassportService.EF_DG13:
+        throw new IllegalArgumentException("DG13 files are not yet supported");
+      case PassportService.EF_DG14:
+        return new DG14File(inputStream);
+      case PassportService.EF_DG15:
+        return new DG15File(inputStream);
+      case PassportService.EF_DG16:
+        throw new IllegalArgumentException("DG16 files are not yet supported");
+      case PassportService.EF_SOD:
+        return new SODFile(inputStream);
+      case PassportService.EF_CVCA:
+        return new CVCAFile(inputStream);
       default:
         BufferedInputStream bufferedIn = new BufferedInputStream(inputStream, 37);
         try {
@@ -104,24 +123,42 @@ public class LDSFileUtil {
    */
   public static short lookupFIDByTag(int tag) {
     switch(tag) {
-      case LDSFile.EF_COM_TAG: return PassportService.EF_COM;
-      case LDSFile.EF_DG1_TAG: return PassportService.EF_DG1;
-      case LDSFile.EF_DG2_TAG: return PassportService.EF_DG2;
-      case LDSFile.EF_DG3_TAG: return PassportService.EF_DG3;
-      case LDSFile.EF_DG4_TAG: return PassportService.EF_DG4;
-      case LDSFile.EF_DG5_TAG: return PassportService.EF_DG5;
-      case LDSFile.EF_DG6_TAG: return PassportService.EF_DG6;
-      case LDSFile.EF_DG7_TAG: return PassportService.EF_DG7;
-      case LDSFile.EF_DG8_TAG: return PassportService.EF_DG8;
-      case LDSFile.EF_DG9_TAG: return PassportService.EF_DG9;
-      case LDSFile.EF_DG10_TAG: return PassportService.EF_DG10;
-      case LDSFile.EF_DG11_TAG: return PassportService.EF_DG11;
-      case LDSFile.EF_DG12_TAG: return PassportService.EF_DG12;
-      case LDSFile.EF_DG13_TAG: return PassportService.EF_DG13;
-      case LDSFile.EF_DG14_TAG: return PassportService.EF_DG14;
-      case LDSFile.EF_DG15_TAG: return PassportService.EF_DG15;
-      case LDSFile.EF_DG16_TAG: return PassportService.EF_DG16;
-      case LDSFile.EF_SOD_TAG: return PassportService.EF_SOD;
+      case LDSFile.EF_COM_TAG:
+        return PassportService.EF_COM;
+      case LDSFile.EF_DG1_TAG:
+        return PassportService.EF_DG1;
+      case LDSFile.EF_DG2_TAG:
+        return PassportService.EF_DG2;
+      case LDSFile.EF_DG3_TAG:
+        return PassportService.EF_DG3;
+      case LDSFile.EF_DG4_TAG:
+        return PassportService.EF_DG4;
+      case LDSFile.EF_DG5_TAG:
+        return PassportService.EF_DG5;
+      case LDSFile.EF_DG6_TAG:
+        return PassportService.EF_DG6;
+      case LDSFile.EF_DG7_TAG:
+        return PassportService.EF_DG7;
+      case LDSFile.EF_DG8_TAG:
+        return PassportService.EF_DG8;
+      case LDSFile.EF_DG9_TAG:
+        return PassportService.EF_DG9;
+      case LDSFile.EF_DG10_TAG:
+        return PassportService.EF_DG10;
+      case LDSFile.EF_DG11_TAG:
+        return PassportService.EF_DG11;
+      case LDSFile.EF_DG12_TAG:
+        return PassportService.EF_DG12;
+      case LDSFile.EF_DG13_TAG:
+        return PassportService.EF_DG13;
+      case LDSFile.EF_DG14_TAG:
+        return PassportService.EF_DG14;
+      case LDSFile.EF_DG15_TAG:
+        return PassportService.EF_DG15;
+      case LDSFile.EF_DG16_TAG:
+        return PassportService.EF_DG16;
+      case LDSFile.EF_SOD_TAG:
+        return PassportService.EF_SOD;
       default:
         throw new NumberFormatException("Unknown tag " + Integer.toHexString(tag));
     }
@@ -136,22 +173,38 @@ public class LDSFileUtil {
    */
   public static int lookupDataGroupNumberByTag(int tag) {
     switch (tag) {
-      case LDSFile.EF_DG1_TAG: return 1;
-      case LDSFile.EF_DG2_TAG: return 2;
-      case LDSFile.EF_DG3_TAG: return 3;
-      case LDSFile.EF_DG4_TAG: return 4;
-      case LDSFile.EF_DG5_TAG: return 5;
-      case LDSFile.EF_DG6_TAG: return 6;
-      case LDSFile.EF_DG7_TAG: return 7;
-      case LDSFile.EF_DG8_TAG: return 8;
-      case LDSFile.EF_DG9_TAG: return 9;
-      case LDSFile.EF_DG10_TAG: return 10;
-      case LDSFile.EF_DG11_TAG: return 11;
-      case LDSFile.EF_DG12_TAG: return 12;
-      case LDSFile.EF_DG13_TAG: return 13;
-      case LDSFile.EF_DG14_TAG: return 14;
-      case LDSFile.EF_DG15_TAG: return 15;
-      case LDSFile.EF_DG16_TAG: return 16;
+      case LDSFile.EF_DG1_TAG:
+        return 1;
+      case LDSFile.EF_DG2_TAG:
+        return 2;
+      case LDSFile.EF_DG3_TAG:
+        return 3;
+      case LDSFile.EF_DG4_TAG:
+        return 4;
+      case LDSFile.EF_DG5_TAG:
+        return 5;
+      case LDSFile.EF_DG6_TAG:
+        return 6;
+      case LDSFile.EF_DG7_TAG:
+        return 7;
+      case LDSFile.EF_DG8_TAG:
+        return 8;
+      case LDSFile.EF_DG9_TAG:
+        return 9;
+      case LDSFile.EF_DG10_TAG:
+        return 10;
+      case LDSFile.EF_DG11_TAG:
+        return 11;
+      case LDSFile.EF_DG12_TAG:
+        return 12;
+      case LDSFile.EF_DG13_TAG:
+        return 13;
+      case LDSFile.EF_DG14_TAG:
+        return 14;
+      case LDSFile.EF_DG15_TAG:
+        return 15;
+      case LDSFile.EF_DG16_TAG:
+        return 16;
       default:
         throw new NumberFormatException("Unknown tag " + Integer.toHexString(tag));   
     }
@@ -167,22 +220,38 @@ public class LDSFileUtil {
    */
   public static int lookupTagByDataGroupNumber(int number) {
     switch (number) {
-      case 1: return LDSFile.EF_DG1_TAG;
-      case 2: return LDSFile.EF_DG2_TAG;
-      case 3: return LDSFile.EF_DG3_TAG;
-      case 4: return LDSFile.EF_DG4_TAG;
-      case 5: return LDSFile.EF_DG5_TAG;
-      case 6: return LDSFile.EF_DG6_TAG;
-      case 7: return LDSFile.EF_DG7_TAG;
-      case 8: return LDSFile.EF_DG8_TAG;
-      case 9: return LDSFile.EF_DG9_TAG;
-      case 10: return LDSFile.EF_DG10_TAG;
-      case 11: return LDSFile.EF_DG11_TAG;
-      case 12: return LDSFile.EF_DG12_TAG;
-      case 13: return LDSFile.EF_DG13_TAG;
-      case 14: return LDSFile.EF_DG14_TAG;
-      case 15: return LDSFile.EF_DG15_TAG;
-      case 16: return LDSFile.EF_DG16_TAG;
+      case 1:
+        return LDSFile.EF_DG1_TAG;
+      case 2:
+        return LDSFile.EF_DG2_TAG;
+      case 3:
+        return LDSFile.EF_DG3_TAG;
+      case 4:
+        return LDSFile.EF_DG4_TAG;
+      case 5:
+        return LDSFile.EF_DG5_TAG;
+      case 6:
+        return LDSFile.EF_DG6_TAG;
+      case 7:
+        return LDSFile.EF_DG7_TAG;
+      case 8:
+        return LDSFile.EF_DG8_TAG;
+      case 9:
+        return LDSFile.EF_DG9_TAG;
+      case 10:
+        return LDSFile.EF_DG10_TAG;
+      case 11:
+        return LDSFile.EF_DG11_TAG;
+      case 12:
+        return LDSFile.EF_DG12_TAG;
+      case 13:
+        return LDSFile.EF_DG13_TAG;
+      case 14:
+        return LDSFile.EF_DG14_TAG;
+      case 15:
+        return LDSFile.EF_DG15_TAG;
+      case 16:
+        return LDSFile.EF_DG16_TAG;
       default:
         throw new NumberFormatException("Unknown number " + number);   
     }
@@ -198,22 +267,38 @@ public class LDSFileUtil {
    */
   public static short lookupFIDByDataGroupNumber(int number) {
     switch (number) {
-      case 1: return PassportService.EF_DG1;
-      case 2: return PassportService.EF_DG2;
-      case 3: return PassportService.EF_DG3;
-      case 4: return PassportService.EF_DG4;
-      case 5: return PassportService.EF_DG5;
-      case 6: return PassportService.EF_DG6;
-      case 7: return PassportService.EF_DG7;
-      case 8: return PassportService.EF_DG8;
-      case 9: return PassportService.EF_DG9;
-      case 10: return PassportService.EF_DG10;
-      case 11: return PassportService.EF_DG11;
-      case 12: return PassportService.EF_DG12;
-      case 13: return PassportService.EF_DG13;
-      case 14: return PassportService.EF_DG14;
-      case 15: return PassportService.EF_DG15;
-      case 16: return PassportService.EF_DG16;
+      case 1:
+        return PassportService.EF_DG1;
+      case 2:
+        return PassportService.EF_DG2;
+      case 3:
+        return PassportService.EF_DG3;
+      case 4:
+        return PassportService.EF_DG4;
+      case 5:
+        return PassportService.EF_DG5;
+      case 6:
+        return PassportService.EF_DG6;
+      case 7:
+        return PassportService.EF_DG7;
+      case 8:
+        return PassportService.EF_DG8;
+      case 9:
+        return PassportService.EF_DG9;
+      case 10:
+        return PassportService.EF_DG10;
+      case 11:
+        return PassportService.EF_DG11;
+      case 12:
+        return PassportService.EF_DG12;
+      case 13:
+        return PassportService.EF_DG13;
+      case 14:
+        return PassportService.EF_DG14;
+      case 15:
+        return PassportService.EF_DG15;
+      case 16:
+        return PassportService.EF_DG16;
       default:
         throw new NumberFormatException("Unknown number " + number);   
     }
@@ -230,24 +315,42 @@ public class LDSFileUtil {
    */
   public static short lookupTagByFID(short fid) {
     switch(fid) {
-      case PassportService.EF_COM: return LDSFile.EF_COM_TAG;
-      case PassportService.EF_DG1: return LDSFile.EF_DG1_TAG;
-      case PassportService.EF_DG2: return LDSFile.EF_DG2_TAG;
-      case PassportService.EF_DG3: return LDSFile.EF_DG3_TAG;
-      case PassportService.EF_DG4: return LDSFile.EF_DG4_TAG;
-      case PassportService.EF_DG5: return LDSFile.EF_DG5_TAG;
-      case PassportService.EF_DG6: return LDSFile.EF_DG6_TAG;
-      case PassportService.EF_DG7: return LDSFile.EF_DG7_TAG;
-      case PassportService.EF_DG8: return LDSFile.EF_DG8_TAG;
-      case PassportService.EF_DG9: return LDSFile.EF_DG9_TAG;
-      case PassportService.EF_DG10: return LDSFile.EF_DG10_TAG;
-      case PassportService.EF_DG11: return LDSFile.EF_DG11_TAG;
-      case PassportService.EF_DG12: return LDSFile.EF_DG12_TAG;
-      case PassportService.EF_DG13: return LDSFile.EF_DG13_TAG;
-      case PassportService.EF_DG14: return LDSFile.EF_DG14_TAG;
-      case PassportService.EF_DG15: return LDSFile.EF_DG15_TAG;
-      case PassportService.EF_DG16: return LDSFile.EF_DG16_TAG;
-      case PassportService.EF_SOD: return LDSFile.EF_SOD_TAG;
+      case PassportService.EF_COM:
+        return LDSFile.EF_COM_TAG;
+      case PassportService.EF_DG1:
+        return LDSFile.EF_DG1_TAG;
+      case PassportService.EF_DG2:
+        return LDSFile.EF_DG2_TAG;
+      case PassportService.EF_DG3:
+        return LDSFile.EF_DG3_TAG;
+      case PassportService.EF_DG4:
+        return LDSFile.EF_DG4_TAG;
+      case PassportService.EF_DG5:
+        return LDSFile.EF_DG5_TAG;
+      case PassportService.EF_DG6:
+        return LDSFile.EF_DG6_TAG;
+      case PassportService.EF_DG7:
+        return LDSFile.EF_DG7_TAG;
+      case PassportService.EF_DG8:
+        return LDSFile.EF_DG8_TAG;
+      case PassportService.EF_DG9:
+        return LDSFile.EF_DG9_TAG;
+      case PassportService.EF_DG10:
+        return LDSFile.EF_DG10_TAG;
+      case PassportService.EF_DG11:
+        return LDSFile.EF_DG11_TAG;
+      case PassportService.EF_DG12:
+        return LDSFile.EF_DG12_TAG;
+      case PassportService.EF_DG13:
+        return LDSFile.EF_DG13_TAG;
+      case PassportService.EF_DG14:
+        return LDSFile.EF_DG14_TAG;
+      case PassportService.EF_DG15:
+        return LDSFile.EF_DG15_TAG;
+      case PassportService.EF_DG16:
+        return LDSFile.EF_DG16_TAG;
+      case PassportService.EF_SOD:
+        return LDSFile.EF_SOD_TAG;
       default:
         throw new NumberFormatException("Unknown fid " + Integer.toHexString(fid));
     }
@@ -262,22 +365,38 @@ public class LDSFileUtil {
    */
   public static int lookupDataGroupNumberByFID(short fid) {
     switch(fid) {
-      case PassportService.EF_DG1: return 1;
-      case PassportService.EF_DG2: return 2;
-      case PassportService.EF_DG3: return 3;
-      case PassportService.EF_DG4: return 4;
-      case PassportService.EF_DG5: return 5;
-      case PassportService.EF_DG6: return 6;
-      case PassportService.EF_DG7: return 7;
-      case PassportService.EF_DG8: return 8;
-      case PassportService.EF_DG9: return 9;
-      case PassportService.EF_DG10: return 10;
-      case PassportService.EF_DG11: return 11;
-      case PassportService.EF_DG12: return 12;
-      case PassportService.EF_DG13: return 13;
-      case PassportService.EF_DG14: return 14;
-      case PassportService.EF_DG15: return 15;
-      case PassportService.EF_DG16: return 16;
+      case PassportService.EF_DG1:
+        return 1;
+      case PassportService.EF_DG2:
+        return 2;
+      case PassportService.EF_DG3:
+        return 3;
+      case PassportService.EF_DG4:
+        return 4;
+      case PassportService.EF_DG5:
+        return 5;
+      case PassportService.EF_DG6:
+        return 6;
+      case PassportService.EF_DG7:
+        return 7;
+      case PassportService.EF_DG8:
+        return 8;
+      case PassportService.EF_DG9:
+        return 9;
+      case PassportService.EF_DG10:
+        return 10;
+      case PassportService.EF_DG11:
+        return 11;
+      case PassportService.EF_DG12:
+        return 12;
+      case PassportService.EF_DG13:
+        return 13;
+      case PassportService.EF_DG14:
+        return 14;
+      case PassportService.EF_DG15:
+        return 15;
+      case PassportService.EF_DG16:
+        return 16;
       default:
         throw new NumberFormatException("Unknown fid " + Integer.toHexString(fid));
     }
@@ -293,24 +412,42 @@ public class LDSFileUtil {
    */
   public static String lookupFileNameByTag(int tag) {
     switch (tag) {
-      case LDSFile.EF_COM_TAG: return "EF_COM";
-      case LDSFile.EF_DG1_TAG: return "EF_DG1";
-      case LDSFile.EF_DG2_TAG: return "EF_DG2";
-      case LDSFile.EF_DG3_TAG: return "EF_DG3";
-      case LDSFile.EF_DG4_TAG: return "EF_DG4";
-      case LDSFile.EF_DG5_TAG: return "EF_DG5";
-      case LDSFile.EF_DG6_TAG: return "EF_DG6";
-      case LDSFile.EF_DG7_TAG: return "EF_DG7";
-      case LDSFile.EF_DG8_TAG: return "EF_DG8";
-      case LDSFile.EF_DG9_TAG: return "EF_DG9";
-      case LDSFile.EF_DG10_TAG: return "EF_DG10";
-      case LDSFile.EF_DG11_TAG: return "EF_DG11";
-      case LDSFile.EF_DG12_TAG: return "EF_DG12";
-      case LDSFile.EF_DG13_TAG: return "EF_DG13";
-      case LDSFile.EF_DG14_TAG: return "EF_DG14";
-      case LDSFile.EF_DG15_TAG: return "EF_DG15";
-      case LDSFile.EF_DG16_TAG: return "EF_DG16";
-      case LDSFile.EF_SOD_TAG: return "EF_SOD";
+      case LDSFile.EF_COM_TAG:
+        return "EF_COM";
+      case LDSFile.EF_DG1_TAG:
+        return "EF_DG1";
+      case LDSFile.EF_DG2_TAG:
+        return "EF_DG2";
+      case LDSFile.EF_DG3_TAG:
+        return "EF_DG3";
+      case LDSFile.EF_DG4_TAG:
+        return "EF_DG4";
+      case LDSFile.EF_DG5_TAG:
+        return "EF_DG5";
+      case LDSFile.EF_DG6_TAG:
+        return "EF_DG6";
+      case LDSFile.EF_DG7_TAG:
+        return "EF_DG7";
+      case LDSFile.EF_DG8_TAG:
+        return "EF_DG8";
+      case LDSFile.EF_DG9_TAG:
+        return "EF_DG9";
+      case LDSFile.EF_DG10_TAG:
+        return "EF_DG10";
+      case LDSFile.EF_DG11_TAG:
+        return "EF_DG11";
+      case LDSFile.EF_DG12_TAG:
+        return "EF_DG12";
+      case LDSFile.EF_DG13_TAG:
+        return "EF_DG13";
+      case LDSFile.EF_DG14_TAG:
+        return "EF_DG14";
+      case LDSFile.EF_DG15_TAG:
+        return "EF_DG15";
+      case LDSFile.EF_DG16_TAG:
+        return "EF_DG16";
+      case LDSFile.EF_SOD_TAG:
+        return "EF_SOD";
       default: return "File with tag 0x" + Integer.toHexString(tag);
     }
   }
@@ -325,25 +462,44 @@ public class LDSFileUtil {
    */
   public static String lookupFileNameByFID(int fid) {
     switch (fid) {
-      case PassportService.EF_COM: return "EF_COM";
-      case PassportService.EF_DG1: return "EF_DG1";
-      case PassportService.EF_DG2: return "EF_DG2";
-      case PassportService.EF_DG3: return "EF_DG3";
-      case PassportService.EF_DG4: return "EF_DG4";
-      case PassportService.EF_DG5: return "EF_DG5";
-      case PassportService.EF_DG6: return "EF_DG6";
-      case PassportService.EF_DG7: return "EF_DG7";
-      case PassportService.EF_DG8: return "EF_DG8";
-      case PassportService.EF_DG9: return "EF_DG9";
-      case PassportService.EF_DG10: return "EF_DG10";
-      case PassportService.EF_DG11: return "EF_DG11";
-      case PassportService.EF_DG12: return "EF_DG12";
-      case PassportService.EF_DG13: return "EF_DG13";
-      case PassportService.EF_DG14: return "EF_DG14";
-      case PassportService.EF_DG15: return "EF_DG15";
-      case PassportService.EF_DG16: return "EF_DG16";
-      case PassportService.EF_SOD: return "EF_SOD";
-      default: return "File with FID 0x" + Integer.toHexString(fid);
+      case PassportService.EF_COM:
+        return "EF_COM";
+      case PassportService.EF_DG1:
+        return "EF_DG1";
+      case PassportService.EF_DG2:
+        return "EF_DG2";
+      case PassportService.EF_DG3:
+        return "EF_DG3";
+      case PassportService.EF_DG4:
+        return "EF_DG4";
+      case PassportService.EF_DG5:
+        return "EF_DG5";
+      case PassportService.EF_DG6:
+        return "EF_DG6";
+      case PassportService.EF_DG7:
+        return "EF_DG7";
+      case PassportService.EF_DG8:
+        return "EF_DG8";
+      case PassportService.EF_DG9:
+        return "EF_DG9";
+      case PassportService.EF_DG10:
+        return "EF_DG10";
+      case PassportService.EF_DG11:
+        return "EF_DG11";
+      case PassportService.EF_DG12:
+        return "EF_DG12";
+      case PassportService.EF_DG13:
+        return "EF_DG13";
+      case PassportService.EF_DG14:
+        return "EF_DG14";
+      case PassportService.EF_DG15:
+        return "EF_DG15";
+      case PassportService.EF_DG16:
+        return "EF_DG16";
+      case PassportService.EF_SOD:
+        return "EF_SOD";
+      default:
+        return "File with FID 0x" + Integer.toHexString(fid);
     }
   }
 }
