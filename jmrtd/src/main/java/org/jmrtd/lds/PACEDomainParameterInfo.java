@@ -95,7 +95,16 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   public static final String ID_EC_PUBLIC_KEY = "1.2.840.10045.2.1";
 
   private String oid;
-  private AlgorithmIdentifier domainParameter;
+ 
+  /*
+   * FIXME: This field is now transient, but should not be.
+   * 
+   * We should serialize the contents of concrete instantiations explicitly.
+   * Possibly by first defining PACEECDomainParameters and PACEDHDomainParameters subclasses
+   * first (yet, ECParameterSpec and DHParameterSpec are also not Serializable).
+   */
+  private transient AlgorithmIdentifier domainParameter;
+  
   private BigInteger parameterId;
 
   /**

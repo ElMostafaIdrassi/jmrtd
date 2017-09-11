@@ -110,7 +110,14 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private SignedData signedData;
+  /*
+   * FIXME: This field is now transient, but probably shouldn't be!
+   * 
+   * - We can either leave this transient and explicitly (de)serialize it in
+   *   readObject/writeObject (using BC's getEncoded())
+   * - Or replace this field with something that implements Serializable and that we control.
+   */
+  private transient SignedData signedData;
 
   /**
    * Constructs a Security Object data structure.

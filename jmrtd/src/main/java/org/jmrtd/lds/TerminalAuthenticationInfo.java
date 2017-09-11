@@ -63,8 +63,18 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   private String oid;
   private int version;
-  private ASN1Sequence efCVCA; /* FIXME: this contains just a file identifier, and possibly a short file identifier? Why not short instead of ASN1Sequence? -- MO */
-
+  
+  /*
+   * FIXME: This shouldn't be transient, as we want this part of the state to be (de)serialized.
+   * 
+   * This contains just a file identifier, and possibly a short file identifier?
+   * Why not short instead of ASN1Sequence? (In which case we can remove the transient.)
+   * 
+   * Alternatively we could explicitly (de)serialize this in readObject/writeObject
+   * (using BC's getEncoded()).
+   */
+  private transient ASN1Sequence efCVCA;
+  
   /**
    * Constructs a new object.
    *

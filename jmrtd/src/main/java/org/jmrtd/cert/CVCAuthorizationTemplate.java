@@ -22,6 +22,12 @@
 
 package org.jmrtd.cert;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.ejbca.cvc.AccessRightEnum;
+import org.ejbca.cvc.AuthorizationRoleEnum;
+
 /**
  * Card verifiable certificate authorization template.
  *  
@@ -30,6 +36,8 @@ package org.jmrtd.cert;
  * @version $Revision$
  */
 public class CVCAuthorizationTemplate {
+
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /**
    * The issuing authority.
@@ -97,8 +105,9 @@ public class CVCAuthorizationTemplate {
           return other == READ_ACCESS_DG4;
         case READ_ACCESS_DG3_AND_DG4:
           return other == READ_ACCESS_DG3 || other == READ_ACCESS_DG4 || other == READ_ACCESS_DG3_AND_DG4;
+        default:
+          return false;
       }
-      return false;
     }
 
     /**
@@ -121,7 +130,8 @@ public class CVCAuthorizationTemplate {
    */
   protected CVCAuthorizationTemplate(org.ejbca.cvc.CVCAuthorizationTemplate template) {
     try {
-      switch(template.getAuthorizationField().getRole()) {
+      AuthorizationRoleEnum role = template.getAuthorizationField().getRole();
+      switch(role) {
         case CVCA:
           this.role = Role.CVCA;
           break;
@@ -134,9 +144,12 @@ public class CVCAuthorizationTemplate {
         case IS:
           this.role = Role.IS;
           break;
+        default:
+          LOGGER.log(Level.WARNING, "Unsupported role " + role);
       }
-      
-      switch(template.getAuthorizationField().getAccessRight()) {
+
+      AccessRightEnum accessRight = template.getAuthorizationField().getAccessRight();
+      switch(accessRight) {
         case READ_ACCESS_NONE:
           this.accessRight = Permission.READ_ACCESS_NONE;
           break;
@@ -149,6 +162,8 @@ public class CVCAuthorizationTemplate {
         case READ_ACCESS_DG3_AND_DG4:
           this.accessRight = Permission.READ_ACCESS_DG3_AND_DG4;
           break;
+        default:
+          LOGGER.log(Level.WARNING, "Unsupported access right " + accessRight);
       }
     } catch (NoSuchFieldException nsfe) {
       throw new IllegalArgumentException("Error getting role from AuthZ template", nsfe);
@@ -212,7 +227,7 @@ public class CVCAuthorizationTemplate {
     if (!this.getClass().equals(otherObj.getClass())) {
       return false;
     }
-    
+
     CVCAuthorizationTemplate otherTemplate = (CVCAuthorizationTemplate) otherObj;
     return this.role == otherTemplate.role && this.accessRight == otherTemplate.accessRight;
   }
@@ -227,9 +242,9 @@ public class CVCAuthorizationTemplate {
     return 2 * role.value + 3 * accessRight.value + 61;
   }
 
-  static org.ejbca.cvc.AccessRightEnum fromPermission(Permission thisPermission) {
+  static org.ejbca.cvc.AccessRightEnum fromPermission(Permission permission) {
     try{
-      switch (thisPermission) {
+      switch (permission) {
         case READ_ACCESS_NONE:
           return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_NONE;
         case READ_ACCESS_DG3:
@@ -239,16 +254,16 @@ public class CVCAuthorizationTemplate {
         case READ_ACCESS_DG3_AND_DG4:
           return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3_AND_DG4;
         default:
-          throw new IllegalArgumentException("Error getting permission for " + thisPermission);
+          throw new IllegalArgumentException("Error getting permission for " + permission);
       }
     } catch (Exception e) {
       throw new IllegalArgumentException("Error getting permission from AuthZ template", e);
     }
   }
 
-  static org.ejbca.cvc.AuthorizationRoleEnum fromRole(Role thisRole) {
+  static org.ejbca.cvc.AuthorizationRoleEnum fromRole(Role role) {
     try {
-      switch (thisRole) {
+      switch (role) {
         case CVCA:
           return org.ejbca.cvc.AuthorizationRoleEnum.CVCA;
         case DV_D:
@@ -257,9 +272,11 @@ public class CVCAuthorizationTemplate {
           return org.ejbca.cvc.AuthorizationRoleEnum.DV_F;
         case IS:
           return org.ejbca.cvc.AuthorizationRoleEnum.IS;
+        default:
+          throw new IllegalArgumentException("Error getting role from AuthZ template " + role);          
       }
     } catch (Exception e) {
+      throw new IllegalArgumentException("Error getting role from AuthZ template", e);
     }
-    throw new IllegalArgumentException("Error getting role from AuthZ template");
   }
 }
