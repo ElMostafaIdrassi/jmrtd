@@ -54,7 +54,7 @@ import org.jmrtd.Util;
  *
  * The object identifier dhpublicnumber or ecPublicKey for DH or ECDH, respectively, SHALL be used to reference
  * explicit domain parameters in an AlgorithmIdentifier (cf. Section 9.1):
- * 
+ *
  * <pre>
  *    dhpublicnumber OBJECT IDENTIFIER ::= {
  *        iso(1) member-body(2) us(840) ansi-x942(10046) number-type(2) 1
@@ -95,21 +95,21 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   public static final String ID_EC_PUBLIC_KEY = "1.2.840.10045.2.1";
 
   private String oid;
- 
+
   /*
    * FIXME: This field is now transient, but should not be.
-   * 
+   *
    * We should serialize the contents of concrete instantiations explicitly.
    * Possibly by first defining PACEECDomainParameters and PACEDHDomainParameters subclasses
    * first (yet, ECParameterSpec and DHParameterSpec are also not Serializable).
    */
   private transient AlgorithmIdentifier domainParameter;
-  
+
   private BigInteger parameterId;
 
   /**
    * Constructs a PACE Domain parameter info.
-   * 
+   *
    * @param protocolOID Must be @see SecurityInfo.#ID_PACE_DH_GM, @see SecurityInfo.#ID_PACE_ECDH_GM, @see SecurityInfo.#ID_PACE_DH_IM, @see SecurityInfo.#ID_PACE_ECDH_IM
    * @param parameters Parameters in the form of algorithm identifier with algorithm 1.2.840.10046.2.1 (DH public number) or 1.2.840.10045.2.1 (EC public key)
    */
@@ -121,7 +121,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     if (!checkRequiredIdentifier(protocolOID)) {
       throw new IllegalArgumentException("Invalid protocol id: " + protocolOID);
     }
-    
+
     this.oid = protocolOID;
     this.domainParameter = domainParameter;
     this.parameterId = parameterId;
@@ -134,9 +134,10 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
   /**
    * Gets the protocol object identifier as a human readable string.
-   * 
+   *
    * @return a string
    */
+  @Override
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
@@ -154,14 +155,14 @@ public class PACEDomainParameterInfo extends SecurityInfo {
    * Gets the parameters in the form of algorithm identifier
    * with algorithm 1.2.840.10046.2.1 (DH public number)
    * or 1.2.840.10045.2.1 (EC public key).
-   * 
-   * @return the parameters 
+   *
+   * @return the parameters
    */
   public AlgorithmParameterSpec getParameters() {
     if (ID_DH_PUBLIC_NUMBER.equals(oid)) {
       throw new IllegalStateException("DH PACEDomainParameterInfo not yet implemented"); // FIXME
     } else if (ID_EC_PUBLIC_KEY.equals(oid)) {
-      return toECParameterSpec(domainParameter);      
+      return toECParameterSpec(domainParameter);
     } else {
       throw new IllegalStateException("Unsupported PACEDomainParameterInfo type " + oid);
     }
@@ -187,22 +188,18 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("PACEDomainParameterInfo");
-    result.append("[");
-    result.append("protocol: ").append(toProtocolOIDString(oid));
-    result.append(", ");
-    result.append("domainParameter: [");
-    result.append("algorithm: ").append(domainParameter.getAlgorithm().getId()); // e.g. ID_EC_PUBLIC_KEY
-    result.append(", ");
-    ASN1Encodable parameters = domainParameter.getParameters(); // e.g. ASN1 sequence of length 6
-    result.append("parameters: ").append(parameters);
-    result.append("]");
-    if (parameterId != null) {
-      result.append(", parameterId: " + parameterId);
-    }
-    result.append("]");
-    return result.toString();
+    return new StringBuilder()
+        .append("PACEDomainParameterInfo")
+        .append("[")
+        .append("protocol: ").append(toProtocolOIDString(oid))
+        .append(", ")
+        .append("domainParameter: [")
+        .append("algorithm: ").append(domainParameter.getAlgorithm().getId()) // e.g. ID_EC_PUBLIC_KEY
+        .append(", ")
+        .append("parameters: ").append(domainParameter.getParameters()) // e.g. ASN1 sequence of length 6
+        .append(parameterId == null ? "" : ", parameterId: " + parameterId)
+        .append("]")
+        .toString();
   }
 
   @Override
@@ -243,11 +240,11 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
   /**
    * Gets a BC algorithm identifier object from an EC parameter spec.
-   * 
+   *
    * @param ecParameterSpec the EC parameter spec
-   * 
+   *
    * @return the BC algorithm identifier object
-   * 
+   *
    * @deprecated Visibility will be restricted
    */
   @Deprecated
@@ -288,11 +285,11 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
   /**
    * Gets the EC parameter spec form the BC algorithm identifier object.
-   * 
+   *
    * @param domainParameter the BC algorithm identifier object
-   * 
+   *
    * @return an EC parameter spec
-   * 
+   *
    * @deprecated Visibility will be restricted
    */
   @Deprecated
@@ -300,7 +297,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     String algorithmOID = domainParameter.getAlgorithm().getId();
     LOGGER.info("DEBUG: algorithmOID = " + algorithmOID);
     //    assert PACEDomainParameterInfo.ID_EC_PUBLIC_KEY.equals(algorithmOID) || PACEDomainParameterInfo.ID_DH_PUBLIC_NUMBER.equals(algorithmOID);
-    ASN1Encodable parameters = (ASN1Encodable)domainParameter.getParameters();
+    ASN1Encodable parameters = domainParameter.getParameters();
 
     if (!(parameters instanceof ASN1Sequence)) {
       throw new IllegalArgumentException("Was expecting an ASN.1 sequence");
@@ -312,7 +309,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       if (x962params.isNamedCurve()) {
         ASN1ObjectIdentifier x96ParamsOID = (ASN1ObjectIdentifier)x962params.getParameters();
         X9ECParameters x9ECParams = X962NamedCurves.getByOID(x96ParamsOID);
-        ECNamedCurveParameterSpec bcECNamedCurveParams = new ECNamedCurveParameterSpec(X962NamedCurves.getName(x96ParamsOID), x9ECParams.getCurve(), x9ECParams.getG(), x9ECParams.getN(), x9ECParams.getH(), x9ECParams.getSeed());      
+        ECNamedCurveParameterSpec bcECNamedCurveParams = new ECNamedCurveParameterSpec(X962NamedCurves.getName(x96ParamsOID), x9ECParams.getCurve(), x9ECParams.getG(), x9ECParams.getN(), x9ECParams.getH(), x9ECParams.getSeed());
         return Util.toECNamedCurveSpec(bcECNamedCurveParams);
       }
     } catch (Exception e) {
@@ -339,7 +336,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       throw new IllegalArgumentException("Was expecting an ASN.1 sequence of length 5 or longer");
     }
 
-    try {        
+    try {
       ASN1Integer versionObject = (ASN1Integer)paramSequence.getObjectAt(0);
       BigInteger version = (versionObject).getValue();
       //        assert BigInteger.ONE.equals(version);
@@ -365,17 +362,17 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       BigInteger x = g.getAffineX();
       BigInteger y = g.getAffineY();
       LOGGER.info("DEBUG: G = (" + x + ", " + y + ")");
-      // assert G is on the curve 
+      // assert G is on the curve
       BigInteger lhs = y.pow(2).mod(p);
       BigInteger xPow3 = x.pow(3);
-      BigInteger rhs = xPow3.add(a.multiply(x)).add(b).mod(p);        
+      BigInteger rhs = xPow3.add(a.multiply(x)).add(b).mod(p);
       LOGGER.info("DEBUG: G on curve = " + lhs.equals(rhs));
 
       EllipticCurve curve = new EllipticCurve(new ECFieldFp(p), a, b);
 
       ASN1Integer orderObject = (ASN1Integer)paramSequence.getObjectAt(4);
       BigInteger n = orderObject.getPositiveValue();
-      LOGGER.info("DEBUG: n = " + n);        
+      LOGGER.info("DEBUG: n = " + n);
 
       if (paramSequence.size() <= 5) {
         return new ECParameterSpec(curve, g, n, 1);
@@ -383,7 +380,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
         ASN1Integer coFactorObject = (ASN1Integer)paramSequence.getObjectAt(5);
         BigInteger coFactor = coFactorObject.getValue();
         LOGGER.info("DEBUG: coFactor = " + coFactor);
-        return new ECParameterSpec(curve, g, n, coFactor.intValue());   
+        return new ECParameterSpec(curve, g, n, coFactor.intValue());
       }
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
@@ -421,7 +418,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     if (ID_PACE_ECDH_CAM.equals(oid)) {
       return "id-PACE-ECDH-CAM";
     }
-    
+
     return oid;
   }
 }

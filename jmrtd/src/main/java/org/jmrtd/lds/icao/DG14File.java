@@ -54,7 +54,7 @@ import org.jmrtd.lds.TerminalAuthenticationInfo;
  * checked here!), and the file identifier of the efCVCA file.
  *
  * @author Wojciech Mostowski (woj@cs.ru.nl)
- * 
+ *
  * @version $Revision$
  */
 public class DG14File extends DataGroup {
@@ -126,7 +126,7 @@ public class DG14File extends DataGroup {
    * Gets Terminal Authentication infos.
    *
    * @return the Terminal Authentication infos.
-   * 
+   *
    * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
   @Deprecated
@@ -144,7 +144,7 @@ public class DG14File extends DataGroup {
    * Returns the Chip Authentication infos.
    *
    * @return the Chip Authentication infos
-   * 
+   *
    * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
   @Deprecated
@@ -167,7 +167,7 @@ public class DG14File extends DataGroup {
    * The key identifier may be -1 if there is only one key.
    *
    * @return the mapping of key identifiers to public keys
-   * 
+   *
    * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
   @Deprecated
@@ -183,9 +183,9 @@ public class DG14File extends DataGroup {
 
   /**
    * Returns the Active Authentication security infos.
-   * 
+   *
    * @return the Active Authentication security infos
-   * 
+   *
    * @deprecated Clients should use {@link #getSecurityInfos()} and filter that collection
    */
   @Deprecated
@@ -225,7 +225,7 @@ public class DG14File extends DataGroup {
 
     DG14File other = (DG14File)obj;
     if (securityInfos == null) {
-      return  other.securityInfos == null;  
+      return  other.securityInfos == null;
     }
     if (other.securityInfos == null) {
       return securityInfos == null;

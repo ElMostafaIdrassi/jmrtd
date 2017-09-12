@@ -29,7 +29,6 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DLSequence;
 import org.jmrtd.Util;
 
@@ -49,7 +48,7 @@ import org.jmrtd.Util;
  * </ul>
  *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
@@ -58,7 +57,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 
   private String oid;
 
-  private BigInteger keyId; /* Optional, use null if implicit. */  
+  private BigInteger keyId; /* Optional, use null if implicit. */
 
   private PublicKey publicKey;
 
@@ -105,26 +104,29 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     checkFields();
   }
 
+  @Override
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new ASN1ObjectIdentifier(oid));
-    vector.add((ASN1Sequence)(Util.toSubjectPublicKeyInfo(publicKey).toASN1Primitive()));
+    vector.add((Util.toSubjectPublicKeyInfo(publicKey).toASN1Primitive()));
     if (keyId != null) {
       vector.add(new ASN1Integer(keyId));
     }
     return new DLSequence(vector);
   }
 
+  @Override
   public String getObjectIdentifier() {
     return oid;
   }
 
   /**
    * Gets the protocol object identifier as a human readable string.
-   * 
+   *
    * @return a string
    */
+  @Override
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
@@ -201,7 +203,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     if (!ChipAuthenticationPublicKeyInfo.class.equals(other.getClass())) {
       return false;
     }
-    
+
     ChipAuthenticationPublicKeyInfo otherInfo = (ChipAuthenticationPublicKeyInfo)other;
     return oid.equals(otherInfo.oid)
         && (keyId == null && otherInfo.keyId == null || keyId != null && keyId.equals(otherInfo.keyId))
@@ -215,7 +217,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     if (ID_PK_ECDH.equals(oid)) {
       return "id-PK-ECDH";
     }
-    
+
     return oid;
   }
 }

@@ -41,9 +41,9 @@ import org.jmrtd.lds.AbstractListInfo;
 /**
  * A facial record consists of a facial record header and one or more facial record datas.
  * See 5.1 of ISO 19794-5.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements BiometricDataBlock {
@@ -65,14 +65,14 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
    * ISO/IEC JTC1/SC37 uses 0x0008 according to <a href="http://www.ibia.org/cbeff/_bdb.php">IBIA</a>.
    * Also see supplement to Doc 9303: R3-p1_v2_sII_0001.
    * (ISO FCD 19794-5 specified this as 0x0501).
-   */	
+   */
   private static final int FORMAT_TYPE_VALUE = 0x0008;
 
   private StandardBiometricHeader sbh;
 
   /**
    * Constructs a face info from a list of face image infos.
-   * 
+   *
    * @param faceImageInfos face image infos
    */
   public FaceInfo(List<FaceImageInfo> faceImageInfos) {
@@ -81,10 +81,10 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Constructs a face info from a list of face image infos.
-   * 
+   *
    * @param sbh the standard biometric header to use
    * @param faceImageInfos face image infos
-   */	
+   */
   public FaceInfo(StandardBiometricHeader sbh, List<FaceImageInfo> faceImageInfos) {
     this.sbh = sbh;
     addAll(faceImageInfos);
@@ -92,9 +92,9 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Constructs a face info from binary encoding.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException when decoding fails
    */
   public FaceInfo(InputStream inputStream) throws IOException {
@@ -103,23 +103,24 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Constructs a face info from binary encoding.
-   *  
+   *
    * @param sbh the standard biometric header to use
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException when decoding fails
    */
   public FaceInfo(StandardBiometricHeader sbh, InputStream inputStream) throws IOException {
-    this.sbh = sbh;		
+    this.sbh = sbh;
     readObject(inputStream);
   }
 
   /**
    * Reads the facial record from an input stream. Note that the standard biometric header
    * has already been read.
-   * 
+   *
    * @param inputStream the input stream
    */
+  @Override
   public void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataInputStream = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
@@ -158,10 +159,11 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
   /**
    * Writes the facial record to an output stream. Note that the standard biometric header
    * (part of CBEFF structure) is not written here.
-   * 
+   *
    * @param outputStream an output stream
    */
-  public void writeObject(OutputStream outputStream) throws IOException {		
+  @Override
+  public void writeObject(OutputStream outputStream) throws IOException {
 
     int headerLength = 14; /* 4 + 4 + 4 + 2 (Section 5.4 of ISO/IEC 19794-5) */
 
@@ -195,7 +197,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Gets the standard biometric header of this biometric data block
-   * 
+   *
    * @return the standard biometric header
    */
   public StandardBiometricHeader getStandardBiometricHeader() {
@@ -217,7 +219,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Gets the face image infos embedded in this face info.
-   * 
+   *
    * @return the embedded face image infos
    */
   public List<FaceImageInfo> getFaceImageInfos() {
@@ -226,7 +228,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Adds a face image info to this face info.
-   * 
+   *
    * @param faceImageInfo the face image info to add
    */
   public void addFaceImageInfo(FaceImageInfo faceImageInfo) {
@@ -235,7 +237,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
   /**
    * Removes a face image info from this face info.
-   * 
+   *
    * @param index the index of the face image info to remove
    */
   public void removeFaceImageInfo(int index) {

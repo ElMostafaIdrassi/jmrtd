@@ -43,7 +43,7 @@ public class PACEException extends CardServiceException {
   public PACEException(String msg) {
     super(msg);
   }
-  
+
   public PACEException(String msg, Throwable cause) {
     super(msg, cause);
   }

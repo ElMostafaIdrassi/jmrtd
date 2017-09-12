@@ -57,17 +57,17 @@ public class DG12File extends DataGroup {
 
   private static final int TAG_LIST_TAG = 0x5C;
 
-  public static final int ISSUING_AUTHORITY_TAG = 0x5F19,
-      DATE_OF_ISSUE_TAG = 0x5F26,  // yyyymmdd
-      NAME_OF_OTHER_PERSON_TAG = 0x5F1A, // formatted per ICAO 9303 rules
-      ENDORSEMENTS_AND_OBSERVATIONS_TAG = 0x5F1B,
-      TAX_OR_EXIT_REQUIREMENTS_TAG = 0x5F1C,
-      IMAGE_OF_FRONT_TAG = 0x5F1D, // Image per ISO/IEC 10918
-      IMAGE_OF_REAR_TAG = 0x5F1E, // Image per ISO/IEC 10918
-      DATE_AND_TIME_OF_PERSONALIZATION = 0x5F55, // yyyymmddhhmmss
-      PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG = 0x5F56,
-      CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0, // 5F1A is always used inside A0 constructed object
-      COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
+  public static final int ISSUING_AUTHORITY_TAG = 0x5F19;
+  public static final int DATE_OF_ISSUE_TAG = 0x5F26;  // yyyymmdd
+  public static final int NAME_OF_OTHER_PERSON_TAG = 0x5F1A; // formatted per ICAO 9303 rules
+  public static final int ENDORSEMENTS_AND_OBSERVATIONS_TAG = 0x5F1B;
+  public static final int TAX_OR_EXIT_REQUIREMENTS_TAG = 0x5F1C;
+  public static final int IMAGE_OF_FRONT_TAG = 0x5F1D; // Image per ISO/IEC 10918
+  public static final int IMAGE_OF_REAR_TAG = 0x5F1E; // Image per ISO/IEC 10918
+  public static final int DATE_AND_TIME_OF_PERSONALIZATION = 0x5F55; // yyyymmddhhmmss
+  public static final int PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG = 0x5F56;
+  public static final int CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0; // 5F1A is always used inside A0 constructed object
+  public static final int COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
 
   private static final String SDF = "yyyyMMdd";
   private static final String SDTF = "yyyyMMddhhmmss";
@@ -152,7 +152,8 @@ public class DG12File extends DataGroup {
     super(EF_DG12_TAG, inputStream);
   }
 
-  protected void readContent(InputStream inputStream) throws IOException {	
+  @Override
+  protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tagListTag = tlvInputStream.readTag();
     if (tagListTag != TAG_LIST_TAG) {
@@ -198,7 +199,7 @@ public class DG12File extends DataGroup {
     if (dateOfIssue != null) {
       tagPresenceList.add(DATE_OF_ISSUE_TAG);
     }
-    if (namesOfOtherPersons != null && namesOfOtherPersons.size() > 0) {
+    if (namesOfOtherPersons != null && !namesOfOtherPersons.isEmpty()) {
       tagPresenceList.add(NAME_OF_OTHER_PERSON_TAG);
     }
     if (endorsementsAndObservations != null) {

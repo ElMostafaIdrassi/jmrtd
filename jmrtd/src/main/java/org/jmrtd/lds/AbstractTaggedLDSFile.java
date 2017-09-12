@@ -81,6 +81,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
    *
    * @throws IOException if reading from the stream fails
    */
+  @Override
   protected void readObject(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int inputTag = tlvIn.readTag();
@@ -91,6 +92,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
     readContent(new SplittableInputStream(inputStream, length));
   }
 
+  @Override
   protected void writeObject(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     int ourTag = getTag();

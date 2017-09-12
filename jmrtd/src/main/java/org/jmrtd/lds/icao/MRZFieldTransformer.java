@@ -25,13 +25,13 @@ package org.jmrtd.lds.icao;
 /**
  * Interface for MRZ field transformers, for instance for abbreviating long names and
  * transliteration of non-ISO characters.
- * 
+ *
  * TODO: work in progress
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public interface MRZFieldTransformer {

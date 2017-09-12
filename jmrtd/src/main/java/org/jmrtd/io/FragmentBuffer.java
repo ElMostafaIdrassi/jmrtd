@@ -30,7 +30,7 @@ import java.util.HashSet;
 
 /**
  * A buffer that can be partially filled.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -54,7 +54,7 @@ public class FragmentBuffer implements Serializable {
 
   /**
    * Creates a fragment buffer.
-   * 
+   *
    * @param length the length of the buffer
    */
   public FragmentBuffer(int length) {
@@ -75,7 +75,7 @@ public class FragmentBuffer implements Serializable {
 
   /**
    * Adds a fragment of bytes at a specific offset to this file.
-   * 
+   *
    * @param offset the fragment offset
    * @param bytes the bytes from which fragment content will be copied
    */
@@ -85,7 +85,7 @@ public class FragmentBuffer implements Serializable {
 
   /**
    * Adds a fragment of bytes at a specific offset to this file.
-   * 
+   *
    * @param offset the fragment offset
    * @param bytes the bytes from which fragment contents will be copied
    * @param srcOffset the offset within bytes where the contents of the fragment start
@@ -106,7 +106,7 @@ public class FragmentBuffer implements Serializable {
         /*
          * [...other fragment.........]
          *    [...this fragment...]
-         *    
+         *
          * This fragment is already contained in other. Don't add and return immediately.
          */
         return;
@@ -114,7 +114,7 @@ public class FragmentBuffer implements Serializable {
         /*
          * [...other fragment...]
          *         [...this fragment...]
-         *         
+         *
          * This fragment is partially contained in other. Extend this fragment to size of other, remove other.
          */
         thisLength = thisOffset + thisLength - other.getOffset();
@@ -124,7 +124,7 @@ public class FragmentBuffer implements Serializable {
         /*
          *    [...other fragment...]
          * [...this fragment...........]
-         * 
+         *
          * The other fragment is contained in this fragment. Remove other.
          */
         fragments.remove(other);
@@ -132,14 +132,14 @@ public class FragmentBuffer implements Serializable {
         /*
          *        [...other fragment...]
          * [...this fragment...]
-         * 
+         *
          * This fragment is partially contained in other. Extend this fragment to size of other, remove other.
          */
         thisLength = other.getOffset() + other.getLength() - thisOffset;
         fragments.remove(other);
       }
     }
-    fragments.add(Fragment.getInstance(thisOffset, thisLength));			
+    fragments.add(Fragment.getInstance(thisOffset, thisLength));
   }
 
   public synchronized int getPosition() {
@@ -174,12 +174,12 @@ public class FragmentBuffer implements Serializable {
         return true;
       }
     }
-    return false;		
+    return false;
   }
 
   /**
    * Calculates the number of bytes left in the buffer starting from index <code>index</code>.
-   * 
+   *
    * @param index the index
    *
    * @return the number of bytes left in the buffer
@@ -201,7 +201,7 @@ public class FragmentBuffer implements Serializable {
       }
     }
     return result;
-  }	
+  }
 
   public Collection<Fragment> getFragments() {
     return fragments;
@@ -220,7 +220,7 @@ public class FragmentBuffer implements Serializable {
   /**
    * Gets the smallest fragment that contains <code>offset</code> and <code>offset + length</code>
    * that has <strong>not</strong> been buffered in this buffer.
-   * 
+   *
    * @param offset the offset
    * @param length the length
    *
@@ -234,7 +234,7 @@ public class FragmentBuffer implements Serializable {
         /*
          * [...other fragment.........]
          *    [...this fragment...]
-         *    
+         *
          * This fragment is already contained in other. Don't add and return immediately.
          */
         thisLength = 0; /* NOTE: we don't care about offset */
@@ -243,7 +243,7 @@ public class FragmentBuffer implements Serializable {
         /*
          * [...other fragment...]
          *         [...this fragment...]
-         *         
+         *
          * This fragment is partially contained in other. Only fetch the trailing part of this fragment.
          */
         int newOffset = other.getOffset() + other.getLength();
@@ -254,7 +254,7 @@ public class FragmentBuffer implements Serializable {
         /*
          *    [...other fragment...]
          * [...this fragment...........]
-         * 
+         *
          * The other fragment is contained in this fragment. We send this fragment as is.
          */
         continue;
@@ -262,7 +262,7 @@ public class FragmentBuffer implements Serializable {
         /*
          *        [...other fragment...]
          * [...this fragment...]
-         * 
+         *
          * This fragment is partially contained in other. Only send the leading part of this fragment.
          */
         thisLength = other.getOffset() - thisOffset;
@@ -339,7 +339,7 @@ public class FragmentBuffer implements Serializable {
     public static Fragment getInstance(int offset, int length) {
       return new Fragment(offset, length);
     }
-    
+
     public int getOffset() {
       return offset;
     }
@@ -352,7 +352,7 @@ public class FragmentBuffer implements Serializable {
     public String toString() {
       return "[" + offset + " .. " + (offset + length - 1)  + " (" + length + ")]";
     }
-    
+
     @Override
     public boolean equals(Object otherObject) {
       if (otherObject == null) {

@@ -33,7 +33,7 @@ import net.sf.scuba.tlv.TLVUtil;
 /**
  * Data structure for storing either a <i>Portrait</i> (as used in DG5) or
  * a <i>Signature or mark</i> (as used in DG7).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -50,7 +50,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
 
   /**
    * Constructs a displayed image info from the image bytes.
-   * 
+   *
    * @param type one of {@link ImageInfo#TYPE_PORTRAIT} or {@link ImageInfo#TYPE_SIGNATURE_OR_MARK}
    * @param imageBytes encoded image, for <i>Portrait</i> and <i>Signature or mark</i> use JPEG encoding
    */
@@ -63,9 +63,9 @@ public class DisplayedImageInfo extends AbstractImageInfo {
 
   /**
    * Constructs a displayed image info from binary encoding.
-   * 
+   *
    * @param in an input stream
-   * 
+   *
    * @throws IOException if decoding fails
    */
   public DisplayedImageInfo(InputStream in) throws IOException {
@@ -75,7 +75,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
   /**
    * Reads the displayed image. This method should be implemented by concrete
    * subclasses. The 5F2E or 7F2E tag and the length are already read.
-   * 
+   *
    * @param inputStream the input stream positioned so that biometric data block tag and length are already read
    *
    * @throws IOException if reading fails
@@ -104,7 +104,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(getDisplayedImageTagFromType(getType()));
     writeImage(tlvOut);
-    tlvOut.writeValueEnd();		
+    tlvOut.writeValueEnd();
   }
 
   int getDisplayedImageTag() {
@@ -120,7 +120,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     length += imageLength;
     return length;
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -140,23 +140,20 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
-    DisplayedImageInfo other = (DisplayedImageInfo) obj;
-    if (displayedImageTag != other.displayedImageTag) {
-      return false;
-    }
-    return true;
+
+    DisplayedImageInfo other = (DisplayedImageInfo)obj;
+    return displayedImageTag == other.displayedImageTag;
   }
 
   /* ONLY PRIVATE METHODS BELOW */
 
   /**
    * As per A1.11.4 in Doc 9303 Part 3 Vol 2:
-   * 
+   *
    * Displayed Facial Image: ISO 10918, JFIF option
    * Displayed Finger: ANSI/NIST-ITL 1-2000
    * Displayed Signature/ usual mark: ISO 10918, JFIF option
-   */	
+   */
   private static String getMimeTypeFromType(int type) {
     switch (type) {
       case TYPE_PORTRAIT: return "image/jpeg";
@@ -176,8 +173,8 @@ public class DisplayedImageInfo extends AbstractImageInfo {
 
   private static int getTypeFromDisplayedImageTag(int tag) {
     switch(tag) {
-      case DISPLAYED_PORTRAIT_TAG: return DisplayedImageInfo.TYPE_PORTRAIT;
-      case DISPLAYED_SIGNATURE_OR_MARK_TAG: return DisplayedImageInfo.TYPE_SIGNATURE_OR_MARK;
+      case DISPLAYED_PORTRAIT_TAG: return ImageInfo.TYPE_PORTRAIT;
+      case DISPLAYED_SIGNATURE_OR_MARK_TAG: return ImageInfo.TYPE_SIGNATURE_OR_MARK;
       default: throw new NumberFormatException("Unknown tag: " + Integer.toHexString(tag));
     }
   }

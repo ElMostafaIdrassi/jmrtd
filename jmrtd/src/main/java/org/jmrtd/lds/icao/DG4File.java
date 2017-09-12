@@ -42,9 +42,9 @@ import org.jmrtd.lds.iso19794.IrisInfo;
 /**
  * File structure for the EF_DG4 file.
  * Based on ISO/IEC 19794-6.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class DG4File extends CBEFFDataGroup<IrisInfo> {
@@ -67,7 +67,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
   /**
    * Creates a new file with the specified records.
-   * 
+   *
    * @param irisInfos records
    */
   public DG4File(List<IrisInfo> irisInfos) {
@@ -76,7 +76,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
   /**
    * Creates a new file with the specified records.
-   * 
+   *
    * @param irisInfos records
    * @param shouldAddRandomDataIfEmpty indicates whether the encoder should add random data when no templates are present
    */
@@ -87,9 +87,9 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
   /**
    * Constructs a new file based on an input stream.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException on error reading from input stream
    */
   public DG4File(InputStream inputStream) throws IOException {
@@ -133,16 +133,17 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
   /**
    * Gets a textual representation of this file.
-   * 
+   *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     return "DG4File [" + super.toString() + "]";
   }
 
   /**
    * Gets the embedded iris infos in this file.
-   * 
+   *
    * @return iris infos
    */
   public List<IrisInfo> getIrisInfos() {
@@ -151,7 +152,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
   /**
    * Adds an iris info to this file.
-   * 
+   *
    * @param irisInfo an iris info
    */
   public void addIrisInfo(IrisInfo irisInfo) {
@@ -160,7 +161,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
   /**
    * Removes an iris info from this file.
-   * 
+   *
    * @param index the index of the iris info to remove
    */
   public void removeIrisInfo(int index) {

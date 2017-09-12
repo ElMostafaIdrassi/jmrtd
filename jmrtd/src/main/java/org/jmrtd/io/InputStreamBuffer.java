@@ -30,10 +30,10 @@ import org.jmrtd.io.FragmentBuffer.Fragment;
 /**
  * Buffers an inputstream (whose length is known in advance) and can supply clients with fresh
  * &quot;copies&quot; of that inputstream served from the buffer.
- * 
+ *
  * NOTE: the original inputstream should no longer be read from, clients should only read bytes
  * from the sub-inputstreams.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  */
 public class InputStreamBuffer {
@@ -43,7 +43,7 @@ public class InputStreamBuffer {
 
   /**
    * Creates an input stream buffer.
-   * 
+   *
    * @param inputStream the input stream
    * @param length the length of the input stream
    */
@@ -55,7 +55,7 @@ public class InputStreamBuffer {
 
   /**
    * Updates this buffer based on some other buffer.
-   * 
+   *
    * @param other the other buffer
    */
   public void updateFrom(InputStreamBuffer other) {
@@ -85,6 +85,7 @@ public class InputStreamBuffer {
     return buffer.getLength();
   }
 
+  @Override
   public String toString() {
     return "InputStreamBuffer [" + buffer + "]";
   }
@@ -126,7 +127,7 @@ public class InputStreamBuffer {
             if (result < 0) {
               return -1;
             }
-            
+
             buffer.addFragment(position++, (byte)result);
             return result;
           } catch (IOException ioe) {
@@ -189,7 +190,7 @@ public class InputStreamBuffer {
           buffer.addFragment(fragment.getOffset(), b, off + alreadyBufferedPrefixLength, bytesReadFromCarrier);
           position += bytesReadFromCarrier;
 
-          return alreadyBufferedPrefixLength + bytesReadFromCarrier;					
+          return alreadyBufferedPrefixLength + bytesReadFromCarrier;
         } else {
           /* No unbuffered fragment. */
           int length = Math.min(len, buffer.getLength() - position);
@@ -261,7 +262,7 @@ public class InputStreamBuffer {
     /**
      * If necessary, resets the carrier (which must support mark) and
      * skips to the current position in the buffer.
-     * 
+     *
      * @throws IOException on error
      */
     private void syncCarrierPosition(int position) throws IOException {

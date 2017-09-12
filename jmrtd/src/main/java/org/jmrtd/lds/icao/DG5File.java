@@ -31,9 +31,9 @@ import org.jmrtd.lds.DisplayedImageInfo;
 
 /**
  * File structure for the EF_DG5 file.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class DG5File extends DisplayedImageDataGroup {
@@ -42,7 +42,7 @@ public class DG5File extends DisplayedImageDataGroup {
 
   /**
    * Constructs a new file from a list of displayed images.
-   * 
+   *
    * @param images the displayed images, all of which should be of type <i>Portrait</i>
    */
   public DG5File(List<DisplayedImageInfo> images) {
@@ -51,9 +51,9 @@ public class DG5File extends DisplayedImageDataGroup {
 
   /**
    * Constructs a new file from binary representation.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException on error reading input stream
    */
   public DG5File(InputStream inputStream) throws IOException {

@@ -27,7 +27,7 @@ import org.ejbca.cvc.AuthorizationRoleEnum;
 
 /**
  * Card verifiable certificate authorization template.
- *  
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -36,7 +36,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * The issuing authority.
-   * 
+   *
    * @author The JMRTD team (info@jmrtd.org)
    *
    * @version $Revision$
@@ -55,7 +55,7 @@ public class CVCAuthorizationTemplate {
 
     /**
      * Returns the value as a bitmap.
-     * 
+     *
      * @return a bitmap
      */
     public byte getValue(){
@@ -65,7 +65,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * The authorization permission.
-   * 
+   *
    * @author The JMRTD team (info@jmrtd.org)
    *
    * @version $Revision$
@@ -84,9 +84,9 @@ public class CVCAuthorizationTemplate {
 
     /**
      * Whether this permission implies the other permission.
-     * 
+     *
      * @param other some other permission
-     * 
+     *
      * @return a boolean
      */
     public boolean implies(Permission other) {
@@ -106,7 +106,7 @@ public class CVCAuthorizationTemplate {
 
     /**
      * Returns the tag as a bitmap
-     * 
+     *
      * @return a bitmap
      */
     public byte getValue() {
@@ -119,7 +119,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Constructs an authorization template based on an EJBCA authorization template.
-   * 
+   *
    * @param template the authZ template to wrap
    */
   protected CVCAuthorizationTemplate(org.ejbca.cvc.CVCAuthorizationTemplate template) {
@@ -130,7 +130,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Constructs an authorization template.
-   * 
+   *
    * @param role the role
    * @param accessRight the access rights
    */
@@ -141,7 +141,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Gets the role.
-   * 
+   *
    * @return the role
    */
   public Role getRole() {
@@ -150,7 +150,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Gets the access rights.
-   * 
+   *
    * @return the access rights
    */
   public Permission getAccessRight() {
@@ -159,7 +159,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Gets a textual representation of this authorization template.
-   * 
+   *
    * @return a textual representation of this authorization template
    */
   @Override
@@ -171,7 +171,7 @@ public class CVCAuthorizationTemplate {
    * Checks equality.
    *
    * @param otherObj the other object
-   * 
+   *
    * @return whether the other object is equal to this object
    */
   @Override
@@ -192,7 +192,7 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Gets a hash code of this object.
-   * 
+   *
    * @return the hash code
    */
   @Override
@@ -231,7 +231,7 @@ public class CVCAuthorizationTemplate {
         case IS:
           return org.ejbca.cvc.AuthorizationRoleEnum.IS;
         default:
-          throw new IllegalArgumentException("Error getting role from AuthZ template " + role);          
+          throw new IllegalArgumentException("Error getting role from AuthZ template " + role);
       }
     } catch (Exception e) {
       throw new IllegalArgumentException("Error getting role from AuthZ template", e);

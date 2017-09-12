@@ -41,7 +41,7 @@ import org.jmrtd.lds.AbstractListInfo;
 /**
  * Fingerprint general record header and finger image data blocks
  * based on Section 7 and Table 2 of ISO/IEC FCD 19794-4 aka Annex F.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -95,7 +95,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Constructs a finger info record.
-   * 
+   *
    * @param captureDeviceId capture device identifier
    * @param acquisitionLevel acquisition level
    * @param scaleUnits scale units, one of {@link #SCALE_UNITS_PPI}, {@link #SCALE_UNITS_PPCM}
@@ -120,7 +120,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Constructs a finger info record.
-   * 
+   *
    * @param sbh standard biometric header to use
    * @param captureDeviceId capture device identifier
    * @param acquisitionLevel acquisition level
@@ -154,9 +154,9 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Constructs a finger info record.
-   * 
+   *
    * @param inputStream input stream
-   * 
+   *
    * @throws IOException on I/O error
    */
   public FingerInfo(InputStream inputStream) throws IOException {
@@ -165,10 +165,10 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Constructs a finger info record.
-   * 
+   *
    * @param sbh standard biometric header to use
    * @param inputStream input stream
-   * 
+   *
    * @throws IOException on I/O error
    */
   public FingerInfo(StandardBiometricHeader sbh, InputStream inputStream) throws IOException {
@@ -179,7 +179,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   /**
    * Gets the Capture device Id. As specified in Section 7.1.4 of ISO 19794-4.
    * Only low-order 12 bits are significant.
-   * 
+   *
    * @return the capture device Id.
    */
   public int getCaptureDeviceId() {
@@ -190,7 +190,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * Gets the image acquisition level. As specified in Section 7.1.5 and Table 1 of ISO 19794-4.
    * Valid settings are: 10 (125 ppi), 20 (250 ppi), 30 (500 ppi), 31 (500 ppi), 40 (1000 ppi), 41 (1000 ppi).
    * (TODO: provide constants for those levels.)
-   * 
+   *
    * @return image acquisition level
    */
   public int getAcquisitionLevel() {
@@ -200,7 +200,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   /**
    * Gets the units used to describe the scanning and resolution of the image.
    * Either PPI or PPCM. As specified in Section 7.1.7 of ISO 19794-4.
-   * 
+   *
    * @return scale units type
    */
   public int getScaleUnits() {
@@ -211,7 +211,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * Gets the rounded scanning resolution used in the horizontal direction.
    * As specified in Section 7.1.8 of ISO 19794-4.
    * Depending on {@link #getScaleUnits()} the result is either in PPI or PPCM.
-   * 
+   *
    * @return the horizontal scanning resolution
    */
   public int getHorizontalScanningResolution() {
@@ -222,7 +222,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * Gets the rounded scanning resolution used in the vertical direction.
    * As specified in Section 7.1.9 of ISO 19794-4.
    * Depending on {@link #getScaleUnits()} the result is either in PPI or PPCM.
-   * 
+   *
    * @return the vertical scanning resolution
    */
   public int getVerticalScanningResolution() {
@@ -233,7 +233,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * Gets the rounded image resolution used in the horizontal direction.
    * As specified in Section 7.1.10 of ISO 19794-4.
    * Depending on {@link #getScaleUnits()} the result is either in PPI or PPCM.
-   * 
+   *
    * @return the horizontal image resolution
    */
   public int getHorizontalImageResolution() {
@@ -244,7 +244,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * Gets the rounded image resolution used in the vertical direction.
    * As specified in Section 7.1.11 of ISO 19794-4.
    * Depending on {@link #getScaleUnits()} the result is either in PPI or PPCM.
-   * 
+   *
    * @return the vertical image resolution
    */
   public int getVerticalImageResolution() {
@@ -254,7 +254,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   /**
    * Gets the pixel depth. As specified in Section 7.1.12 of ISO 19794-4.
    * Valid values are between <code>0x1</code> to <code>0x10</code>.
-   * 
+   *
    * @return the pixel depth
    */
   public int getDepth() {
@@ -279,11 +279,12 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Reads a finger info from an input stream.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException if reading fails
    */
+  @Override
   public void readObject(InputStream inputStream) throws IOException {
     /* General record header (32) according to Table 2 in Section 7.1 of ISO/IEC 19794-4. */
 
@@ -336,11 +337,12 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Writes this finger info to an output stream.
-   * 
+   *
    * @param outputStream an output stream
-   * 
+   *
    * @throws IOException if writing fails
    */
+  @Override
   public void writeObject(OutputStream outputStream) throws IOException {
 
     long headerLength = 32; /* 4 + 4 + 6 + 2 + 2 + 1 + 1 + 2 + 2 + 2 + 2 + 1 + 1 + 2 */
@@ -380,6 +382,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     }
   }
 
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("FingerInfo [");
@@ -393,7 +396,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Gets the standard biometric header of this biometric data block
-   * 
+   *
    * @return the standard biometric header
    */
   public StandardBiometricHeader getStandardBiometricHeader() {
@@ -416,7 +419,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Gets the finger image infos embedded in this finger info.
-   * 
+   *
    * @return the embedded finger image infos
    */
   public List<FingerImageInfo> getFingerImageInfos() {
@@ -425,17 +428,17 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Adds a finger image info to this finger info.
-   * 
+   *
    * @param fingerImageInfo the finger image info to add
    */
   public void addFingerImageInfo(FingerImageInfo fingerImageInfo) { add(fingerImageInfo); }
 
   /**
    * Removes a finger image info from this finger info.
-   * 
+   *
    * @param index the index of the finger image info to remove
    */
-  public void removeFingerImageInfo(int index) { remove(index); }	
+  public void removeFingerImageInfo(int index) { remove(index); }
 
   /* ONLY PRIVATE BELOW */
 
@@ -446,7 +449,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     long result = 0L;
     for (int i = 0; i < byteCount; i++) {
       result <<= 8;
-      result += (int)(buf[i] & 0xFF);
+      result += buf[i] & 0xFF;
     }
     return result;
   }
@@ -455,30 +458,30 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     if (byteCount <= 0) {
       return;
     }
-    
+
     for (int i = 0; i < (byteCount - 8); i++) {
       out.write(0);
     }
     if (byteCount > 8) { byteCount = 8; }
     for (int i = (byteCount - 1); i >= 0; i--) {
-      long mask = (long)(0xFFL << (i * 8));
+      long mask = 0xFFL << (i * 8);
       byte b = (byte)((value & mask) >> (i * 8));
       out.write(b);
-    }		
+    }
   }
 
   /**
    * Compression algorithm codes based on Table 3 in Section 7.1.13 of 19794-4.
-   * 
+   *
    * 0 Uncompressed, no bit packing
    * 1 Uncompressed, bit packed
    * 2 Compressed, WSQ
    * 3 Compressed, JPEG
    * 4 Compressed, JPEG2000
-   * 5 PNG 
-   * 
+   * 5 PNG
+   *
    * @param imageDataType
-   * 
+   *
    * @return MIME type string
    */
   static String toMimeType(int imageDataType) {
@@ -506,7 +509,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     if ("images/png".equals(mimeType)) {
       return FingerInfo.COMPRESSION_PNG;
     }
-    
+
     throw new IllegalArgumentException("Did not recognize mimeType");
   }
 

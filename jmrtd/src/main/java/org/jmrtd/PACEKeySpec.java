@@ -44,7 +44,7 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Constructs a PACE key from a string value.
-   * 
+   *
    * @param key the string value containing CAN, PIN or PUK
    * @param keyReference indicates the type of key, valid values are
    *                     {@code MRZ_PACE_KEY_REFERENCE}, {@code CAN_PACE_KEY_REFERENCE},
@@ -56,7 +56,7 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Constructs a key.
-   * 
+   *
    * @param key CAN, MRZ, PIN, PUK password bytes
    * @param keyReference indicates the type of key, valid values are
    *                     {@code MRZ_PACE_KEY_REFERENCE}, {@code CAN_PACE_KEY_REFERENCE},
@@ -70,7 +70,7 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Creates a PACE key from relevant details from a Machine Readable Zone.
-   * 
+   *
    * @param mrz the details from the Machine Readable Zone
    *
    * @return the PACE key
@@ -83,9 +83,9 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Creates a PACE key from a Card Access Number.
-   * 
+   *
    * @param can the Card Access Number
-   * 
+   *
    * @return the PACE key
    */
   public static PACEKeySpec createCANKey(String can) {
@@ -94,9 +94,9 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Creates a PACE key from a PIN.
-   * 
+   *
    * @param pin the PIN
-   * 
+   *
    * @return the PACE key
    */
   public static PACEKeySpec createPINKey(String pin) {
@@ -105,9 +105,9 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Creates a PACE key from a PUK.
-   * 
+   *
    * @param puk the PUK
-   * 
+   *
    * @return the PACE key
    */
   public static PACEKeySpec createPUKKey(String puk) {
@@ -118,7 +118,7 @@ public class PACEKeySpec implements AccessKeySpec {
    * Returns the type of key, valid values are
    *                     {@code MRZ_PACE_KEY_REFERENCE}, {@code CAN_PACE_KEY_REFERENCE},
    *                     {@code PIN_PACE_KEY_REFERENCE}, {@code PUK_PACE_KEY_REFERENCE}
-   *                     
+   *
    * @return the type of key
    */
   public byte getKeyReference() {
@@ -127,7 +127,7 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Returns the key bytes.
-   * 
+   *
    * @return the key bytes
    */
   public byte[] getKey() {

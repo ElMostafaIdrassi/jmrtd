@@ -35,11 +35,11 @@ import net.sf.scuba.tlv.TLVUtil;
 
 /**
  * ISO 7816-11 decoder for BIR.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public class ISO781611Decoder implements ISO781611 {
@@ -50,7 +50,7 @@ public class ISO781611Decoder implements ISO781611 {
 
   /**
    * Constructs an ISO7816-11 decoder that uses the given BDB decoder.
-   * 
+   *
    * @param bdbDecoder the BDB decoder to use
    */
   public ISO781611Decoder(BiometricDataBlockDecoder<?> bdbDecoder) {
@@ -59,11 +59,11 @@ public class ISO781611Decoder implements ISO781611 {
 
   /**
    * Reads a BIT group from an input stream.
-   * 
+   *
    * @param inputStream the input stream to read from
-   * 
+   *
    * @return a complex CBEFF info representing the BIT group
-   * 
+   *
    * @throws IOException if reading fails
    */
   public ComplexCBEFFInfo decode(InputStream inputStream) throws IOException {
@@ -72,11 +72,11 @@ public class ISO781611Decoder implements ISO781611 {
 
   /**
    * Reads a BIT group from an input stream.
-   * 
+   *
    * @param inputStream the input stream to read from
-   * 
+   *
    * @return a complex CBEFF info representing the BIT group
-   * 
+   *
    * @throws IOException if reading fails
    */
   private ComplexCBEFFInfo readBITGroup(InputStream inputStream) throws IOException {
@@ -119,12 +119,12 @@ public class ISO781611Decoder implements ISO781611 {
 
   /**
    * Reads a BIT from the input stream.
-   * 
+   *
    * @param inputStream the input stream to read from
    * @param index index of this BIT within the BIT group
-   * 
+   *
    * @return a CBEFF info representing the BIT
-   * 
+   *
    * @throws IOException if reading fails
    */
   private CBEFFInfo readBIT(InputStream inputStream, int index) throws IOException {
@@ -136,7 +136,7 @@ public class ISO781611Decoder implements ISO781611 {
 
   private CBEFFInfo readBIT(int tag, int length, InputStream inputStream, int index) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
-    if (tag != BIOMETRIC_INFORMATION_TEMPLATE_TAG /* 7F60 */) { 
+    if (tag != BIOMETRIC_INFORMATION_TEMPLATE_TAG /* 7F60 */) {
       throw new IllegalArgumentException("Expected tag BIOMETRIC_INFORMATION_TEMPLATE_TAG (" + Integer.toHexString(BIOMETRIC_INFORMATION_TEMPLATE_TAG) + "), found " + Integer.toHexString(tag) + ", index is " + index);
     }
 
@@ -220,15 +220,21 @@ public class ISO781611Decoder implements ISO781611 {
       case SMT_DO_CC /* 0x8E */:
         /* NOTE: payload contains a MAC */
         long skippedBytes = 0;
-        while (skippedBytes < doLength) { skippedBytes += tlvIn.skip(doLength); }
-        break;
+        while (skippedBytes < doLength) {
+          skippedBytes += tlvIn.skip(doLength);
+        }
+        return null;
       case SMT_DO_DS /* 0x9E */:
         /* NOTE: payload contains a signature */
         skippedBytes = 0;
-        while (skippedBytes < doLength) { skippedBytes += tlvIn.skip(doLength); }
-        break;
+        while (skippedBytes < doLength) {
+          skippedBytes += tlvIn.skip(doLength);
+        }
+        return null;
+      default:
+        LOGGER.info("Unsupported data object tag " + Integer.toHexString(doTag));
+        return null;
     }
-    return null;
   }
 
   private BiometricDataBlock readBiometricDataBlock(InputStream inputStream, StandardBiometricHeader sbh, int index) throws IOException {
@@ -239,7 +245,7 @@ public class ISO781611Decoder implements ISO781611 {
       throw new IllegalArgumentException("Expected tag BIOMETRIC_DATA_BLOCK_TAG (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_TAG) + ") or BIOMETRIC_DATA_BLOCK_TAG_ALT (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG) + "), found " + Integer.toHexString(bioDataBlockTag));
     }
     // this.biometricDataBlockTag = bioDataBlockTag;
-    int length = tlvIn.readLength();		
+    int length = tlvIn.readLength();
     BiometricDataBlock bdb = bdbDecoder.decode(inputStream, sbh, index, length);
     return bdb;
   }

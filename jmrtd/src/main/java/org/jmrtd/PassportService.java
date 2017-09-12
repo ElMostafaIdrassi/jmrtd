@@ -215,7 +215,7 @@ public class PassportService extends PassportApduService {
   public int maxBlockSize;
 
   enum State {
-    SESSION_STOPPED_STATE,  
+    SESSION_STOPPED_STATE,
     SESSION_STARTED_STATE,
     BAC_AUTHENTICATED_STATE,
     PACE_AUTHENTICATED_STATE,
@@ -230,7 +230,8 @@ public class PassportService extends PassportApduService {
   /**
    * @deprecated visibility will be set to private
    */
-  protected SecureMessagingWrapper wrapper;
+  @Deprecated
+  private SecureMessagingWrapper wrapper;
 
   private boolean isICAOAppletSelected;
 
@@ -362,7 +363,7 @@ public class PassportService extends PassportApduService {
    * @param bacKey the key based on the document number,
    *               the card holder's birth date,
    *               and the document's expiration date
-   *               
+   *
    * @return the BAC result
    *
    * @throws CardServiceException if authentication failed
@@ -379,12 +380,12 @@ public class PassportService extends PassportApduService {
    * It does BAC using kEnc and kMac keys, usually calculated
    * from the document number, the card holder's date of birth,
    * and the card's date of expiry.
-   * 
+   *
    * A secure messaging channel is set up as a result.
    *
    * @param kEnc static 3DES key required for BAC
    * @param kMac static 3DES key required for BAC
-   * 
+   *
    * @return the result
    *
    * @throws CardServiceException if authentication failed
@@ -456,7 +457,7 @@ public class PassportService extends PassportApduService {
   /**
    * Performs <i>Terminal Authentication</i> (TA) part of EAC (version 1). For details see
    * TR-03110 ver. 1.11.
-   * 
+   *
    * In short, we feed the sequence of terminal certificates to the card for verification,
    * get a challenge from the card, sign it with the terminal private key, and send the result
    * back to the card for verification.
@@ -482,7 +483,7 @@ public class PassportService extends PassportApduService {
   /**
    * Performs <i>Terminal Authentication</i> (TA) part of EAC (version 1). For details see
    * TR-03110 ver. 1.11.
-   * 
+   *
    * In short, we feed the sequence of terminal certificates to the card for verification,
    * get a challenge from the card, sign it with the terminal private key, and send the result
    * back to the card for verification.
@@ -551,6 +552,7 @@ public class PassportService extends PassportApduService {
    *
    * @param wrapper wrapper
    */
+  @Deprecated
   public void setWrapper(SecureMessagingWrapper wrapper) {
     this.wrapper = wrapper;
   }

@@ -42,9 +42,9 @@ import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * The EAC Terminal Authentication protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  *
  * @since 0.5.6
@@ -54,7 +54,7 @@ public class TAProtocol {
   private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-  
+
   private PassportService service;
   private SecureMessagingWrapper wrapper;
 

@@ -32,7 +32,7 @@ import net.sf.scuba.util.Hex;
 
 /**
  * Result from Active Authentication protocol.
- * 
+ *
  * @author The JMRTD team
  *
  * @version $Revision$

@@ -57,54 +57,63 @@ public class FaceImageInfo extends AbstractImageInfo {
   public enum EyeColor {
     UNSPECIFIED {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_UNSPECIFIED;
       }
     },
     BLACK {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_BLACK;
       }
     },
     BLUE {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_BLUE;
       }
     },
     BROWN {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_BROWN;
       }
     },
     GRAY {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_GRAY;
       }
     },
     GREEN {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_GREEN;
       }
     },
     MULTI_COLORED {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_MULTI_COLORED;
       }
     },
     PINK {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_PINK;
       }
     },
     UNKNOWN {
 
+      @Override
       public int toInt() {
         return EYE_COLOR_UNKNOWN;
       }
@@ -147,83 +156,123 @@ public class FaceImageInfo extends AbstractImageInfo {
     UNKNOWN
   };
 
-  public static final int
-  HAIR_COLOR_UNSPECIFIED = 0x00,
-  HAIR_COLOR_BALD = 0x01,
-  HAIR_COLOR_BLACK = 0x02,
-  HAIR_COLOR_BLONDE = 0x03,
-  HAIR_COLOR_BROWN = 0x04,
-  HAIR_COLOR_GRAY = 0x05,
-  HAIR_COLOR_WHITE = 0x06,
-  HAIR_COLOR_RED = 0x07,
-  HAIR_COLOR_GREEN = 0x08,
-  HAIR_COLOR_BLUE = 0x09,
-  HAIR_COLOR_UNKNOWN = 0xFF;
+  public static final int HAIR_COLOR_UNSPECIFIED = 0x00;
+  public static final int HAIR_COLOR_BALD = 0x01;
+  public static final int HAIR_COLOR_BLACK = 0x02;
+  public static final int HAIR_COLOR_BLONDE = 0x03;
+  public static final int HAIR_COLOR_BROWN = 0x04;
+  public static final int HAIR_COLOR_GRAY = 0x05;
+  public static final int HAIR_COLOR_WHITE = 0x06;
+  public static final int HAIR_COLOR_RED = 0x07;
+  public static final int HAIR_COLOR_GREEN = 0x08;
+  public static final int HAIR_COLOR_BLUE = 0x09;
+  public static final int HAIR_COLOR_UNKNOWN = 0xFF;
 
   /** Feature flags meaning based on Section 5.5.6 of ISO 19794-5. */
-  public enum Features { FEATURES_ARE_SPECIFIED, GLASSES, MOUSTACHE, BEARD, TEETH_VISIBLE, BLINK, MOUTH_OPEN, LEFT_EYE_PATCH, RIGHT_EYE_PATCH, DARK_GLASSES, DISTORTING_MEDICAL_CONDITION };
-  private static final int
-  FEATURE_FEATURES_ARE_SPECIFIED_FLAG = 0x000001,
-  FEATURE_GLASSES_FLAG = 0x000002,
-  FEATURE_MOUSTACHE_FLAG = 0x000004,
-  FEATURE_BEARD_FLAG = 0x000008,
-  FEATURE_TEETH_VISIBLE_FLAG = 0x000010,
-  FEATURE_BLINK_FLAG = 0x000020,
-  FEATURE_MOUTH_OPEN_FLAG = 0x000040,
-  FEATURE_LEFT_EYE_PATCH_FLAG = 0x000080,
-  FEATURE_RIGHT_EYE_PATCH = 0x000100,
-  FEATURE_DARK_GLASSES = 0x000200,
-  FEATURE_DISTORTING_MEDICAL_CONDITION = 0x000400;
+  public enum Features {
+    FEATURES_ARE_SPECIFIED,
+    GLASSES,
+    MOUSTACHE,
+    BEARD,
+    TEETH_VISIBLE,
+    BLINK,
+    MOUTH_OPEN,
+    LEFT_EYE_PATCH,
+    RIGHT_EYE_PATCH,
+    DARK_GLASSES,
+    DISTORTING_MEDICAL_CONDITION
+  };
+
+  private static final int FEATURE_FEATURES_ARE_SPECIFIED_FLAG = 0x000001;
+  private static final int FEATURE_GLASSES_FLAG = 0x000002;
+  private static final int FEATURE_MOUSTACHE_FLAG = 0x000004;
+  private static final int FEATURE_BEARD_FLAG = 0x000008;
+  private static final int FEATURE_TEETH_VISIBLE_FLAG = 0x000010;
+  private static final int FEATURE_BLINK_FLAG = 0x000020;
+  private static final int FEATURE_MOUTH_OPEN_FLAG = 0x000040;
+  private static final int FEATURE_LEFT_EYE_PATCH_FLAG = 0x000080;
+  private static final int FEATURE_RIGHT_EYE_PATCH = 0x000100;
+  private static final int FEATURE_DARK_GLASSES = 0x000200;
+  private static final int FEATURE_DISTORTING_MEDICAL_CONDITION = 0x000400;
 
   /** Expression code based on Section 5.5.7 of ISO 19794-5. */
-  public enum Expression { UNSPECIFIED, NEUTRAL, SMILE_CLOSED, SMILE_OPEN, RAISED_EYEBROWS, EYES_LOOKING_AWAY, SQUINTING, FROWNING };
-  public static final short
-  EXPRESSION_UNSPECIFIED = 0x0000,
-  EXPRESSION_NEUTRAL = 0x0001,
-  EXPRESSION_SMILE_CLOSED = 0x0002,
-  EXPRESSION_SMILE_OPEN = 0x0003,
-  EXPRESSION_RAISED_EYEBROWS = 0x0004,
-  EXPRESSION_EYES_LOOKING_AWAY = 0x0005,
-  EXPRESSION_SQUINTING = 0x0006,
-  EXPRESSION_FROWNING = 0x0007;
+  public enum Expression {
+    UNSPECIFIED,
+    NEUTRAL,
+    SMILE_CLOSED,
+    SMILE_OPEN,
+    RAISED_EYEBROWS,
+    EYES_LOOKING_AWAY,
+    SQUINTING,
+    FROWNING
+  };
+
+  public static final short EXPRESSION_UNSPECIFIED = 0x0000;
+  public static final short EXPRESSION_NEUTRAL = 0x0001;
+  public static final short EXPRESSION_SMILE_CLOSED = 0x0002;
+  public static final short EXPRESSION_SMILE_OPEN = 0x0003;
+  public static final short EXPRESSION_RAISED_EYEBROWS = 0x0004;
+  public static final short EXPRESSION_EYES_LOOKING_AWAY = 0x0005;
+  public static final short EXPRESSION_SQUINTING = 0x0006;
+  public static final short EXPRESSION_FROWNING = 0x0007;
 
   /** Face image type code based on Section 5.7.1 of ISO 19794-5. */
-  public enum FaceImageType { BASIC, FULL_FRONTAL, TOKEN_FRONTAL };
-  public static final int
-  FACE_IMAGE_TYPE_BASIC = 0x00,
-  FACE_IMAGE_TYPE_FULL_FRONTAL = 0x01,
-  FACE_IMAGE_TYPE_TOKEN_FRONTAL = 0x02;
+  public enum FaceImageType {
+    BASIC,
+    FULL_FRONTAL,
+    TOKEN_FRONTAL
+  };
+
+  public static final int FACE_IMAGE_TYPE_BASIC = 0x00;
+  public static final int FACE_IMAGE_TYPE_FULL_FRONTAL = 0x01;
+  public static final int FACE_IMAGE_TYPE_TOKEN_FRONTAL = 0x02;
 
   /** Image data type code based on Section 5.7.2 of ISO 19794-5. */
-  public enum ImageDataType { TYPE_JPEG, TYPE_JPEG2000 };
-  public static final int
-  IMAGE_DATA_TYPE_JPEG = 0x00,
-  IMAGE_DATA_TYPE_JPEG2000 = 0x01;
+  public enum ImageDataType {
+    TYPE_JPEG,
+    TYPE_JPEG2000
+  };
+
+  public static final int IMAGE_DATA_TYPE_JPEG = 0x00;
+  public static final int IMAGE_DATA_TYPE_JPEG2000 = 0x01;
 
   /** Color space code based on Section 5.7.4 of ISO 19794-5. */
-  public enum ImageColorSpace { UNSPECIFIED, RGB24, YUV422, GRAY8, OTHER };
-  public static final int
-  IMAGE_COLOR_SPACE_UNSPECIFIED = 0x00,
-  IMAGE_COLOR_SPACE_RGB24 = 0x01,
-  IMAGE_COLOR_SPACE_YUV422 = 0x02,
-  IMAGE_COLOR_SPACE_GRAY8 = 0x03,
-  IMAGE_COLOR_SPACE_OTHER = 0x04;
+  public enum ImageColorSpace {
+    UNSPECIFIED,
+    RGB24,
+    YUV422,
+    GRAY8,
+    OTHER
+  };
+
+  public static final int IMAGE_COLOR_SPACE_UNSPECIFIED = 0x00;
+  public static final int IMAGE_COLOR_SPACE_RGB24 = 0x01;
+  public static final int IMAGE_COLOR_SPACE_YUV422 = 0x02;
+  public static final int IMAGE_COLOR_SPACE_GRAY8 = 0x03;
+  public static final int IMAGE_COLOR_SPACE_OTHER = 0x04;
 
   /** Source type based on Section 5.7.6 of ISO 19794-5. */
-  public enum SourceType { UNSPECIFIED, STATIC_PHOTO_UNKNOWN_SOURCE, STATIC_PHOTO_DIGITAL_CAM, STATIC_PHOTO_SCANNER, VIDEO_FRAME_UNKNOWN_SOURCE, VIDEO_FRAME_ANALOG_CAM, VIDEO_FRAME_DIGITAL_CAM, UNKNOWN }
+  public enum SourceType {
+    UNSPECIFIED, STATIC_PHOTO_UNKNOWN_SOURCE, STATIC_PHOTO_DIGITAL_CAM, STATIC_PHOTO_SCANNER, VIDEO_FRAME_UNKNOWN_SOURCE, VIDEO_FRAME_ANALOG_CAM, VIDEO_FRAME_DIGITAL_CAM, UNKNOWN
+  }
 
-  public static final int
-  SOURCE_TYPE_UNSPECIFIED = 0x00,
-  SOURCE_TYPE_STATIC_PHOTO_UNKNOWN_SOURCE = 0x01,
-  SOURCE_TYPE_STATIC_PHOTO_DIGITAL_CAM = 0x02,
-  SOURCE_TYPE_STATIC_PHOTO_SCANNER = 0x03,
-  SOURCE_TYPE_VIDEO_FRAME_UNKNOWN_SOURCE = 0x04,
-  SOURCE_TYPE_VIDEO_FRAME_ANALOG_CAM = 0x05,
-  SOURCE_TYPE_VIDEO_FRAME_DIGITAL_CAM = 0x06,
-  SOURCE_TYPE_UNKNOWN = 0x07;
+  public static final int SOURCE_TYPE_UNSPECIFIED = 0x00;
+  public static final int SOURCE_TYPE_STATIC_PHOTO_UNKNOWN_SOURCE = 0x01;
+  public static final int SOURCE_TYPE_STATIC_PHOTO_DIGITAL_CAM = 0x02;
+  public static final int SOURCE_TYPE_STATIC_PHOTO_SCANNER = 0x03;
+  public static final int SOURCE_TYPE_VIDEO_FRAME_UNKNOWN_SOURCE = 0x04;
+  public static final int SOURCE_TYPE_VIDEO_FRAME_ANALOG_CAM = 0x05;
+  public static final int SOURCE_TYPE_VIDEO_FRAME_DIGITAL_CAM = 0x06;
+  public static final int SOURCE_TYPE_UNKNOWN = 0x07;
 
   /** Indexes into poseAngle array. */
-  private static final int YAW = 0, PITCH = 1, ROLL = 2;
+  private static final int YAW = 0;
+
+  /** Indexes into poseAngle array. */
+  private static final int PITCH = 1;
+
+  /** Indexes into poseAngle array. */
+  private static final int ROLL = 2;
 
   private long recordLength;
   private Gender gender;
@@ -323,6 +372,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Override
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = (inputStream instanceof DataInputStream) ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
@@ -394,11 +444,12 @@ public class FaceImageInfo extends AbstractImageInfo {
    *
    * @throws IOException if writing fails
    */
+  @Override
   public void writeObject(OutputStream outputStream) throws IOException {
     ByteArrayOutputStream recordOut = new ByteArrayOutputStream();
     writeFacialRecordData(recordOut);
     byte[] facialRecordData = recordOut.toByteArray();
-    long faceImageBlockLength = facialRecordData.length + 4L;		
+    long faceImageBlockLength = facialRecordData.length + 4L;
     DataOutputStream dataOut = new DataOutputStream(outputStream);
     dataOut.writeInt((int)faceImageBlockLength);
     dataOut.write(facialRecordData);
@@ -410,6 +461,7 @@ public class FaceImageInfo extends AbstractImageInfo {
    *
    * @return the record length
    */
+  @Override
   public long getRecordLength() {
     /* Should be equal to (20 + 8 * featurePoints.length + 12 + getImageLength()). */
     return recordLength;
@@ -476,7 +528,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Gets the feature mask.
-   * 
+   *
    * @return feature mask
    */
   public int getFeatureMask() {
@@ -504,7 +556,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Gets the image data type.
-   * 
+   *
    * @return image data type
    */
   public int getImageDataType() {
@@ -562,9 +614,10 @@ public class FaceImageInfo extends AbstractImageInfo {
    * @see java.lang.Object#toString()
    */
   /* TODO: rename this method, distinguish between a pretty print version to be used in JMRTD GUI and a proper toString() */
+  @Override
   public String toString() {
     StringBuilder out = new StringBuilder();
-    
+
     out.append("Image size: ").append(getWidth()).append(" x ").append(getHeight()).append("\n");
     out.append("Gender: ").append(gender == null ? Gender.UNSPECIFIED : gender).append("\n");
     out.append("Eye color: ").append(eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor).append("\n");
@@ -578,11 +631,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     if (featurePoints == null || featurePoints.length == 0) {
       out.append("   (none)\n");
     } else {
-      for (int i = 0; i < featurePoints.length; i++) {
-        out.append("   ").append(featurePoints[i].toString()).append("\n");
+      for (FeaturePoint featurePoint : featurePoints) {
+        out.append("   ").append(featurePoint.toString()).append("\n");
       }
     }
-    
+
     return out.toString();
   }
 
@@ -608,8 +661,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /* Feature Point(s) (optional) (8 * featurePointCount) */
-    for (int i = 0; i < featurePoints.length; i++) {
-      FeaturePoint fp = featurePoints[i];
+    for (FeaturePoint fp : featurePoints) {
       dataOut.writeByte(fp.getType());
       dataOut.writeByte((fp.getMajorCode() << 4) | fp.getMinorCode());
       dataOut.writeShort(fp.getX());
@@ -630,7 +682,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     /*
      * Image data type code based on Section 5.8.1
      * ISO 19794-5
-     */		
+     */
     writeImage(dataOut);
     dataOut.flush();
     dataOut.close();
@@ -694,7 +746,7 @@ public class FaceImageInfo extends AbstractImageInfo {
         out.append(", ");
       }
     }
-    
+
     return out.toString();
   }
 
@@ -717,7 +769,7 @@ public class FaceImageInfo extends AbstractImageInfo {
       case EXPRESSION_FROWNING:
         return "frowning";
       default:
-        return "unknown";        
+        return "unknown";
     }
   }
 
@@ -793,7 +845,7 @@ public class FaceImageInfo extends AbstractImageInfo {
    * @version $Revision$
    */
   public static class FeaturePoint implements Serializable {
-    
+
     private static final long serialVersionUID = -4209679423938065215L;
 
     private int type;
@@ -828,7 +880,7 @@ public class FaceImageInfo extends AbstractImageInfo {
      * @param y Y-coordinate
      */
     FeaturePoint(int type, byte code, int x, int y) {
-      this(type, (int)((code & 0xF0) >> 4), (int)(code & 0x0F), x ,y);
+      this(type, (code & 0xF0) >> 4, code & 0x0F, x ,y);
     }
 
     /**
@@ -883,6 +935,7 @@ public class FaceImageInfo extends AbstractImageInfo {
      *
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       return new StringBuilder()
           .append("( point: ").append(getMajorCode()).append(".").append(getMinorCode())

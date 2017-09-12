@@ -35,10 +35,10 @@ import org.jmrtd.Util;
 /**
  * An ECDH key agreement implementation, used by PACE protocol for the Generic Mapping
  * case, which is able to return the shared secret in the form of an EC point.
- * 
+ *
  * Specifically this implementation is able to keep both X and Y coordinate instead of
  * only returning the X coordinate.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision: $
@@ -49,9 +49,9 @@ public class PACEGMWithECDHAgreement {
 
   /**
    * Initializes the key agreement implementation.
-   * 
+   *
    * @param privateKey this party's private key
-   * 
+   *
    * @throws InvalidKeyException if the private key is not an instance of {@link ECPrivateKey}
    */
   public void init(PrivateKey privateKey) throws InvalidKeyException {
@@ -59,16 +59,16 @@ public class PACEGMWithECDHAgreement {
       throw new InvalidKeyException("Not an ECPrivateKey");
     }
     this.privateKey = (ECPrivateKey)privateKey;
-    
+
   }
 
   /**
    * Performs a key agreement protocol.
-   * 
+   *
    * @param publicKey the other party's public key
-   * 
+   *
    * @return the resulting shared secretin the form of an EC point
-   * 
+   *
    * @throws InvalidKeyException if the provided key is not an instance of {@link ECPublicKey}
    * @throws IllegalStateException if this key agreement has not been initialized
    */
@@ -76,11 +76,11 @@ public class PACEGMWithECDHAgreement {
     if (privateKey == null) {
       throw new IllegalStateException("Not initialized!");
     }
-    
+
     if (!(publicKey instanceof ECPublicKey)) {
       throw new InvalidKeyException("Not an ECPublicKey");
     }
-    
+
     ECPublicKeyParameters pub = Util.toBouncyECPublicKeyParameters((ECPublicKey)publicKey);
 
     org.bouncycastle.math.ec.ECPoint p = pub.getQ().multiply(Util.toBouncyECPrivateKeyParameters(privateKey).getD()).normalize();

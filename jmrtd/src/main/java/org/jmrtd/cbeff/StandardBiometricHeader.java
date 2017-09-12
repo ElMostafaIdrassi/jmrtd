@@ -29,11 +29,11 @@ import java.util.TreeMap;
 
 /**
  * A Standard Biometric Header preceeds a Biometric Data Block.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public class StandardBiometricHeader implements Serializable {
@@ -44,7 +44,7 @@ public class StandardBiometricHeader implements Serializable {
 
   /**
    * Constructs a standard biometric header.
-   * 
+   *
    * @param elements the elements, consisting of a tag and value
    */
   public StandardBiometricHeader(Map<Integer, byte[]> elements) {
@@ -53,7 +53,7 @@ public class StandardBiometricHeader implements Serializable {
 
   /**
    * Gets the elements of this standard biometric header.
-   * 
+   *
    * @return the elements, each consisting of a tag and value
    */
   public SortedMap<Integer, byte[]> getElements() {

@@ -123,6 +123,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
    *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     return "DG2File [" + super.toString() + "]";
   }

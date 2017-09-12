@@ -81,11 +81,11 @@ import net.sf.scuba.util.Hex;
 
 /**
  * The Password Authenticated Connection Establishment protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.5.6
  */
 public class PACEProtocol {
@@ -96,9 +96,9 @@ public class PACEProtocol {
 
   /**
    * Used in the last step of PACE-CAM.
-   * 
+   *
    * From 9303-11:
-   * 
+   *
    * AES [19] SHALL be used in CBC-mode according to [ISO/IEC 10116]
    * with IV=E(KSEnc,-1), where -1 is the bit string of length 128
    * with all bits set to 1.
@@ -112,23 +112,23 @@ public class PACEProtocol {
 
   /** Constant used in IM pseudo random number mapping, see Doc 9303 - Part 11, 4.4.3.3.2. */
   /* a668892a7c41e3ca739f40b057d85904, 16 bytes, 128 bits  */
-  private static final byte[] C0_LENGTH_128 = 
+  private static final byte[] C0_LENGTH_128 =
     { (byte)0xA6, 0x68, (byte)0x89, 0x2A, 0x7C, 0x41, (byte)0xE3, (byte)0xCA, 0x73, (byte)0x9F, 0x40, (byte)0xB0, 0x57, (byte)0xD8, 0x59, 0x04 };
 
   /** Constant used in IM pseudo random number mapping, see Doc 9303 - Part 11, 4.4.3.3.2. */
   /* a4e136ac725f738b01c1f60217c188ad, 16 bytes, 128 bits */
-  private static final byte[] C1_LENGTH_128 = 
+  private static final byte[] C1_LENGTH_128 =
     { (byte)0xA4, (byte)0xE1, 0x36, (byte)0xAC, 0x72, 0x5F, 0x73, (byte)0x8B, 0x01, (byte)0xC1, (byte)0xF6, 0x02, 0x17, (byte)0xC1, (byte)0x88, (byte)0xAD };
 
   /** Constant used in IM pseudo random number mapping, see Doc 9303 - Part 11, 4.4.3.3.2. */
   /* d463d65234124ef7897054986dca0a174e28df758cbaa03f240616414d5a1676, 32 bytes, 256 bits */
-  private static final byte[] C0_LENGTH_256 = 
+  private static final byte[] C0_LENGTH_256 =
     { (byte)0xD4, 0x63, (byte)0xD6, 0x52, 0x34, 0x12, 0x4E, (byte)0xF7, (byte)0x89, 0x70, 0x54, (byte)0x98, 0x6D, (byte)0xCA, 0x0A, 0x17,
         0x4E, 0x28, (byte)0xDF, 0x75, (byte)0x8C, (byte)0xBA, (byte)0xA0, 0x3F, 0x24, 0x06, 0x16, 0x41, 0x4D, 0x5A, 0x16, 0x76 };
 
   /** Constant used in IM pseudo random number mapping, see Doc 9303 - Part 11, 4.4.3.3.2. */
   /* 54bd7255f0aaf831bec3423fcf39d69b6cbf066677d0faae5aadd99df8e53517, 32 bytes, 256 bits */
-  private static final byte[] C1_LENGTH_256 = 
+  private static final byte[] C1_LENGTH_256 =
     { 0x54, (byte)0xBD, 0x72, 0x55, (byte)0xF0, (byte)0xAA, (byte)0xF8, 0x31, (byte)0xBE, (byte)0xC3, 0x42, 0x3F, (byte)0xCF, 0x39, (byte)0xD6, (byte)0x9B,
         0x6C, (byte)0xBF, 0x06, 0x66, 0x77, (byte)0xD0, (byte)0xFA, (byte)0xAE, 0x5A, (byte)0xAD, (byte)0xD9, (byte)0x9D, (byte)0xF8, (byte)0xE5, 0x35, 0x17 };
 
@@ -139,7 +139,7 @@ public class PACEProtocol {
 
   /**
    * Constructs a PACE protocol instance.
-   * 
+   *
    * @param service the service for sending APDUs
    * @param wrapper the already established secure messaging channel (or {@code null})
    */
@@ -155,11 +155,11 @@ public class PACEProtocol {
    * @param accessKey the MRZ or CAN based access key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
-   * 
+   *
    * @return a PACE result
    *
    * @throws PACEException on error
-   * 
+   *
    * @deprecated Use the variant of this method that takes an AccessKeySpec
    */
   @Deprecated
@@ -167,17 +167,17 @@ public class PACEProtocol {
     if (!(accessKey instanceof AccessKeySpec)) {
       throw new IllegalArgumentException("Wrong key type: " + accessKey.getClass().getSimpleName());
     }
-    
+
     return doPACE((AccessKeySpec)accessKey, oid, params);
   }
-  
+
   /**
    * Performs the PACE 2.0 / SAC protocol.
    *
    * @param accessKey the MRZ or CAN based access key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
-   * 
+   *
    * @return a PACE result
    *
    * @throws PACEException on error
@@ -197,7 +197,7 @@ public class PACEProtocol {
    * @param staticPACEKey the password key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param staticParameters explicit static domain parameters the domain params for DH or ECDH
-   * 
+   *
    * @return a PACE result
    *
    * @throws PACEException if authentication failed
@@ -268,7 +268,7 @@ public class PACEProtocol {
     byte[] sharedSecretBytes = doPACEStep3KeyAgreement(agreementAlg, ephemeralPCDKeyPair.getPrivate(), ephemeralPICCPublicKey);
 
     /* Derive secure messaging keys. */
-    /* Compute session keys K_mac = KDF_mac(K), K_enc = KDF_enc(K). */    
+    /* Compute session keys K_mac = KDF_mac(K), K_enc = KDF_enc(K). */
     SecretKey encKey = null;
     SecretKey macKey = null;
     try {
@@ -282,7 +282,7 @@ public class PACEProtocol {
      * Compute authentication token T_PCD = MAC(K_mac, PK_PICC~).
      * Exchange authentication token T_PCD and T_PICC with PICC.
      * Check authentication token T_PICC.
-     * 
+     *
      * Extract encryptedChipAuthenticationData, if mapping is CAM.
      */
     byte[] encryptedChipAuthenticationData = doPACEStep4(oid, mappingType, ephemeralPCDKeyPair, ephemeralPICCPublicKey, macKey);
@@ -343,12 +343,12 @@ public class PACEProtocol {
   /**
    * The first step in the PACE protocol receives an encrypted nonce from the PICC
    * and decrypts it.
-   * 
+   *
    * @param staticPACEKey the static PACE key
    * @param staticPACECipher the cipher to reuse
-   * 
+   *
    * @return the decrypted encrypted PICC nonce
-   * 
+   *
    * @throws PACEException on error
    */
   /*
@@ -384,15 +384,15 @@ public class PACEProtocol {
    * The second step in the PACE protocol computes ephemeral domain parameters
    * by mapping the PICC generated nonce (and optionally the PCD generated nonce,
    * which will be exchanged, in case of Integrated Mapping).
-   * 
+   *
    * @param mappingType either CAM, GM, or IM
    * @param agreementAlg the agreement algorithm, either DH or ECDH
    * @param params the static domain parameters
    * @param piccNonce the nonce received from the PICC
    * @param staticPACECipher the cipher to use in IM
-   * 
+   *
    * @return the newly computed ephemeral domain parameters
-   * 
+   *
    * @throws PACEException on error
    */
   /*
@@ -421,13 +421,13 @@ public class PACEProtocol {
    * The second step in the PACE protocol (GM case) computes ephemeral domain parameters
    * by performing a key agreement protocol with the PICC nonce as
    * input.
-   * 
+   *
    * @param agreementAlg the agreement algorithm, either DH or ECDH
    * @param params the static domain parameters
    * @param piccNonce the received nonce from the PICC
-   * 
+   *
    * @return the computed ephemeral domain parameters
-   * 
+   *
    * @throws PACEException on error
    */
   public PACEGMMappingResult doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
@@ -438,7 +438,7 @@ public class PACEProtocol {
       PublicKey pcdMappingPublicKey = pcdMappingKeyPair.getPublic();
       PrivateKey pcdMappingPrivateKey = pcdMappingKeyPair.getPrivate();
 
-      byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);            
+      byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);
       byte[] step2Data = Util.wrapDO((byte)0x81, pcdMappingEncodedPublicKey);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
       byte[] piccMappingEncodedPublicKey = Util.unwrapDO((byte)0x82, step2Response);
@@ -447,8 +447,8 @@ public class PACEProtocol {
       if ("ECDH".equals(agreementAlg)) {
         /* Treat shared secret as an ECPoint. */
         PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();
-        mappingAgreement.init((ECPrivateKey)pcdMappingPrivateKey);
-        ECPoint mappingSharedSecretPoint = mappingAgreement.doPhase((ECPublicKey)piccMappingPublicKey);
+        mappingAgreement.init(pcdMappingPrivateKey);
+        ECPoint mappingSharedSecretPoint = mappingAgreement.doPhase(piccMappingPublicKey);
         AlgorithmParameterSpec ephemeralParameters = mapNonceGMWithECDH(piccNonce, mappingSharedSecretPoint, (ECParameterSpec)params);
         return new PACEGMWithECDHMappingResult(params, piccNonce, piccMappingPublicKey, pcdMappingKeyPair, mappingSharedSecretPoint, ephemeralParameters);
       } else if ("DH".equals(agreementAlg)) {
@@ -473,14 +473,14 @@ public class PACEProtocol {
    * The second step in the PACE protocol computes ephemeral domain parameters
    * by performing a key agreement protocol with the PICC and PCD nonces as
    * input.
-   * 
+   *
    * @param agreementAlg the agreement algorithm, either DH or ECDH
    * @param params the static domain parameters
    * @param piccNonce the received nonce from the PICC
    * @param staticPACECipher the cipher to use for IM
-   * 
+   *
    * @return the computed ephemeral domain parameters
-   * 
+   *
    * @throws PACEException on error
    */
   /*
@@ -492,7 +492,7 @@ public class PACEProtocol {
    * and sent to the MRTD chip.
    * The pseudo-random function R_p() is described in Section 3.4.2.2.3.
    * The function f_G() is defined in [4] and [25].
-   * 
+   *
    * [4]: Brier, Eric; Coron, Jean-S&eacute;́bastien; Icart, Thomas; Madore, David; Randriam, Hugues; and
    *      Tibouch, Mehdi, Efficient Indifferentiable Hashing into Ordinary Elliptic Curves, Advances in
    *      Cryptology – CRYPTO 2010, Springer-Verlag, 2010.
@@ -507,7 +507,7 @@ public class PACEProtocol {
       byte[] step2Data = Util.wrapDO((byte)0x81, pcdNonce);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
 
-      /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */      
+      /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */
 
       if ("ECDH".equals(agreementAlg)) {
         AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
@@ -544,7 +544,7 @@ public class PACEProtocol {
    * Exchange PK_PCD~ and PK_PICC~ with PICC.
    * Check that PK_PCD~ and PK_PICC~ differ.
    */
-  public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {    
+  public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {
     try {
       byte[] pcdEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdPublicKey);
       byte[] step3Data = Util.wrapDO((byte)0x83, pcdEncodedPublicKey);
@@ -585,7 +585,7 @@ public class PACEProtocol {
    * Compute authentication token T_PCD = MAC(K_mac, PK_PICC~).
    * Exchange authentication token T_PCD and T_PICC with PICC.
    * Check authentication token T_PICC.
-   * 
+   *
    * Extracts encryptedChipAuthenticationData, if mapping type id CAM.
    */
   public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
@@ -637,12 +637,12 @@ public class PACEProtocol {
 
   /**
    * Derives the static key K_pi.
-   * 
+   *
    * @param keySpec the key material from the MRZ
    * @param oid the PACE object identifier is needed to determine the cipher algorithm and the key length
-   * 
+   *
    * @return the derived key
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static SecretKey deriveStaticPACEKey(KeySpec keySpec, String oid) throws GeneralSecurityException {
@@ -726,14 +726,14 @@ public class PACEProtocol {
   /**
    * Transforms the nonces using a pseudo random number function and maps the resulting value to a point on the curve.
    * The resulting point is used as a generator as part of the returned domain parameters.
-   * 
+   *
    * @param nonceS the nonce from the PICC
    * @param nonceT the nonce from the PCD
    * @param cipherAlgorithm the cipher algorithm to be used by the pseudo random function (either {@code "AES"} or {@code "DESede"})
    * @param params the static domain parameters
-   * 
+   *
    * @return the newly computed domain parameters
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static AlgorithmParameterSpec mapNonceIMWithECDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, ECParameterSpec params) throws GeneralSecurityException {
@@ -755,21 +755,21 @@ public class PACEProtocol {
    * <g>. The random nonce t SHALL be chosen randomly by the inspection system and sent to the MRTD
    * chip. The pseudo-random function R_p() is descibed in Section 4.3.3. The function f_g() is defined as
    * f_g(x) = x^a mod p, and a = (p-1)/q is the cofactor. Implementations MUST check that g~ != 1.
-   * 
+   *
    * NOTE: The public key validation method described in RFC 2631 MUST be used to
    * prevent smallsubgroup attacks.
    */
   /**
    * Transforms the nonces using a pseudo random number function and maps the resulting value to a field element.
    * The resulting field element is used as a generator as part of the returned domain parameters.
-   * 
+   *
    * @param nonceS the nonce from the PICC
    * @param nonceT the nonce from the PCD
    * @param cipherAlgorithm the cipher algorithm to be used by the pseudo random function (either {@code "AES"} or {@code "DESede"})
    * @param params the static domain parameters
-   * 
+   *
    * @return the newly computed domain parameters
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static AlgorithmParameterSpec mapNonceIMWithDH(byte[] nonceS, byte[] nonceT, String cipherAlgorithm, DHParameterSpec params) throws GeneralSecurityException {
@@ -802,14 +802,14 @@ public class PACEProtocol {
   /**
    * Pseudo random number function as specified in Doc 9303 - Part 11, 4.4.3.3.2.
    * Used in PACE IM.
-   * 
+   *
    * @param s the nonce that was sent by the ICC
    * @param t the nonce that was generated by the PCD
    * @param p the order of the prime field
    * @param algorithm the algorithm for block cipher E (either {@code "AES"} or {@code "DESede"})
-   * 
+   *
    * @return the resulting x
-   * 
+   *
    * @throws GeneralSecurityException on cryptographic error
    */
   public static byte[] pseudoRandomFunction(byte[] s, byte[] t, BigInteger p, String algorithm) throws GeneralSecurityException {
@@ -883,7 +883,7 @@ public class PACEProtocol {
    *
    * @param t the field element to encode
    * @param params the parameters describing the curve and field
-   * 
+   *
    * @return the point on the curve that the input is mapped to
    */
   public static ECPoint icartPointEncode(BigInteger t, ECParameterSpec params) {
@@ -934,12 +934,12 @@ public class PACEProtocol {
 
   /**
    * Updates the parameters of the given public key to match the parameters of the given private key.
-   * 
+   *
    * @param publicKey the public key, should be an EC public key
    * @param privateKey the private key, should be an EC private key
-   * 
+   *
    * @return a new public key that uses the parameters of the private key
-   * 
+   *
    * @throws GeneralSecurityException on security error, or when keys are not EC
    */
   public static PublicKey updateParameterSpec(PublicKey publicKey, PrivateKey privateKey) throws GeneralSecurityException {
@@ -947,7 +947,7 @@ public class PACEProtocol {
       throw new NoSuchAlgorithmException("Unsupported key type");
     }
 
-    KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);    
+    KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
     KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
     return keyFactory.generatePublic(keySpec);
   }
@@ -1016,7 +1016,7 @@ public class PACEProtocol {
 
   /**
    * Checks consistency of input parameters.
-   * 
+   *
    * @param agreementAlg the agreement algorithm derived from the OID
    * @param params the parameters
    */

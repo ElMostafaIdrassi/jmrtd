@@ -72,7 +72,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    *
    * @param dataGroupTag the datagroup tag to use
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException on error
    */
   protected CBEFFDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
@@ -98,7 +98,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     if (subRecords == null) {
       subRecords = new ArrayList<R>();
     }
-    subRecords.remove(index);		
+    subRecords.remove(index);
   }
 
   public List<R> getSubRecords() {
@@ -119,7 +119,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     if (!(other instanceof CBEFFDataGroup<?>)) {
       return false;
     }
-    
+
     try {
       @SuppressWarnings("unchecked")
       CBEFFDataGroup<R> otherDG = (CBEFFDataGroup<R>)other;
@@ -129,7 +129,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
       if (subRecordCount != otherSubRecords.size()) {
         return false;
       }
-      
+
       for (int i = 0; i < subRecordCount; i++) {
         R subRecord = subRecords.get(i);
         R otherSubRecord = otherSubRecords.get(i);

@@ -36,9 +36,9 @@ import org.jmrtd.io.SplittableInputStream;
 
 /**
  * Base class for image infos.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public abstract class AbstractImageInfo implements ImageInfo {
@@ -82,14 +82,14 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Constructs an abstract image info.
-   * 
+   *
    * @param type type of image info
    * @param width width of image
    * @param height height of image
    * @param inputStream encoded image
    * @param imageLength length of encoded image
    * @param mimeType mime-type of encoded image
-   * 
+   *
    * @throws IOException if reading fails
    */
   public AbstractImageInfo(int type, int width, int height, InputStream inputStream, long imageLength, String mimeType) throws IOException {
@@ -105,7 +105,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
    * {@link ImageInfo#TYPE_FINGER},
    * {@link ImageInfo#TYPE_IRIS},
    * {@link ImageInfo#TYPE_SIGNATURE_OR_MARK}.
-   * 
+   *
    * @return content type
    */
   public int getType() {
@@ -114,7 +114,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Gets the mime-type of the encoded image.
-   * 
+   *
    * @return the mime-type of the encoded image
    */
   public String getMimeType() {
@@ -123,7 +123,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Gets the width of the image.
-   * 
+   *
    * @return the width of the image
    */
   public int getWidth() {
@@ -132,7 +132,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Gets the height of the image.
-   * 
+   *
    * @return the height of the image
    */
   public int getHeight() {
@@ -141,7 +141,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Gets the length of the encoded image.
-   * 
+   *
    * @return the length of the encoded image
    */
   public int getImageLength() {
@@ -159,7 +159,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Gets a textual representation of this image info.
-   * 
+   *
    * @return a textual representation of this image info
    */
   @Override
@@ -194,7 +194,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
       if (!other.getClass().equals(this.getClass())) {
         return false;
       }
-      
+
       AbstractImageInfo otherImageInfo = (AbstractImageInfo)other;
       return (Arrays.equals(getImageBytes(), otherImageInfo.getImageBytes()))
           // && getImageLength() == otherImageInfo.getImageLength()
@@ -208,7 +208,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Encodes this image info.
-   * 
+   *
    * @return a byte array containing the encoded image info
    */
   public byte[] getEncoded() {
@@ -224,14 +224,14 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Gets the record length.
-   * 
+   *
    * @return the record length
    */
   public abstract long getRecordLength();
 
   /**
    * Gets the encoded image as an input stream.
-   * 
+   *
    * @return an input stream containing the encoded image
    */
   public InputStream getImageInputStream() {
@@ -250,7 +250,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   /**
    * Clients should call this method after positioning the input stream to the
    * image bytes.
-   * 
+   *
    * @param inputStream input stream
    * @param imageLength image length
    *
@@ -335,5 +335,5 @@ public abstract class AbstractImageInfo implements ImageInfo {
       default:
         throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }
-  }	
+  }
 }

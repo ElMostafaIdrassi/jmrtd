@@ -140,6 +140,7 @@ public class TAResult implements Serializable {
    *
    * @return a textual representation of this terminal authentication result
    */
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("TAResult [chipAuthenticationResult: " + chipAuthenticationResult + ", ");

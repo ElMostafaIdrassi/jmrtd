@@ -37,25 +37,26 @@ import net.sf.scuba.data.Country;
  */
 public class ICAOCountry extends Country {
 
+  private static final long serialVersionUID = 2942942609311086138L;
+
   private static final Logger LOGGER = Logger.getLogger("nl.innovalor");
-  
-  public static final ICAOCountry
-  DE = new ICAOCountry("DE", "D<<", "Germany", "German"),
-  GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen"),
-  GBN = new ICAOCountry("GB","GBN","British National (Overseas)"),
-  GBO = new ICAOCountry("GB","GBO","British Overseas citizen"),
-  GBP = new ICAOCountry("GB","GBP","British Protected person"),
-  GBS = new ICAOCountry("GB","GBS","British Subject"),
-  UNO = new ICAOCountry("UN","UNO","United Nations Organization"),
-  UNA = new ICAOCountry("UN","UNA","United Nations Agency"),
-  UNK = new ICAOCountry("UN","UNK","United Nations Interim Administration Mission in Kosovo"),
-  XOM = new ICAOCountry("XO","XOM","Sovereign Military Order of Malta"),
-  XCC = new ICAOCountry("XC","XCC","Carribean Community"),
-  XPO = new ICAOCountry("XP", "XPO", "Interpol"),
-  XXA = new ICAOCountry("XX","XXA","Stateless person", "Stateless"),
-  XXB = new ICAOCountry("XX","XXB","Refugee", "Refugee"),
-  XXC = new ICAOCountry("XX","XXC","Refugee (other)", "Refugee (other)"),
-  XXX = new ICAOCountry("XX","XXX","Unspecified", "Unspecified");
+
+  public static final ICAOCountry DE = new ICAOCountry("DE", "D<<", "Germany", "German");
+  public static final ICAOCountry GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen");
+  public static final ICAOCountry GBN = new ICAOCountry("GB","GBN","British National (Overseas)");
+  public static final ICAOCountry GBO = new ICAOCountry("GB","GBO","British Overseas citizen");
+  public static final ICAOCountry GBP = new ICAOCountry("GB","GBP","British Protected person");
+  public static final ICAOCountry GBS = new ICAOCountry("GB","GBS","British Subject");
+  public static final ICAOCountry UNO = new ICAOCountry("UN","UNO","United Nations Organization");
+  public static final ICAOCountry UNA = new ICAOCountry("UN","UNA","United Nations Agency");
+  public static final ICAOCountry UNK = new ICAOCountry("UN","UNK","United Nations Interim Administration Mission in Kosovo");
+  public static final ICAOCountry XOM = new ICAOCountry("XO","XOM","Sovereign Military Order of Malta");
+  public static final ICAOCountry XCC = new ICAOCountry("XC","XCC","Carribean Community");
+  public static final ICAOCountry XPO = new ICAOCountry("XP", "XPO", "Interpol");
+  public static final ICAOCountry XXA = new ICAOCountry("XX","XXA","Stateless person", "Stateless");
+  public static final ICAOCountry XXB = new ICAOCountry("XX","XXB","Refugee", "Refugee");
+  public static final ICAOCountry XXC = new ICAOCountry("XX","XXC","Refugee (other)", "Refugee (other)");
+  public static final ICAOCountry XXX = new ICAOCountry("XX","XXX","Unspecified", "Unspecified");
 
   private static ICAOCountry[] VALUES = {
       DE,

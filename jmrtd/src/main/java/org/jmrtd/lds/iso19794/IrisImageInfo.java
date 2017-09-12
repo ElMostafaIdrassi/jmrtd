@@ -188,6 +188,7 @@ public class IrisImageInfo extends AbstractImageInfo {
    *
    * @return the record length
    */
+  @Override
   public long getRecordLength() {
     return 11L + getImageLength();
   }
@@ -199,6 +200,7 @@ public class IrisImageInfo extends AbstractImageInfo {
    *
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return new StringBuilder()
         .append("IrisImageInfo [")
@@ -211,6 +213,7 @@ public class IrisImageInfo extends AbstractImageInfo {
         .toString();
   }
 
+  @Override
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
@@ -245,6 +248,7 @@ public class IrisImageInfo extends AbstractImageInfo {
     readImage(inputStream, imageLength);
   }
 
+  @Override
   protected void writeObject(OutputStream out) throws IOException {
 
     DataOutputStream dataOut = out instanceof DataOutputStream ? (DataOutputStream)out : new DataOutputStream(out);

@@ -112,7 +112,7 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   /*
    * FIXME: This field is now transient, but probably shouldn't be!
-   * 
+   *
    * - We can either leave this transient and explicitly (de)serialize it in
    *   readObject/writeObject (using BC's getEncoded())
    * - Or replace this field with something that implements Serializable and that we control.
@@ -186,7 +186,7 @@ public class SODFile extends AbstractTaggedLDSFile {
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,
           digestEncryptionAlgorithm,
           ICAO_LDS_SOD_OID, contentInfo,
-          encryptedDigest, docSigningCertificate);      
+          encryptedDigest, docSigningCertificate);
     } catch (IOException ioe) {
       throw new IllegalArgumentException("Error creating signedData", ioe);
     }
@@ -209,7 +209,7 @@ public class SODFile extends AbstractTaggedLDSFile {
       byte[] encryptedDigest,
       X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException {
     super(EF_SOD_TAG);
-    try {      
+    try {
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,
           digestEncryptionAlgorithm,
           ICAO_LDS_SOD_OID,
@@ -250,8 +250,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   public Map<Integer, byte[]> getDataGroupHashes() {
     DataGroupHash[] hashObjects = getLDSSecurityObject(signedData).getDatagroupHash();
     Map<Integer, byte[]> hashMap = new TreeMap<Integer, byte[]>(); /* HashMap... get it? :D (not funny anymore, now that it's a TreeMap.) */
-    for (int i = 0; i < hashObjects.length; i++) {
-      DataGroupHash hashObject = hashObjects[i];
+    for (DataGroupHash hashObject : hashObjects) {
       int number = hashObject.getDataGroupNumber();
       byte[] hashValue = hashObject.getDataGroupHashValue().getOctets();
       hashMap.put(number, hashValue);
@@ -272,7 +271,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    * Gets the parameters of the digest encryption (signature) algorithm.
    * For instance for {@code "RSASSA/PSS"} this includes the hash algorithm
    * and the salt length.
-   * 
+   *
    * @return the algorithm parameters
    */
   public AlgorithmParameterSpec getDigestEncryptionAlgorithmParams() {
@@ -283,10 +282,10 @@ public class SODFile extends AbstractTaggedLDSFile {
    * Gets the e-content inside the signed data structure.
    *
    * @return the e-content
-   * 
+   *
    * @throws SignatureException if the contents do not check out
    */
-  public byte[] getEContent() throws SignatureException {    
+  public byte[] getEContent() throws SignatureException {
     return SignedDataUtil.getEContent(signedData);
   }
 
@@ -381,8 +380,7 @@ public class SODFile extends AbstractTaggedLDSFile {
     try {
       IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
       X500Name name = issuerAndSerialNumber.getName();
-      X500Principal x500Principal = new X500Principal(name.getEncoded(ASN1Encoding.DER));   
-      return x500Principal;
+      return new X500Principal(name.getEncoded(ASN1Encoding.DER));
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Could not get issuer", ioe);
       return null;
@@ -396,8 +394,7 @@ public class SODFile extends AbstractTaggedLDSFile {
    */
   public BigInteger getSerialNumber() {
     IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
-    BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
-    return serialNumber;
+    return issuerAndSerialNumber.getSerialNumber().getValue();
   }
 
   /**
@@ -411,6 +408,7 @@ public class SODFile extends AbstractTaggedLDSFile {
       X509Certificate cert = getDocSigningCertificate();
       return "SODFile " + cert.getIssuerX500Principal();
     } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
       return "SODFile";
     }
   }
@@ -442,12 +440,15 @@ public class SODFile extends AbstractTaggedLDSFile {
       Map<Integer, byte[]> dataGroupHashes,
       String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, IOException {
     DataGroupHash[] dataGroupHashesArray = new DataGroupHash[dataGroupHashes.size()];
+
     int i = 0;
-    for (int dataGroupNumber: dataGroupHashes.keySet()) {
+    for (Map.Entry<Integer, byte[]> entry: dataGroupHashes.entrySet()) {
+      int dataGroupNumber = entry.getKey();
       byte[] hashBytes = dataGroupHashes.get(dataGroupNumber);
       DataGroupHash hash = new DataGroupHash(dataGroupNumber, new DEROctetString(hashBytes));
       dataGroupHashesArray[i++] = hash;
     }
+
     AlgorithmIdentifier digestAlgorithmIdentifier = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
     LDSSecurityObject securityObject = null;
     if (ldsVersion == null) {

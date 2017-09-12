@@ -76,24 +76,22 @@ public class DG11File extends DataGroup {
 
   public static final int TAG_LIST_TAG = 0x5C;
 
-  public static final int
-  FULL_NAME_TAG = 0x5F0E,
-  OTHER_NAME_TAG = 0x5F0F,
-  PERSONAL_NUMBER_TAG = 0x5F10,
-  FULL_DATE_OF_BIRTH_TAG = 0x5F2B, // In 'CCYYMMDD' format.
-  PLACE_OF_BIRTH_TAG = 0x5F11, // Fields separated by '<'
-  PERMANENT_ADDRESS_TAG = 0x5F42, // Fields separated by '<'
-  TELEPHONE_TAG = 0x5F12,
-  PROFESSION_TAG = 0x5F13,
-  TITLE_TAG = 0x5F14,
-  PERSONAL_SUMMARY_TAG = 0x5F15,
-  PROOF_OF_CITIZENSHIP_TAG = 0x5F16, // Compressed image per ISO/IEC 10918
-  OTHER_VALID_TD_NUMBERS_TAG = 0x5F17, // Separated by '<'
-  CUSTODY_INFORMATION_TAG = 0x5F18;
+  public static final int FULL_NAME_TAG = 0x5F0E;
+  public static final int OTHER_NAME_TAG = 0x5F0F;
+  public static final int PERSONAL_NUMBER_TAG = 0x5F10;
+  public static final int FULL_DATE_OF_BIRTH_TAG = 0x5F2B; // In 'CCYYMMDD' format.
+  public static final int PLACE_OF_BIRTH_TAG = 0x5F11; // Fields separated by '<'
+  public static final int PERMANENT_ADDRESS_TAG = 0x5F42; // Fields separated by '<'
+  public static final int TELEPHONE_TAG = 0x5F12;
+  public static final int PROFESSION_TAG = 0x5F13;
+  public static final int TITLE_TAG = 0x5F14;
+  public static final int PERSONAL_SUMMARY_TAG = 0x5F15;
+  public static final int PROOF_OF_CITIZENSHIP_TAG = 0x5F16; // Compressed image per ISO/IEC 10918
+  public static final int OTHER_VALID_TD_NUMBERS_TAG = 0x5F17; // Separated by '<'
+  public static final int CUSTODY_INFORMATION_TAG = 0x5F18;
 
-  public static final int
-  CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0, // 5F0F is always used inside A0 constructed object
-  COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
+  public static final int CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0; // 5F0F is always used inside A0 constructed object
+  public static final int COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
 
   private static final String SDF = "yyyyMMdd";
 
@@ -198,6 +196,7 @@ public class DG11File extends DataGroup {
     super(EF_DG11_TAG, inputStream);
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tagListTag = tlvInputStream.readTag();
@@ -276,7 +275,7 @@ public class DG11File extends DataGroup {
         case PLACE_OF_BIRTH_TAG:
           parsePlaceOfBirth(value);
           break;
-        case PERMANENT_ADDRESS_TAG: 
+        case PERMANENT_ADDRESS_TAG:
           parsePermanentAddress(value);
           break;
         case TELEPHONE_TAG:
@@ -463,6 +462,7 @@ public class DG11File extends DataGroup {
 
   /* Accessors below. */
 
+  @Override
   public int getTag() {
     return EF_DG11_TAG;
   }
@@ -480,7 +480,7 @@ public class DG11File extends DataGroup {
     if (nameOfHolder != null) {
       tagPresenceList.add(FULL_NAME_TAG);
     }
-    if (otherNames != null && otherNames.size() > 0) {
+    if (otherNames != null && !otherNames.isEmpty()) {
       tagPresenceList.add(OTHER_NAME_TAG);
     }
     if (personalNumber != null) {
@@ -489,10 +489,10 @@ public class DG11File extends DataGroup {
     if (fullDateOfBirth != null) {
       tagPresenceList.add(FULL_DATE_OF_BIRTH_TAG);
     }
-    if (placeOfBirth != null && placeOfBirth.size() > 0) {
+    if (placeOfBirth != null && !placeOfBirth.isEmpty()) {
       tagPresenceList.add(PLACE_OF_BIRTH_TAG);
     }
-    if (permanentAddress != null && permanentAddress.size() > 0) {
+    if (permanentAddress != null && !permanentAddress.isEmpty()) {
       tagPresenceList.add(PERMANENT_ADDRESS_TAG);
     }
     if (telephone != null) {
@@ -510,7 +510,7 @@ public class DG11File extends DataGroup {
     if (proofOfCitizenship != null) {
       tagPresenceList.add(PROOF_OF_CITIZENSHIP_TAG);
     }
-    if (otherValidTDNumbers != null && otherValidTDNumbers.size() > 0) {
+    if (otherValidTDNumbers != null && !otherValidTDNumbers.isEmpty()) {
       tagPresenceList.add(OTHER_VALID_TD_NUMBERS_TAG);
     }
     if (custodyInformation != null) {
@@ -712,7 +712,7 @@ public class DG11File extends DataGroup {
             tlvOut.writeValue(otherName.trim().getBytes("UTF-8"));
           }
           tlvOut.writeValueEnd(); /* CONTENT_SPECIFIC_CONSTRUCTED_TAG */
-          break; 	
+          break;
         case PERSONAL_NUMBER_TAG:
           tlvOut.writeTag(tag);
           tlvOut.writeValue(personalNumber.trim().getBytes("UTF-8"));
@@ -724,7 +724,7 @@ public class DG11File extends DataGroup {
           // (also see that during parsing field in incorrect case of BCD encoding is
           // handled but JMRTD itself uses incorrect way of writing field)
           //byte[] fullDateOfBirthBytes = Hex.hexStringToBytes(fullDateOfBirthString);
-          //tlvOut.writeValue(fullDateOfBirthBytes);		
+          //tlvOut.writeValue(fullDateOfBirthBytes);
           tlvOut.writeValue(fullDateOfBirthString.getBytes("UTF-8"));
           break;
         case PLACE_OF_BIRTH_TAG:

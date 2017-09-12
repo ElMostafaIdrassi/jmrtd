@@ -42,17 +42,17 @@ import javax.crypto.interfaces.DHPublicKey;
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.ChipAuthenticationInfo;
-import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
+import org.jmrtd.lds.SecurityInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * The EAC Chip Authentication protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.5.6
  */
 public class CAProtocol {
@@ -65,7 +65,7 @@ public class CAProtocol {
 
   /**
    * Constructs a protocol instance.
-   * 
+   *
    * @param service the card service
    * @param wrapper the existing secure messaging wrapper
    */
@@ -78,7 +78,7 @@ public class CAProtocol {
    * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
    * ver. 1.11. In short, we authenticate the chip with DH or ECDH key agreement
    * protocol and create new secure messaging keys.
-   * 
+   *
    * The newly established secure messaging wrapper is made available to the caller in
    * the result.
    *
@@ -101,7 +101,7 @@ public class CAProtocol {
       throw new IllegalArgumentException("Unknown agreement algorithm");
     }
     if (!("ECDH".equals(agreementAlg) || "DH".equals(agreementAlg))) {
-      throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);  
+      throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);
     }
 
     if (oid == null) {
@@ -141,13 +141,13 @@ public class CAProtocol {
 
   /**
    * Sends the PCD's public key to the PICC.
-   * 
+   *
    * @param service the card service
    * @param wrapper the existing secure messaging wrapper
    * @param oid the Chip Authentication object identifier
    * @param keyId a key identifier or {@code null}
    * @param pcdPublicKey the public key to send
-   * 
+   *
    * @throws CardServiceException on error
    */
   public static void sendPublicKey(PassportService service, SecureMessagingWrapper wrapper, String oid, BigInteger keyId, PublicKey pcdPublicKey) throws CardServiceException {
@@ -165,7 +165,7 @@ public class CAProtocol {
 
       service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData); /* FIXME: Constant for 0x91. */
     } else if (cipherAlg.startsWith("AES")) {
-      service.sendMSESetATIntAuth(wrapper, oid, keyId);        
+      service.sendMSESetATIntAuth(wrapper, oid, keyId);
       service.sendGeneralAuthenticate(wrapper, Util.wrapDO((byte)0x80, keyData), true); /* FIXME: Constant for 0x80. */
     } else {
       throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
@@ -174,15 +174,15 @@ public class CAProtocol {
 
   /**
    * Does the key agreement step. Genereates a secret based on the PICC's public key and the PCD's private key.
-   * 
+   *
    * @param agreementAlg the agreement algorithm
    * @param piccPublicKey the PICC's public key
    * @param pcdPrivateKey the PCD's private key
-   * 
+   *
    * @return the shared secret
-   * 
+   *
    * @throws NoSuchAlgorithmException if the agreement algorithm is unsupported
-   * 
+   *
    * @throws InvalidKeyException if one of the keys is invalid
    */
   public static byte[] computeSharedSecret(String agreementAlg, PublicKey piccPublicKey, PrivateKey pcdPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
@@ -194,12 +194,12 @@ public class CAProtocol {
 
   /**
    * Restarts secure messaging based on the shared secret.
-   * 
+   *
    * @param oid the Chip Authentication object identifier
    * @param sharedSecret the shared secret
-   * 
+   *
    * @return the secure messaging wrapper
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret) throws GeneralSecurityException {
@@ -222,7 +222,7 @@ public class CAProtocol {
 
   /**
    * Gets the secure messaging wrapper currently in use.
-   * 
+   *
    * @return a secure messaging wrapper
    */
   public SecureMessagingWrapper getWrapper() {
@@ -258,25 +258,25 @@ public class CAProtocol {
   /**
    * Infers the Chip Authentication OID form a Chip Authentication public key OID.
    * This is a best effort.
-   * 
+   *
    * @param publicKeyOID the Chip Authentication public key OID
-   * 
+   *
    * @return an OID or {@code null}
    */
   private static String inferChipAuthenticationOIDfromPublicKeyOID(String publicKeyOID) {
-    if (ChipAuthenticationPublicKeyInfo.ID_PK_ECDH.equals(publicKeyOID)) {
+    if (SecurityInfo.ID_PK_ECDH.equals(publicKeyOID)) {
       /*
        * This seems to work for French passports (generation 2013, 2014),
        * but it is best effort.
        */
       LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-ECDH-3DES-CBC-CBC");
-      return ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC;
-    } else if (ChipAuthenticationPublicKeyInfo.ID_PK_DH.equals(publicKeyOID)) {
+      return SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC;
+    } else if (SecurityInfo.ID_PK_DH.equals(publicKeyOID)) {
       /*
        * Not tested. Best effort.
        */
       LOGGER.warning("Could not determine ChipAuthentication algorithm, defaulting to id-CA-DH-3DES-CBC-CBC");
-      return ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC;
+      return SecurityInfo.ID_CA_DH_3DES_CBC_CBC;
     } else {
       LOGGER.warning("No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID " + publicKeyOID);
     }

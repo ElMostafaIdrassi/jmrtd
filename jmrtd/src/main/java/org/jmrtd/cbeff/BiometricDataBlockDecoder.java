@@ -27,26 +27,26 @@ import java.io.InputStream;
 
 /**
  * Interface to be implemented by client code to decode BDB implementations.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @param <B> the type of BDB implementation that is decoded by this decoder
- * 
+ *
  * @since 0.4.7
  */
 public interface BiometricDataBlockDecoder<B extends BiometricDataBlock> {
 
   /**
    * Reads a biometric data block from an input stream.
-   * 
+   *
    * @param inputStream the input stream to read from
    * @param sbh the standard biometric header that preceded this BDB
    * @param index the index of this BDB
    * @param length the length of this BDB
    * @return a biometric data block
-   * 
+   *
    * @throws IOException if reading failed
    */
   B decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException;

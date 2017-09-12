@@ -80,13 +80,13 @@ import org.jmrtd.Util;
 /**
  * Utility class for helping with CMS SignedData in security object document and
  * card security file.
- * 
+ *
  * This hopefully abstracts some of the BC dependencies away.
- * 
+ *
  * FIXME: WORK IN PROGRESS
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 /* package-visible */ class SignedDataUtil {
@@ -195,13 +195,13 @@ import org.jmrtd.Util;
 
     String contentType = encapContentInfo.getContentType().getId();
 
-    DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();    
+    DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();
 
     ASN1InputStream inputStream = null;
     try {
       inputStream = new ASN1InputStream(new ByteArrayInputStream(eContent.getOctets()));
       ASN1Primitive firstObject = inputStream.readObject();
-      return firstObject;      
+      return firstObject;
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Unexpected exception", ioe);
     } finally {
@@ -220,11 +220,11 @@ import org.jmrtd.Util;
 
   /**
    * Removes the tag from a tagged object.
-   * 
+   *
    * @param asn1Encodable the encoded tagged object
-   * 
+   *
    * @return the object
-   * 
+   *
    * @throws IOException if the input is not a tagged object or the tagNo is not 0
    */
   public static ASN1Primitive getObjectFromTaggedObject(ASN1Encodable asn1Encodable) throws IOException {
@@ -237,9 +237,9 @@ import org.jmrtd.Util;
     int tagNo = asn1TaggedObject.getTagNo();
     if (tagNo != 0) {
       throw new IOException("Was expecting tag 0, found " + Integer.toHexString(tagNo));
-    }   
+    }
 
-    return asn1TaggedObject.getObject();     
+    return asn1TaggedObject.getObject();
   }
 
   public static String getSignerInfoDigestAlgorithm(SignedData signedData) {
@@ -257,9 +257,9 @@ import org.jmrtd.Util;
    * Gets the parameters of the digest encryption (signature) algorithm.
    * For instance for {@code "RSASSA/PSS"} this includes the hash algorithm
    * and the salt length.
-   * 
+   *
    * @param signedData the signed data object
-   * 
+   *
    * @return the algorithm parameters
    */
   public static AlgorithmParameterSpec getDigestEncryptionAlgorithmParams(SignedData signedData) {
@@ -307,7 +307,7 @@ import org.jmrtd.Util;
    *
    * @return the contents of the security object over which the
    *         signature is to be computed
-   *         
+   *
    * @throws SignatureException if the contents do not check out
    */
   public static byte[] getEContent(SignedData signedData) throws SignatureException{
@@ -374,7 +374,7 @@ import org.jmrtd.Util;
 
     X509CertificateObject certObject = null;
     for (int i = 0; i < certs.size(); i++) {
-      org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance((ASN1Sequence)certs.getObjectAt(i));
+      org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance(certs.getObjectAt(i));
       certObject = new X509CertificateObject(certAsASN1Object); // NOTE: >= BC 1.48
       //      certObject = new X509CertificateObject(X509CertificateStructure.getInstance(certAsASN1Object)); // NOTE: <= BC 1.47
       certSpec = certObject.getEncoded();
@@ -403,15 +403,15 @@ import org.jmrtd.Util;
     ASN1Set crls = null;
     ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Object());
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
-  }  
+  }
 
   public static SignerInfo createSignerInfo(String digestAlgorithm,
       String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
       byte[] encryptedDigest, X509Certificate docSigningCertificate) throws NoSuchAlgorithmException {
     /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
-    X500Principal docSignerPrincipal = ((X509Certificate)docSigningCertificate).getIssuerX500Principal();
+    X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
     X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
-    BigInteger serial = ((X509Certificate)docSigningCertificate).getSerialNumber();
+    BigInteger serial = docSigningCertificate.getSerialNumber();
     SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
 
     AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
@@ -466,9 +466,9 @@ import org.jmrtd.Util;
       byte[] dataToBeSigned = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo).getEncoded(ASN1Encoding.DER);
       Signature s = null;
       if (provider != null) {
-        s = Signature.getInstance(digestEncryptionAlgorithm, provider);             
+        s = Signature.getInstance(digestEncryptionAlgorithm, provider);
       } else {
-        s = Signature.getInstance(digestEncryptionAlgorithm);             
+        s = Signature.getInstance(digestEncryptionAlgorithm);
       }
       s.initSign(privateKey);
       s.update(dataToBeSigned);
@@ -580,97 +580,97 @@ import org.jmrtd.Util;
   }
 
   public static String lookupOIDByMnemonic(String name) throws NoSuchAlgorithmException {
-    if (name.equals("O")) {
+    if ("O".equals(name)) {
       return X509ObjectIdentifiers.organization.getId();
     }
-    if (name.equals("OU")) {
+    if ("OU".equals(name)) {
       return X509ObjectIdentifiers.organizationalUnitName.getId();
     }
-    if (name.equals("CN")) {
+    if ("CN".equals(name)) {
       return X509ObjectIdentifiers.commonName.getId();
     }
-    if (name.equals("C")) {
+    if ("C".equals(name)) {
       return X509ObjectIdentifiers.countryName.getId();
     }
-    if (name.equals("ST")) {
+    if ("ST".equals(name)) {
       return X509ObjectIdentifiers.stateOrProvinceName.getId();
     }
-    if (name.equals("L")) {
+    if ("L".equals(name)) {
       return X509ObjectIdentifiers.localityName.getId();
     }
-    if (name.equalsIgnoreCase("SHA-1") || name.equalsIgnoreCase("SHA1")) {
+    if ("SHA-1".equalsIgnoreCase(name) || "SHA1".equalsIgnoreCase(name)) {
       return X509ObjectIdentifiers.id_SHA1.getId();
     }
-    if (name.equalsIgnoreCase("SHA-224") || name.equalsIgnoreCase("SHA224")) {
+    if ("SHA-224".equalsIgnoreCase(name) || "SHA224".equalsIgnoreCase(name)) {
       return NISTObjectIdentifiers.id_sha224.getId();
     }
-    if (name.equalsIgnoreCase("SHA-256") || name.equalsIgnoreCase("SHA256")) {
+    if ("SHA-256".equalsIgnoreCase(name) || "SHA256".equalsIgnoreCase(name)) {
       return NISTObjectIdentifiers.id_sha256.getId();
     }
-    if (name.equalsIgnoreCase("SHA-384") || name.equalsIgnoreCase("SHA384")) {
+    if ("SHA-384".equalsIgnoreCase(name) || "SHA384".equalsIgnoreCase(name)) {
       return NISTObjectIdentifiers.id_sha384.getId();
     }
-    if (name.equalsIgnoreCase("SHA-512") || name.equalsIgnoreCase("SHA512")) {
+    if ("SHA-512".equalsIgnoreCase(name) || "SHA512".equalsIgnoreCase(name)) {
       return NISTObjectIdentifiers.id_sha512.getId();
     }
-    if (name.equalsIgnoreCase("RSA")) {
+    if ("RSA".equalsIgnoreCase(name)) {
       return PKCS1_RSA_OID;
     }
-    if (name.equalsIgnoreCase("MD2withRSA")) {
+    if ("MD2withRSA".equalsIgnoreCase(name)) {
       return PKCS1_MD2_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("MD4withRSA")) {
+    if ("MD4withRSA".equalsIgnoreCase(name)) {
       return PKCS1_MD4_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("MD5withRSA")) {
+    if ("MD5withRSA".equalsIgnoreCase(name)) {
       return PKCS1_MD5_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA1withRSA")) {
+    if ("SHA1withRSA".equalsIgnoreCase(name)) {
       return PKCS1_SHA1_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA256withRSA")) {
+    if ("SHA256withRSA".equalsIgnoreCase(name)) {
       return PKCS1_SHA256_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA384withRSA")) {
+    if ("SHA384withRSA".equalsIgnoreCase(name)) {
       return PKCS1_SHA384_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA512withRSA")) {
+    if ("SHA512withRSA".equalsIgnoreCase(name)) {
       return PKCS1_SHA512_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA224withRSA")) {
+    if ("SHA224withRSA".equalsIgnoreCase(name)) {
       return PKCS1_SHA224_WITH_RSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA1withECDSA")) {
+    if ("SHA1withECDSA".equalsIgnoreCase(name)) {
       return X9_SHA1_WITH_ECDSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA224withECDSA")) {
+    if ("SHA224withECDSA".equalsIgnoreCase(name)) {
       return X9_SHA224_WITH_ECDSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA256withECDSA")) {
+    if ("SHA256withECDSA".equalsIgnoreCase(name)) {
       return X9_SHA256_WITH_ECDSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA384withECDSA")) {
+    if ("SHA384withECDSA".equalsIgnoreCase(name)) {
       return X9_SHA384_WITH_ECDSA_OID;
     }
-    if (name.equalsIgnoreCase("SHA512withECDSA")) {
+    if ("SHA512withECDSA".equalsIgnoreCase(name)) {
       return X9_SHA512_WITH_ECDSA_OID;
     }
-    if (name.equalsIgnoreCase("SAwithRSA/PSS")) {
+    if ("SAwithRSA/PSS".equalsIgnoreCase(name)) {
       return PKCS1_RSASSA_PSS_OID;
     }
-    if (name.equalsIgnoreCase("SSAwithRSA/PSS")) {
+    if ("SSAwithRSA/PSS".equalsIgnoreCase(name)) {
       return PKCS1_RSASSA_PSS_OID;
     }
-    if (name.equalsIgnoreCase("RSASSA-PSS")) {
+    if ("RSASSA-PSS".equalsIgnoreCase(name)) {
       return PKCS1_RSASSA_PSS_OID;
     }
-    if (name.equalsIgnoreCase("MGF1")) {
+    if ("MGF1".equalsIgnoreCase(name)) {
       return PKCS1_MGF1;
     }
-    if (name.equalsIgnoreCase("SHA256withRSAandMGF1")) {
+    if ("SHA256withRSAandMGF1".equalsIgnoreCase(name)) {
       return PKCS1_MGF1;
     }
-    if (name.equalsIgnoreCase("SHA512withRSAandMGF1")) {
+    if ("SHA512withRSAandMGF1".equalsIgnoreCase(name)) {
       return PKCS1_MGF1;
     }
 
@@ -681,11 +681,11 @@ import org.jmrtd.Util;
 
   /**
    * Checks that the content actually digests to the hash value contained in the message digest attribute.
-   * 
+   *
    * @param attributes the attributes, this should contain an attribute of type {@link #RFC_3369_MESSAGE_DIGEST_OID}
    * @param digAlg the digest algorithm
    * @param contentBytes the contents
-   * 
+   *
    * @throws NoSuchAlgorithmException if the digest algorithm is unsupported
    * @throws SignatureException if the reported digest does not correspond to the computed digest
    */
@@ -703,14 +703,14 @@ import org.jmrtd.Util;
 
       if (storedDigestedContent == null) {
         LOGGER.warning("Error extracting signedAttribute message digest in eContent!");
-      } 
+      }
 
       MessageDigest dig = MessageDigest.getInstance(digAlg);
       byte[] computedDigestedContent = dig.digest(contentBytes);
       if (!Arrays.equals(storedDigestedContent, computedDigestedContent)) {
         throw new SignatureException("Error checking signedAttribute message digest in eContent!");
       }
-    }    
+    }
   }
 
   private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
@@ -748,7 +748,7 @@ import org.jmrtd.Util;
       }
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
-    }    
+    }
     /* Default to SHA-1. */
     return new MGF1ParameterSpec("SHA-1");
   }
@@ -758,12 +758,12 @@ import org.jmrtd.Util;
     if (signerInfos == null || signerInfos.size() <= 0) {
       throw new IllegalArgumentException("No signer info in signed data");
     }
-    
+
     if (signerInfos.size() > 1) {
       LOGGER.warning("Found " + signerInfos.size() + " signerInfos");
     }
 
-    return SignerInfo.getInstance((ASN1Sequence)signerInfos.getObjectAt(0));
+    return SignerInfo.getInstance(signerInfos.getObjectAt(0));
   }
 
   private static ASN1Set createSingletonSet(ASN1Object e) {

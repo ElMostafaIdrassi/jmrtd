@@ -17,46 +17,20 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id$
+ * $Id: $
  */
 
-package org.jmrtd.protocol;
+package org.jmrtd;
 
 import java.io.Serializable;
-
-import javax.crypto.SecretKey;
-
-import net.sf.scuba.smartcards.APDUWrapper;
+import java.security.spec.KeySpec;
 
 /**
- * Secure messaging wrapper base class.
+ * Super interface for BACKeySpec and PACEKeySpec.
  *
- * @author The JMRTD team
+ * @author The JMRTD team (info@jmrtd.org)
  *
- * @version $Revision$
+ * @version $Revision: $
  */
-public abstract class SecureMessagingWrapper implements Serializable, APDUWrapper {
-
-  private static final long serialVersionUID = 4709645514566992414L;
-
-  /**
-   * Gets the send sequence counter.
-   *
-   * @return the send sequence counter
-   */
-  public abstract long getSendSequenceCounter();
-
-  /**
-   * Gets the shared key for encrypting APDU payloads.
-   *
-   * @return the encryption key
-   */
-  public abstract SecretKey getEncryptionKey();
-
-  /**
-   * Get the shared key for computing message authentication codes over APDU payloads.
-   *
-   * @return the MAC key
-   */
-  public abstract SecretKey getMACKey();
+public interface AccessKeySpec extends Serializable, KeySpec {
 }

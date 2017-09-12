@@ -48,10 +48,11 @@ import org.bouncycastle.asn1.DLSequence;
  *     Authentication.</li>
  * </ul>
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
- * 
- * @version $Revision$
+ * @author The JMRTD team (info@jmrtd.org)
  *
+ * @version $Revision$
+ */
+/*
  * FIXME: dependency on BC?
  */
 public class ChipAuthenticationInfo extends SecurityInfo {
@@ -60,10 +61,11 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  /** Chip Authentication version. */
-  public static final int
-  VERSION_1 = 1,
-  VERSION_2 = 2;
+  /** Chip Authentication version 1. */
+  public static final int VERSION_1 = 1;
+
+  /** Chip Authentication version 2. */
+  public static final int VERSION_2 = 2;
 
   private String oid;
   private int version;
@@ -93,6 +95,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     checkFields();
   }
 
+  @Override
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector v = new ASN1EncodableVector();
@@ -106,9 +109,10 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
   /**
    * Gets the protocol object identifier.
-   * 
+   *
    * @return the {@code ID_CA_} object identifier indicating the Chip Authentication protocol
    */
+  @Override
   public String getObjectIdentifier() {
     return oid;
   }
@@ -119,9 +123,10 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
   /**
    * Gets the protocol object identifier as a human readable string.
-   * 
+   *
    * @return a string
    */
+  @Override
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
@@ -198,7 +203,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     if (!ChipAuthenticationInfo.class.equals(other.getClass())) {
       return false;
     }
-    
+
     ChipAuthenticationInfo otherChipAuthenticationInfo = (ChipAuthenticationInfo)other;
     return oid.equals(otherChipAuthenticationInfo.oid)
         && version == otherChipAuthenticationInfo.version
@@ -207,9 +212,9 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
   public static String toKeyAgreementAlgorithm(String oid) {
     if (oid == null) {
-      throw new NumberFormatException("Unknown OID: null"); 
+      throw new NumberFormatException("Unknown OID: null");
     }
-    
+
     if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
         || ID_CA_DH_AES_CBC_CMAC_128.equals(oid)
         || ID_CA_DH_AES_CBC_CMAC_192.equals(oid)
@@ -221,7 +226,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
       return "ECDH";
     }
-    
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -300,7 +305,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     if (ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
       return "id-CA-ECDH-AES-CBC-CMAC-256";
     }
-    
+
     return oid;
   }
 }

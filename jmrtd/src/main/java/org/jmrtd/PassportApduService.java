@@ -130,7 +130,7 @@ public class PassportApduService extends CardService {
     plainAPDUCount = 0;
     try {
       mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
-      cipher = Util.getCipher("DESede/CBC/NoPadding");      
+      cipher = Util.getCipher("DESede/CBC/NoPadding");
     } catch (GeneralSecurityException gse) {
       throw new CardServiceException("Unexpected security exception during initialization", gse);
     }
@@ -168,11 +168,11 @@ public class PassportApduService extends CardService {
    * as result.
 
    * @param capdu the command APDU
-   * 
+   *
    * @return the response APDU
-   * 
+   *
    * @throws CardServiceException on error
-   */ 
+   */
   @Override
   public synchronized ResponseAPDU transmit(CommandAPDU capdu) throws CardServiceException {
     return service.transmit(capdu);
@@ -261,7 +261,7 @@ public class PassportApduService extends CardService {
         throw new CardServiceException("Exception during transmission of wrapped APDU"
             + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
       } finally {
-        notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);				
+        notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);
       }
     }
 
@@ -672,7 +672,7 @@ public class PassportApduService extends CardService {
   /**
    * The MSE Set AT APDU for TA, see EAC 1.11 spec, Section B.2.
    * MANAGE SECURITY ENVIRONMENT command with SET Authentication Template function.
-   * 
+   *
    * Note that caller is responsible for prefixing the byte[] params with specified tags.
    *
    * @param wrapper secure messaging wrapper
@@ -697,11 +697,11 @@ public class PassportApduService extends CardService {
   /* For Chip Authentication. We prefix 0x80 for OID and 0x84 for keyId. */
   /**
    * The  MSE Set AT for chip authentication.
-   * 
+   *
    * @param wrapper secure messaging wrapper
    * @param oid the OID
    * @param keyId the keyId or {@code null}
-   * 
+   *
    * @throws CardServiceException on error
    */
   public synchronized void sendMSESetATIntAuth(APDUWrapper wrapper, String oid, BigInteger keyId) throws CardServiceException {
@@ -896,8 +896,9 @@ public class PassportApduService extends CardService {
     int length = certData.length;
     if (certData.length > maxBlock) {
       int numBlock = certData.length / blockSize;
-      if (numBlock * blockSize < certData.length)
+      if (numBlock * blockSize < certData.length) {
         numBlock++;
+      }
       int i = 0;
       while (i < numBlock - 1) {
         CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816 | 0x10, ISO7816.INS_PSO, 0x00, 0xBE, certData, offset, length);
@@ -973,7 +974,7 @@ public class PassportApduService extends CardService {
       case ISO7816.SW_COMMAND_NOT_ALLOWED:
         throw new CardServiceException("Access to file denied, " + commandResponseMessage, sw);
       default:
-        throw new CardServiceException("Error occured, " + commandResponseMessage, sw);        
+        throw new CardServiceException("Error occured, " + commandResponseMessage, sw);
     }
   }
 }

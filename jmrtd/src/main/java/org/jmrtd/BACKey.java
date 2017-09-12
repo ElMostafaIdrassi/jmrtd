@@ -37,7 +37,7 @@ public class BACKey implements BACKeySpec {
   private static final long serialVersionUID = -1059774581180524710L;
 
   private static final String SDF = "yyMMdd";
-  
+
   private String documentNumber;
   private String dateOfBirth;
   private String dateOfExpiry;
@@ -50,7 +50,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Creates a BAC key.
-   * 
+   *
    * @param documentNumber the document number string, cannot be <code>null</code>
    * @param dateOfBirth the date of birth string in <i>yymmdd</i> format, cannot be <code>null</code>
    * @param dateOfExpiry the date of expiry string in <i>yymmdd</i> format, cannot be <code>null</code>
@@ -75,7 +75,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Creates a BAC key.
-   * 
+   *
    * @param documentNumber the document number string, cannot be <code>null</code>
    * @param dateOfBirth the date of birth, cannot be <code>null</code>
    * @param dateOfExpiry the date of expiry, cannot be <code>null</code>
@@ -86,7 +86,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Gets the document number string.
-   * 
+   *
    * @return the document number string
    */
   public String getDocumentNumber() {
@@ -95,7 +95,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Gets the date of birth string.
-   * 
+   *
    * @return a date in <i>yymmdd</i> format
    */
   public String getDateOfBirth() {
@@ -104,7 +104,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Gets the date of expiry string.
-   * 
+   *
    * @return a date in <i>yymmdd</i> format
    */
   public String getDateOfExpiry() {
@@ -113,9 +113,10 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Gets a textual representation of this BAC key.
-   * 
+   *
    * @return a textual representation of this BAC key
    */
+  @Override
   public String toString() {
     assert(dateOfBirth != null && dateOfBirth.length() == 6);
     assert(dateOfExpiry != null && dateOfExpiry.length() == 6);
@@ -125,9 +126,10 @@ public class BACKey implements BACKeySpec {
   /**
    * Gets the hash code of this BAC key.
    * Document number, date of birth, and date of expiry (with year in <i>yy</i> precision) are taken into account.
-   * 
+   *
    * @return a hash code
    */
+  @Override
   public int hashCode() {
     int result = 5;
     result = 61 * result + (documentNumber == null ? 0 : documentNumber.hashCode());
@@ -138,11 +140,12 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Tests equality of this BAC key with respect to another object.
-   * 
+   *
    * @param o another object
-   * 
+   *
    * @return whether this BAC key equals another object
    */
+  @Override
   public boolean equals(Object o) {
     if (o == null) {
       return false;
@@ -161,7 +164,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * The algorithm of this key specification.
-   * 
+   *
    * @return constant &quot;BAC&quot;
    */
   public String getAlgorithm() {

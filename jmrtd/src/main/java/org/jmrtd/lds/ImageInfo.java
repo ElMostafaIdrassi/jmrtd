@@ -26,19 +26,19 @@ import java.io.InputStream;
 
 /**
  * Common interface type for records containing an encoded image.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public interface ImageInfo extends LDSElement {
 
   /** Mime-type. */
   static String JPEG_MIME_TYPE = "image/jpeg";
-  
+
   /** Mime-type. */
   static String JPEG2000_MIME_TYPE = "image/jp2";
-  
+
   /** Mime-type. */
   static String WSQ_MIME_TYPE = "image/x-wsq";
 
@@ -46,8 +46,8 @@ public interface ImageInfo extends LDSElement {
   static final int TYPE_PORTRAIT = 0;
 
   /** Type of image. */
-  static final int TYPE_SIGNATURE_OR_MARK = 1; 
-  
+  static final int TYPE_SIGNATURE_OR_MARK = 1;
+
   /** Type of image. */
   static final int TYPE_FINGER = 2;
 
@@ -61,49 +61,49 @@ public interface ImageInfo extends LDSElement {
    * {@link #TYPE_SIGNATURE_OR_MARK},
    * {@link #TYPE_FINGER},
    * {@link #TYPE_IRIS}.
-   * 
+   *
    * @return type of image
    */
   int getType();
 
   /**
    * Gets the mime-type of the encoded image as a <code>String</code>.
-   * 
+   *
    * @return mime-type string
    */
   String getMimeType();
 
   /**
    * Gets the width of the image in pixels.
-   * 
+   *
    * @return image width
    */
   int getWidth();
 
   /**
    * Gets the height of the image in pixels.
-   * 
+   *
    * @return image height
    */
   int getHeight();
 
   /**
    * Gets the length of the total record (header and data) in bytes.
-   * 
+   *
    * @return the length of the record
    */
   long getRecordLength();
 
   /**
    * Gets the length of the encoded image in bytes.
-   * 
+   *
    * @return the length of the image bytes
    */
   int getImageLength();
 
   /**
    * Gets an input stream from which the image bytes can be read.
-   * 
+   *
    * @return image input stream
    */
   InputStream getImageInputStream();

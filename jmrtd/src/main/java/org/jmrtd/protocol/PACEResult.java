@@ -35,7 +35,7 @@ import org.jmrtd.lds.PACEInfo.MappingType;
 
 /**
  * Result of PACE protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -62,7 +62,7 @@ public class PACEResult implements Serializable {
 
   /**
    * The result of a PACE protocol run.
-   * 
+   *
    * @param paceKey the access key
    * @param mappingType the mapping type, {@code GM}, {@code IM}, or {@code CAM}
    * @param agreementAlg the agreement algorithm, {@code "DH"} or {@code "ECDH"}
@@ -92,7 +92,7 @@ public class PACEResult implements Serializable {
 
   /**
    * Gets the access key that was used.
-   * 
+   *
    * @return the PACE key
    */
   public AccessKeySpec getPACEKey() {
@@ -152,7 +152,7 @@ public class PACEResult implements Serializable {
         .append(", mappingResult: " + mappingResult)
         .append(", pcdKeyPair: " + pcdKeyPair)
         .append(", piccPublicKey: " + piccPublicKey)
-        .toString();    
+        .toString();
   }
 
   @Override
@@ -453,7 +453,7 @@ public class PACEResult implements Serializable {
       } else if (!sharedSecretPointY.equals(other.sharedSecretPointY)) {
         return false;
       }
-      
+
       return true;
     }
   }

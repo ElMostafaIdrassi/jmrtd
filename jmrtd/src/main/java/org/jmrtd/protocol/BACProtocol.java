@@ -38,11 +38,11 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * The Basic Access Control protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.5.6
  */
 public class BACProtocol {
@@ -54,7 +54,7 @@ public class BACProtocol {
 
   /**
    * Constructs a BAC protocol instance.
-   * 
+   *
    * @param service the service to send APDUs
    */
   public BACProtocol(PassportService service) {
@@ -159,11 +159,11 @@ public class BACProtocol {
     long ssc = 0;
     for (int i = 4; i < 8; i++) {
       ssc <<= 8;
-      ssc += (long)(rndICC[i] & 0x000000FF);
+      ssc += rndICC[i] & 0x000000FF;
     }
     for (int i = 4; i < 8; i++) {
       ssc <<= 8;
-      ssc += (long)(rndIFD[i] & 0x000000FF);
+      ssc += rndIFD[i] & 0x000000FF;
     }
     return ssc;
   }

@@ -24,30 +24,30 @@ package org.jmrtd;
 
 /**
  * A BAC key.
- * 
+ *
  * @author The JMRTD team
- * 
+ *
  * @version $Revision$
  */
 public interface BACKeySpec extends AccessKeySpec {
 
   /**
    * Gets the document number. This does not include a check digit.
-   * 
+   *
    * @return the document number
    */
   String getDocumentNumber();
 
   /**
    * Gets the date of birth string.
-   * 
+   *
    * @return a <i>yymmdd</i> string
    */
   String getDateOfBirth();
 
   /**
    * Gets the date of expiry string.
-   * 
+   *
    * @return a <i>yymmdd</i> string
    */
   String getDateOfExpiry();

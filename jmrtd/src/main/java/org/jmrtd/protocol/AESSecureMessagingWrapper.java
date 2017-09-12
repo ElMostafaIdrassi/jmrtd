@@ -51,7 +51,7 @@ import net.sf.scuba.tlv.TLVUtil;
  * An AES secure messaging wrapper for APDUs. Based on TR-SAC.
  *
  * @author The JMRTD team (info@jmrtd.org)
- * 	
+ *
  * @version $Revision$
  */
 public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements Serializable {
@@ -92,6 +92,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @return the current value of the send sequence counter.
    */
+  @Override
   public long getSendSequenceCounter() {
     return ssc;
   }
@@ -166,7 +167,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     int lc = commandAPDU.getNc();
     int le = commandAPDU.getNe();
 
-    ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
+    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
     byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
     byte[] paddedMaskedHeader = Util.pad(maskedHeader, 16); // 128 bits is 16 bytes

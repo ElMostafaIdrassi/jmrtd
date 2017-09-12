@@ -69,6 +69,7 @@ public class DG1File extends DataGroup {
     super(EF_DG1_TAG, in);
   }
 
+  @Override
   protected void readContent(InputStream in) throws IOException {
     TLVInputStream tlvIn = in instanceof TLVInputStream ? (TLVInputStream)in : new TLVInputStream(in);
     tlvIn.skipToTag(MRZ_INFO_TAG);
@@ -103,7 +104,7 @@ public class DG1File extends DataGroup {
     if (!(obj.getClass().equals(this.getClass()))) {
       return false;
     }
-    
+
     DG1File other = (DG1File)obj;
     return mrzInfo.equals(other.mrzInfo);
   }

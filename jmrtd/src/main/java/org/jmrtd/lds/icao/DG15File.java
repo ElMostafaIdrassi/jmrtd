@@ -49,7 +49,7 @@ public class DG15File extends DataGroup {
   private static final long serialVersionUID = 3834304239673755744L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-    
+
   private static final String[] PUBLIC_KEY_ALGORITHMS = { "RSA", "EC" };
 
   private PublicKey publicKey;
@@ -75,6 +75,7 @@ public class DG15File extends DataGroup {
     super(EF_DG15_TAG, inputStream);
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     DataInputStream dataInputStream = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
     try {
@@ -90,13 +91,13 @@ public class DG15File extends DataGroup {
     X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
 
     for (String algorithm: PUBLIC_KEY_ALGORITHMS) {
-      try {        
+      try {
         return Util.getPublicKey(algorithm, pubKeySpec);
       } catch (InvalidKeySpecException ikse) {
         /* NOTE: Ignore, try next algorithm. */
       }
     }
-    
+
     throw new InvalidAlgorithmParameterException();
   }
 
@@ -122,7 +123,7 @@ public class DG15File extends DataGroup {
     if (obj.getClass() != this.getClass()) {
       return false;
     }
-    
+
     DG15File other = (DG15File)obj;
     return publicKey.equals(other.publicKey);
   }
@@ -135,5 +136,5 @@ public class DG15File extends DataGroup {
   @Override
   public String toString() {
     return "DG15File [" + Util.getDetailedPublicKeyAlgorithm(publicKey) + "]";
-  }  
+  }
 }

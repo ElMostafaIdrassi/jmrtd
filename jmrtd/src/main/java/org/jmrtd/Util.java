@@ -125,7 +125,7 @@ public class Util {
 
   /**
    * Gets the BC provider, if present.
-   * 
+   *
    * @return the BC provider, the SC provider, or <code>null</code>
    */
   public static Provider getBouncyCastleProvider() {
@@ -323,9 +323,9 @@ public class Util {
 
   /**
    * Unpads the input {@code bytes} according to ISO9797-1 padding method 2.
-   * 
+   *
    * @param bytes the input
-   * 
+   *
    * @return the unpadded bytes
    *
    * @throws BadPaddingException on padding exception
@@ -360,7 +360,7 @@ public class Util {
 
     /* Trailer. */
     if (((decryptedResponse[decryptedResponse.length - 1] & 0xF) ^ 0xC) != 0) {
-      /* 
+      /*
        * Trailer.
        * NOTE: 0xF = 0000 1111, 0xC = 0000 1100.
        */
@@ -407,7 +407,7 @@ public class Util {
     int messageOffset = paddingLength + 1;
 
     int paddedMessageLength = decryptedResponse.length - trailerLength - digestLength;
-    int messageLength = paddedMessageLength - messageOffset;    
+    int messageLength = paddedMessageLength - messageOffset;
 
     /* There must be at least one byte of message string. */
     if (messageLength <= 0) {
@@ -736,7 +736,7 @@ public class Util {
     }
 
     @SuppressWarnings("unchecked")
-    List<String> names = (List<String>)Collections.list(ECNamedCurveTable.getNames());
+    List<String> names = Collections.list(ECNamedCurveTable.getNames());
     List<org.bouncycastle.jce.spec.ECNamedCurveSpec> namedSpecs = new ArrayList<org.bouncycastle.jce.spec.ECNamedCurveSpec>();
     for (String name: names) {
       org.bouncycastle.jce.spec.ECNamedCurveSpec namedSpec = toECNamedCurveSpec(ECNamedCurveTable.getParameterSpec(name));
@@ -747,7 +747,7 @@ public class Util {
         namedSpecs.add(namedSpec);
       }
     }
-    if (namedSpecs.size() == 0) {
+    if (namedSpecs.isEmpty()) {
       // throw new IllegalArgumentException("No named curve found");
       return null;
     } else if (namedSpecs.size() == 1) {
@@ -789,7 +789,7 @@ public class Util {
       if ("EC".equals(algorithm) || "ECDH".equals(algorithm) || (publicKey instanceof ECPublicKey)) {
         ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
         try {
-          SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo((ASN1Sequence)asn1In.readObject());
+          SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(asn1In.readObject());
           AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
           String algOID = algorithmIdentifier.getAlgorithm().getId();
           if (!SecurityInfo.ID_EC_PUBLIC_KEY.equals(algOID)) {
@@ -823,6 +823,8 @@ public class Util {
             /* FIXME: investigate the compressed versus uncompressed point issue. What is allowed in TR03110? -- MO */
             // In case we would like to compress the point:
             // p = p.getCurve().createPoint(p.getX().toBigInteger(), p.getY().toBigInteger(), true);
+
+            LOGGER.info("DEBUG: =====> q " + q);
             subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded());
             return subjectPublicKeyInfo;
           } else {
@@ -834,7 +836,7 @@ public class Util {
       } else if ("DH".equals(algorithm) || (publicKey instanceof DHPublicKey)) {
         ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
         try {
-          SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(((ASN1Sequence)asn1In.readObject()));
+          SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance((asn1In.readObject()));
           AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
 
           DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
@@ -1110,14 +1112,14 @@ public class Util {
     try {
       if (params instanceof ECParameterSpec) {
         ECPoint w = os2ECPoint(encodedPublicKey);
-        ECParameterSpec ecParams = (ECParameterSpec)params;        
+        ECParameterSpec ecParams = (ECParameterSpec)params;
         return getPublicKey("EC", new ECPublicKeySpec(w, ecParams));
       } else if (params instanceof DHParameterSpec) {
         DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
         try {
           int b = dataIn.read();
           if (b != 0x04) {
-            throw new IllegalArgumentException("Expected encoded public key to start with 0x04"); 
+            throw new IllegalArgumentException("Expected encoded public key to start with 0x04");
           }
           int length = encodedPublicKey.length - 1;
           byte[] publicValue = new byte[length];
@@ -1164,7 +1166,7 @@ public class Util {
    * @param x an EC point
    * @param y another EC point
    * @param params the domain parameters
-   * 
+   *
    * @return the resulting EC point
    */
   public static ECPoint add(ECPoint x, ECPoint y, ECParameterSpec params) {
@@ -1176,11 +1178,11 @@ public class Util {
 
   /**
    * EC point scalar multiplication.
-   * 
+   *
    * @param s the scalar
    * @param point an EC point
    * @param params the domain parameters
-   * 
+   *
    * @return the resulting EC point
    */
   public static ECPoint multiply(BigInteger s, ECPoint point, ECParameterSpec params) {
@@ -1439,7 +1441,7 @@ public class Util {
     } catch (Exception e) {
       LOGGER.log(Level.FINE, "Default provider could not provide this Key Factory or Public Key, falling back to explicit BC", e);
       KeyFactory kf = KeyFactory.getInstance(algorithm, BC_PROVIDER);
-      return kf.generatePublic(keySpec);          
+      return kf.generatePublic(keySpec);
     }
   }
 

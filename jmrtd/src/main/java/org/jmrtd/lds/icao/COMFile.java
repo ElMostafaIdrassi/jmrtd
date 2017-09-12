@@ -161,6 +161,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     super(EF_COM_TAG, in);
   }
 
+  @Override
   protected void readContent(InputStream in) throws IOException {
     TLVInputStream tlvIn = in instanceof TLVInputStream ? (TLVInputStream)in : new TLVInputStream(in);
     int versionLDSTag = tlvIn.readTag();
@@ -195,8 +196,8 @@ public class COMFile extends AbstractTaggedLDSFile {
     /* int tagListLength = */ tlvIn.readLength();
     byte[] tagBytes = tlvIn.readValue();
     tagList = new ArrayList<Integer>();
-    for (int i = 0; i < tagBytes.length; i++) {
-      int dgTag = (tagBytes[i] & 0xFF);
+    for (byte tagByte : tagBytes) {
+      int dgTag = (tagByte & 0xFF);
       tagList.add(dgTag);
     }
   }
@@ -270,6 +271,7 @@ public class COMFile extends AbstractTaggedLDSFile {
 
   }
 
+  @Override
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
     tlvOut.writeTag(VERSION_LDS_TAG);
@@ -327,7 +329,7 @@ public class COMFile extends AbstractTaggedLDSFile {
     if (!other.getClass().equals(getClass())) {
       return false;
     }
-    
+
     COMFile otherCOMFile = (COMFile)other;
     return versionLDS.equals(otherCOMFile.versionLDS) &&
         updateLevelLDS.equals(otherCOMFile.updateLevelLDS) &&

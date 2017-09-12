@@ -32,7 +32,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * ISO 7816-11 encoder for BIR.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -43,7 +43,7 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   /**
    * Constructs an ISO7816-11 encoder that uses the given BDB encoder.
-   * 
+   *
    * @param bdbEncoder the BDB encoder to use
    */
   public ISO781611Encoder(BiometricDataBlockEncoder<B> bdbEncoder) {
@@ -52,10 +52,10 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   /**
    * Writes a BIT group to an output stream.
-   * 
+   *
    * @param cbeffInfo a CBEFF info containing the BIT group
    * @param outputStream the output stream to write to
-   * 
+   *
    * @throws IOException if something goes wrong
    */
   public void encode(CBEFFInfo cbeffInfo, OutputStream outputStream) throws IOException {
@@ -100,7 +100,7 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
     for (SortedMap.Entry<Integer, byte[]> entry: elements.entrySet()) {
       tlvOut.writeTag(entry.getKey());
       tlvOut.writeValue(entry.getValue());
-    }		
+    }
     tlvOut.writeValueEnd(); /* BIOMETRIC_HEADER_TEMPLATE_BASE_TAG, i.e. A1 */
   }
 

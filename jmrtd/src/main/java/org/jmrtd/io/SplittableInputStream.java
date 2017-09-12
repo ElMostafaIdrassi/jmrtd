@@ -29,9 +29,9 @@ import java.io.InputStream;
  * An input stream which will wrap another input stream (and yield the same bytes) and which can
  * spawn new fresh input stream copies (using {@link #getInputStream(int)})
  * (that also yield the same bytes).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class SplittableInputStream extends InputStream {
@@ -41,7 +41,7 @@ public class SplittableInputStream extends InputStream {
 
   /**
    * Wraps an input stream so that copy streams can be split off.
-   * 
+   *
    * @param inputStream the original input stream
    * @param length the precise length of bytes that the original input stream provides
    */
@@ -56,7 +56,7 @@ public class SplittableInputStream extends InputStream {
 
   /**
    * Gets a copy of the inputstream positioned at <code>position</code>.
-   * 
+   *
    * @param position a position between <code>0</code> and {@link #getPosition()}
    * @return a fresh input stream
    */
@@ -75,7 +75,7 @@ public class SplittableInputStream extends InputStream {
 
   /**
    * The position of the input stream (the number of bytes read since this input stream was constructed)
-   * 
+   *
    * @return the position of this input stream
    */
   public int getPosition() {
@@ -212,7 +212,7 @@ public class SplittableInputStream extends InputStream {
    *
    * @see java.io.InputStream#mark(int)
    * @see java.io.IOException
-   * 
+   *
    * @throws IOException on error
    */
   @Override

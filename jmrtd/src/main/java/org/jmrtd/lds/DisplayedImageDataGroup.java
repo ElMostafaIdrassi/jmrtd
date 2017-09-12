@@ -43,7 +43,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
 public abstract class DisplayedImageDataGroup extends DataGroup {
 
   private static final long serialVersionUID = 5994136177872308962L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final int DISPLAYED_IMAGE_COUNT_TAG = 0x02;
@@ -73,7 +73,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
    *
    * @param dataGroupTag a tag indicating DG5, DG6, or DG7
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException on error reading the input stream
    */
   public DisplayedImageDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
@@ -84,6 +84,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     checkTypesConsistentWithTag();
   }
 
+  @Override
   protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int countTag = tlvIn.readTag();
@@ -106,6 +107,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     }
   }
 
+  @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
     tlvOut.writeTag(DISPLAYED_IMAGE_COUNT_TAG);
@@ -122,7 +124,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     result.append(" [");
     boolean isFirst = true;
     if (imageInfos == null) {
-      throw new IllegalStateException("imageInfos cannot be null");	
+      throw new IllegalStateException("imageInfos cannot be null");
     }
     for (DisplayedImageInfo info: imageInfos) {
       if (isFirst) {
@@ -152,7 +154,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     if (!getClass().equals(other.getClass())) {
       return false;
     }
-    
+
     DisplayedImageDataGroup otherDG = (DisplayedImageDataGroup)other;
     return this.imageInfos == otherDG.imageInfos || this.imageInfos != null && this.imageInfos.equals(otherDG.imageInfos);
   }

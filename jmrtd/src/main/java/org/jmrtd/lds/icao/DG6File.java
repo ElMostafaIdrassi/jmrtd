@@ -29,9 +29,9 @@ import org.jmrtd.lds.DisplayedImageDataGroup;
 
 /**
  * File structure for the EF_DG6 file.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class DG6File extends DisplayedImageDataGroup {
@@ -40,9 +40,9 @@ public class DG6File extends DisplayedImageDataGroup {
 
   /**
    * Constructs a new file from binary representation.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException on error reading input stream
    */
   public DG6File(InputStream inputStream) throws IOException {

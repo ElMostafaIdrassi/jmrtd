@@ -62,6 +62,7 @@ public class MRZInfo extends AbstractLDSInfo {
   private static final String MRZ_CHARS = "<0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   /** @deprecated to be replaced with documentCode */
+  @Deprecated
   private int documentType;
 
   private String documentCode;
@@ -306,6 +307,7 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @param outputStream the output stream to write to
    */
+  @Override
   public void writeObject(OutputStream outputStream) throws IOException {
     DataOutputStream dataOut = new DataOutputStream(outputStream);
     writeDocumentType(dataOut);
@@ -643,6 +645,7 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     try {
       String str = new String(getEncoded(), "UTF-8");
@@ -668,6 +671,7 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @return a hash code
    */
+  @Override
   public int hashCode() {
     return 2 * toString().hashCode() + 53;
   }
@@ -679,6 +683,7 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @return a boolean
    */
+  @Override
   public boolean equals(Object obj) {
     if (obj == null) {
       return false;
@@ -686,7 +691,7 @@ public class MRZInfo extends AbstractLDSInfo {
     if (!(obj.getClass().equals(this.getClass()))) {
       return false;
     }
-    
+
     MRZInfo other = (MRZInfo)obj;
 
     return
@@ -778,14 +783,13 @@ public class MRZInfo extends AbstractLDSInfo {
     String[] secondaryComponents = secondaryIdentifier.split(" |<");
 
     StringBuilder name = new StringBuilder();
-    for (int i = 0; i < primaryComponents.length; i++) {
-      String component = primaryComponents[i];
+    for (String component : primaryComponents) {
       name.append(component);
       name.append('<');
     }
-    for (int i = 0; i < secondaryComponents.length; i++) {
+    for (String secondaryComponent : secondaryComponents) {
       name.append('<');
-      name.append(secondaryComponents[i]);
+      name.append(secondaryComponent);
     }
     return mrzFormat(name.toString(), width);
   }

@@ -24,11 +24,11 @@ package org.jmrtd.cbeff;
 
 /**
  * Constants interface representing ISO7816-11.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public interface ISO781611 {

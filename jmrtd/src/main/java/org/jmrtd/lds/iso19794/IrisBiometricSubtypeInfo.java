@@ -35,9 +35,9 @@ import org.jmrtd.lds.AbstractListInfo;
  * Iris biometric subtype data block (containing iris image data blocks)
  * based on Section 6.5.3 and Table 3 of
  * ISO/IEC 19794-6 2005.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
@@ -45,17 +45,20 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
   private static final long serialVersionUID = -6588640634764878039L;
 
   /** Biometric subtype value. */
-  public static final int
-  EYE_UNDEF = 0,
-  EYE_RIGHT = 1,
-  EYE_LEFT = 2;
+  public static final int EYE_UNDEF = 0;
+
+  /** Biometric subtype value. */
+  public static final int EYE_RIGHT = 1;
+
+  /** Biometric subtype value. */
+  public static final int EYE_LEFT = 2;
 
   private int imageFormat;
   private int biometricSubtype;
 
   /**
    * Constructs a biometric subtype info.
-   * 
+   *
    * @param biometricSubtype one of {@link #EYE_UNDEF}, {@link #EYE_RIGHT}, {@link #EYE_LEFT}
    * @param imageFormat the image format as specified in the {@link IrisInfo} of which this is a part
    * @param irisImageInfos the iris image info records
@@ -68,10 +71,10 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Constructs an iris biometric subtype from binary encoding.
-   * 
+   *
    * @param in an input stream
    * @param imageFormat the image format used
-   * 
+   *
    * @throws IOException if reading fails
    */
   public IrisBiometricSubtypeInfo(InputStream in, int imageFormat) throws IOException {
@@ -81,11 +84,12 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Reads an iris biometric subtype from input stream.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException if reading fails
    */
+  @Override
   public void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
@@ -107,11 +111,12 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Writes an iris biometric subtype to output stream.
-   * 
+   *
    * @param outputStream an output stream
-   * 
+   *
    * @throws IOException if writing fails
    */
+  @Override
   public void writeObject(OutputStream outputStream) throws IOException {
     DataOutputStream dataOut = outputStream instanceof DataOutputStream ? (DataOutputStream)outputStream : new DataOutputStream(outputStream);
 
@@ -126,7 +131,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Gets the record length.
-   * 
+   *
    * @return the record length
    */
   public long getRecordLength() {
@@ -138,6 +143,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
     return result;
   }
 
+  @Override
   public String toString() {
     List<IrisImageInfo> irisImageInfos = getSubRecords();
     return "IrisBiometricSubtypeInfo ["
@@ -149,7 +155,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
   /**
    * The biometric subtype (feature identifier).
    * Result is one of {@link #EYE_UNDEF}, {@link #EYE_RIGHT}, {@link #EYE_LEFT}.
-   * 
+   *
    * @return the biometric subtype.
    */
   public int getBiometricSubtype() {
@@ -159,7 +165,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
   /**
    * Gets the image format used in the images encoded in this record.
    *
-   * @return the image format 
+   * @return the image format
    */
   public int getImageFormat() {
     return imageFormat;
@@ -167,7 +173,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Gets the iris image infos embedded in this iris biometric subtype info.
-   * 
+   *
    * @return the embedded iris image infos
    */
   public List<IrisImageInfo> getIrisImageInfos() {
@@ -176,7 +182,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Adds an iris image info to this iris biometric subtype info.
-   * 
+   *
    * @param irisImageInfo the iris image info to add
    */
   public void addIrisImageInfo(IrisImageInfo irisImageInfo) {
@@ -185,7 +191,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /**
    * Removes an iris image info from this iris biometric subtype info.
-   * 
+   *
    * @param index the index of the iris image info to remove
    */
   public void removeIrisImageInfo(int index) {
@@ -196,10 +202,14 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   private static String biometricSubtypeToString(int biometricSubtype) {
     switch (biometricSubtype) {
-      case EYE_LEFT: return "Left eye";
-      case EYE_RIGHT: return "Right eye";
-      case EYE_UNDEF: return "Undefined";
-      default: throw new NumberFormatException("Unknown biometric subtype: " + Integer.toHexString(biometricSubtype));
+      case EYE_LEFT:
+        return "Left eye";
+      case EYE_RIGHT:
+        return "Right eye";
+      case EYE_UNDEF:
+        return "Undefined";
+      default:
+        throw new NumberFormatException("Unknown biometric subtype: " + Integer.toHexString(biometricSubtype));
     }
-  }	
+  }
 }

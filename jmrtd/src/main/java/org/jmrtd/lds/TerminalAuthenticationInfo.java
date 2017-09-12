@@ -22,8 +22,6 @@
 
 package org.jmrtd.lds;
 
-import java.util.logging.Logger;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -56,25 +54,23 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 6220506985707094044L;
 
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
   public static final int VERSION_1 = 1;
   private static final int VERSION_2 = 2;
 
   private String oid;
   private int version;
-  
+
   /*
    * FIXME: This shouldn't be transient, as we want this part of the state to be (de)serialized.
-   * 
+   *
    * This contains just a file identifier, and possibly a short file identifier?
    * Why not short instead of ASN1Sequence? (In which case we can remove the transient.)
-   * 
+   *
    * Alternatively we could explicitly (de)serialize this in readObject/writeObject
    * (using BC's getEncoded()).
    */
   private transient ASN1Sequence efCVCA;
-  
+
   /**
    * Constructs a new object.
    *
@@ -121,13 +117,14 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   /**
    * Gets the version. This will be 1 or 2.
-   * 
+   *
    * @return the version
    */
   public int getVersion() {
     return version;
   }
 
+  @Override
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector v = new ASN1EncodableVector();
@@ -151,7 +148,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   /**
    * Gets the protocol object identifier as a human readable string.
-   * 
+   *
    * @return a string
    */
   @Override
@@ -180,17 +177,14 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("TerminalAuthenticationInfo [");
-    result.append("protocol: ").append(toProtocolOIDString(oid));
-    result.append(", ");
-    result.append("version: ").append(version);
-    result.append(", ");
-    result.append("fileID: ").append(getFileId());
-    result.append(", ");
-    result.append("shortFileID: ").append(getShortFileId());
-    result.append("]");
-    return result.toString();
+    return new StringBuilder()
+        .append("TerminalAuthenticationInfo [")
+        .append("protocol: ").append(toProtocolOIDString(oid)).append(", ")
+        .append("version: ").append(version).append(", ")
+        .append("fileID: ").append(getFileId()).append(", ")
+        .append("shortFileID: ").append(getShortFileId())
+        .append("]")
+        .toString();
   }
 
   @Override
@@ -219,7 +213,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     if (efCVCA != null && otherTerminalAuthenticationInfo.efCVCA == null) {
       return false;
     }
-    
+
     return getDERObject().equals(otherTerminalAuthenticationInfo.getDERObject());
   }
 
@@ -281,10 +275,10 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     if (efCVCA == null) {
       return -1;
     }
-    ASN1Sequence s = (ASN1Sequence)efCVCA;
+    ASN1Sequence s = efCVCA;
     DEROctetString fid = (DEROctetString)s.getObjectAt(0);
     byte[] bytes = fid.getOctets();
-    return (short)(((bytes[0] & 0xFF) << 8) | (bytes[1] & 0xFF));		
+    return (short)(((bytes[0] & 0xFF) << 8) | (bytes[1] & 0xFF));
   }
 
   private static byte getShortFileId(ASN1Sequence efCVCA) {
@@ -328,7 +322,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     if (ID_TA_ECDSA_SHA_256.equals(oid)) {
       return "id-TA-ECDSA-SHA-256";
     }
-    
+
     return oid;
   }
 }

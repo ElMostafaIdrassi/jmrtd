@@ -115,6 +115,7 @@ public class CVCAFile extends AbstractLDSFile {
     return fid;
   }
 
+  @Override
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = new DataInputStream(inputStream);
     int tag = dataIn.read();
@@ -150,6 +151,7 @@ public class CVCAFile extends AbstractLDSFile {
     }
   }
 
+  @Override
   protected void writeObject(OutputStream outputStream) throws IOException {
     byte[] result = new byte[LENGTH];
     result[0] = CAR_TAG;

@@ -95,7 +95,7 @@ public class CardSecurityFile implements Serializable {
 
   /**
    * Constructs a new file from the provided data.
-   * 
+   *
    * @param digestAlgorithm the digest algorithm as Java mnemonic
    * @param digestEncryptionAlgorithm the signature algorithm as Java mnemonic
    * @param securityInfos a non-empty list of security infos
@@ -129,7 +129,7 @@ public class CardSecurityFile implements Serializable {
     this.digestAlgorithm = digestAlgorithm;
     this.digestEncryptionAlgorithm = digestEncryptionAlgorithm;
     this.securityInfos = new HashSet<SecurityInfo>(securityInfos);
-    this.encryptedDigest = encryptedDigest;    
+    this.encryptedDigest = encryptedDigest;
     this.certificate = certificate;
   }
 
@@ -187,7 +187,7 @@ public class CardSecurityFile implements Serializable {
 
   /**
    * Gets the DER encoded file.
-   * 
+   *
    * @return the encoded file
    */
   public byte[] getEncoded() {

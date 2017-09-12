@@ -42,7 +42,7 @@ import org.jmrtd.lds.icao.DG7File;
 
 /**
  * Static LDS file methods.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -107,7 +107,7 @@ public class LDSFileUtil {
           return new CVCAFile(fid, bufferedIn);
         } catch (Exception e) {
           bufferedIn.reset();
-          throw new NumberFormatException("Unknown file " + Integer.toHexString(fid));   
+          throw new NumberFormatException("Unknown file " + Integer.toHexString(fid));
         }
     }
   }
@@ -166,9 +166,9 @@ public class LDSFileUtil {
 
   /**
    * Finds a data group number for an ICAO tag.
-   * 
+   *
    * @param tag an ICAO tag (the first byte of the EF)
-   * 
+   *
    * @return a data group number (1-16)
    */
   public static int lookupDataGroupNumberByTag(int tag) {
@@ -206,14 +206,14 @@ public class LDSFileUtil {
       case LDSFile.EF_DG16_TAG:
         return 16;
       default:
-        throw new NumberFormatException("Unknown tag " + Integer.toHexString(tag));   
+        throw new NumberFormatException("Unknown tag " + Integer.toHexString(tag));
     }
   }
 
   /**
    * Finds an ICAO tag for a data group number.
-   * 
-   * 
+   *
+   *
    * @param number a data group number (1-16)
    *
    * @return an ICAO tag (the first byte of the EF)
@@ -253,14 +253,14 @@ public class LDSFileUtil {
       case 16:
         return LDSFile.EF_DG16_TAG;
       default:
-        throw new NumberFormatException("Unknown number " + number);   
+        throw new NumberFormatException("Unknown number " + number);
     }
   }
 
   /**
    * Finds an ICAO tag for a data group number.
-   * 
-   * 
+   *
+   *
    * @param number a data group number (1-16)
    *
    * @return a file identifier
@@ -300,7 +300,7 @@ public class LDSFileUtil {
       case 16:
         return PassportService.EF_DG16;
       default:
-        throw new NumberFormatException("Unknown number " + number);   
+        throw new NumberFormatException("Unknown number " + number);
     }
   }
 
@@ -358,9 +358,9 @@ public class LDSFileUtil {
 
   /**
    * Finds a data group number by file identifier.
-   * 
+   *
    * @param fid a file id
-   * 
+   *
    * @return a data group number
    */
   public static int lookupDataGroupNumberByFID(short fid) {
@@ -455,9 +455,9 @@ public class LDSFileUtil {
   /**
    * Returns a mnemonic name corresponding to the file represented by the
    * given file identifier, such as "EF_COM", "EF_SOD", or "EF_DG1".
-   * 
+   *
    * @param fid an LDS file identifiers
-   * 
+   *
    * @return a mnemonic name corresponding to the file represented by the given ICAO tag
    */
   public static String lookupFileNameByFID(int fid) {

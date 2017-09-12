@@ -39,7 +39,7 @@ import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 
 /**
  * Card verifiable certificate builder.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -48,7 +48,7 @@ public class CVCertificateBuilder {
 
   /**
    * Card verifiable certificate factory method.
-   * 
+   *
    * @param publicKey the public key
    * @param signerKey private key
    * @param algorithmName algorithm name
@@ -58,7 +58,7 @@ public class CVCertificateBuilder {
    * @param validFrom valid from date
    * @param validTo valid to date
    * @param provider provider name
-   * 
+   *
    * @return a card verifiable certificate
    *
    * @throws IOException on error

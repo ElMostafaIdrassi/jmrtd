@@ -97,6 +97,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     this(ID_AA, VERSION_1, signatureAlgorithmOID);
   }
 
+  @Override
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector v = new ASN1EncodableVector();
@@ -113,6 +114,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    *
    * @return an object identifier
    */
+  @Override
   public String getObjectIdentifier() {
     return oid;
   }
@@ -123,9 +125,10 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
   /**
    * Gets the protocol object identifier as a human readable string.
-   * 
+   *
    * @return a string
    */
+  @Override
   public String getProtocolOIDString() {
     return toProtocolOIDString(oid);
   }
@@ -202,7 +205,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    *
    * @throws NoSuchAlgorithmException if the OID was not recognized
    */
-  public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {		
+  public static String lookupMnemonicByOID(String oid) throws NoSuchAlgorithmException {
     if (ECDSA_PLAIN_SHA1_OID.equals(oid)) {
       return "SHA1withECDSA";
     }
@@ -221,7 +224,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) {
       return "RIPEMD160withECDSA";
     }
-    
+
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 
@@ -250,7 +253,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
       if (version != VERSION_1) {
         throw new IllegalArgumentException("Wrong version: " + version);
       }
-      
+
       /* FIXME check to see if signatureAlgorithmOID is valid. */
 
       if (!ECDSA_PLAIN_SHA1_OID.equals(signatureAlgorithmOID)
@@ -277,7 +280,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   public static String toSignatureAlgorithmOIDString(String oid) {
     if (ECDSA_PLAIN_SHA1_OID.equals(oid)) {
       return "ecdsa-plain-SHA224";
-    }    
+    }
     if (ECDSA_PLAIN_SHA224_OID.equals(oid)) {
       return "ecdsa-plain-SHA224";
     }
@@ -293,7 +296,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     if (ECDSA_PLAIN_RIPEMD160_OID.equals(oid)) {
       return "ecdsa-plain-RIPEMD160";
     }
-    
+
     return oid;
   }
 }

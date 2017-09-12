@@ -42,11 +42,11 @@ import org.jmrtd.lds.AbstractListInfo;
  * Iris record header and biometric subtype blocks
  * based on Section 6.5.3 and Table 2 of
  * ISO/IEC 19794-6 2005.
- * 
+ *
  * TODO: proper enums for fields.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> implements BiometricDataBlock {
@@ -67,7 +67,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   /**
    * ISO/IEC JTC1/SC37 uses 0x0009 according to <a href="http://www.ibia.org/cbeff/_bdb.php">IBIA</a>.
    * (ISO FCD 19794-6 specified this as 0x0601).
-   */	
+   */
   private static final int FORMAT_TYPE_VALUE = 0x0009;
 
   /** Image format */
@@ -149,7 +149,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Constructs a new iris info object.
-   * 
+   *
    * @param captureDeviceId capture device identifier assigned by vendor
    * @param horizontalOrientation horizontal orientation: {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
    * @param verticalOrientation vertical orientation: {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
@@ -181,7 +181,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Constructs a new iris info object.
-   * 
+   *
    * @param sbh standard biometric header to use
    * @param captureDeviceId capture device identifier assigned by vendor
    * @param horizontalOrientation horizontal orientation: {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
@@ -239,9 +239,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Constructs an iris info from binary encoding.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException if reading fails
    */
   public IrisInfo(InputStream inputStream) throws IOException {
@@ -250,10 +250,10 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Constructs an iris info from binary encoding.
-   * 
+   *
    * @param sbh standard biometric header to use
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException if reading fails
    */
   public IrisInfo(StandardBiometricHeader sbh, InputStream inputStream) throws IOException {
@@ -263,11 +263,12 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Reads this iris info from input stream.
-   * 
+   *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException if reading fails
    */
+  @Override
   public void readObject(InputStream inputStream) throws IOException {
 
     /* Iris Record Header (45) */
@@ -349,11 +350,12 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Writes this iris info to an output stream.
-   * 
+   *
    * @param outputStream an output stream
-   * 
+   *
    * @throws IOException if writing fails
    */
+  @Override
   public void writeObject(OutputStream outputStream) throws IOException {
 
     int headerLength = 45;
@@ -404,7 +406,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the capture device id.
-   * 
+   *
    * @return the captureDeviceId
    */
   public int getCaptureDeviceId() {
@@ -413,7 +415,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the horizontal orientation
-   * 
+   *
    * @return the horizontalOrientation, one of {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
    */
   public int getHorizontalOrientation() {
@@ -422,7 +424,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the vertical orientation
-   * 
+   *
    * @return the verticalOrientation, one of {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
    */
   public int getVerticalOrientation() {
@@ -431,7 +433,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the scan type.
-   * 
+   *
    * @return the scanType, one of {@link #SCAN_TYPE_UNDEF}, {@link #SCAN_TYPE_PROGRESSIVE}, {@link #SCAN_TYPE_INTERLACE_FRAME}, {@link #SCAN_TYPE_INTERLACE_FIELD}, or {@link #SCAN_TYPE_CORRECTED}
    */
   public int getScanType() {
@@ -440,7 +442,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the iris occlusion.
-   * 
+   *
    * @return the irisOcclusion
    */
   public int getIrisOcclusion() {
@@ -449,7 +451,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the iris occlusing filling.
-   * 
+   *
    * @return the occlusionFilling
    */
   public int getOcclusionFilling() {
@@ -458,7 +460,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the boundary extraction.
-   * 
+   *
    * @return the boundaryExtraction
    */
   public int getBoundaryExtraction() {
@@ -467,7 +469,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the iris diameter.
-   * 
+   *
    * @return the irisDiameter
    */
   public int getIrisDiameter() {
@@ -476,7 +478,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the image format.
-   * 
+   *
    * @return the imageFormat
    */
   public int getImageFormat() {
@@ -485,7 +487,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the raw image width.
-   * 
+   *
    * @return the rawImageWidth
    */
   public int getRawImageWidth() {
@@ -494,7 +496,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the raw image height.
-   * 
+   *
    * @return the rawImageHeight
    */
   public int getRawImageHeight() {
@@ -503,7 +505,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the intensity depth.
-   * 
+   *
    * @return the intensityDepth
    */
   public int getIntensityDepth() {
@@ -512,7 +514,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the image transformation.
-   * 
+   *
    * @return the imageTransformation
    */
   public int getImageTransformation() {
@@ -521,7 +523,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the device unique id.
-   * 
+   *
    * @return the deviceUniqueId
    */
   public byte[] getDeviceUniqueId() {
@@ -530,7 +532,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the standard biometric header of this iris info.
-   * 
+   *
    * @return the standard biometric header
    */
   public StandardBiometricHeader getStandardBiometricHeader() {
@@ -553,11 +555,12 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Generates a textual representation of this object.
-   * 
+   *
    * @return a textual representation of this object
-   * 
+   *
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("IrisInfo [");
@@ -568,7 +571,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets the iris biometric subtype infos embedded in this iris info.
-   * 
+   *
    * @return iris biometric subtype infos
    */
   public List<IrisBiometricSubtypeInfo> getIrisBiometricSubtypeInfos() {
@@ -577,7 +580,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Adds an iris biometric subtype info to this iris info.
-   * 
+   *
    * @param irisBiometricSubtypeInfo an iris biometric subtype info
    */
   public void addIrisBiometricSubtypeInfo(IrisBiometricSubtypeInfo irisBiometricSubtypeInfo) {
@@ -586,7 +589,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Removes an iris biometric subtype info from this iris info.
-   * 
+   *
    * @param index the index of the biometric subtype info to remove
    */
   public void removeIrisBiometricSubtypeInfo(int index) {

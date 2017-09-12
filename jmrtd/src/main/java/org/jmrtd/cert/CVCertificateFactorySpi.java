@@ -42,11 +42,11 @@ import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * Card verifiable certificate factory.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @see CardVerifiableCertificate
  */
 public class CVCertificateFactorySpi extends CertificateFactorySpi {
@@ -55,11 +55,12 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
 
   /**
    * Generates the certificate based on an input source.
-   * 
+   *
    * @param inputStream the input source
-   * 
+   *
    * @throws CertificateException on parsing errors
    */
+  @Override
   public Certificate engineGenerateCertificate(InputStream inputStream) throws CertificateException {
     try {
       /* Read certificate as byte[] */
@@ -89,22 +90,25 @@ public class CVCertificateFactorySpi extends CertificateFactorySpi {
 
   /**
    * Not implemented.
-   * 
+   *
    * @param inputStream input stream
    */
+  @Override
   public CRL engineGenerateCRL(InputStream inputStream) throws CRLException {
     return null; // TODO
   }
 
   /**
    * Not implemented.
-   * 
+   *
    * @param inputStream input stream
    */
+  @Override
   public Collection<? extends CRL> engineGenerateCRLs(InputStream inputStream) throws CRLException {
     return null; // TODO
   }
 
+  @Override
   public Collection<? extends Certificate> engineGenerateCertificates(InputStream in) throws CertificateException {
     return null; // TODO
   }

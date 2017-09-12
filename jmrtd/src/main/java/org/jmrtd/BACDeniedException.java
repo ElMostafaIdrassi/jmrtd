@@ -7,7 +7,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -26,11 +26,11 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * Exception for signaling failed BAC.
- * 
+ *
  * @author The JMRTD team
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.4.8
  */
 public class BACDeniedException extends CardServiceException {
@@ -41,7 +41,7 @@ public class BACDeniedException extends CardServiceException {
 
   /**
    * Creates an exception.
-   * 
+   *
    * @param msg the message
    * @param bacKey the BAC entry that was tried
    * @param sw status word or <code>-1</code>
@@ -53,7 +53,7 @@ public class BACDeniedException extends CardServiceException {
 
   /**
    * Gets the BAC entries that were tried before BAC failed
-   * 
+   *
    * @return a list
    */
   public BACKeySpec getBACKey() {

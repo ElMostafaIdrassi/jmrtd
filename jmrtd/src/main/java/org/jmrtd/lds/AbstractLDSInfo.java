@@ -29,8 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Base class for data structures that are contained in files in the LDS. 
- * 
+ * Base class for data structures that are contained in files in the LDS.
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$

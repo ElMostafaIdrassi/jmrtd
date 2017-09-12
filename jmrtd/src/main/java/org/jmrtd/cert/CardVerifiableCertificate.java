@@ -141,7 +141,7 @@ public class CardVerifiableCertificate extends Certificate {
    */
   public String getSigAlgName() {
     try {
-      OIDField oid = cvCertificate.getCertificateBody().getPublicKey().getObjectIdentifier();			
+      OIDField oid = cvCertificate.getCertificateBody().getPublicKey().getObjectIdentifier();
       String algorithm = AlgorithmUtil.getAlgorithmName(oid);
       return algorithm;
     } catch (NoSuchFieldException nsfe) {
@@ -173,6 +173,7 @@ public class CardVerifiableCertificate extends Certificate {
    *
    * @exception CertificateEncodingException if an encoding error occurs.
    */
+  @Override
   public byte[] getEncoded() throws CertificateEncodingException {
     try {
       return cvCertificate.getDEREncoded();
@@ -186,6 +187,7 @@ public class CardVerifiableCertificate extends Certificate {
    *
    * @return the public key.
    */
+  @Override
   public PublicKey getPublicKey() {
     try {
       org.ejbca.cvc.CVCPublicKey publicKey = cvCertificate.getCertificateBody().getPublicKey();
@@ -230,6 +232,7 @@ public class CardVerifiableCertificate extends Certificate {
    * @exception SignatureException on signature errors.
    * @exception CertificateException on encoding errors.
    */
+  @Override
   public void verify(PublicKey key) throws CertificateException,
   NoSuchAlgorithmException, InvalidKeyException,
   NoSuchProviderException, SignatureException {
@@ -266,6 +269,7 @@ public class CardVerifiableCertificate extends Certificate {
    * @throws SignatureException on signature errors.
    * @throws CertificateException on encoding errors.
    */
+  @Override
   public void verify(PublicKey key, String provider)
       throws CertificateException, NoSuchAlgorithmException,
       InvalidKeyException, NoSuchProviderException, SignatureException {

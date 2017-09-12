@@ -32,9 +32,9 @@ import java.util.List;
 /**
  * Abstract base class for several data structures used in the LDS
  * containing a list of elements.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  *
  * @param <R> the type of the elements
@@ -49,7 +49,7 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     if (this.subRecords == null) {
       this.subRecords = new ArrayList<R>();
     }
-    
+
     return new ArrayList<R>(this.subRecords);
   }
 
@@ -70,10 +70,11 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
   protected void remove(int index) {
     if (this.subRecords == null) {
       this.subRecords = new ArrayList<R>();
-    }    
+    }
     this.subRecords.remove(index);
   }
 
+  @Override
   public boolean equals(Object other) {
     if (other == null) {
       return false;
@@ -84,7 +85,7 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     if (!(other instanceof AbstractListInfo<?>)) {
       return false;
     }
-    
+
     try {
       @SuppressWarnings("unchecked")
       AbstractListInfo<R> otherRecord = (AbstractListInfo<R>)other;
@@ -94,7 +95,7 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
       if (subRecordCount != otherSubRecords.size()) {
         return false;
       }
-      
+
       for (int i = 0; i < subRecordCount; i++) {
         R subRecord = subRecords.get(i);
         R otherSubRecord = otherSubRecords.get(i);
@@ -112,6 +113,7 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     }
   }
 
+  @Override
   public int hashCode() {
     int result = 1234567891;
     List<R> subRecords = getSubRecords();
@@ -125,6 +127,7 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     return 7 * result + 11;
   }
 
+  @Override
   public abstract void writeObject(OutputStream outputStream) throws IOException;
 
   public abstract void readObject(InputStream inputStream) throws IOException;

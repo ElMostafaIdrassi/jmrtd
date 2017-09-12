@@ -183,7 +183,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     ssc++;
     try {
       byte[] data = responseAPDU.getData();
-      if (data == null || data.length <= 0) {  
+      if (data == null || data.length <= 0) {
         // no sense in unwrapping - card indicates some kind of error
         throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
         /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
@@ -196,10 +196,12 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     }
   }
 
+  @Override
   public SecretKey getEncryptionKey() {
     return ksEnc;
   }
 
+  @Override
   public SecretKey getMACKey() {
     return ksMac;
   }
@@ -232,7 +234,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     int lc = commandAPDU.getNc();
     int le = commandAPDU.getNe();
 
-    ByteArrayOutputStream bOut = new ByteArrayOutputStream();		
+    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
     byte[] maskedHeader = new byte[] { (byte)(commandAPDU.getCLA() | (byte)0x0C), (byte)commandAPDU.getINS(), (byte)commandAPDU.getP1(), (byte)commandAPDU.getP2() };
     byte[] paddedMaskedHeader = Util.pad(maskedHeader, 8);
@@ -355,7 +357,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * The SM Data Objects (see [ISO/IEC 7816-4]) MUST be used in the following order:
    *   - Command APDU: [DO‘85’ or DO‘87’] [DO‘97’] DO‘8E’.
    *   - Response APDU: [DO‘85’ or DO‘87’] [DO‘99’] DO‘8E’.
-   * 
+   *
    */
 
   /**
@@ -427,12 +429,12 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
   /**
    * Check the MAC.
-   * 
+   *
    * @param rapdu the bytes of the response APDU, including the {@code 0x8E} tag, the length of the MAC, the MAC itself, and the status word
    * @param cc1 the MAC sent by the other party
    * @param ssc the send sequence counter
    * @return whether the computed MAC is identical
-   * 
+   *
    * @throws GeneralSecurityException on security related error
    */
   private boolean checkMac(byte[] rapdu, byte[] cc1, long ssc) throws GeneralSecurityException {

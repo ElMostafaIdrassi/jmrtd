@@ -24,11 +24,11 @@ package org.jmrtd.cbeff;
 
 /**
  * CBEFF according to ISO 19785-1 (version 2.0) and NISTIR 6529-A (version 1.1).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public interface CBEFFInfo {

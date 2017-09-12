@@ -26,16 +26,16 @@ import java.io.Serializable;
 
 /**
  * Top level interface for all data structures in the LDS.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public interface LDSElement extends Serializable {
 
   /**
    * Gets the encoded contents of this LDS info.
-   * 
+   *
    * @return a byte array containing the encoding of this LDS info
    */
   byte[] getEncoded();

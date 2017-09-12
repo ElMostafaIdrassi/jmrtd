@@ -26,19 +26,19 @@ import java.io.Serializable;
 
 /**
  * Biometric data block.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public interface BiometricDataBlock extends Serializable {
 
   /**
    * Gets the standard biometric header of this biometric data block
-   * 
+   *
    * @return the standard biometric header
    */
-  public StandardBiometricHeader getStandardBiometricHeader();	
+  public StandardBiometricHeader getStandardBiometricHeader();
 }

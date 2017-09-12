@@ -31,9 +31,9 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * The Active Authentication protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  *
  * @since 0.5.6
@@ -68,7 +68,7 @@ public class AAProtocol {
       if (challenge == null || challenge.length != 8) {
         throw new IllegalArgumentException("AA failed: bad challenge");
       }
-      byte[] response = service.sendInternalAuthenticate(wrapper, challenge);     
+      byte[] response = service.sendInternalAuthenticate(wrapper, challenge);
       return new AAResult(publicKey, digestAlgorithm, signatureAlgorithm, challenge, response);
     } catch (IllegalArgumentException iae) {
       throw new CardServiceException("Exception", iae);

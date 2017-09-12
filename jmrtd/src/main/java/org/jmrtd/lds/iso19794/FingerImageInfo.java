@@ -45,9 +45,9 @@ import org.jmrtd.lds.AbstractImageInfo;
  * @version $Revision$
  */
 public class FingerImageInfo extends AbstractImageInfo {
-  
+
   private static final long serialVersionUID = -6625447389275461027L;
-  
+
   /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
   public static final int
   /* NOTE: in comment: max image area in sq mm, sq in, with in mm, in, length in mm, in */
@@ -65,7 +65,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   POSITION_PLAIN_RIGHT_FOUR_FINGERS = 13, /* 6800 83.8 3.3 76.2 3.0 */
   POSITION_PLAIN_LEFT_FOUR_FINGERS = 14, /* 6800 83.8 3.3 76.2 3.0 */
   POSITION_PLAIN_THUMBS = 15; /* 4800 50.8 2.0 76.2 3.0 */
-  
+
   /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
   public static final int
   /* NOTE: in comment: max image area in sq mm, sq in, with in mm, in, length in mm, in */
@@ -86,7 +86,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   POSITION_LEFT_INTERDIGITAL = 34, /* 106.45 13.97 5.5 7.62 3.0 */
   POSITION_LEFT_THENAR = 35, /* 77.42 7.62 3.0 10.16 4.0 */
   POSITION_LEFT_HYPOTHENAR = 36; /* 106.45 7.62 3.0 13.97 5.5 */
-  
+
   /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
   public static final int
   IMPRESSION_TYPE_LIVE_SCAN_PLAIN = 0,
@@ -96,18 +96,18 @@ public class FingerImageInfo extends AbstractImageInfo {
   IMPRESSION_TYPE_LATENT = 7,
   IMPRESSION_TYPE_SWIPE = 8,
   IMPRESSION_TYPE_LIVE_SCAN_CONTACTLESS = 9;
-  
+
   private static final byte[] FORMAT_TYPE_VALUE = { 0x00, 0x09 };
-  
+
   private long recordLength;
   private int position;
   private int viewCount;
   private int viewNumber;
   private int quality;
   private int impressionType;
-  
+
   private int compressionAlgorithm;
-  
+
   /**
    * Constructs a finger image info.
    *
@@ -142,7 +142,7 @@ public class FingerImageInfo extends AbstractImageInfo {
     this.compressionAlgorithm = compressionAlgorithm;
     this.recordLength = imageLength + 14L;
   }
-  
+
   /**
    * Constructs a new finger information record.
    *
@@ -157,7 +157,7 @@ public class FingerImageInfo extends AbstractImageInfo {
     this.compressionAlgorithm = compressionAlgorithm;
     readObject(inputStream);
   }
-  
+
   /**
    * Gets the quality of the overall scanned finger/palm image as a number
    * between 0 and 100. As specified in 7.2.5 of ISO 19794-4.
@@ -167,7 +167,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getQuality() {
     return quality;
   }
-  
+
   /**
    * Gets the finger/palm position. As specified in Section 7.2.2 of ISO 19794-4.
    *
@@ -176,7 +176,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getPosition() {
     return position;
   }
-  
+
   /**
    * Gets the compression algorithm. One of
    * {@link FingerInfo#COMPRESSION_UNCOMPRESSED_BIT_PACKED},
@@ -192,7 +192,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getCompressionAlgorithm() {
     return compressionAlgorithm;
   }
-  
+
   /**
    * Gets the total number of specific views available for this finger.
    * As specified in Section 7.2.3 of ISO 19794-4.
@@ -202,7 +202,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getViewCount() {
     return viewCount;
   }
-  
+
   /**
    * Gets the specific image view number associated with the finger.
    * As specified in Section 7.2.4 of ISO 19794-4.
@@ -212,7 +212,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getViewNumber() {
     return viewNumber;
   }
-  
+
   /**
    * Gets the impression type. As specified in Section 7.2.6 of ISO 19794-4.
    *
@@ -221,10 +221,11 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getImpressionType() {
     return impressionType;
   }
-  
+
+  @Override
   protected void readObject(InputStream inputStream) throws IOException {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
-    
+
     /* Finger image header (14), see Table 4, 7.2 in Annex F. */
     /* NOTE: sometimes called "finger header", "finger record header" */
     this.recordLength = dataIn.readInt() & 0xFFFFFFFFL;
@@ -236,12 +237,12 @@ public class FingerImageInfo extends AbstractImageInfo {
     setWidth(dataIn.readUnsignedShort());
     setHeight(dataIn.readUnsignedShort());
     /* int RFU = */ dataIn.readUnsignedByte(); /* Should be 0x0000 */
-    
+
     long imageLength = recordLength - 14;
-    
+
     readImage(inputStream, imageLength);
   }
-  
+
   /**
    * Writes the biometric data to <code>out</code>.
    *
@@ -251,17 +252,18 @@ public class FingerImageInfo extends AbstractImageInfo {
    *
    * @throws IOException if writing to out fails
    */
-  protected void writeObject(OutputStream out) throws IOException {		
+  @Override
+  protected void writeObject(OutputStream out) throws IOException {
     ByteArrayOutputStream imageOut = new ByteArrayOutputStream();
     writeImage(imageOut);
     imageOut.flush();
     byte[] imageBytes = imageOut.toByteArray();
     imageOut.close();
-    
+
     long fingerDataBlockLength = imageBytes.length + 14L;
-    
+
     DataOutputStream dataOut = out instanceof DataOutputStream ? (DataOutputStream)out : new DataOutputStream(out);
-    
+
     /* Finger Information (14) */
     dataOut.writeInt((int)(fingerDataBlockLength & 0xFFFFFFFFL));
     dataOut.writeByte(position);
@@ -272,21 +274,22 @@ public class FingerImageInfo extends AbstractImageInfo {
     dataOut.writeShort(getWidth());
     dataOut.writeShort(getHeight());
     dataOut.writeByte(0x00); /* RFU */
-    
+
     dataOut.write(imageBytes);
     dataOut.flush();
   }
-  
+
   /**
    * Gets the record length.
    *
    * @return the record length
    */
+  @Override
   public long getRecordLength() {
     /* Should be equal to (getImageLength() + 14) */
     return recordLength;
   }
-  
+
   /**
    * Gets the format type.
    *
@@ -295,7 +298,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public byte[] getFormatType() {
     return FORMAT_TYPE_VALUE;
   }
-  
+
   /**
    * Gets the biometric sub-type.
    *
@@ -304,7 +307,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   public int getBiometricSubtype() {
     return toBiometricSubtype(position);
   }
-  
+
   /**
    * Generates a textual representation of this object.
    *
@@ -312,6 +315,7 @@ public class FingerImageInfo extends AbstractImageInfo {
    *
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return new StringBuilder()
         .append("FingerImageInfo [")
@@ -325,7 +329,7 @@ public class FingerImageInfo extends AbstractImageInfo {
         .append("]")
         .toString();
   }
-  
+
   private static String positionToString(int position) {
     switch (position) {
       case POSITION_UNKNOWN_FINGER: return "Unknown finger";
@@ -362,7 +366,7 @@ public class FingerImageInfo extends AbstractImageInfo {
       default: return null;
     }
   }
-  
+
   private static String impressionTypeToString(int impressionType) {
     switch (impressionType) {
       case IMPRESSION_TYPE_LIVE_SCAN_PLAIN: return "Live scan plain";
@@ -375,7 +379,7 @@ public class FingerImageInfo extends AbstractImageInfo {
       default: return null;
     }
   }
-  
+
   /**
    * Converts from ISO (FRH) coding to ICAO/CBEFF (BHT) coding.
    *

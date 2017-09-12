@@ -24,22 +24,22 @@ package org.jmrtd.lds;
 
 /**
  * LDS element at file level.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
 public interface LDSFile extends LDSElement {
 
-  
+
 /* NOTE: In EAC 1.11 documents there is also the CVCA file that has no tag. */
 
   /** ICAO tag for document index (COM). */
   public static final int EF_COM_TAG = 0x60;
-  
+
   /** ICAO data group tag for DG1. */
   public static final int EF_DG1_TAG = 0x61;
-  
+
   /** ICAO data group tag for DG2. */
   public static final int EF_DG2_TAG = 0x75;
 
@@ -84,16 +84,16 @@ public interface LDSFile extends LDSElement {
 
   /** ICAO data group tag for DG16. */
   public static final int EF_DG16_TAG = 0x70;
-  
+
   /** ICAO tag for document security index (SOd). */
   public static final int EF_SOD_TAG = 0x77;
 
   /**
    * Returns the length of this file.
-   * 
+   *
    * @return the length of this file
    */
-  /* 
+  /*
    * FIXME: Note that this is not necessarily the total length of the file:
    * For TLV files this gives the length of the value. -- MO
    */

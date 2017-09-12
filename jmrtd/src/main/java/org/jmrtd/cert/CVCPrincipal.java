@@ -30,7 +30,7 @@ import net.sf.scuba.data.Country;
 /**
  * Card verifiable certificate principal.
  * This just wraps the EJBCA implementation.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -53,7 +53,7 @@ public class CVCPrincipal implements Principal, Serializable {
       throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found null");
     }
     if (name.length() < 2 + 5 || name.length() > 2 + 9 + 5) {
-      throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found \"" + name + "\""); 
+      throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found \"" + name + "\"");
     }
     country = Country.getInstance(name.substring(0, 2).toUpperCase());
     mnemonic = name.substring(2, name.length() - 5);
@@ -62,7 +62,7 @@ public class CVCPrincipal implements Principal, Serializable {
 
   /**
    * Constructs a principal.
-   * 
+   *
    * @param country the country
    * @param mnemonic the mnemonic
    * @param seqNumber the sequence number
@@ -83,7 +83,7 @@ public class CVCPrincipal implements Principal, Serializable {
    * Consists of the concatenation of
    * country code (length 2), mnemonic (length &lt; 9) and
    * sequence number (length 5).
-   * 
+   *
    * @return the name of the principal
    */
   public String getName() {
@@ -92,7 +92,7 @@ public class CVCPrincipal implements Principal, Serializable {
 
   /**
    * Gets a textual representation of this principal.
-   * 
+   *
    * @return a textual representation of this principal
    */
   @Override
@@ -129,9 +129,9 @@ public class CVCPrincipal implements Principal, Serializable {
 
   /**
    * Tests for equality with respect to another object.
-   * 
+   *
    * @param otherObj another object
-   * 
+   *
    * @return whether this principal equals the other object
    */
   @Override
@@ -145,7 +145,7 @@ public class CVCPrincipal implements Principal, Serializable {
     if (!otherObj.getClass().equals(this.getClass())) {
       return false;
     }
-    
+
     CVCPrincipal otherPrincipal = (CVCPrincipal)otherObj;
     return otherPrincipal.country.equals(this.country)
         && otherPrincipal.mnemonic.equals(this.mnemonic)
@@ -154,7 +154,7 @@ public class CVCPrincipal implements Principal, Serializable {
 
   /**
    * Gets a hash code of this object.
-   * 
+   *
    * @return the hash code
    */
   @Override

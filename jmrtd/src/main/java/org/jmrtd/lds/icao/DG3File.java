@@ -43,9 +43,9 @@ import org.jmrtd.lds.iso19794.FingerInfo;
 /**
  * File structure for the EF_DG3 file.
  * Partially specified in ISO/IEC FCD 19794-4 aka Annex F.
- * 
+ *
  * @author The JMRD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class DG3File extends CBEFFDataGroup<FingerInfo> {
@@ -70,7 +70,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
 
   /**
    * Creates a new file with the specified records.
-   * 
+   *
    * @param fingerInfos records
    */
   public DG3File(List<FingerInfo> fingerInfos) {
@@ -79,7 +79,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
 
   /**
    * Creates a new file with the specified records.
-   * 
+   *
    * @param fingerInfos records
    * @param shouldAddRandomDataIfEmpty whether to add random data when there are no records to encode
    */
@@ -92,7 +92,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
    * Creates a new file based on an input stream.
    *
    * @param inputStream an input stream
-   * 
+   *
    * @throws IOException on error reading from input stream
    */
   public DG3File(InputStream inputStream) throws IOException {
@@ -136,25 +136,26 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
 
   /**
    * Gets a textual representation of this file.
-   * 
+   *
    * @return a textual representation of this file
    */
+  @Override
   public String toString() {
     return "DG3File [" + super.toString() + "]";
   }
 
   /**
    * Gets the finger infos embedded in this file.
-   * 
+   *
    * @return finger infos
    */
   public List<FingerInfo> getFingerInfos() {
-    return getSubRecords();  
+    return getSubRecords();
   }
 
   /**
    * Adds a finger info to this file.
-   * 
+   *
    * @param fingerInfo the finger info to add
    */
   public void addFingerInfo(FingerInfo fingerInfo) {
@@ -163,7 +164,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
 
   /**
    * Removes a finger info from this file.
-   * 
+   *
    * @param index the index of the finger info to remove
    */
   public void removeFingerInfo(int index) {

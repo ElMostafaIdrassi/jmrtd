@@ -28,11 +28,11 @@ import java.util.List;
 /**
  * Complex (nested) CBEFF BIR.
  * Specified in ISO 19785-1 (version 2.0) and NISTIR 6529-A (version 1.1).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.4.7
  */
 public class ComplexCBEFFInfo implements CBEFFInfo {
@@ -42,10 +42,10 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
   public ComplexCBEFFInfo() {
     this.subRecords = new ArrayList<CBEFFInfo>();
   }
-  
+
   /**
    * Gets the records inside this complex CBEFF info.
-   * 
+   *
    * @return a list of CBEFF infos
    */
   public List<CBEFFInfo> getSubRecords() {
@@ -54,7 +54,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
 
   /**
    * Adds a record to this complex CBEFF info.
-   * 
+   *
    * @param subRecord the CBEFF info to add
    */
   public void add(CBEFFInfo subRecord) {
@@ -63,7 +63,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
 
   /**
    * Adds all records in a list to this complex CBEFF info.
-   * 
+   *
    * @param subRecords a list of CBEFF infos
    */
   public void addAll(List<CBEFFInfo> subRecords) {
@@ -72,7 +72,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
 
   /**
    * Removes a record in this complex CBEFF info.
-   * 
+   *
    * @param index the index of the CBEFF info to remove
    */
   public void remove(int index) {
@@ -81,9 +81,9 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
 
   /**
    * Tests whether the parameter equals this complex CBEFF info.
-   * 
+   *
    * @param other some other object
-   * 
+   *
    * @return whether the other object is equal to this complex CBEFF info
    */
   @Override
@@ -104,7 +104,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
 
   /**
    * Computes a hash code.
-   * 
+   *
    * @return the hash code for this complex CBEFF info
    */
   @Override

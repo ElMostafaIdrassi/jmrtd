@@ -23,15 +23,15 @@
 package org.jmrtd.cbeff;
 
 /**
- * Simple CBEFF BIR. 
+ * Simple CBEFF BIR.
  * Specified in ISO 19785-1 (version 2.0) and NISTIR 6529-A (version 1.1).
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @param <B> the embedded BDB
- * 
+ *
  * @since 0.4.7
  */
 public class SimpleCBEFFInfo<B extends BiometricDataBlock> implements CBEFFInfo {
@@ -40,7 +40,7 @@ public class SimpleCBEFFInfo<B extends BiometricDataBlock> implements CBEFFInfo 
 
   /**
    * Constructs a simple CBEFF info from the given BDB.
-   * 
+   *
    * @param bdb a biometric data block
    */
   public SimpleCBEFFInfo(B bdb) {
@@ -49,7 +49,7 @@ public class SimpleCBEFFInfo<B extends BiometricDataBlock> implements CBEFFInfo 
 
   /**
    * Gets the biometric data block from this simple CBEFF info.
-   * 
+   *
    * @return a biometric data block
    */
   public B getBiometricDataBlock() {
