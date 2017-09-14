@@ -39,7 +39,7 @@ public class ICAOCountry extends Country {
 
   private static final long serialVersionUID = 2942942609311086138L;
 
-  private static final Logger LOGGER = Logger.getLogger("nl.innovalor");
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   public static final ICAOCountry DE = new ICAOCountry("DE", "D<<", "Germany", "German");
   public static final ICAOCountry GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen");

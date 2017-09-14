@@ -300,12 +300,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
 
-    CommandAPDU wrappedCommandAPDU = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
+    return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
 
     /* FIXME: If extended length APDUs are supported (they must for EAC, that 256 should be 65536). See bug #26 in SF bugtracker. -- MO */
-    //		wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
-
-    return wrappedCommandAPDU;
+    // new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
   }
 
   /**
@@ -393,8 +391,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     byte[] ciphertext = new byte[length];
     inputStream.readFully(ciphertext);
     byte[] paddedData = cipher.doFinal(ciphertext);
-    byte[] data = Util.unpad(paddedData);
-    return data;
+    return Util.unpad(paddedData);
   }
 
   /**

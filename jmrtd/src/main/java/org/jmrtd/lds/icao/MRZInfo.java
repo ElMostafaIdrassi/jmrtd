@@ -772,9 +772,12 @@ public class MRZInfo extends AbstractLDSInfo {
 
   private String genderToString() {
     switch (gender) {
-      case MALE: return "M";
-      case FEMALE: return "F";
-      default: return "<";
+      case MALE:
+        return "M";
+      case FEMALE:
+        return "F";
+      default:
+        return "<";
     }
   }
 
@@ -812,26 +815,25 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @throws IOException if something goes wrong
    */
-  private String readCountry(DataInputStream in) throws IOException {
-    String dataString = readString(in, 3);
-    return dataString;
+  private String readCountry(DataInputStream inputStream) throws IOException {
+    return readString(inputStream, 3);
   }
 
   /**
    * Reads the 1 letter gender information.
    *
-   * @param in input source
+   * @param inputStream input source
    *
    * @return the gender of the passport holder
    *
    * @throws IOException if something goes wrong
    */
-  private Gender readGender(DataInputStream in) throws IOException {
-    String genderStr = readString(in, 1);
-    if (genderStr.equalsIgnoreCase("M")) {
+  private Gender readGender(DataInputStream inputStream) throws IOException {
+    String genderStr = readString(inputStream, 1);
+    if ("M".equalsIgnoreCase(genderStr)) {
       return Gender.MALE;
     }
-    if (genderStr.equalsIgnoreCase("F")) {
+    if ("F".equalsIgnoreCase(genderStr)) {
       return Gender.FEMALE;
     }
     return Gender.UNKNOWN;
@@ -919,6 +921,7 @@ public class MRZInfo extends AbstractLDSInfo {
     if (str2 == null) {
       str2 = "";
     }
+
     int length = Math.max(str1.length(), str2.length());
     return mrzFormat(str1, length).equals(mrzFormat(str2, length));
   }

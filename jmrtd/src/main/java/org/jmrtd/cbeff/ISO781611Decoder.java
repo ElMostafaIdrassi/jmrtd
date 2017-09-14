@@ -246,7 +246,6 @@ public class ISO781611Decoder implements ISO781611 {
     }
     // this.biometricDataBlockTag = bioDataBlockTag;
     int length = tlvIn.readLength();
-    BiometricDataBlock bdb = bdbDecoder.decode(inputStream, sbh, index, length);
-    return bdb;
+    return bdbDecoder.decode(inputStream, sbh, index, length);
   }
 }

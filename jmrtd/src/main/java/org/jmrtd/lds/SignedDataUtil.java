@@ -193,15 +193,12 @@ import org.jmrtd.Util;
   public static ASN1Primitive getContent(SignedData signedData) {
     ContentInfo encapContentInfo = signedData.getEncapContentInfo();
 
-    String contentType = encapContentInfo.getContentType().getId();
-
     DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();
 
     ASN1InputStream inputStream = null;
     try {
       inputStream = new ASN1InputStream(new ByteArrayInputStream(eContent.getOctets()));
-      ASN1Primitive firstObject = inputStream.readObject();
-      return firstObject;
+      return inputStream.readObject();
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Unexpected exception", ioe);
     } finally {
@@ -209,7 +206,7 @@ import org.jmrtd.Util;
         try {
           inputStream.close();
         } catch (IOException ioe) {
-          LOGGER.log(Level.WARNING, "Exception closing input stream");
+          LOGGER.log(Level.FINE, "Exception closing input stream", ioe);
           /* At least we tried... */
         }
       }
@@ -387,8 +384,7 @@ import org.jmrtd.Util;
      */
     try {
       CertificateFactory factory = CertificateFactory.getInstance("X.509");
-      X509Certificate cert = (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certSpec));
-      return cert;
+      return (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certSpec));
     } catch (Exception e) {
       /* NOTE: Reconstructing using preferred provider didn't work?!?! */
       return certObject;
@@ -450,13 +446,16 @@ import org.jmrtd.Util;
       byte[] certSpec = cert.getEncoded();
       ASN1InputStream asn1In = new ASN1InputStream(certSpec);
       try {
-        ASN1Sequence certSeq = (ASN1Sequence)asn1In.readObject();
-        return certSeq;
+        return (ASN1Sequence)asn1In.readObject();
       } finally {
-        asn1In.close();
+        try {
+          asn1In.close();
+        } catch (IOException ioe) {
+          LOGGER.log(Level.FINE, "Error closing stream", ioe);
+        }
       }
     } catch (IOException ioe) {
-      throw new CertificateException("Could not construct certificate byte stream");
+      throw new CertificateException("Could not construct certificate byte stream", ioe);
     }
   }
 

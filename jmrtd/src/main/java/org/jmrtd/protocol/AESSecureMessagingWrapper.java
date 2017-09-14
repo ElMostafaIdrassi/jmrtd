@@ -241,8 +241,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
 
-    CommandAPDU wc = new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
-    return wc;
+    return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
   }
 
   /**
@@ -347,8 +346,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     byte[] ciphertext = new byte[length];
     inputStream.readFully(ciphertext);
     byte[] paddedData = cipher.doFinal(ciphertext);
-    byte[] data = Util.unpad(paddedData);
-    return data;
+    return Util.unpad(paddedData);
   }
 
   /**
@@ -395,8 +393,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     byte[] sscBytes = getSSCAsBytes(ssc);
     byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
-    IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
-    return ivParams;
+    return new IvParameterSpec(encryptedSSC);
   }
 
   /**
@@ -408,8 +405,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    */
   private IvParameterSpec getIV(byte[] sscBytes) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
-    IvParameterSpec ivParams = new IvParameterSpec(encryptedSSC);
-    return ivParams;
+    return new IvParameterSpec(encryptedSSC);
   }
 
   /**

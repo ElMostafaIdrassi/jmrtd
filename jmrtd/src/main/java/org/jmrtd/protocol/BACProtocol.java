@@ -146,9 +146,7 @@ public class BACProtocol {
 
     documentNumber = fixDocumentNumber(documentNumber);
 
-    byte[] keySeed = computeKeySeedForBAC(documentNumber, dateOfBirth, dateOfExpiry);
-
-    return keySeed;
+    return computeKeySeedForBAC(documentNumber, dateOfBirth, dateOfExpiry);
   }
 
   public static long computeSendSequenceCounter(byte[] rndICC, byte[] rndIFD) {

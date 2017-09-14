@@ -56,7 +56,8 @@ public abstract class AbstractImageInfo implements ImageInfo {
   int imagePositionInInputStream;
   int imageLength;
 
-  private int width, height;
+  private int width;
+  private int height;
 
   /* PACKAGE ONLY VISIBLE CONSTRUCTORS BELOW */
 
@@ -237,8 +238,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   public InputStream getImageInputStream() {
     /* DEBUG: START */
     if (splittableInputStream != null) {
-      InputStream imageInputStream = splittableInputStream.getInputStream(imagePositionInInputStream);
-      return imageInputStream;
+      return splittableInputStream.getInputStream(imagePositionInInputStream);
       /* DEBUG: END */
     } else if (imageBytes != null) {
       return new ByteArrayInputStream(imageBytes);
@@ -282,23 +282,23 @@ public abstract class AbstractImageInfo implements ImageInfo {
     outputStream.write(getImageBytes());
   }
 
-  final protected void setMimeType(String mimeType) {
+  protected final void setMimeType(String mimeType) {
     this.mimeType = mimeType;
   }
 
-  final protected void setType(int type) {
+  protected final void setType(int type) {
     this.type = type;
   }
 
-  final protected void setWidth(int width) {
+  protected final void setWidth(int width) {
     this.width = width;
   }
 
-  final protected void setHeight(int height) {
+  protected final void setHeight(int height) {
     this.height = height;
   }
 
-  final protected void setImageBytes(byte[] imageBytes) {
+  protected final void setImageBytes(byte[] imageBytes) {
     try {
       readImage(new ByteArrayInputStream(imageBytes), imageBytes.length);
     } catch (IOException e) {

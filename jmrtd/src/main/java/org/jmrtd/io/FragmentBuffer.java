@@ -227,7 +227,8 @@ public class FragmentBuffer implements Serializable {
    * @return the fragment that has not yet been buffered
    */
   public synchronized Fragment getSmallestUnbufferedFragment(int offset, int length) {
-    int thisOffset = offset, thisLength = length;
+    int thisOffset = offset;
+    int thisLength = length;
     for (Fragment other: fragments) {
       /* On partial overlap we change this fragment, removing sections already buffered. */
       if (other.getOffset() <= thisOffset && thisOffset + thisLength <= other.getOffset() + other.getLength()) {

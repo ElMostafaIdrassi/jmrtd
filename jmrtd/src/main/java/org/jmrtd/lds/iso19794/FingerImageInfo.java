@@ -48,23 +48,48 @@ public class FingerImageInfo extends AbstractImageInfo {
 
   private static final long serialVersionUID = -6625447389275461027L;
 
-  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
-  public static final int
   /* NOTE: in comment: max image area in sq mm, sq in, with in mm, in, length in mm, in */
-  POSITION_UNKNOWN_FINGER = 0, /* 1745 40.6 1.6 38.1 1.5 */
-  POSITION_RIGHT_THUMB = 1, /* 1745 40.6 1.6 38.1 1.5 */
-  POSITION_RIGHT_INDEX_FINGER = 2, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_RIGHT_MIDDLE_FINGER = 3, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_RIGHT_RING_FINGER = 4, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_RIGHT_LITTLE_FINGER = 5, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_LEFT_THUMB = 6, /* 1745 40.6 1.6 38.1 1.5 */
-  POSITION_LEFT_INDEX_FINGER = 7, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_LEFT_MIDDLE_FINGER = 8, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_LEFT_RING_FINGER = 9, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_LEFT_LITTLE_FINGER = 10, /* 1640 40.6 1.6 38.1 1.5 */
-  POSITION_PLAIN_RIGHT_FOUR_FINGERS = 13, /* 6800 83.8 3.3 76.2 3.0 */
-  POSITION_PLAIN_LEFT_FOUR_FINGERS = 14, /* 6800 83.8 3.3 76.2 3.0 */
-  POSITION_PLAIN_THUMBS = 15; /* 4800 50.8 2.0 76.2 3.0 */
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_UNKNOWN_FINGER = 0; /* 1745 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_THUMB = 1; /* 1745 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_INDEX_FINGER = 2; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_MIDDLE_FINGER = 3; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_RING_FINGER = 4; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_LITTLE_FINGER = 5; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_THUMB = 6; /* 1745 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_INDEX_FINGER = 7; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_MIDDLE_FINGER = 8; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_RING_FINGER = 9; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_LITTLE_FINGER = 10; /* 1640 40.6 1.6 38.1 1.5 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_PLAIN_RIGHT_FOUR_FINGERS = 13; /* 6800 83.8 3.3 76.2 3.0 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_PLAIN_LEFT_FOUR_FINGERS = 14; /* 6800 83.8 3.3 76.2 3.0 */
+
+  /** Finger code, according to Table 5, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_PLAIN_THUMBS = 15; /* 4800 50.8 2.0 76.2 3.0 */
 
   /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
   public static final int

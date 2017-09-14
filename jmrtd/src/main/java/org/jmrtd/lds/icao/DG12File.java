@@ -497,7 +497,7 @@ public class DG12File extends DataGroup {
         .append("DG12File [")
         .append(issuingAuthority == null ? "" : issuingAuthority).append(", ")
         .append(dateOfIssue == null ? "" : dateOfIssue).append(", ")
-        .append(namesOfOtherPersons == null || namesOfOtherPersons.size() == 0 ? "" : namesOfOtherPersons).append(", ")
+        .append(namesOfOtherPersons == null || namesOfOtherPersons.isEmpty() ? "" : namesOfOtherPersons).append(", ")
         .append(endorsementsAndObservations == null ? "" : endorsementsAndObservations).append(", ")
         .append(taxOrExitRequirements == null ? "" : taxOrExitRequirements).append(", ")
         .append(imageOfFront == null ? "" : "image (" + imageOfFront.length + ")").append(", ")

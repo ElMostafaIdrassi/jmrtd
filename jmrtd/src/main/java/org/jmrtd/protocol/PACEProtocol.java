@@ -531,8 +531,7 @@ public class PACEProtocol {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(ephemeralParams);
-      KeyPair kp = keyPairGenerator.generateKeyPair();
-      return kp;
+      return keyPairGenerator.generateKeyPair();
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error during generation of PCD key pair");
     }

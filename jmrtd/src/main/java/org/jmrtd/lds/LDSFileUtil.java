@@ -25,6 +25,8 @@ package org.jmrtd.lds;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.lds.icao.COMFile;
@@ -49,6 +51,8 @@ import org.jmrtd.lds.icao.DG7File;
  */
 public class LDSFileUtil {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   /**
    * Factory method for creating LDS files for a given input stream.
    *
@@ -106,6 +110,7 @@ public class LDSFileUtil {
           /* Just try, will read 36 bytes at most, and we can reset bufferedIn. */
           return new CVCAFile(fid, bufferedIn);
         } catch (Exception e) {
+          LOGGER.log(Level.WARNING, "Unknown file " + Integer.toHexString(fid), e);
           bufferedIn.reset();
           throw new NumberFormatException("Unknown file " + Integer.toHexString(fid));
         }

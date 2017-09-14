@@ -545,11 +545,7 @@ public class PACEResult implements Serializable {
       }
 
       PACEIMMappingResult other = (PACEIMMappingResult) obj;
-      if (!Arrays.equals(pcdNonce, other.pcdNonce)) {
-        return false;
-      }
-
-      return true;
+      return Arrays.equals(pcdNonce, other.pcdNonce);
     }
   }
 }

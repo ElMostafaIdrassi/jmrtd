@@ -142,9 +142,9 @@ public class CardVerifiableCertificate extends Certificate {
   public String getSigAlgName() {
     try {
       OIDField oid = cvCertificate.getCertificateBody().getPublicKey().getObjectIdentifier();
-      String algorithm = AlgorithmUtil.getAlgorithmName(oid);
-      return algorithm;
+      return AlgorithmUtil.getAlgorithmName(oid);
     } catch (NoSuchFieldException nsfe) {
+      LOGGER.log(Level.WARNING, "No such field", nsfe);
       return null;
     }
   }
@@ -159,6 +159,7 @@ public class CardVerifiableCertificate extends Certificate {
       OIDField oid = cvCertificate.getCertificateBody().getPublicKey().getObjectIdentifier();
       return oid.getAsText();
     } catch (NoSuchFieldException nsfe) {
+      LOGGER.log(Level.WARNING, "No such field", nsfe);
       return null;
     }
   }
@@ -191,7 +192,7 @@ public class CardVerifiableCertificate extends Certificate {
   public PublicKey getPublicKey() {
     try {
       org.ejbca.cvc.CVCPublicKey publicKey = cvCertificate.getCertificateBody().getPublicKey();
-      if (publicKey.getAlgorithm().equals("RSA")) { // TODO: something similar for EC / ECDSA?
+      if ("RSA".equals(publicKey.getAlgorithm())) { // TODO: something similar for EC / ECDSA?
         RSAPublicKey rsaPublicKey = (RSAPublicKey)publicKey;
         try {
           return rsaKeyFactory.generatePublic(new RSAPublicKeySpec(rsaPublicKey.getModulus(), rsaPublicKey.getPublicExponent()));
@@ -204,7 +205,7 @@ public class CardVerifiableCertificate extends Certificate {
       /* It's ECDSA... */
       return publicKey;
     } catch (NoSuchFieldException nsfe) {
-      LOGGER.log(Level.WARNING, "Exception", nsfe);
+      LOGGER.log(Level.WARNING, "No such field", nsfe);
       return null;
     }
   }
@@ -252,7 +253,6 @@ public class CardVerifiableCertificate extends Certificate {
       throw new NoSuchAlgorithmException("Tried all security providers: None was able to provide this signature algorithm.");
     }
   }
-
 
   /**
    * Verifies that this certificate was signed using the
