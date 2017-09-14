@@ -202,7 +202,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       bOut.write(TLVUtil.getLengthAsBytes(ciphertext.length + (hasDO85 ? 0 : 1)));
       if (!hasDO85) {
         bOut.write(0x01);
-      };
+      }
       bOut.write(ciphertext);
       do8587 = bOut.toByteArray();
     }
@@ -282,6 +282,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
             case (byte) 0x8E:
               cc = readDO8E(inputStream);
               finished = true;
+              break;
+            default:
+              LOGGER.warning("Unexpected tag " + Integer.toHexString(tag));
               break;
           }
         }

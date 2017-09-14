@@ -87,7 +87,7 @@ public class PACEInfo extends SecurityInfo {
 
     /** Chip Authentication Mapping. */
     CAM
-  };
+  }
 
   /** Standardized domain parameters. Based on Table 6. */
   public static final int PARAM_ID_GFP_1024_160 = 0;

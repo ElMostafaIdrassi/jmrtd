@@ -154,7 +154,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     GREEN,
     BLUE,
     UNKNOWN
-  };
+  }
 
   public static final int HAIR_COLOR_UNSPECIFIED = 0x00;
   public static final int HAIR_COLOR_BALD = 0x01;
@@ -181,7 +181,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     RIGHT_EYE_PATCH,
     DARK_GLASSES,
     DISTORTING_MEDICAL_CONDITION
-  };
+  }
 
   private static final int FEATURE_FEATURES_ARE_SPECIFIED_FLAG = 0x000001;
   private static final int FEATURE_GLASSES_FLAG = 0x000002;
@@ -205,7 +205,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     EYES_LOOKING_AWAY,
     SQUINTING,
     FROWNING
-  };
+  }
 
   public static final short EXPRESSION_UNSPECIFIED = 0x0000;
   public static final short EXPRESSION_NEUTRAL = 0x0001;
@@ -221,7 +221,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     BASIC,
     FULL_FRONTAL,
     TOKEN_FRONTAL
-  };
+  }
 
   public static final int FACE_IMAGE_TYPE_BASIC = 0x00;
   public static final int FACE_IMAGE_TYPE_FULL_FRONTAL = 0x01;
@@ -231,7 +231,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   public enum ImageDataType {
     TYPE_JPEG,
     TYPE_JPEG2000
-  };
+  }
 
   public static final int IMAGE_DATA_TYPE_JPEG = 0x00;
   public static final int IMAGE_DATA_TYPE_JPEG2000 = 0x01;
@@ -243,7 +243,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     YUV422,
     GRAY8,
     OTHER
-  };
+  }
 
   public static final int IMAGE_COLOR_SPACE_UNSPECIFIED = 0x00;
   public static final int IMAGE_COLOR_SPACE_RGB24 = 0x01;
@@ -253,7 +253,14 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /** Source type based on Section 5.7.6 of ISO 19794-5. */
   public enum SourceType {
-    UNSPECIFIED, STATIC_PHOTO_UNKNOWN_SOURCE, STATIC_PHOTO_DIGITAL_CAM, STATIC_PHOTO_SCANNER, VIDEO_FRAME_UNKNOWN_SOURCE, VIDEO_FRAME_ANALOG_CAM, VIDEO_FRAME_DIGITAL_CAM, UNKNOWN
+    UNSPECIFIED,
+    STATIC_PHOTO_UNKNOWN_SOURCE,
+    STATIC_PHOTO_DIGITAL_CAM,
+    STATIC_PHOTO_SCANNER,
+    VIDEO_FRAME_UNKNOWN_SOURCE,
+    VIDEO_FRAME_ANALOG_CAM,
+    VIDEO_FRAME_DIGITAL_CAM,
+    UNKNOWN
   }
 
   public static final int SOURCE_TYPE_UNSPECIFIED = 0x00;

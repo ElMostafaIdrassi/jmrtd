@@ -386,14 +386,14 @@ import org.jmrtd.Util;
       CertificateFactory factory = CertificateFactory.getInstance("X.509");
       return (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certSpec));
     } catch (Exception e) {
-      /* NOTE: Reconstructing using preferred provider didn't work?!?! */
+      LOGGER.log(Level.FINE, "Reconstructing using preferred provider didn't work.", e);
       return certObject;
     }
   }
 
   public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
       String contentTypeOID, ContentInfo contentInfo, byte[] encryptedDigest,
-      X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException, IOException {
+      X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException {
     ASN1Set digestAlgorithmsSet = SignedDataUtil.createSingletonSet(SignedDataUtil.createDigestAlgorithms(digestAlgorithm));
     ASN1Set certificates =  createSingletonSet(SignedDataUtil.createCertificate(docSigningCertificate));
     ASN1Set crls = null;

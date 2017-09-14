@@ -31,6 +31,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
@@ -49,7 +50,7 @@ public class DG15File extends DataGroup {
   private static final long serialVersionUID = 3834304239673755744L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
+  
   private static final String[] PUBLIC_KEY_ALGORITHMS = { "RSA", "EC" };
 
   private PublicKey publicKey;
@@ -84,6 +85,7 @@ public class DG15File extends DataGroup {
 
       publicKey = getPublicKey(value);
     } catch (GeneralSecurityException e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception while reading DG15 content", e);
     }
   }
 

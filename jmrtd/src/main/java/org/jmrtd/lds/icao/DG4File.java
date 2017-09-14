@@ -167,4 +167,27 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
   public void removeIrisInfo(int index) {
     remove(index);
   }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (shouldAddRandomDataIfEmpty ? 1231 : 1237);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    DG4File other = (DG4File)obj;
+    return shouldAddRandomDataIfEmpty == other.shouldAddRandomDataIfEmpty;
+  }
 }

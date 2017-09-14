@@ -54,6 +54,12 @@ public class LDSFileUtil {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
   /**
+   * Objects of this class should not be constructed.
+   */
+  private LDSFileUtil() {
+  }
+  
+  /**
    * Factory method for creating LDS files for a given input stream.
    *
    * @param fid file identifier
