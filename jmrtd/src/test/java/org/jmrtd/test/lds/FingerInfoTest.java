@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.CBEFFInfo;
 import org.jmrtd.cbeff.ISO781611;
@@ -70,7 +71,8 @@ public class FingerInfoTest extends TestCase {
     testElements(fingerInfo);
   }
 
-
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   public void testFields() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testFieldsReasonable(fingerInfo);
@@ -90,7 +92,7 @@ public class FingerInfoTest extends TestCase {
   }
 
   public void testReflexiveReconstruct(FingerInfo fingerInfo) {
-    FingerInfo fingerInfo2 = new FingerInfo(fingerInfo.getCaptureDeviceId(), fingerInfo.getAcquisitionLevel(), fingerInfo.getScaleUnits(), fingerInfo.getHorizontalScanningResolution(), fingerInfo.getVerticalScanningResolution(), fingerInfo.getHorizontalImageResolution(), fingerInfo.getVerticalImageResolution(), fingerInfo.getDepth(), fingerInfo.getCompressionAlgorithm(), fingerInfo.getFingerImageInfos());
+    FingerInfo fingerInfo2 = new FingerInfo(fingerInfo.getCaptureDeviceId(), fingerInfo.getAcquisitionLevel(), fingerInfo.getScaleUnits(), fingerInfo.getHorizontalScanningResolution(), fingerInfo.getVerticalScanningResolution(), fingerInfo.getHorizontalImageResolution(), fingerInfo.getVerticalImageResolution(), fingerInfo.getDepth(), fingerInfo.getCompressionAlgorithm(), fingerInfo.getFingerImageInfos());    
     assertEquals(fingerInfo, fingerInfo2);
   }
 

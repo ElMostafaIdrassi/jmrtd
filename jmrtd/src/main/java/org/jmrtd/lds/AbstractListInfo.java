@@ -28,6 +28,8 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Abstract base class for several data structures used in the LDS
@@ -42,6 +44,8 @@ import java.util.List;
 public abstract class AbstractListInfo<R extends Serializable> extends AbstractLDSInfo {
 
   private static final long serialVersionUID = 2970076896364365191L;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private List<R> subRecords;
 
@@ -109,6 +113,7 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
       }
       return true;
     } catch (ClassCastException cce) {
+      LOGGER.log(Level.WARNING, "Wrong class", cce);
       return false;
     }
   }

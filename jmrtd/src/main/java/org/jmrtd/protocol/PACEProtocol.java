@@ -186,7 +186,7 @@ public class PACEProtocol {
     try {
       return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in key derivation step");
+      throw new PACEException("PCD side error in key derivation step", gse);
     }
   }
 
@@ -215,7 +215,7 @@ public class PACEProtocol {
     try {
       staticPACECipher = Cipher.getInstance(cipherAlg + "/CBC/NoPadding");
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in static cipher construction during key derivation step");
+      throw new PACEException("PCD side error in static cipher construction during key derivation step", gse);
     }
 
     try {
@@ -231,7 +231,7 @@ public class PACEProtocol {
 
       service.sendMSESetATMutualAuth(wrapper, oid, paceKeyReference, referencePrivateKeyOrForComputingSessionKey);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side error in static PACE key derivation step", cse.getSW());
+      throw new PACEException("PICC side error in static PACE key derivation step", cse, cse.getSW());
     }
 
     /*
@@ -533,7 +533,7 @@ public class PACEProtocol {
       keyPairGenerator.initialize(ephemeralParams);
       return keyPairGenerator.generateKeyPair();
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error during generation of PCD key pair");
+      throw new PACEException("PCD side error during generation of PCD key pair", gse);
     }
   }
 
@@ -617,7 +617,7 @@ public class PACEProtocol {
           return step4ResponseInputStream.readValue();
         }
       } catch (IOException ioe) {
-        LOGGER.log(Level.WARNING, "Could not parse step 4 response");
+        LOGGER.log(Level.WARNING, "Could not parse step 4 response", ioe);
       } finally {
         try {
           step4ResponseInputStream.close();

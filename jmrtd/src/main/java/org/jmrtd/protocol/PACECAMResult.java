@@ -78,14 +78,8 @@ public class PACECAMResult extends PACEResult {
     }
 
     PACECAMResult other = (PACECAMResult) obj;
-    if (!Arrays.equals(chipAuthenticationData, other.chipAuthenticationData)) {
-      return false;
-    }
-    if (!Arrays.equals(encryptedChipAuthenticationData, other.encryptedChipAuthenticationData)) {
-      return false;
-    }
-
-    return true;
+    return Arrays.equals(chipAuthenticationData, other.chipAuthenticationData)
+        && Arrays.equals(encryptedChipAuthenticationData, other.encryptedChipAuthenticationData);
   }
 
   @Override

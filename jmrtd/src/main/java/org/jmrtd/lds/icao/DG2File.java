@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
@@ -52,8 +51,6 @@ import org.jmrtd.lds.iso19794.FaceInfo;
 public class DG2File extends CBEFFDataGroup<FaceInfo> {
 
   private static final long serialVersionUID = 414300652684010416L;
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FaceInfo>() {
     public FaceInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {

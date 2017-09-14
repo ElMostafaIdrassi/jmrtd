@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import net.sf.scuba.util.Hex;
+
 /**
  * A Standard Biometric Header preceeds a Biometric Data Block.
  *
@@ -59,4 +61,61 @@ public class StandardBiometricHeader implements Serializable {
   public SortedMap<Integer, byte[]> getElements() {
     return new TreeMap<Integer, byte[]>(elements);
   }
+
+  @Override
+  public String toString() {
+    return "StandardBiometricHeader " + toString(elements);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((elements == null) ? 0 : elements.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    StandardBiometricHeader other = (StandardBiometricHeader) obj;
+    return equals(elements, other.elements);
+  }
+
+  private static boolean equals(Map<Integer, byte[]> elements1, Map<Integer, byte[]> elements2) {
+    if (elements1 == null && elements2 != null) {
+      return false;
+    }
+    if (elements1 != null && elements2 == null) {
+      return false;
+    }
+
+    return elements1 == elements2 || elements1.entrySet().equals(elements2.entrySet());
+  }
+  
+  private static String toString(SortedMap<Integer, byte[]> elements) {
+    StringBuilder result = new StringBuilder();
+    result.append("[");
+    boolean isFirst = true;
+    for (Map.Entry<Integer, byte[]> entry: elements.entrySet()) {
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        result.append(", ");
+      }
+      result.append(Integer.toHexString(entry.getKey())).append(" -> ").append(Hex.bytesToHexString(entry.getValue()));
+    }
+    result.append("]");
+    return result.toString();
+  }
+
 }

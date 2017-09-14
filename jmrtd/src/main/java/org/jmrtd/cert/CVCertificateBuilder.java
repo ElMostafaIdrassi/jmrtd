@@ -47,7 +47,13 @@ import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 public class CVCertificateBuilder {
 
   /**
-   * Card verifiable certificate factory method.
+   * Hides the default constructor.
+   */
+  private CVCertificateBuilder() {
+  }
+  
+  /**
+   * Produces card verifiable certificates.
    *
    * @param publicKey the public key
    * @param signerKey private key

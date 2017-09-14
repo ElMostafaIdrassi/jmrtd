@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -412,7 +413,9 @@ public class FaceImageInfo extends AbstractImageInfo {
       int x = dataIn.readUnsignedShort(); /* +2 = 4 */
       int y = dataIn.readUnsignedShort(); /* +2 = 6 */
       long skippedBytes = 0;
-      while (skippedBytes < 2) { skippedBytes += dataIn.skip(2); } /* +2 = 8, NOTE: 2 bytes reserved */
+      while (skippedBytes < 2) {
+        skippedBytes += dataIn.skip(2);
+      } /* +2 = 8, NOTE: 2 bytes reserved */
       featurePoints[i] = new FeaturePoint(featureType, featurePoint, x, y);
     }
 
@@ -468,7 +471,6 @@ public class FaceImageInfo extends AbstractImageInfo {
    *
    * @return the record length
    */
-  @Override
   public long getRecordLength() {
     /* Should be equal to (20 + 8 * featurePoints.length + 12 + getImageLength()). */
     return recordLength;
@@ -646,6 +648,58 @@ public class FaceImageInfo extends AbstractImageInfo {
     return out.toString();
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + colorSpace;
+    result = prime * result + deviceType;
+    result = prime * result + expression;
+    result = prime * result + ((eyeColor == null) ? 0 : eyeColor.hashCode());
+    result = prime * result + faceImageType;
+    result = prime * result + featureMask;
+    result = prime * result + Arrays.hashCode(featurePoints);
+    result = prime * result + ((gender == null) ? 0 : gender.hashCode());
+    result = prime * result + hairColor;
+    result = prime * result + imageDataType;
+    result = prime * result + Arrays.hashCode(poseAngle);
+    result = prime * result + Arrays.hashCode(poseAngleUncertainty);
+    result = prime * result + quality;
+    result = prime * result + (int) (recordLength ^ (recordLength >>> 32));
+    result = prime * result + sourceType;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    
+    FaceImageInfo other = (FaceImageInfo)obj;
+    return colorSpace == other.colorSpace 
+        && deviceType == other.deviceType
+        && expression == other.expression
+        && eyeColor == other.eyeColor
+        && faceImageType == other.faceImageType
+        && featureMask == other.featureMask
+        && Arrays.equals(featurePoints, other.featurePoints)
+        && gender == other.gender
+        && hairColor == other.hairColor
+        && imageDataType == other.imageDataType
+        && Arrays.equals(poseAngle, other.poseAngle)
+        && Arrays.equals(poseAngleUncertainty, other.poseAngleUncertainty)
+        && quality == other.quality
+        && recordLength == other.recordLength
+        && sourceType == other.sourceType;
+  }
+
   private void writeFacialRecordData(OutputStream outputStream) throws IOException {
     DataOutputStream dataOut = new DataOutputStream(outputStream);
 
@@ -696,19 +750,30 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   private String hairColorToString() {
-    switch(hairColor) {
-      case HAIR_COLOR_UNSPECIFIED: return "unspecified";
-      case HAIR_COLOR_BALD: return "bald";
-      case HAIR_COLOR_BLACK: return "black";
-      case HAIR_COLOR_BLONDE: return "blonde";
-      case HAIR_COLOR_BROWN: return "brown";
-      case HAIR_COLOR_GRAY: return "gray";
-      case HAIR_COLOR_WHITE: return "white";
-      case HAIR_COLOR_RED: return "red";
-      case HAIR_COLOR_GREEN: return "green";
-      case HAIR_COLOR_BLUE: return "blue";
+    switch (hairColor) {
+      case HAIR_COLOR_UNSPECIFIED:
+        return "unspecified";
+      case HAIR_COLOR_BALD:
+        return "bald";
+      case HAIR_COLOR_BLACK:
+        return "black";
+      case HAIR_COLOR_BLONDE:
+        return "blonde";
+      case HAIR_COLOR_BROWN:
+        return "brown";
+      case HAIR_COLOR_GRAY:
+        return "gray";
+      case HAIR_COLOR_WHITE:
+        return "white";
+      case HAIR_COLOR_RED:
+        return "red";
+      case HAIR_COLOR_GREEN:
+        return "green";
+      case HAIR_COLOR_BLUE:
+        return "blue";
+      default:
+        return "unknown";
     }
-    return "unknown";
   }
 
   private String featureMaskToString() {
@@ -748,7 +813,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
     StringBuilder out = new StringBuilder();
     for (Iterator<String> it = features.iterator(); it.hasNext();) {
-      out.append(it.next().toString());
+      out.append(it.next());
       if (it.hasNext()) {
         out.append(", ");
       }
@@ -803,11 +868,15 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   private String faceImageTypeToString() {
     switch (faceImageType) {
-      case FACE_IMAGE_TYPE_BASIC: return "basic";
-      case FACE_IMAGE_TYPE_FULL_FRONTAL: return "full frontal";
-      case FACE_IMAGE_TYPE_TOKEN_FRONTAL: return "token frontal";
+      case FACE_IMAGE_TYPE_BASIC:
+        return "basic";
+      case FACE_IMAGE_TYPE_FULL_FRONTAL:
+        return "full frontal";
+      case FACE_IMAGE_TYPE_TOKEN_FRONTAL:
+        return "token frontal";
+      default:
+        return "unknown";
     }
-    return "unknown";
   }
 
   private String sourceTypeToString() {
@@ -826,8 +895,9 @@ public class FaceImageInfo extends AbstractImageInfo {
         return "single video frame from an analogue camera";
       case SOURCE_TYPE_VIDEO_FRAME_DIGITAL_CAM:
         return "single video frame from a digital camera";
+      default:
+        return "unknown";
     }
-    return "unknown";
   }
 
   private static String toMimeType(int compressionAlg) {

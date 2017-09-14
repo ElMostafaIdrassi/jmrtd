@@ -165,8 +165,7 @@ public class ISO781611Decoder implements ISO781611 {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int expectedBHTTag = (BIOMETRIC_HEADER_TEMPLATE_BASE_TAG /* + index */) & 0xFF;
     if (bhtTag != expectedBHTTag) {
-      String warning = "Expected tag " + Integer.toHexString(expectedBHTTag) + ", found " + Integer.toHexString(bhtTag);
-      if (LOGGER != null) { LOGGER.warning(warning); }
+      LOGGER.warning("Expected tag " + Integer.toHexString(expectedBHTTag) + ", found " + Integer.toHexString(bhtTag));
     }
     Map<Integer, byte[]> elements = new HashMap<Integer, byte[]>();
     int bytesRead = 0;

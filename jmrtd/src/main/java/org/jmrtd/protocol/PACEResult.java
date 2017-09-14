@@ -496,11 +496,7 @@ public class PACEResult implements Serializable {
       }
 
       PACEGMWithDHMappingResult other = (PACEGMWithDHMappingResult) obj;
-      if (!Arrays.equals(sharedSecret, other.sharedSecret)) {
-        return false;
-      }
-
-      return true;
+      return Arrays.equals(sharedSecret, other.sharedSecret);
     }
   }
 

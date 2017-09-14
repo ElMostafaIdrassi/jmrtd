@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
@@ -51,8 +50,6 @@ import org.jmrtd.lds.iso19794.FingerInfo;
 public class DG3File extends CBEFFDataGroup<FingerInfo> {
 
   private static final long serialVersionUID = -1037522331623814528L;
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FingerInfo>() {
     public FingerInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
@@ -189,7 +186,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     DG3File other = (DG3File)obj;
     return shouldAddRandomDataIfEmpty == other.shouldAddRandomDataIfEmpty;
   }

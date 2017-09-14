@@ -111,7 +111,6 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     return displayedImageTag;
   }
 
-  @Override
   public long getRecordLength() {
     long length = 0;
     int imageLength = getImageLength();

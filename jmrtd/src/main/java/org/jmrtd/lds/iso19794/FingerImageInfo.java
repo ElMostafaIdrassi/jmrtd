@@ -309,7 +309,6 @@ public class FingerImageInfo extends AbstractImageInfo {
    *
    * @return the record length
    */
-  @Override
   public long getRecordLength() {
     /* Should be equal to (getImageLength() + 14) */
     return recordLength;
@@ -331,6 +330,42 @@ public class FingerImageInfo extends AbstractImageInfo {
    */
   public int getBiometricSubtype() {
     return toBiometricSubtype(position);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + compressionAlgorithm;
+    result = prime * result + impressionType;
+    result = prime * result + position;
+    result = prime * result + quality;
+    result = prime * result + (int) (recordLength ^ (recordLength >>> 32));
+    result = prime * result + viewCount;
+    result = prime * result + viewNumber;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    
+    FingerImageInfo other = (FingerImageInfo)obj;
+    return compressionAlgorithm == other.compressionAlgorithm
+        && impressionType == other.impressionType
+        && position == other.position
+        && quality == other.quality
+        && recordLength == other.recordLength
+        && viewCount == other.viewCount
+        && viewNumber == other.viewNumber;
   }
 
   /**

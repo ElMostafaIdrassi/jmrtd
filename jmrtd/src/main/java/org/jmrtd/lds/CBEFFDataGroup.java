@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
@@ -143,6 +144,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
       }
       return true;
     } catch (ClassCastException cce) {
+      LOGGER.log(Level.WARNING, "Wrong class", cce);
       return false;
     }
   }
@@ -172,12 +174,14 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    * @throws IOException on I/O errors
    */
   protected void writeOptionalRandomData(OutputStream outputStream) throws IOException {
-    if (subRecords.size() == 0) {
-      TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
-      tlvOut.writeTag(ISO781611.DISCRETIONARY_DATA_FOR_PAYLOAD_TAG);
-      byte[] value = new byte[8];
-      random.nextBytes(value);
-      tlvOut.writeValue(value);
+    if (!subRecords.isEmpty()) {
+      return;
     }
+
+    TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+    tlvOut.writeTag(ISO781611.DISCRETIONARY_DATA_FOR_PAYLOAD_TAG);
+    byte[] value = new byte[8];
+    random.nextBytes(value);
+    tlvOut.writeValue(value);
   }
 }

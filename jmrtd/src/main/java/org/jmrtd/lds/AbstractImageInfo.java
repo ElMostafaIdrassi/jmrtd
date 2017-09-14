@@ -101,7 +101,8 @@ public abstract class AbstractImageInfo implements ImageInfo {
   /* PUBLIC METHODS BELOW */
 
   /**
-   * Content type, one of
+   * Returns the content-type,
+   * where content-type is one of
    * {@link ImageInfo#TYPE_PORTRAIT},
    * {@link ImageInfo#TYPE_FINGER},
    * {@link ImageInfo#TYPE_IRIS},
@@ -114,7 +115,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets the mime-type of the encoded image.
+   * Returns the mime-type of the encoded image.
    *
    * @return the mime-type of the encoded image
    */
@@ -123,7 +124,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets the width of the image.
+   * Returns the width of the image.
    *
    * @return the width of the image
    */
@@ -132,7 +133,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets the height of the image.
+   * Returns the height of the image.
    *
    * @return the height of the image
    */
@@ -141,7 +142,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets the length of the encoded image.
+   * Returns the length of the encoded image.
    *
    * @return the length of the encoded image
    */
@@ -149,13 +150,14 @@ public abstract class AbstractImageInfo implements ImageInfo {
     /* DEBUG: START */
     if (splittableInputStream != null) {
       return imageLength;
-      /* DEBUG: END */
-
-    } else if (imageBytes != null) {
-      return imageBytes.length;
-    } else {
-      throw new IllegalStateException("DEBUG");
     }
+    /* DEBUG: END */
+
+    if (imageBytes == null) {
+      throw new IllegalStateException("Cannot get length of null");
+    }
+
+    return imageBytes.length;
   }
 
   /**
@@ -224,13 +226,6 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets the record length.
-   *
-   * @return the record length
-   */
-  public abstract long getRecordLength();
-
-  /**
    * Gets the encoded image as an input stream.
    *
    * @return an input stream containing the encoded image
@@ -258,24 +253,24 @@ public abstract class AbstractImageInfo implements ImageInfo {
    */
   protected void readImage(InputStream inputStream, long imageLength) throws IOException {
     /* DEBUG: START */
-//    if (inputStream instanceof SplittableInputStream) {
-//      this.imageBytes = null;
-//      this.splittableInputStream = (SplittableInputStream)inputStream;
-//      this.imagePositionInInputStream = splittableInputStream.getPosition();
-//
-//      this.imageLength = (int)imageLength;
-//      long totalSkippedBytes = 0;
-//      while (totalSkippedBytes < imageLength) {
-//        long currentlySkippedBytes = splittableInputStream.skip(imageLength - totalSkippedBytes);
-//        totalSkippedBytes += currentlySkippedBytes;
-//      }
-//    } else {
-      /* DEBUG: END */
-      this.splittableInputStream = null;
-      this.imageBytes = new byte[(int)imageLength];
-      DataInputStream dataIn = new DataInputStream(inputStream);
-      dataIn.readFully(this.imageBytes);
-//    }
+    //    if (inputStream instanceof SplittableInputStream) {
+    //      this.imageBytes = null;
+    //      this.splittableInputStream = (SplittableInputStream)inputStream;
+    //      this.imagePositionInInputStream = splittableInputStream.getPosition();
+    //
+    //      this.imageLength = (int)imageLength;
+    //      long totalSkippedBytes = 0;
+    //      while (totalSkippedBytes < imageLength) {
+    //        long currentlySkippedBytes = splittableInputStream.skip(imageLength - totalSkippedBytes);
+    //        totalSkippedBytes += currentlySkippedBytes;
+    //      }
+    //    } else {
+    /* DEBUG: END */
+    this.splittableInputStream = null;
+    this.imageBytes = new byte[(int)imageLength];
+    DataInputStream dataIn = new DataInputStream(inputStream);
+    dataIn.readFully(this.imageBytes);
+    //    }
   }
 
   protected void writeImage(OutputStream outputStream) throws IOException {

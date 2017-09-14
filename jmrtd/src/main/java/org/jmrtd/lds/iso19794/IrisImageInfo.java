@@ -188,9 +188,40 @@ public class IrisImageInfo extends AbstractImageInfo {
    *
    * @return the record length
    */
-  @Override
   public long getRecordLength() {
     return 11L + getImageLength();
+  }
+  
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + imageFormat;
+    result = prime * result + imageNumber;
+    result = prime * result + quality;
+    result = prime * result + rotationAngle;
+    result = prime * result + rotationAngleUncertainty;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    
+    IrisImageInfo other = (IrisImageInfo) obj;
+    return imageFormat == other.imageFormat
+        && imageNumber == other.imageNumber
+        && quality == other.quality
+        && rotationAngle == other.rotationAngle
+        && rotationAngleUncertainty == other.rotationAngleUncertainty;
   }
 
   /**
@@ -282,15 +313,19 @@ public class IrisImageInfo extends AbstractImageInfo {
 
   private static String getMimeTypeFromImageFormat(int imageFormat) {
     switch (imageFormat) {
-      case IrisInfo.IMAGEFORMAT_MONO_RAW:
-      case IrisInfo.IMAGEFORMAT_RGB_RAW: return WSQ_MIME_TYPE;
-      case IrisInfo.IMAGEFORMAT_MONO_JPEG:
-      case IrisInfo.IMAGEFORMAT_RGB_JPEG:
-      case IrisInfo.IMAGEFORMAT_MONO_JPEG_LS:
-      case IrisInfo.IMAGEFORMAT_RGB_JPEG_LS: return JPEG_MIME_TYPE;
-      case IrisInfo.IMAGEFORMAT_MONO_JPEG2000:
-      case IrisInfo.IMAGEFORMAT_RGB_JPEG2000: return JPEG2000_MIME_TYPE;
+      case IrisInfo.IMAGEFORMAT_MONO_RAW: // Fall through...
+      case IrisInfo.IMAGEFORMAT_RGB_RAW:
+        return WSQ_MIME_TYPE;
+      case IrisInfo.IMAGEFORMAT_MONO_JPEG: // Fall through...
+      case IrisInfo.IMAGEFORMAT_RGB_JPEG: // Fall through...
+      case IrisInfo.IMAGEFORMAT_MONO_JPEG_LS: // Fall through...
+      case IrisInfo.IMAGEFORMAT_RGB_JPEG_LS:
+        return JPEG_MIME_TYPE;
+      case IrisInfo.IMAGEFORMAT_MONO_JPEG2000: // Fall through...
+      case IrisInfo.IMAGEFORMAT_RGB_JPEG2000:
+        return JPEG2000_MIME_TYPE;
+      default:
+        return null;
     }
-    return null;
   }
 }

@@ -67,21 +67,29 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    */
   private static final int FORMAT_TYPE_VALUE = 0x0007;
 
-  /**
-   * Scale units.
-   */
-  public static final int SCALE_UNITS_PPI = 1, SCALE_UNITS_PPCM = 2;
+  /** Scale units points per inch. */
+  public static final int SCALE_UNITS_PPI = 1;
 
-  /**
-   * Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4.
-   */
-  public static final int
-  COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING = 0,
-  COMPRESSION_UNCOMPRESSED_BIT_PACKED = 1,
-  COMPRESSION_WSQ = 2,
-  COMPRESSION_JPEG = 3,
-  COMPRESSION_JPEG2000 = 4,
-  COMPRESSION_PNG = 5;
+  /** Scale units points per centimeter. */
+  public static final int SCALE_UNITS_PPCM = 2;
+
+  /** Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4. */
+  public static final int COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING = 0;
+
+  /** Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4. */
+  public static final int COMPRESSION_UNCOMPRESSED_BIT_PACKED = 1;
+
+  /** Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4. */
+  public static final int COMPRESSION_WSQ = 2;
+
+  /** Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4. */
+  public static final int COMPRESSION_JPEG = 3;
+
+  /** Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4. */
+  public static final int COMPRESSION_JPEG2000 = 4;
+
+  /** Image compression algorithm type as specified in Section 7.1.13 and Table 3 of ISO 19794-4. */
+  public static final int COMPRESSION_PNG = 5;
 
   private int captureDeviceId;
   private int acquisitionLevel;
@@ -383,6 +391,47 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + acquisitionLevel;
+    result = prime * result + captureDeviceId;
+    result = prime * result + compressionAlgorithm;
+    result = prime * result + depth;
+    result = prime * result + imageResolutionHorizontal;
+    result = prime * result + imageResolutionVertical;
+    result = prime * result + ((sbh == null) ? 0 : sbh.hashCode());
+    result = prime * result + scaleUnits;
+    result = prime * result + scanResolutionHorizontal;
+    result = prime * result + scanResolutionVertical;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    FingerInfo other = (FingerInfo)obj;
+    return acquisitionLevel == other.acquisitionLevel
+        && captureDeviceId == other.captureDeviceId
+        && compressionAlgorithm == other.compressionAlgorithm
+        && depth == other.depth
+        && imageResolutionHorizontal == other.imageResolutionHorizontal
+        && imageResolutionVertical == other.imageResolutionVertical
+        && scaleUnits == other.scaleUnits
+        && scanResolutionHorizontal == other.scanResolutionHorizontal
+        && scanResolutionVertical == other.scanResolutionVertical;
+  }
+
+  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("FingerInfo [");
@@ -486,14 +535,21 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    */
   static String toMimeType(int imageDataType) {
     switch (imageDataType) {
-      case FingerInfo.COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING: return "image/raw";
-      case FingerInfo.COMPRESSION_UNCOMPRESSED_BIT_PACKED: return "image/raw";
-      case FingerInfo.COMPRESSION_WSQ: return "image/x-wsq";
-      case FingerInfo.COMPRESSION_JPEG: return "image/jpeg";
-      case FingerInfo.COMPRESSION_JPEG2000: return "image/jpeg2000";
-      case FingerInfo.COMPRESSION_PNG: return "image/png";
+      case FingerInfo.COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING:
+        return "image/raw";
+      case FingerInfo.COMPRESSION_UNCOMPRESSED_BIT_PACKED:
+        return "image/raw";
+      case FingerInfo.COMPRESSION_WSQ:
+        return "image/x-wsq";
+      case FingerInfo.COMPRESSION_JPEG:
+        return "image/jpeg";
+      case FingerInfo.COMPRESSION_JPEG2000:
+        return "image/jpeg2000";
+      case FingerInfo.COMPRESSION_PNG:
+        return "image/png";
+      default:
+        return null;
     }
-    return null;
   }
 
   static int fromMimeType(String mimeType) {

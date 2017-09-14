@@ -50,7 +50,7 @@ public class DG15File extends DataGroup {
   private static final long serialVersionUID = 3834304239673755744L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final String[] PUBLIC_KEY_ALGORITHMS = { "RSA", "EC" };
 
   private PublicKey publicKey;
@@ -96,7 +96,7 @@ public class DG15File extends DataGroup {
       try {
         return Util.getPublicKey(algorithm, pubKeySpec);
       } catch (InvalidKeySpecException ikse) {
-        /* NOTE: Ignore, try next algorithm. */
+        LOGGER.log(Level.FINE, "Ignore, try next algorithm", ikse);
       }
     }
 

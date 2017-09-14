@@ -58,7 +58,7 @@ public class ICAOCountry extends Country {
   public static final ICAOCountry XXC = new ICAOCountry("XX","XXC","Refugee (other)", "Refugee (other)");
   public static final ICAOCountry XXX = new ICAOCountry("XX","XXX","Unspecified", "Unspecified");
 
-  private static ICAOCountry[] VALUES = {
+  private static final ICAOCountry[] VALUES = {
       DE,
       GBD, GBN, GBO, GBP, GBS,
       UNO, UNA, UNK,
@@ -69,6 +69,23 @@ public class ICAOCountry extends Country {
   private String nationality;
   private String alpha2Code;
   private String alpha3Code;
+
+  /**
+   * Prevent caller from creating instance.
+   */
+  private ICAOCountry() {
+  }
+
+  private ICAOCountry(String alpha2Code, String alpha3Code, String name) {
+    this(alpha2Code, alpha3Code, name, name);
+  }
+
+  private ICAOCountry(String alpha2Code, String alpha3Code, String name, String nationality) {
+    this.alpha2Code = alpha2Code;
+    this.alpha3Code = alpha3Code;
+    this.name = name;
+    this.nationality = nationality;
+  }
 
   /**
    * Gets an ICAO country instance.
@@ -90,23 +107,6 @@ public class ICAOCountry extends Country {
       LOGGER.log(Level.FINE, "Unknown country", e);
     }
     throw new IllegalArgumentException("Illegal ICAO country alpha 3 code " + alpha3Code);
-  }
-
-  /**
-   * Prevent caller from creating instance.
-   */
-  private ICAOCountry() {
-  }
-
-  private ICAOCountry(String alpha2Code, String alpha3Code, String name) {
-    this(alpha2Code, alpha3Code, name, name);
-  }
-
-  private ICAOCountry(String alpha2Code, String alpha3Code, String name, String nationality) {
-    this.alpha2Code = alpha2Code;
-    this.alpha3Code = alpha3Code;
-    this.name = name;
-    this.nationality = nationality;
   }
 
   @Override
