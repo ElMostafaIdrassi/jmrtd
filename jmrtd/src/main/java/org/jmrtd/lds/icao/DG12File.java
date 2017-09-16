@@ -64,7 +64,7 @@ public class DG12File extends DataGroup {
   public static final int TAX_OR_EXIT_REQUIREMENTS_TAG = 0x5F1C;
   public static final int IMAGE_OF_FRONT_TAG = 0x5F1D; // Image per ISO/IEC 10918
   public static final int IMAGE_OF_REAR_TAG = 0x5F1E; // Image per ISO/IEC 10918
-  public static final int DATE_AND_TIME_OF_PERSONALIZATION = 0x5F55; // yyyymmddhhmmss
+  public static final int DATE_AND_TIME_OF_PERSONALIZATION_TAG = 0x5F55; // yyyymmddhhmmss
   public static final int PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG = 0x5F56;
   public static final int CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0; // 5F1A is always used inside A0 constructed object
   public static final int COUNT_TAG = 0x02; // Used in A0 constructed object to indicate single byte count of simple objects
@@ -215,7 +215,7 @@ public class DG12File extends DataGroup {
       tagPresenceList.add(IMAGE_OF_REAR_TAG);
     }
     if (dateAndTimeOfPersonalization != null) {
-      tagPresenceList.add(DATE_AND_TIME_OF_PERSONALIZATION);
+      tagPresenceList.add(DATE_AND_TIME_OF_PERSONALIZATION_TAG);
     }
     if (personalizationSystemSerialNumber != null) {
       tagPresenceList.add(PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG);
@@ -277,7 +277,7 @@ public class DG12File extends DataGroup {
         case IMAGE_OF_REAR_TAG:
           parseImageOfRear(value);
           break;
-        case DATE_AND_TIME_OF_PERSONALIZATION:
+        case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
           parseDateAndTimeOfPersonalization(value);
           break;
         case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
@@ -579,7 +579,7 @@ public class DG12File extends DataGroup {
           tlvOut.writeTag(tag);
           tlvOut.writeValue(imageOfRear);
           break;
-        case DATE_AND_TIME_OF_PERSONALIZATION:
+        case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
           tlvOut.writeTag(tag);
           // the following commented line  writes date and time of personalisation field incorrectly
           //tlvOut.writeValue(Hex.hexStringToBytes(SDTF.format(dateAndTimeOfPersonalization)));
