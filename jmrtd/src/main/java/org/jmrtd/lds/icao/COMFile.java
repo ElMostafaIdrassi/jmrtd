@@ -109,8 +109,7 @@ public class COMFile extends AbstractTaggedLDSFile {
       Integer majorVersionUnicode = Integer.parseInt(st.nextToken().trim());
       Integer minorVersionUnicode = Integer.parseInt(st.nextToken().trim());
       Integer releaseLevelUnicode = Integer.parseInt(st.nextToken().trim());
-      initialize(
-          String.format("%02d", versionLDS),
+      initialize(String.format("%02d", versionLDS),
           String.format("%02d", updateLevelLDS),
           String.format("%02d", majorVersionUnicode),
           String.format("%02d", minorVersionUnicode),
@@ -120,31 +119,6 @@ public class COMFile extends AbstractTaggedLDSFile {
       throw new IllegalArgumentException("Could not parse version number", nfe);
     } catch (IllegalFormatConversionException ifce) {
       throw new IllegalArgumentException("Could not parse version number", ifce);
-    }
-  }
-
-  private void initialize(String versionLDS, String updateLevelLDS,
-      String majorVersionUnicode, String minorVersionUnicode,
-      String releaseLevelUnicode, int[] tagList) {
-    if (tagList == null) {
-      throw new IllegalArgumentException("Null tag list");
-    }
-    if (versionLDS == null || versionLDS.length() != 2
-        || updateLevelLDS == null || updateLevelLDS.length() != 2
-        || majorVersionUnicode == null || majorVersionUnicode.length() != 2
-        || minorVersionUnicode == null || minorVersionUnicode.length() != 2
-        || releaseLevelUnicode == null || releaseLevelUnicode.length() != 2
-        || tagList == null) {
-      throw new IllegalArgumentException();
-    }
-    this.versionLDS = versionLDS;
-    this.updateLevelLDS = updateLevelLDS;
-    this.majorVersionUnicode = majorVersionUnicode;
-    this.minorVersionUnicode = minorVersionUnicode;
-    this.releaseLevelUnicode = releaseLevelUnicode;
-    this.tagList = new ArrayList<Integer>(tagList.length);
-    for (int tag: tagList) {
-      this.tagList.add(tag);
     }
   }
 
@@ -347,5 +321,30 @@ public class COMFile extends AbstractTaggedLDSFile {
         11 * minorVersionUnicode.hashCode() +
         13 * releaseLevelUnicode.hashCode() +
         17 * tagList.hashCode();
+  }
+
+  private void initialize(String versionLDS, String updateLevelLDS,
+      String majorVersionUnicode, String minorVersionUnicode,
+      String releaseLevelUnicode, int[] tagList) {
+    if (tagList == null) {
+      throw new IllegalArgumentException("Null tag list");
+    }
+    if (versionLDS == null || versionLDS.length() != 2
+        || updateLevelLDS == null || updateLevelLDS.length() != 2
+        || majorVersionUnicode == null || majorVersionUnicode.length() != 2
+        || minorVersionUnicode == null || minorVersionUnicode.length() != 2
+        || releaseLevelUnicode == null || releaseLevelUnicode.length() != 2
+        || tagList == null) {
+      throw new IllegalArgumentException();
+    }
+    this.versionLDS = versionLDS;
+    this.updateLevelLDS = updateLevelLDS;
+    this.majorVersionUnicode = majorVersionUnicode;
+    this.minorVersionUnicode = minorVersionUnicode;
+    this.releaseLevelUnicode = releaseLevelUnicode;
+    this.tagList = new ArrayList<Integer>(tagList.length);
+    for (int tag: tagList) {
+      this.tagList.add(tag);
+    }
   }
 }

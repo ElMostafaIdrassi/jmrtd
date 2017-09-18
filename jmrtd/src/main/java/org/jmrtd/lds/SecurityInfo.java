@@ -264,7 +264,6 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
         }
         return new PACEDomainParameterInfo(oid, domainParameters);
       }
-      //			throw new IllegalArgumentException("Malformed input stream.");
       LOGGER.warning("Unsupported SecurityInfo, oid = " + oid);
       return null;
     } catch (Exception e) {

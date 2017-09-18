@@ -265,20 +265,6 @@ public class PassportApduService extends CardService {
       }
     }
 
-    //		if ((sw & ISO7816.SW_CORRECT_LENGTH_00) == ISO7816.SW_CORRECT_LENGTH_00) {
-    //			/* Re-transmit with corrected length if incorrect length. */
-    //			int ne = (sw & 0xFF);
-    //			plainCapdu = new CommandAPDU(plainCapdu.getCLA(), plainCapdu.getINS(), plainCapdu.getP1(), plainCapdu.getP2(), plainCapdu.getData(), ne);
-    //			if (wrapper != null) {
-    //				capdu = wrapper.wrap(plainCapdu);
-    //			}
-    //			rapdu = transmit(capdu);
-    //			if (wrapper != null) {
-    //				rapdu = wrapper.unwrap(rapdu, rapdu.getBytes().length);
-    //				notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);
-    //			}
-    //		}
-
     return rapdu;
   }
 
@@ -361,15 +347,14 @@ public class PassportApduService extends CardService {
    * @throws CardServiceException if the command was not successful
    */
   public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int offset, int le, boolean isExtendedLength) throws CardServiceException {
-    //		boolean retrySending = false;
     CommandAPDU capdu = null;
     ResponseAPDU rapdu = null;
-    //		do {
-    //			retrySending = false;
+
     // In case the data ended right on the block boundary
     if (le == 0) {
       return null;
     }
+    
     // In the case of long read 2/3 less bytes of the actual data will be returned,
     // because a tag and length will be sent along, here we need to account for this
     if (isExtendedLength) {
@@ -400,35 +385,8 @@ public class PassportApduService extends CardService {
       sw = (short)cse.getSW();
     }
 
-    /* There are 3 cases according to R2-p1_v2_sIII_0039... */
-    //			if (sw == ISO7816.SW_NO_ERROR) {
-    //				/* sw == 0x9000, no need to try again. */
-    //				retrySending = false;
-    //			} else if (sw == ISO7816.SW_END_OF_FILE) {
-    //				/* sw == 0x6282 means EOF, try again with shorter le. */
-    //				le--;
-    //				retrySending = true;
-    //			} else if ((sw & ISO7816.SW_CORRECT_LENGTH_00) == ISO7816.SW_CORRECT_LENGTH_00) {
-    //				/* sw == 0x6Cxx means xx is correct length, try again with that le. */
-    //				/* NOTE: the transmit method also does retransmission on 6Cxx. */
-    //				le = sw & 0xFF;
-    //				retrySending = true;
-    //			} else {
-    //				/* All other cases. */
-    //				if (sw == ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED) {
-    //					/* No access, fail READ BINARY, throw a CSE. */
-    //					throw new CardServiceException("Security status not satisfied during READ BINARY", sw);
-    //				} else {
-    //					/* Unexpected sw, don't throw exception, but log. */
-    //					LOGGER.warning("Unhandled case for status word in READ BINARY, sw == " + Integer.toHexString(sw));
-    //					retrySending = false;
-    //				}
-    //			}
-    //		} while (retrySending);
-
     byte[] rapduBytes = rapdu == null ? null : rapdu.getData();
 
-    //		short sw = (short)rapdu.getSW(); /* NOTE: Update the SW to the last resent APDU. */
     if (isExtendedLength && sw == ISO7816.SW_NO_ERROR) {
       /* Strip the response off the tag 0x53 and the length field. */
       byte[] data = rapduBytes;
@@ -539,11 +497,6 @@ public class PassportApduService extends CardService {
       }
 
       cipher.init(Cipher.ENCRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);
-      /*
-       * cipher.update(rndIFD); cipher.update(rndICC); cipher.update(kIFD); //
-       * This doesn't work, apparently we need to create plaintext array. //
-       * Probably has something to do with ZERO_IV_PARAM_SPEC.
-       */
       byte[] plaintext = new byte[32];
       System.arraycopy(rndIFD, 0, plaintext, 0, 8);
       System.arraycopy(rndICC, 0, plaintext, 8, 8);
@@ -591,12 +544,6 @@ public class PassportApduService extends CardService {
       if (rapduBytes.length != 42) {
         throw new CardServiceException("Mutual authentication failed: expected length: 40 + 2, actual length: " + rapduBytes.length, sw);
       }
-
-      /*
-       * byte[] eICC = new byte[32]; System.arraycopy(rapdu, 0, eICC, 0, 32);
-       *
-       * byte[] mICC = new byte[8]; System.arraycopy(rapdu, 32, mICC, 0, 8);
-       */
 
       /* Decrypt the response. */
       cipher.init(Cipher.DECRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);

@@ -227,10 +227,6 @@ public class PassportService extends PassportApduService {
   /* FIXME: We should keep track of a stack of these states instead. -- MO */
   private State state;
 
-  /**
-   * @deprecated visibility will be set to private
-   */
-  @Deprecated
   private SecureMessagingWrapper wrapper;
 
   private boolean isICAOAppletSelected;

@@ -242,7 +242,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
       return "AES";
     }
-    //      return null;
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -258,7 +258,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
       return "SHA-256";
     }
-    //      return null;
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -274,10 +274,9 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     } else if (ID_CA_DH_AES_CBC_CMAC_256.equals(oid)
         || ID_CA_ECDH_AES_CBC_CMAC_256.equals(oid)) {
       return 256;
-    } else {
-      // return -1;
-      throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
     }
+
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");   
   }
 
   private static String toProtocolOIDString(String oid) {

@@ -372,8 +372,7 @@ import org.jmrtd.Util;
     X509CertificateObject certObject = null;
     for (int i = 0; i < certs.size(); i++) {
       org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance(certs.getObjectAt(i));
-      certObject = new X509CertificateObject(certAsASN1Object); // NOTE: >= BC 1.48
-      //      certObject = new X509CertificateObject(X509CertificateStructure.getInstance(certAsASN1Object)); // NOTE: <= BC 1.47
+      certObject = new X509CertificateObject(certAsASN1Object);
       certSpec = certObject.getEncoded();
     }
 

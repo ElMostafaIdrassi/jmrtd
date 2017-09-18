@@ -82,15 +82,12 @@ public class ISO781611Decoder implements ISO781611 {
   private ComplexCBEFFInfo readBITGroup(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int tag = tlvIn.readTag();
-    switch (tag) {
-      case BIOMETRIC_INFORMATION_GROUP_TEMPLATE_TAG:
-        int length = tlvIn.readLength();
-        return readBITGroup(tag, length, inputStream);
-      default:
-        throw new IllegalArgumentException("Expected tag "
-            + Integer.toHexString(BIOMETRIC_INFORMATION_GROUP_TEMPLATE_TAG)
-            + ", found " + Integer.toHexString(tag));
+    if (tag != BIOMETRIC_INFORMATION_GROUP_TEMPLATE_TAG) {
+      throw new IllegalArgumentException("Expected tag " + Integer.toHexString(BIOMETRIC_INFORMATION_GROUP_TEMPLATE_TAG) + ", found " + Integer.toHexString(tag));
     }
+
+    int length = tlvIn.readLength();
+    return readBITGroup(tag, length, inputStream);
   }
 
   private ComplexCBEFFInfo readBITGroup(int tag, int length, InputStream inputStream) throws IOException {
@@ -149,7 +146,7 @@ public class ISO781611Decoder implements ISO781611 {
     } else if ((bhtTag & 0xA0) == 0xA0) {
       StandardBiometricHeader sbh = readBHT(inputStream, bhtTag, bhtLength, index);
       BiometricDataBlock bdb = readBiometricDataBlock(inputStream, sbh, index);
-      return new SimpleCBEFFInfo(bdb);
+      return new SimpleCBEFFInfo<BiometricDataBlock>(bdb);
     } else {
       throw new IllegalArgumentException("Unsupported template tag: " + Integer.toHexString(bhtTag));
     }
