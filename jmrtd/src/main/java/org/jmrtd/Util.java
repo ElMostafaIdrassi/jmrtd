@@ -39,6 +39,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.cert.CertificateFactory;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -51,7 +52,6 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
@@ -65,7 +65,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
@@ -645,6 +644,14 @@ public class Util {
       if (name != null) {
         algorithm += " [" + name + "]";
       }
+    } else if (publicKey instanceof DHPublicKey) {
+      DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+      dhPublicKey.getY();
+      DHParameterSpec dhParamSpec = dhPublicKey.getParams();
+      BigInteger g = dhParamSpec.getG();
+      int l = dhParamSpec.getL();
+      BigInteger p = dhParamSpec.getP();
+      algorithm += " [p.length = " + p.bitLength() + ", g.length = " + g.bitLength() + ", l = " + l + "]";
     }
 
     return algorithm;
@@ -1342,7 +1349,8 @@ public class Util {
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
       byte[] t = Util.i2os(pcdECPublicKey.getQ().getX().toBigInteger());
-      return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
+      return Util.alignKeyDataToSize(t, (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0)); // TODO: Interop Ispra for SecP521r1 20170925.
+//      return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
     }
 
     throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + agreementAlg);
@@ -1360,10 +1368,9 @@ public class Util {
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
 
-
   /* Get standard crypto primitives from default provider or (if that fails) from BC. */
 
-  public static Cipher getCipher(String algorithm) throws NoSuchAlgorithmException, NoSuchPaddingException {
+  public static Cipher getCipher(String algorithm) throws GeneralSecurityException {
     try {
       return Cipher.getInstance(algorithm);
     } catch (Exception e) {
@@ -1372,7 +1379,7 @@ public class Util {
     }
   }
 
-  public static Cipher getCipher(String algorithm, int mode, Key keySpec) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+  public static Cipher getCipher(String algorithm, int mode, Key keySpec) throws GeneralSecurityException {
     try {
       Cipher cipher =  Cipher.getInstance(algorithm);
       cipher.init(mode, keySpec);
@@ -1385,7 +1392,7 @@ public class Util {
     }
   }
 
-  public static KeyAgreement getKeyAgreement(String algorithm) throws NoSuchAlgorithmException {
+  public static KeyAgreement getKeyAgreement(String algorithm) throws GeneralSecurityException {
     try {
       return KeyAgreement.getInstance(algorithm);
     } catch (Exception e) {
@@ -1394,7 +1401,7 @@ public class Util {
     }
   }
 
-  public static KeyPairGenerator getKeyPairGenerator(String algorithm) throws NoSuchAlgorithmException {
+  public static KeyPairGenerator getKeyPairGenerator(String algorithm) throws GeneralSecurityException {
     try {
       return KeyPairGenerator.getInstance(algorithm);
     } catch (Exception e) {
@@ -1403,7 +1410,7 @@ public class Util {
     }
   }
 
-  public static Mac getMac(String algorithm) throws NoSuchAlgorithmException {
+  public static Mac getMac(String algorithm) throws GeneralSecurityException {
     try {
       return Mac.getInstance(algorithm);
     } catch (Exception e) {
@@ -1412,7 +1419,7 @@ public class Util {
     }
   }
 
-  public static Mac getMac(String algorithm, Key key) throws NoSuchAlgorithmException, InvalidKeyException {
+  public static Mac getMac(String algorithm, Key key) throws GeneralSecurityException {
     try {
       Mac mac = Mac.getInstance(algorithm);
       mac.init(key);
@@ -1425,7 +1432,7 @@ public class Util {
     }
   }
 
-  public static MessageDigest getMessageDigest(String algorithm) throws NoSuchAlgorithmException {
+  public static MessageDigest getMessageDigest(String algorithm) throws GeneralSecurityException {
     try {
       return MessageDigest.getInstance(algorithm);
     } catch (Exception e) {
@@ -1434,7 +1441,7 @@ public class Util {
     }
   }
 
-  public static PublicKey getPublicKey(String algorithm, KeySpec keySpec) throws InvalidKeySpecException, NoSuchAlgorithmException {
+  public static PublicKey getPublicKey(String algorithm, KeySpec keySpec) throws GeneralSecurityException {
     try {
       KeyFactory kf = KeyFactory.getInstance(algorithm);
       return kf.generatePublic(keySpec);
@@ -1445,12 +1452,21 @@ public class Util {
     }
   }
 
-  public static Signature getSignature(String algorithm) throws NoSuchAlgorithmException {
+  public static Signature getSignature(String algorithm) throws GeneralSecurityException {
     try {
       return Signature.getInstance(algorithm);
     } catch (Exception e) {
       LOGGER.log(Level.FINE, "Default provider could not provide this Signature, falling back to explicit BC", e);
       return Signature.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+
+  public static CertificateFactory getCertificateFactory(String algorithm) throws GeneralSecurityException {
+    try {
+      return CertificateFactory.getInstance(algorithm);
+    } catch (Exception e) {
+      LOGGER.log(Level.FINE, "Default provider could not provide this Certificate Factory, falling back ot explicit BC", e);
+      return CertificateFactory.getInstance(algorithm, BC_PROVIDER);
     }
   }
 }

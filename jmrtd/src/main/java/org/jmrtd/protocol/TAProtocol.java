@@ -29,6 +29,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Signature;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
@@ -55,6 +56,8 @@ public class TAProtocol {
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   private PassportService service;
   private SecureMessagingWrapper wrapper;
 
@@ -106,7 +109,7 @@ public class TAProtocol {
       /* NOTE: Never happens, ISO-8859-1 is supported. */
       throw new CardServiceException("Unsupported encoding", e);
     }
-    idPICC[idPICC.length - 1] = (byte) MRZInfo.checkDigit(documentNumber);
+    idPICC[idPICC.length - 1] = (byte)MRZInfo.checkDigit(documentNumber);
     return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
   }
 
@@ -244,8 +247,7 @@ public class TAProtocol {
       sig.update(dtbsBytes);
       byte[] signedData = sig.sign();
       if (sigAlg.toUpperCase().endsWith("ECDSA")) {
-        int keySize = ((org.bouncycastle.jce.interfaces.ECPrivateKey) terminalKey).getParameters().getCurve()
-            .getFieldSize() / 8;
+        int keySize = (int)Math.ceil(((org.bouncycastle.jce.interfaces.ECPrivateKey)terminalKey).getParameters().getCurve().getFieldSize() / 8.0); //TODO: Interop Ispra 20170925
         signedData = Util.getRawECDSASignature(signedData, keySize);
       }
 

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
@@ -182,6 +183,8 @@ public class CardSecurityFile implements Serializable {
       throw new IOException("Certificate exception during SignedData creation", ce);
     } catch (NoSuchAlgorithmException nsae) {
       throw new IOException("Unsupported algorithm", nsae);
+    } catch (GeneralSecurityException gse) {
+      throw new IOException("General security exception", gse);
     }
   }
 

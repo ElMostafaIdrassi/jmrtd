@@ -124,7 +124,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
    *
    */
-  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
+  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", true, ssc);
   }
 
@@ -142,11 +142,11 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
    *
    */
-  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
+  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC, long ssc) throws GeneralSecurityException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", doCheckMAC, ssc);
   }
 
-  private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, boolean doCheckMAC, long ssc) throws NoSuchAlgorithmException, NoSuchPaddingException {
+  private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, boolean doCheckMAC, long ssc) throws GeneralSecurityException {
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
     this.shouldCheckMAC = doCheckMAC;

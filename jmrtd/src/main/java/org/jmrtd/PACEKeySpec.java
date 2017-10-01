@@ -78,7 +78,7 @@ public class PACEKeySpec implements AccessKeySpec {
    * @throws GeneralSecurityException on error
    */
   public static PACEKeySpec createMRZKey(BACKeySpec mrz) throws GeneralSecurityException {
-    return new PACEKeySpec(PACEProtocol.computeKeySeedForPACE(mrz), PassportApduService.MRZ_PACE_KEY_REFERENCE);
+    return new PACEKeySpec(PACEProtocol.computeKeySeedForPACE(mrz), PassportAPDUService.MRZ_PACE_KEY_REFERENCE);
   }
 
   /**
@@ -89,7 +89,7 @@ public class PACEKeySpec implements AccessKeySpec {
    * @return the PACE key
    */
   public static PACEKeySpec createCANKey(String can) {
-    return new PACEKeySpec(can, PassportApduService.CAN_PACE_KEY_REFERENCE);
+    return new PACEKeySpec(can, PassportAPDUService.CAN_PACE_KEY_REFERENCE);
   }
 
   /**
@@ -100,7 +100,7 @@ public class PACEKeySpec implements AccessKeySpec {
    * @return the PACE key
    */
   public static PACEKeySpec createPINKey(String pin) {
-    return new PACEKeySpec(pin, PassportApduService.PIN_PACE_KEY_REFERENCE);
+    return new PACEKeySpec(pin, PassportAPDUService.PIN_PACE_KEY_REFERENCE);
   }
 
   /**
@@ -111,7 +111,7 @@ public class PACEKeySpec implements AccessKeySpec {
    * @return the PACE key
    */
   public static PACEKeySpec createPUKKey(String puk) {
-    return new PACEKeySpec(puk, PassportApduService.PUK_PACE_KEY_REFERENCE);
+    return new PACEKeySpec(puk, PassportAPDUService.PUK_PACE_KEY_REFERENCE);
   }
 
   /**

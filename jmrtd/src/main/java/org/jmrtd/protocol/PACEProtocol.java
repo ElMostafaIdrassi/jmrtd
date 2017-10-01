@@ -63,7 +63,6 @@ import org.jmrtd.BACKeySpec;
 import org.jmrtd.PACEException;
 import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PACESecretKeySpec;
-import org.jmrtd.PassportApduService;
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
@@ -224,7 +223,7 @@ public class PACEProtocol {
       byte[] referencePrivateKeyOrForComputingSessionKey = null;
 
       /* Send to the PICC. */
-      byte paceKeyReference = PassportApduService.MRZ_PACE_KEY_REFERENCE;
+      byte paceKeyReference = PassportService.MRZ_PACE_KEY_REFERENCE;
       if (staticPACEKey instanceof PACESecretKeySpec) {
         paceKeyReference = ((PACESecretKeySpec)staticPACEKey).getKeyReference();
       }

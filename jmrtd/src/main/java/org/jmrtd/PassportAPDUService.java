@@ -70,7 +70,7 @@ import net.sf.scuba.util.Hex;
  *
  * @version $Revision$
  */
-public class PassportApduService extends CardService {
+class PassportAPDUService extends CardService {
 
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte MRZ_PACE_KEY_REFERENCE = 0x01;
@@ -124,7 +124,7 @@ public class PassportApduService extends CardService {
    *             	                  <li>Mac: "ISO9797Alg3Mac"</li>
    *                              </ul>
    */
-  public PassportApduService(CardService service) throws CardServiceException {
+  public PassportAPDUService(CardService service) throws CardServiceException {
     this.service = service;
     plainTextAPDUListeners = new HashSet<APDUListener>();
     plainAPDUCount = 0;

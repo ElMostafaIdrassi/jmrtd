@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
@@ -128,13 +129,12 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @param privateKey private key to sign the data
    * @param docSigningCertificate the document signing certificate
    *
-   * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
-   * @throws CertificateException if the document signing certificate cannot be used
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
    */
   public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
       Map<Integer, byte[]> dataGroupHashes,
       PrivateKey privateKey,
-      X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException {
+      X509Certificate docSigningCertificate) throws GeneralSecurityException {
     this(digestAlgorithm, digestEncryptionAlgorithm, dataGroupHashes, privateKey, docSigningCertificate, null);
   }
 
@@ -148,13 +148,12 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @param docSigningCertificate the document signing certificate to embed
    * @param provider specific signature provider that should be used to create the signature
    *
-   * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
-   * @throws CertificateException if the document signing certificate cannot be used
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
    */
   public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
       Map<Integer, byte[]> dataGroupHashes,
       PrivateKey privateKey,
-      X509Certificate docSigningCertificate, String provider) throws NoSuchAlgorithmException, CertificateException {
+      X509Certificate docSigningCertificate, String provider) throws GeneralSecurityException {
     this(digestAlgorithm, digestEncryptionAlgorithm, dataGroupHashes, privateKey, docSigningCertificate, provider, null, null);
   }
 
@@ -170,14 +169,13 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @param ldsVersion LDS version
    * @param unicodeVersion Unicode version
    *
-   * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
-   * @throws CertificateException if the document signing certificate cannot be used
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
    */
   public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
       Map<Integer, byte[]> dataGroupHashes,
       PrivateKey privateKey,
       X509Certificate docSigningCertificate, String provider,
-      String ldsVersion, String unicodeVersion) throws NoSuchAlgorithmException, CertificateException {
+      String ldsVersion, String unicodeVersion) throws GeneralSecurityException {
     super(EF_SOD_TAG);
     try {
       ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
@@ -201,13 +199,12 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @param encryptedDigest externally signed contents
    * @param docSigningCertificate the document signing certificate
    *
-   * @throws NoSuchAlgorithmException if either of the algorithm parameters is not recognized
-   * @throws CertificateException if the document signing certificate cannot be used
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
    */
   public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
       Map<Integer, byte[]> dataGroupHashes,
       byte[] encryptedDigest,
-      X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException {
+      X509Certificate docSigningCertificate) throws GeneralSecurityException {
     super(EF_SOD_TAG);
     try {
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,

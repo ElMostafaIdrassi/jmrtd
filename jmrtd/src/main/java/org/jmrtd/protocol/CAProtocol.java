@@ -30,6 +30,7 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -58,6 +59,8 @@ import net.sf.scuba.smartcards.CardServiceException;
 public class CAProtocol {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private PassportService service;
 
@@ -119,7 +122,8 @@ public class CAProtocol {
       }
 
       /* Generate the inspection system's ephemeral key pair. */
-      KeyPairGenerator keyPairGenerator = Util.getKeyPairGenerator(agreementAlg); // FIXME: Shouldn't we use "EC" instead of "ECDH"?
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER); // FIXME: Shouldn't we use "EC" instead of "ECDH"?
+      LOGGER.info("DEBUG: ====> keyPairGenerator.getProvider() = " + keyPairGenerator.getProvider());
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
@@ -159,10 +163,9 @@ public class CAProtocol {
     if (cipherAlg.startsWith("DESede")) {
       byte[] idData = null;
       if (keyId != null) {
-        byte[] keyIdBytes = keyId.toByteArray();
+        byte[] keyIdBytes = keyId.toByteArray(); // FIXME: Shouldn't this be  Util.i2os(keyId); ? -- MO 20170926
         idData = Util.wrapDO((byte)0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
       }
-
       service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData); /* FIXME: Constant for 0x91. */
     } else if (cipherAlg.startsWith("AES")) {
       service.sendMSESetATIntAuth(wrapper, oid, keyId);
@@ -186,7 +189,7 @@ public class CAProtocol {
    * @throws InvalidKeyException if one of the keys is invalid
    */
   public static byte[] computeSharedSecret(String agreementAlg, PublicKey piccPublicKey, PrivateKey pcdPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
-    KeyAgreement agreement = Util.getKeyAgreement(agreementAlg);
+    KeyAgreement agreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
     agreement.init(pcdPrivateKey);
     agreement.doPhase(piccPublicKey, true);
     return agreement.generateSecret();

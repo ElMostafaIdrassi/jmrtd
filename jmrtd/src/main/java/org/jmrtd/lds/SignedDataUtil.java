@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -382,7 +383,7 @@ import org.jmrtd.Util;
      * the fact that we're using BC.
      */
     try {
-      CertificateFactory factory = CertificateFactory.getInstance("X.509");
+      CertificateFactory factory = Util.getCertificateFactory("X.509");
       return (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certSpec));
     } catch (Exception e) {
       LOGGER.log(Level.FINE, "Reconstructing using preferred provider didn't work.", e);
@@ -392,7 +393,7 @@ import org.jmrtd.Util;
 
   public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
       String contentTypeOID, ContentInfo contentInfo, byte[] encryptedDigest,
-      X509Certificate docSigningCertificate) throws NoSuchAlgorithmException, CertificateException {
+      X509Certificate docSigningCertificate) throws GeneralSecurityException {
     ASN1Set digestAlgorithmsSet = SignedDataUtil.createSingletonSet(SignedDataUtil.createDigestAlgorithms(digestAlgorithm));
     ASN1Set certificates =  createSingletonSet(SignedDataUtil.createCertificate(docSigningCertificate));
     ASN1Set crls = null;
@@ -402,7 +403,7 @@ import org.jmrtd.Util;
 
   public static SignerInfo createSignerInfo(String digestAlgorithm,
       String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
-      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws NoSuchAlgorithmException {
+      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
     /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
     X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
     X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
@@ -418,7 +419,7 @@ import org.jmrtd.Util;
     return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
   }
 
-  public static ASN1Set createAuthenticatedAttributes(String digestAlgorithm, String contentTypeOID, ContentInfo contentInfo) throws NoSuchAlgorithmException {
+  public static ASN1Set createAuthenticatedAttributes(String digestAlgorithm, String contentTypeOID, ContentInfo contentInfo) throws GeneralSecurityException {
     /* Check bug found by Paulo Assumpco. */
     if ("SHA256".equals(digestAlgorithm)) {
       digestAlgorithm = "SHA-256";

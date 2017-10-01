@@ -75,7 +75,7 @@ import net.sf.scuba.smartcards.CardServiceException;
  *
  * @version $Revision:352 $
  */
-public class PassportService extends PassportApduService {
+public class PassportService extends PassportAPDUService {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 

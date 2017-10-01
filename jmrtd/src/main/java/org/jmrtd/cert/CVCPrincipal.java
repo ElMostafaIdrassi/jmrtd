@@ -55,7 +55,45 @@ public class CVCPrincipal implements Principal, Serializable {
     if (name.length() < 2 + 5 || name.length() > 2 + 9 + 5) {
       throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found \"" + name + "\"");
     }
-    country = Country.getInstance(name.substring(0, 2).toUpperCase());
+
+    final String alpha2Code = name.substring(0, 2).toUpperCase();
+    try {
+      country = Country.getInstance(alpha2Code);
+    } catch (IllegalArgumentException iae) {
+      country = new Country() {
+
+        @Override
+        public int valueOf() {
+          // TODO Auto-generated method stub
+          return -1;
+        }
+
+        @Override
+        public String getName() {
+          // TODO Auto-generated method stub
+          return "Unknown";
+        }
+
+        @Override
+        public String getNationality() {
+          // TODO Auto-generated method stub
+          return "Unknown";
+        }
+
+        @Override
+        public String toAlpha2Code() {
+          // TODO Auto-generated method stub
+          return alpha2Code;
+        }
+
+        @Override
+        public String toAlpha3Code() {
+          // TODO Auto-generated method stub
+          return "XXX";
+        }
+
+      };
+    }
     mnemonic = name.substring(2, name.length() - 5);
     seqNumber = name.substring(name.length() - 5, name.length());
   }
