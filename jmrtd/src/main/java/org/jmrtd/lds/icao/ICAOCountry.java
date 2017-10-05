@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.scuba.data.Country;
+import net.sf.scuba.data.TestCountry;
 
 /**
  * Special ICAO countries not covered in {@link net.sf.scuba.data.ISOCountry}.
@@ -42,27 +43,43 @@ public class ICAOCountry extends Country {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   public static final ICAOCountry DE = new ICAOCountry("DE", "D<<", "Germany", "German");
+  
   public static final ICAOCountry GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen");
   public static final ICAOCountry GBN = new ICAOCountry("GB","GBN","British National (Overseas)");
   public static final ICAOCountry GBO = new ICAOCountry("GB","GBO","British Overseas citizen");
   public static final ICAOCountry GBP = new ICAOCountry("GB","GBP","British Protected person");
   public static final ICAOCountry GBS = new ICAOCountry("GB","GBS","British Subject");
-  public static final ICAOCountry UNO = new ICAOCountry("UN","UNO","United Nations Organization");
-  public static final ICAOCountry UNA = new ICAOCountry("UN","UNA","United Nations Agency");
-  public static final ICAOCountry UNK = new ICAOCountry("UN","UNK","United Nations Interim Administration Mission in Kosovo");
-  public static final ICAOCountry XOM = new ICAOCountry("XO","XOM","Sovereign Military Order of Malta");
-  public static final ICAOCountry XCC = new ICAOCountry("XC","XCC","Carribean Community");
-  public static final ICAOCountry XPO = new ICAOCountry("XP", "XPO", "Interpol");
+  
   public static final ICAOCountry XXA = new ICAOCountry("XX","XXA","Stateless person", "Stateless");
   public static final ICAOCountry XXB = new ICAOCountry("XX","XXB","Refugee", "Refugee");
   public static final ICAOCountry XXC = new ICAOCountry("XX","XXC","Refugee (other)", "Refugee (other)");
   public static final ICAOCountry XXX = new ICAOCountry("XX","XXX","Unspecified", "Unspecified");
 
+  /** Part B: Europe. */
+  public static final ICAOCountry EUE = new ICAOCountry("EU", "EUE", "Europe", "European");
+  
+  /** Part C: Codes for Use in United Nations Travel Documents. */
+  public static final ICAOCountry UNO = new ICAOCountry("UN","UNO","United Nations Organization");
+  public static final ICAOCountry UNA = new ICAOCountry("UN","UNA","United Nations Agency");
+  public static final ICAOCountry UNK = new ICAOCountry("UN","UNK","United Nations Interim Administration Mission in Kosovo");
+
+  /** Part D: Other issuing authorities. */
+  public static final ICAOCountry XBA = new ICAOCountry("XX", "XBA", "African Development Bank (ADB)");
+  public static final ICAOCountry XIM = new ICAOCountry("XX", "XIM", "African Export-Import Bank (AFREXIM bank)");
+  public static final ICAOCountry XCC = new ICAOCountry("XC","XCC","Carribean Community or one of its emissaries (CARICOM)");
+  public static final ICAOCountry XCO = new ICAOCountry("XX", "XCO", "Common Market for Eastern an Southern Africa (COMESA)");
+  public static final ICAOCountry XEC = new ICAOCountry("XX", "XEC", "Economic Community of West African States (ECOWAS)");
+  public static final ICAOCountry XPO = new ICAOCountry("XP", "XPO", "International Criminal Police Organization (INTERPOL)");
+  public static final ICAOCountry XOM = new ICAOCountry("XO","XOM","Sovereign Military Order of Malta or one of its emissaries");
+
+  
   private static final ICAOCountry[] VALUES = {
       DE,
       GBD, GBN, GBO, GBP, GBS,
+      XXA, XXB, XXC, XXX,
+      EUE,
       UNO, UNA, UNK,
-      XOM, XCC, XXA, XXB, XXC, XXX
+      XBA, XIM, XCC, XCO, XEC, XPO, XOM
   };
 
   private String name;
