@@ -183,6 +183,71 @@ public class DG12File extends DataGroup {
     }
   }
 
+  @Override
+  protected void writeContent(OutputStream outputStream) throws IOException {
+    TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+    tlvOut.writeTag(TAG_LIST_TAG);
+    List<Integer> tags = getTagPresenceList();
+    DataOutputStream dataOut = new DataOutputStream(tlvOut);
+    for (int tag: tags) {
+      dataOut.writeShort(tag);
+    }
+    dataOut.flush();
+    tlvOut.writeValueEnd(); /* TAG_LIST_TAG */
+    for (int tag: tags) {
+      switch (tag) {
+        case ISSUING_AUTHORITY_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(issuingAuthority.trim().getBytes("UTF-8"));
+          break;
+        case DATE_OF_ISSUE_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(dateOfIssue.getBytes("UTF-8"));
+          break;
+        case NAME_OF_OTHER_PERSON_TAG:
+          if (namesOfOtherPersons == null) {
+            namesOfOtherPersons = new ArrayList<String>();
+          }
+          tlvOut.writeTag(CONTENT_SPECIFIC_CONSTRUCTED_TAG);
+          tlvOut.writeTag(COUNT_TAG);
+          tlvOut.write(namesOfOtherPersons.size());
+          tlvOut.writeValueEnd(); /* COUNT_TAG */
+          for (String nameOfOtherPerson: namesOfOtherPersons) {
+            tlvOut.writeTag(NAME_OF_OTHER_PERSON_TAG);
+            tlvOut.writeValue(nameOfOtherPerson.trim().getBytes("UTF-8"));
+          }
+          tlvOut.writeValueEnd(); /* CONTENT_SPECIFIC_CONSTRUCTED_TAG */
+          break;
+        case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(endorsementsAndObservations.trim().getBytes("UTF-8"));
+          break;
+        case TAX_OR_EXIT_REQUIREMENTS_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(taxOrExitRequirements.trim().getBytes("UTF-8"));
+          break;
+        case IMAGE_OF_FRONT_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(imageOfFront);
+          break;
+        case IMAGE_OF_REAR_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(imageOfRear);
+          break;
+        case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(dateAndTimeOfPersonalization.getBytes("UTF-8"));
+          break;
+        case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
+          tlvOut.writeTag(tag);
+          tlvOut.writeValue(personalizationSystemSerialNumber.trim().getBytes("UTF-8"));
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
+      }
+    }
+  }
+
   /**
    * Gets the tags of fields actually present in this file.
    *
@@ -526,72 +591,5 @@ public class DG12File extends DataGroup {
   @Override
   public int hashCode() {
     return 13 * toString().hashCode() + 112;
-  }
-
-  @Override
-  protected void writeContent(OutputStream outputStream) throws IOException {
-    TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
-    tlvOut.writeTag(TAG_LIST_TAG);
-    List<Integer> tags = getTagPresenceList();
-    DataOutputStream dataOut = new DataOutputStream(tlvOut);
-    for (int tag: tags) {
-      dataOut.writeShort(tag);
-    }
-    dataOut.flush();
-    tlvOut.writeValueEnd(); /* TAG_LIST_TAG */
-    for (int tag: tags) {
-      switch (tag) {
-        case ISSUING_AUTHORITY_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(issuingAuthority.trim().getBytes("UTF-8"));
-          break;
-        case DATE_OF_ISSUE_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(dateOfIssue.getBytes("UTF-8"));
-          break;
-        case NAME_OF_OTHER_PERSON_TAG:
-          if (namesOfOtherPersons == null) {
-            namesOfOtherPersons = new ArrayList<String>();
-          }
-          tlvOut.writeTag(CONTENT_SPECIFIC_CONSTRUCTED_TAG);
-          tlvOut.writeTag(COUNT_TAG);
-          tlvOut.write(namesOfOtherPersons.size());
-          tlvOut.writeValueEnd(); /* COUNT_TAG */
-          for (String nameOfOtherPerson: namesOfOtherPersons) {
-            tlvOut.writeTag(NAME_OF_OTHER_PERSON_TAG);
-            tlvOut.writeValue(nameOfOtherPerson.trim().getBytes("UTF-8"));
-          }
-          tlvOut.writeValueEnd(); /* CONTENT_SPECIFIC_CONSTRUCTED_TAG */
-          break;
-        case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(endorsementsAndObservations.trim().getBytes("UTF-8"));
-          break;
-        case TAX_OR_EXIT_REQUIREMENTS_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(taxOrExitRequirements.trim().getBytes("UTF-8"));
-          break;
-        case IMAGE_OF_FRONT_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(imageOfFront);
-          break;
-        case IMAGE_OF_REAR_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(imageOfRear);
-          break;
-        case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
-          tlvOut.writeTag(tag);
-          // the following commented line  writes date and time of personalisation field incorrectly
-          //tlvOut.writeValue(Hex.hexStringToBytes(SDTF.format(dateAndTimeOfPersonalization)));
-          tlvOut.writeValue(dateAndTimeOfPersonalization.getBytes("UTF-8"));
-          break;
-        case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(personalizationSystemSerialNumber.trim().getBytes("UTF-8"));
-          break;
-        default:
-          throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
-      }
-    }
   }
 }

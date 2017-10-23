@@ -273,7 +273,6 @@ public class PassportService extends PassportAPDUService {
     isICAOAppletSelected = false;
 
     state = State.SESSION_STOPPED_STATE;
-    LOGGER.info("DEBUG: isExtendedAPDULengthSupported: " + isExtendedAPDULengthSupported());
   }
 
   /**
@@ -339,18 +338,18 @@ public class PassportService extends PassportAPDUService {
   }
 
   /**
-   * Sends a <code>READ BINARY</code> command to the passport, use wrapper when secure channel set up.
+   * Sends a {@code READ BINARY} command to the passport, use wrapper when secure channel set up.
    *
    * @param offset offset into the file
    * @param le the expected length of the file to read
-   * @param longRead whether to use extended length APDUs
+   * @param isExtendedLength whether to use extended length APDUs
    *
-   * @return a byte array of length <code>le</code> with (the specified part of) the contents of the currently selected file
+   * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException on tranceive error
    */
-  public synchronized byte[] sendReadBinary(int offset, int le, boolean longRead) throws CardServiceException {
-    return sendReadBinary(wrapper, offset, le, longRead);
+  public synchronized byte[] sendReadBinary(int offset, int le, boolean isExtendedLength) throws CardServiceException {
+    return sendReadBinary(wrapper, offset, le, isExtendedLength);
   }
 
   /**
@@ -408,7 +407,6 @@ public class PassportService extends PassportAPDUService {
    */
   public synchronized PACEResult doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
-    LOGGER.info("DEBUG: Starting secure messaging based on PACE");
     wrapper = paceResult.getWrapper();
     state = State.PACE_AUTHENTICATED_STATE;
     return paceResult;
@@ -431,7 +429,6 @@ public class PassportService extends PassportAPDUService {
    */
   public synchronized CAResult doCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
     CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, oid, publicKeyOID, publicKey);
-    LOGGER.info("DEBUG: Starting secure messaging based on Chip Authentication");
     wrapper = caResult.getWrapper();
     state = State.CA_EXECUTED_STATE;
     return caResult;
@@ -534,8 +531,7 @@ public class PassportService extends PassportAPDUService {
   }
 
   /**
-   * Gets the wrapper. Returns <code>null</code> until BAC has been
-   * performed.
+   * Gets the wrapper. Returns {@code null} until access control has been performed.
    *
    * @return the wrapper
    */

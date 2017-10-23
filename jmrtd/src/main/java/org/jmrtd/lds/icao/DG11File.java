@@ -114,6 +114,17 @@ public class DG11File extends DataGroup {
   private List<Integer> tagPresenceList;
 
   /**
+   * Constructs a file from binary representation.
+   *
+   * @param inputStream an input stream
+   *
+   * @throws IOException if reading fails
+   */
+  public DG11File(InputStream inputStream) throws IOException {
+    super(EF_DG11_TAG, inputStream);
+  }
+  
+  /**
    * Constructs a new file. Use <code>null</code> if data element is not present.
    * Use <code>&#39;&lt;&#39;</code> as separator.
    *
@@ -144,7 +155,7 @@ public class DG11File extends DataGroup {
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
   }
-
+  
   /**
    * Constructs a new file. Use <code>null</code> if data element is not present.
    * Use <code>&#39;&lt;&#39;</code> as separator.
@@ -183,281 +194,6 @@ public class DG11File extends DataGroup {
     this.proofOfCitizenship = proofOfCitizenship; // FIXME: deep copy
     this.otherValidTDNumbers = otherValidTDNumbers == null ? new ArrayList<String>() : new ArrayList<String>(otherValidTDNumbers);
     this.custodyInformation = custodyInformation;
-  }
-
-  /**
-   * Constructs a file from binary representation.
-   *
-   * @param inputStream an input stream
-   *
-   * @throws IOException if reading fails
-   */
-  public DG11File(InputStream inputStream) throws IOException {
-    super(EF_DG11_TAG, inputStream);
-  }
-
-  @Override
-  protected void readContent(InputStream inputStream) throws IOException {
-    TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
-    int tagListTag = tlvInputStream.readTag();
-    if (tagListTag != TAG_LIST_TAG) {
-      throw new IllegalArgumentException("Expected tag list in DG11");
-    }
-
-    int tagListLength = tlvInputStream.readLength();
-    int tagListBytesRead = 0;
-
-    int expectedTagCount = tagListLength / 2;
-
-    ByteArrayInputStream tagListBytesInputStream = new ByteArrayInputStream(tlvInputStream.readValue());
-
-    /* Find out which tags are present. */
-    List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
-    while (tagListBytesRead < tagListLength) {
-      /* We're using another TLV inputstream everytime to read each tag. */
-      TLVInputStream anotherTLVInputStream = new TLVInputStream(tagListBytesInputStream);
-      int tag = anotherTLVInputStream.readTag();
-      tagListBytesRead += TLVUtil.getTagLength(tag);
-      tagList.add(tag);
-    }
-
-    /* Now read the fields in order. */
-    for (int t: tagList) {
-      readField(t, tlvInputStream);
-    }
-  }
-
-  private void readField(int fieldTag, TLVInputStream tlvIn) throws IOException {
-    int tag = tlvIn.readTag();
-    if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
-      /* int contentSpecificLength = */ tlvIn.readLength();
-      int countTag = tlvIn.readTag();
-      if (countTag != COUNT_TAG) {
-        throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
-      }
-      int countLength = tlvIn.readLength();
-      if (countLength != 1) {
-        throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
-      }
-      byte[] countValue = tlvIn.readValue();
-      if (countValue == null || countValue.length != 1) {
-        throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
-      }
-      int count = countValue[0] & 0xFF;
-      for (int i = 0; i < count; i++) {
-        tag = tlvIn.readTag();
-        if (tag != OTHER_NAME_TAG) {
-          throw new IllegalArgumentException("Expected " + Integer.toHexString(OTHER_NAME_TAG) + ", found " + Integer.toHexString(tag));
-        }
-        /* int otherNameLength = */ tlvIn.readLength();
-        byte[] value = tlvIn.readValue();
-        parseOtherName(value);
-      }
-    } else {
-      if (tag != fieldTag) {
-        throw new IllegalArgumentException("Expected " + Integer.toHexString(fieldTag) + ", but found " + Integer.toHexString(tag));
-      }
-      tlvIn.readLength();
-      byte[] value = tlvIn.readValue();
-      switch (tag) {
-        case FULL_NAME_TAG:
-          parseNameOfHolder(value);
-          break;
-        case OTHER_NAME_TAG:
-          parseOtherName(value);
-          break;
-        case PERSONAL_NUMBER_TAG:
-          parsePersonalNumber(value);
-          break;
-        case FULL_DATE_OF_BIRTH_TAG:
-          parseFullDateOfBirth(value);
-          break;
-        case PLACE_OF_BIRTH_TAG:
-          parsePlaceOfBirth(value);
-          break;
-        case PERMANENT_ADDRESS_TAG:
-          parsePermanentAddress(value);
-          break;
-        case TELEPHONE_TAG:
-          parseTelephone(value);
-          break;
-        case PROFESSION_TAG:
-          parseProfession(value);
-          break;
-        case TITLE_TAG:
-          parseTitle(value);
-          break;
-        case PERSONAL_SUMMARY_TAG:
-          parsePersonalSummary(value);
-          break;
-        case PROOF_OF_CITIZENSHIP_TAG:
-          parseProofOfCitizenShip(value);
-          break;
-        case OTHER_VALID_TD_NUMBERS_TAG:
-          parseOtherValidTDNumbers(value);
-          break;
-        case CUSTODY_INFORMATION_TAG:
-          parseCustodyInformation(value);
-          break;
-        default:
-          throw new IllegalArgumentException("Unknown field tag in DG11: " + Integer.toHexString(tag));
-      }
-    }
-  }
-
-  /* Field parsing and interpretation below. */
-
-  private void parseCustodyInformation(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      //		custodyInformation = in.replace("<", " ").trim();
-      custodyInformation = field.trim();
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-      custodyInformation = new String(value).trim();
-    }
-  }
-
-  private void parseOtherValidTDNumbers(byte[] value) {
-    String field = new String(value).trim();
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    otherValidTDNumbers = new ArrayList<String>();
-    StringTokenizer st = new StringTokenizer(field, "<");
-    while (st.hasMoreTokens()) {
-      String number = st.nextToken().trim();
-      otherValidTDNumbers.add(number);
-    }
-  }
-
-  private void parseProofOfCitizenShip(byte[] value) {
-    proofOfCitizenship = value;
-  }
-
-  private void parsePersonalSummary(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      //		personalSummary = in.replace("<", " ").trim();
-      personalSummary = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      personalSummary = new String(value).trim();
-    }
-  }
-
-  private void parseTitle(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      //		title = in.replace("<", " ").trim();
-      title = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      title = new String(value).trim();
-    }
-  }
-
-  private void parseProfession(byte[] value) {
-    String field = new String(value);
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    //		profession = in.replace("<", " ").trim();
-    profession = field.trim();
-  }
-
-  private void parseTelephone(byte[] value) {
-    String field = new String(value);
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    //		telephone = in.replace("<", " ").trim();
-    telephone = field.replace("<", " ").trim();
-  }
-
-  private void parsePermanentAddress(byte[] value) {
-    String field = new String(value);
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    StringTokenizer st = new StringTokenizer(field, "<");
-    permanentAddress = new ArrayList<String>();
-    while (st.hasMoreTokens()) {
-      String line = st.nextToken().trim();
-      permanentAddress.add(line);
-    }
-  }
-
-  private void parsePlaceOfBirth(byte[] value) {
-    String field = new String(value);
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    StringTokenizer st = new StringTokenizer(field, "<");
-    placeOfBirth = new ArrayList<String>();
-    while (st.hasMoreTokens()) {
-      String line = st.nextToken().trim();
-      placeOfBirth.add(line);
-    }
-  }
-
-  private void parseFullDateOfBirth(byte[] value) {
-    String field = null;
-    if (value.length == 4) {
-      /* Either France or Belgium uses this encoding for dates. */
-      field = Hex.bytesToHexString(value);
-    } else {
-      field = new String(value);
-      try {
-        field = new String(value, "UTF-8");
-      } catch (UnsupportedEncodingException usee) {
-        LOGGER.log(Level.WARNING, "Exception", usee);
-      }
-    }
-    fullDateOfBirth = field;
-  }
-
-  private synchronized void parseOtherName(byte[] value) {
-    if (otherNames == null) {
-      otherNames = new ArrayList<String>();
-    }
-    try {
-      String field = new String(value, "UTF-8");
-      otherNames.add(field.trim());
-    } catch (UnsupportedEncodingException usee) {
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      otherNames.add(new String(value).trim());
-    }
-  }
-
-  private void parsePersonalNumber(byte[] value) {
-    String field = new String(value);
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    personalNumber = field.trim();
-  }
-
-  private void parseNameOfHolder(byte[] value) {
-    String field = new String(value);
-    try {
-      field = new String(value, "UTF-8");
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.log(Level.WARNING, "Exception", uee);
-    }
-    nameOfHolder = field.trim();
   }
 
   /* Accessors below. */
@@ -681,7 +417,40 @@ public class DG11File extends DataGroup {
   public int hashCode() {
     return 13 * toString().hashCode() + 111;
   }
+  
+  /* Reading and writing content of this data group. */
+  
+  @Override
+  protected void readContent(InputStream inputStream) throws IOException {
+    TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
+    int tagListTag = tlvInputStream.readTag();
+    if (tagListTag != TAG_LIST_TAG) {
+      throw new IllegalArgumentException("Expected tag list in DG11");
+    }
 
+    int tagListLength = tlvInputStream.readLength();
+    int tagListBytesRead = 0;
+
+    int expectedTagCount = tagListLength / 2;
+
+    ByteArrayInputStream tagListBytesInputStream = new ByteArrayInputStream(tlvInputStream.readValue());
+
+    /* Find out which tags are present. */
+    List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
+    while (tagListBytesRead < tagListLength) {
+      /* We're using another TLV inputstream everytime to read each tag. */
+      TLVInputStream anotherTLVInputStream = new TLVInputStream(tagListBytesInputStream);
+      int tag = anotherTLVInputStream.readTag();
+      tagListBytesRead += TLVUtil.getTagLength(tag);
+      tagList.add(tag);
+    }
+
+    /* Now read the fields in order. */
+    for (int t: tagList) {
+      readField(t, tlvInputStream);
+    }
+  }
+  
   @Override
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
@@ -720,11 +489,6 @@ public class DG11File extends DataGroup {
         case FULL_DATE_OF_BIRTH_TAG:
           tlvOut.writeTag(tag);
           String fullDateOfBirthString = fullDateOfBirth;
-          // the following 2 commented lines  write date of birth field incorrectly
-          // (also see that during parsing field in incorrect case of BCD encoding is
-          // handled but JMRTD itself uses incorrect way of writing field)
-          //byte[] fullDateOfBirthBytes = Hex.hexStringToBytes(fullDateOfBirthString);
-          //tlvOut.writeValue(fullDateOfBirthBytes);
           tlvOut.writeValue(fullDateOfBirthString.getBytes("UTF-8"));
           break;
         case PLACE_OF_BIRTH_TAG:
@@ -797,6 +561,239 @@ public class DG11File extends DataGroup {
           tlvOut.writeValue(custodyInformation.trim().replace(' ', '<').getBytes("UTF-8"));
           break;
         default: throw new IllegalStateException("Unknown tag in DG11: " + Integer.toHexString(tag));
+      }
+    }
+  }
+  
+  /* Field parsing and interpretation below. */
+
+  private void parseCustodyInformation(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      //		custodyInformation = in.replace("<", " ").trim();
+      custodyInformation = field.trim();
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+      custodyInformation = new String(value).trim();
+    }
+  }
+
+  private void parseOtherValidTDNumbers(byte[] value) {
+    String field = new String(value).trim();
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    otherValidTDNumbers = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(field, "<");
+    while (st.hasMoreTokens()) {
+      String number = st.nextToken().trim();
+      otherValidTDNumbers.add(number);
+    }
+  }
+
+  private void parseProofOfCitizenShip(byte[] value) {
+    proofOfCitizenship = value;
+  }
+
+  private void parsePersonalSummary(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      //		personalSummary = in.replace("<", " ").trim();
+      personalSummary = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      personalSummary = new String(value).trim();
+    }
+  }
+
+  private void parseTitle(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      //		title = in.replace("<", " ").trim();
+      title = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      title = new String(value).trim();
+    }
+  }
+
+  private void parseProfession(byte[] value) {
+    String field = new String(value);
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    //		profession = in.replace("<", " ").trim();
+    profession = field.trim();
+  }
+
+  private void parseTelephone(byte[] value) {
+    String field = new String(value);
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    //		telephone = in.replace("<", " ").trim();
+    telephone = field.replace("<", " ").trim();
+  }
+
+  private void parsePermanentAddress(byte[] value) {
+    String field = new String(value);
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    StringTokenizer st = new StringTokenizer(field, "<");
+    permanentAddress = new ArrayList<String>();
+    while (st.hasMoreTokens()) {
+      String line = st.nextToken().trim();
+      permanentAddress.add(line);
+    }
+  }
+
+  private void parsePlaceOfBirth(byte[] value) {
+    String field = new String(value);
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    StringTokenizer st = new StringTokenizer(field, "<");
+    placeOfBirth = new ArrayList<String>();
+    while (st.hasMoreTokens()) {
+      String line = st.nextToken().trim();
+      placeOfBirth.add(line);
+    }
+  }
+
+  private void parseFullDateOfBirth(byte[] value) {
+    String field = null;
+    if (value.length == 4) {
+      /* Either France or Belgium uses this encoding for dates. */
+      field = Hex.bytesToHexString(value);
+    } else {
+      field = new String(value);
+      try {
+        field = new String(value, "UTF-8");
+      } catch (UnsupportedEncodingException usee) {
+        LOGGER.log(Level.WARNING, "Exception", usee);
+      }
+    }
+    fullDateOfBirth = field;
+  }
+
+  private synchronized void parseOtherName(byte[] value) {
+    if (otherNames == null) {
+      otherNames = new ArrayList<String>();
+    }
+    try {
+      String field = new String(value, "UTF-8");
+      otherNames.add(field.trim());
+    } catch (UnsupportedEncodingException usee) {
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      otherNames.add(new String(value).trim());
+    }
+  }
+
+  private void parsePersonalNumber(byte[] value) {
+    String field = new String(value);
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    personalNumber = field.trim();
+  }
+
+  private void parseNameOfHolder(byte[] value) {
+    String field = new String(value);
+    try {
+      field = new String(value, "UTF-8");
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.log(Level.WARNING, "Exception", uee);
+    }
+    nameOfHolder = field.trim();
+  }
+
+  private void readField(int fieldTag, TLVInputStream tlvIn) throws IOException {
+    int tag = tlvIn.readTag();
+    if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
+      /* int contentSpecificLength = */ tlvIn.readLength();
+      int countTag = tlvIn.readTag();
+      if (countTag != COUNT_TAG) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
+      }
+      int countLength = tlvIn.readLength();
+      if (countLength != 1) {
+        throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
+      }
+      byte[] countValue = tlvIn.readValue();
+      if (countValue == null || countValue.length != 1) {
+        throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
+      }
+      int count = countValue[0] & 0xFF;
+      for (int i = 0; i < count; i++) {
+        tag = tlvIn.readTag();
+        if (tag != OTHER_NAME_TAG) {
+          throw new IllegalArgumentException("Expected " + Integer.toHexString(OTHER_NAME_TAG) + ", found " + Integer.toHexString(tag));
+        }
+        /* int otherNameLength = */ tlvIn.readLength();
+        byte[] value = tlvIn.readValue();
+        parseOtherName(value);
+      }
+    } else {
+      if (tag != fieldTag) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(fieldTag) + ", but found " + Integer.toHexString(tag));
+      }
+      tlvIn.readLength();
+      byte[] value = tlvIn.readValue();
+      switch (tag) {
+        case FULL_NAME_TAG:
+          parseNameOfHolder(value);
+          break;
+        case OTHER_NAME_TAG:
+          parseOtherName(value);
+          break;
+        case PERSONAL_NUMBER_TAG:
+          parsePersonalNumber(value);
+          break;
+        case FULL_DATE_OF_BIRTH_TAG:
+          parseFullDateOfBirth(value);
+          break;
+        case PLACE_OF_BIRTH_TAG:
+          parsePlaceOfBirth(value);
+          break;
+        case PERMANENT_ADDRESS_TAG:
+          parsePermanentAddress(value);
+          break;
+        case TELEPHONE_TAG:
+          parseTelephone(value);
+          break;
+        case PROFESSION_TAG:
+          parseProfession(value);
+          break;
+        case TITLE_TAG:
+          parseTitle(value);
+          break;
+        case PERSONAL_SUMMARY_TAG:
+          parsePersonalSummary(value);
+          break;
+        case PROOF_OF_CITIZENSHIP_TAG:
+          parseProofOfCitizenShip(value);
+          break;
+        case OTHER_VALID_TD_NUMBERS_TAG:
+          parseOtherValidTDNumbers(value);
+          break;
+        case CUSTODY_INFORMATION_TAG:
+          parseCustodyInformation(value);
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown field tag in DG11: " + Integer.toHexString(tag));
       }
     }
   }

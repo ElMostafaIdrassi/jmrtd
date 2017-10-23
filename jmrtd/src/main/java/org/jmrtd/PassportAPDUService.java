@@ -323,26 +323,26 @@ class PassportAPDUService extends CardService {
    *
    * @param offset offset into the file
    * @param le the expected length of the file to read
-   * @param longRead whether to use extended length APDUs
+   * @param isExtendedLength whether to use extended length APDUs
    *
    * @return a byte array of length <code>le</code> with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException if the command was not successful
    */
-  public synchronized byte[] sendReadBinary(short offset, int le, boolean longRead) throws CardServiceException {
-    return sendReadBinary(null, offset, le, longRead);
+  public synchronized byte[] sendReadBinary(short offset, int le, boolean isExtendedLength) throws CardServiceException {
+    return sendReadBinary(null, offset, le, isExtendedLength);
   }
 
   /**
-   * Sends a <code>READ BINARY</code> command to the passport. Secure
+   * Sends a {@code READ BINARY} command to the passport. Secure
    * messaging will be applied to the command and response apdu.
    *
    * @param wrapper the secure messaging wrapper to use
    * @param offset offset into the file
    * @param le the expected length of the file to read
-   * @param isExtendedLength whether it should be a long (INS=B1) read
+   * @param isExtendedLength whether it should be a long ({@code INS == 0xB1}) read
    *
-   * @return a byte array of length at most <code>le</code> with (the specified part of) the contents of the currently selected file
+   * @return a byte array of length at most {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException if the command was not successful
    */
@@ -657,11 +657,9 @@ class PassportAPDUService extends CardService {
     //  int p2 = 0xA6;
     ResponseAPDU rapdu = null;
     if (keyId == null || keyId.compareTo(BigInteger.ZERO) < 0) {
-      LOGGER.info("DEBUG: implicit case, keyId == " + keyId);
       CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, p1, p2, toOIDBytes(oid));
       rapdu = transmit(wrapper, capdu);
     } else {
-      LOGGER.info("DEBUG: explicit case, keyId == " + keyId);
       byte[] oidBytes = toOIDBytes(oid);
       byte[] keyIdBytes = Util.wrapDO((byte)0x84, Util.i2os(keyId));
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
