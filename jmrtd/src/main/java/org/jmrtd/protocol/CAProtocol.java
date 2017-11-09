@@ -232,7 +232,7 @@ public class CAProtocol {
     return wrapper;
   }
 
-  private static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
+  public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
     if ("DH".equals(agreementAlg)) {
       /* TODO: this is probably wrong, what should be hashed? */
       MessageDigest md = MessageDigest.getInstance("SHA-1");

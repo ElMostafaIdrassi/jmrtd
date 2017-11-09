@@ -293,9 +293,8 @@ public class PACEProtocolTest extends TestCase {
         macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
         byte[] macKeyBytes = macKey.getEncoded();
         assertTrue(Arrays.equals(expectedMacKeyBytes, macKeyBytes));
-
       } catch (GeneralSecurityException gse) {
-        gse.printStackTrace();
+        LOGGER.log(Level.WARNING, "Unexpected security exception", gse);
         throw new IllegalStateException(gse.getMessage());
       }
 
@@ -639,7 +638,7 @@ public class PACEProtocolTest extends TestCase {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(agreementAlg);
       keyAgreement.init(pcdPrivateKey);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
     }
   }

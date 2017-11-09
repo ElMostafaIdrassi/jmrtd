@@ -37,7 +37,7 @@ public class BACDeniedException extends CardServiceException {
 
   private static final long serialVersionUID = -7094953658210693249L;
 
-  private BACKeySpec bacKey;
+  private final BACKeySpec bacKey;
 
   /**
    * Creates an exception.
