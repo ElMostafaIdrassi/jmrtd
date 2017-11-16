@@ -23,6 +23,7 @@
 package org.jmrtd.cert;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -76,7 +77,7 @@ public class CardVerifiableCertificate extends Certificate {
   private org.ejbca.cvc.CVCertificate cvCertificate;
 
   private transient KeyFactory rsaKeyFactory;
-
+  
   /**
    * Constructs a wrapper.
    *
@@ -119,7 +120,7 @@ public class CardVerifiableCertificate extends Certificate {
       CVCAuthorizationTemplate.Role role,
       CVCAuthorizationTemplate.Permission permission,
       byte[] signatureData) {
-    super("CVC");
+    this(null);
     try {
       CAReferenceField authorityRef = new CAReferenceField(authorityReference.getCountry().toAlpha2Code(), authorityReference.getMnemonic(), authorityReference.getSeqNumber());
       HolderReferenceField  holderRef = new HolderReferenceField(holderReference.getCountry().toAlpha2Code(), holderReference.getMnemonic(), holderReference.getSeqNumber());
