@@ -53,6 +53,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
 
   /**
    * Constructs a displayed image data group from a list of displayed images.
+   * The list should not be {@code null} or contain {@code null} valued displayed images.
    *
    * @param dataGroupTag a tag indicating DG5, DG6, or DG7
    * @param imageInfos a list of displayed images
@@ -177,6 +178,9 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
 
   private void checkTypesConsistentWithTag() {
     for (DisplayedImageInfo imageInfo: imageInfos) {
+      if (imageInfo == null) {
+        throw new IllegalArgumentException("Found a null image info");
+      }
       switch (imageInfo.getType()) {
         case ImageInfo.TYPE_SIGNATURE_OR_MARK:
           if (displayedImageTagToUse != DisplayedImageInfo.DISPLAYED_SIGNATURE_OR_MARK_TAG) {

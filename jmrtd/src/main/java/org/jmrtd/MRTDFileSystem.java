@@ -136,7 +136,9 @@ class MRTDFileSystem implements FileSystemStructured {
 
       /* Check buffer to see if we already have some of the bytes. */
       fileInfo = getFileInfo();
-      //      assert fileInfo != null;
+      if (fileInfo == null) {
+        throw new IllegalStateException("Could not get file info");
+      }
       Fragment fragment = fileInfo.getSmallestUnbufferedFragment(offset, length);
 
       int responseLength = length;
