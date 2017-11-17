@@ -23,21 +23,28 @@
 package org.jmrtd.test.protocol;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Security;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
+import org.jmrtd.Util;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import junit.framework.TestCase;
 import net.sf.scuba.smartcards.CommandAPDU;
+import net.sf.scuba.util.Hex;
 
 public class DESedeSecureMessagingWrapperTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+
+  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   public void testDESedeSecureMessagingWrapper() {
     try {
@@ -51,7 +58,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testDESedeSecureMessagingWrapperWrapUnwrap() {
     try {
       SecretKey encKey = getRandomDESedeKey();
@@ -69,6 +76,27 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
+    }
+  }
+  
+  /*
+   * See https://stackoverflow.com/q/47307716/27190.
+   */
+  public void testStackOverflowTim() {
+    try {
+      Security.insertProviderAt(BC_PROVIDER, 1);
+      SecretKey encKey = new SecretKeySpec(Hex.hexStringToBytes("3DE649F8AEA41C04FB6D4CD9043757AD"), "DESede");
+            
+      SecretKey macKey = new SecretKeySpec(Hex.hexStringToBytes("8C34AD61974F68CEBA3E0EAEA1456476"), "DESede");
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, 0x00AB1D2F337FD997D6L);
+      
+      CommandAPDU protectedCommandAPDU = wrapper.wrap(new CommandAPDU(Hex.hexStringToBytes("00 A4 02 0C 02 01 1E")));
+      assertEquals("0CA4020C15870901FF0E241E2F94B5088E0822FF803EC310433600", Hex.bytesToHexString(protectedCommandAPDU.getBytes()));
+      
+      CommandAPDU protectedReadBinaryCommandAPDU = wrapper.wrap(new CommandAPDU(Hex.hexStringToBytes("00 B0 00 00 04")));
+      assertEquals("0CB000000D9701048E0868DD9FD88472834A00", Hex.bytesToHexString(protectedReadBinaryCommandAPDU.getBytes()));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
     }
   }
 

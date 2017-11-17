@@ -1061,11 +1061,15 @@ public class PACEProtocol {
     /*
      * NOTE: AESCMAC will generate 128 bit (16 byte) results, not 64 bit (8 byte),
      * both authentication token generation and secure messaging,
-     * where the Mac is applied, will copy only the first 8 bytes. -- MO
+     * where the Mac is applied, will copy only the first 8 bytes.
      */
     if (cipherAlg.startsWith("DESede")) {
-      /* FIXME: Is macAlg = "ISO9797Alg3Mac" equivalent to macAlg = "DESedeMac"??? - MO */
-      return "ISO9797Alg3Mac";
+      /* NOTE: Some options to be considered here:
+       *  - "DESedeMac" (not sure if similar to any of the below options)
+       *  - "ISO9797Alg3Mac" (the same we use for BAC based secure messaging)
+       *  - "ISO9797ALG3WITHISO7816-4PADDING" (this one was suggested Michal Iwanicki of Decatur Ltd. Thanks!)
+       */
+      return "ISO9797ALG3WITHISO7816-4PADDING";
     } else if (cipherAlg.startsWith("AES")) {
       return "AESCMAC";
     } else {
