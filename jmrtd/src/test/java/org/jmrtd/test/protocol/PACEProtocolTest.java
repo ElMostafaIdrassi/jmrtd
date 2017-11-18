@@ -19,6 +19,7 @@ import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,10 +87,10 @@ public class PACEProtocolTest extends TestCase {
       KeyFactory keyFactory  = KeyFactory.getInstance("EC");
       PublicKey publicKey = keyFactory.generatePublic(new ECPublicKeySpec(publicKeyPoint, (ECParameterSpec)params));
 
-      byte[] encodedPublicKeyForSmartCard = Util.encodePublicKeyForSmartCard(publicKey);
+      byte[] encodedPublicKeyForSmartCard = PACEProtocol.encodePublicKeyForSmartCard(publicKey);
       LOGGER.info("DEBUG: encoded public key for smart card = \n" + Hex.bytesToPrettyString(encodedPublicKeyForSmartCard));
 
-      byte[] encodedPublicKeyForMac = Util.encodePublicKeyDataObject(oid, publicKey);
+      byte[] encodedPublicKeyForMac = PACEProtocol.encodePublicKeyDataObject(oid, publicKey);
       LOGGER.info("DEBUG: encoded public key for MAC = \n" + Hex.bytesToPrettyString(encodedPublicKeyForMac));
 
     } catch(Exception e) {
@@ -104,7 +105,7 @@ public class PACEProtocolTest extends TestCase {
    * (see RFC 5639).
    */
   public void testSupplementSampleECDHGM() {
-//    Security.insertProviderAt(BC_PROVIDER, 4);
+    //    Security.insertProviderAt(BC_PROVIDER, 4);
     try {
 
       String serialNumber = "T22000129"; /* Check digit 3 */
@@ -314,7 +315,7 @@ public class PACEProtocolTest extends TestCase {
           + "B80F20BA 5DC7BE1D 43D9BF85 0149FBB3"
           + "6462");
 
-      byte[] encodedPCDPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, pcdPublicKey);
+      byte[] encodedPCDPublicKeyDataObject = PACEProtocol.encodePublicKeyDataObject(oid, pcdPublicKey);
 
       LOGGER.info("DEBUG: expectedInputDataForPICCToken = " + Hex.bytesToHexString(expectedInputDataForPICCToken));
       LOGGER.info("DEBUG: encodedPCDPublicKeyDataObject = " + Hex.bytesToHexString(encodedPCDPublicKeyDataObject));
@@ -322,7 +323,7 @@ public class PACEProtocolTest extends TestCase {
 
       assertTrue(Arrays.equals(expectedInputDataForPICCToken, encodedPCDPublicKeyDataObject));
 
-      byte[] encodedPICCPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, piccPublicKey);
+      byte[] encodedPICCPublicKeyDataObject = PACEProtocol.encodePublicKeyDataObject(oid, piccPublicKey);
       assertTrue(Arrays.equals(expectedInputDataForPCDToken, encodedPICCPublicKeyDataObject));
 
       /* Given in example. */
@@ -565,10 +566,10 @@ public class PACEProtocolTest extends TestCase {
           + "3C5CE397 545D015C 175EB513 0551EDBC"
           + "2EE5D4");
 
-      byte[] encodedPCDPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, pcdPublicKey);
+      byte[] encodedPCDPublicKeyDataObject = PACEProtocol.encodePublicKeyDataObject(oid, pcdPublicKey);
       assertTrue(Arrays.equals(expectedInputDataForPICCToken, encodedPCDPublicKeyDataObject));
 
-      byte[] encodedPICCPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, piccPublicKey);
+      byte[] encodedPICCPublicKeyDataObject = PACEProtocol.encodePublicKeyDataObject(oid, piccPublicKey);
       assertTrue(Arrays.equals(expectedInputDataForPCDToken, encodedPICCPublicKeyDataObject));
 
       /* Given in example. */
@@ -621,7 +622,7 @@ public class PACEProtocolTest extends TestCase {
       KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
       PrivateKey pcdMappingPrivateKey = keyFactory.generatePrivate(new ECPrivateKeySpec(pcdMappingPrivateKeyFieldElement, ecParams));
       //			PublicKey piccMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccMappingPublicKeyPoint, ecParams));
-      PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
+      PublicKey piccMappingPublicKey = PACEProtocol.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
 
       PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();      
       mappingAgreement.init(pcdMappingPrivateKey);

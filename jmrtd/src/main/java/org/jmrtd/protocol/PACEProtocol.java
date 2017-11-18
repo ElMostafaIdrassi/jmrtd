@@ -24,10 +24,12 @@ package org.jmrtd.protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -54,10 +56,13 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
+import javax.crypto.spec.DHPublicKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.PACEException;
@@ -76,6 +81,7 @@ import org.jmrtd.protocol.PACEResult.PACEMappingResult;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;
 
 /**
@@ -319,11 +325,7 @@ public class PACEProtocol {
         Cipher decryptCipher = Cipher.getInstance("AES/CBC/NoPadding");
         decryptCipher.init(Cipher.DECRYPT_MODE, encKey, new IvParameterSpec(IV_FOR_PACE_CAM_DECRYPTION));
         byte[] paddedChipAuthenticationData = decryptCipher.doFinal(encryptedChipAuthenticationData);
-        LOGGER.info("DEBUG: paddedChipAuthenticationData = " + Hex.bytesToHexString(paddedChipAuthenticationData));
         chipAuthenticationData = Util.unpad(paddedChipAuthenticationData);
-
-        LOGGER.info("DEBUG: chipAuthenticationData = " + Hex.bytesToHexString(chipAuthenticationData));
-
       } catch (GeneralSecurityException gse) {
         LOGGER.log(Level.WARNING, "Could not decrypt Chip Authentication data", gse);
       }
@@ -365,7 +367,7 @@ public class PACEProtocol {
       byte[] step1Data = new byte[] { };
       /* Command data is empty. This implies an empty dynamic authentication object. */
       byte[] step1Response = service.sendGeneralAuthenticate(wrapper, step1Data, false);
-      byte[] step1EncryptedNonce = Util.unwrapDO((byte)0x80, step1Response);
+      byte[] step1EncryptedNonce = unwrapDO(0x80, step1Response);
 
       /* (Re)initialize the K_pi cipher for decryption. */
       staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[staticPACECipher.getBlockSize()])); // Fix proposed by Halvdan Grelland (halvdanhg@gmail.com)
@@ -437,11 +439,11 @@ public class PACEProtocol {
       PublicKey pcdMappingPublicKey = pcdMappingKeyPair.getPublic();
       PrivateKey pcdMappingPrivateKey = pcdMappingKeyPair.getPrivate();
 
-      byte[] pcdMappingEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdMappingPublicKey);
-      byte[] step2Data = Util.wrapDO((byte)0x81, pcdMappingEncodedPublicKey);
+      byte[] pcdMappingEncodedPublicKey = encodePublicKeyForSmartCard(pcdMappingPublicKey);
+      byte[] step2Data = wrapDO(0x81, pcdMappingEncodedPublicKey);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
-      byte[] piccMappingEncodedPublicKey = Util.unwrapDO((byte)0x82, step2Response);
-      PublicKey piccMappingPublicKey = Util.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
+      byte[] piccMappingEncodedPublicKey = unwrapDO(0x82, step2Response);
+      PublicKey piccMappingPublicKey = decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
 
       if ("ECDH".equals(agreementAlg)) {
         /* Treat shared secret as an ECPoint. */
@@ -503,7 +505,7 @@ public class PACEProtocol {
       byte[] pcdNonce = new byte[piccNonce.length];
       random.nextBytes(pcdNonce);
 
-      byte[] step2Data = Util.wrapDO((byte)0x81, pcdNonce);
+      byte[] step2Data = wrapDO(0x81, pcdNonce);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
 
       /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */
@@ -544,11 +546,11 @@ public class PACEProtocol {
    */
   public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {
     try {
-      byte[] pcdEncodedPublicKey = Util.encodePublicKeyForSmartCard(pcdPublicKey);
-      byte[] step3Data = Util.wrapDO((byte)0x83, pcdEncodedPublicKey);
+      byte[] pcdEncodedPublicKey = encodePublicKeyForSmartCard(pcdPublicKey);
+      byte[] step3Data = wrapDO(0x83, pcdEncodedPublicKey);
       byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, false);
-      byte[] piccEncodedPublicKey = Util.unwrapDO((byte)0x84, step3Response);
-      PublicKey piccPublicKey = Util.decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
+      byte[] piccEncodedPublicKey = unwrapDO(0x84, step3Response);
+      PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 
       if (pcdPublicKey.equals(piccPublicKey)) {
         throw new PACEException("PCD's public key and PICC's public key are the same in key agreement step!");
@@ -589,7 +591,7 @@ public class PACEProtocol {
   public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
     try {
       byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
-      byte[] step4Data = Util.wrapDO((byte)0x85, pcdToken);
+      byte[] step4Data = wrapDO(0x85, pcdToken);
       byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, true);
       TLVInputStream step4ResponseInputStream = new TLVInputStream(new ByteArrayInputStream(step4Response));
       try {
@@ -972,7 +974,7 @@ public class PACEProtocol {
   }
 
   private static byte[] generateAuthenticationToken(String oid, Mac mac, PublicKey publicKey) throws GeneralSecurityException {
-    byte[] encodedPublicKeyDataObject = Util.encodePublicKeyDataObject(oid, publicKey);
+    byte[] encodedPublicKeyDataObject = encodePublicKeyDataObject(oid, publicKey);
     byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
 
     /* Output length needs to be 64 bits, copy first 8 bytes. */
@@ -1010,6 +1012,252 @@ public class PACEProtocol {
 
   public static byte[] computeKeySeedForPACE(String cardAccessNumber) throws GeneralSecurityException {
     return Util.computeKeySeed(cardAccessNumber,  "SHA-1", false);
+  }
+
+  /**
+   * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
+   *
+   * For signing authentication token, not for sending to smart card.
+   * Assumes context is known.
+   *
+   * @param oid object identifier
+   * @param publicKey public key
+   *
+   * @return encoded public key data object for signing as authentication token
+   *
+   * @throws InvalidKeyException when public key is not DH or EC
+   */
+  public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey) throws InvalidKeyException {
+    return encodePublicKeyDataObject(oid, publicKey, true);
+  }
+
+  /**
+   * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
+   *
+   * For signing authentication token, not for sending to smart card.
+   *
+   * @param oid object identifier
+   * @param publicKey public key
+   * @param isContextKnown whether context of public key is known to receiver (we will not include domain parameters in that case).
+   *
+   * @return encoded public key data object for signing as authentication token
+   *
+   * @throws InvalidKeyException when public key is not DH or EC
+   */
+  public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey, boolean isContextKnown) throws InvalidKeyException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
+    try {
+      tlvOutputStream.writeTag(0x7F49); // FIXME: constant for 7F49 */
+      if (publicKey instanceof DHPublicKey) {
+        DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+        DHParameterSpec params = dhPublicKey.getParams();
+        BigInteger p = params.getP();
+        int l = params.getL();
+        BigInteger generator = params.getG();
+        BigInteger y = dhPublicKey.getY();
+
+        tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag  */
+        if (!isContextKnown) {
+          tlvOutputStream.writeTag(0x81);
+          tlvOutputStream.writeValue(Util.i2os(p)); /* p: Prime modulus */
+
+          tlvOutputStream.writeTag(0x82);
+          tlvOutputStream.writeValue(Util.i2os(BigInteger.valueOf(l))); /* q: Order of the subgroup */
+
+          tlvOutputStream.writeTag(0x83);
+          tlvOutputStream.writeValue(Util.i2os(generator)); /* Generator */
+        }
+        tlvOutputStream.writeTag(0x84);
+        tlvOutputStream.writeValue(Util.i2os(y)); /* y: Public value */
+      } else if (publicKey instanceof ECPublicKey) {
+        ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
+        ECParameterSpec params = ecPublicKey.getParams();
+        BigInteger p = Util.getPrime(params);
+        EllipticCurve curve = params.getCurve();
+        BigInteger a = curve.getA();
+        BigInteger b = curve.getB();
+        ECPoint generator = params.getGenerator();
+        BigInteger order = params.getOrder();
+        int coFactor = params.getCofactor();
+        ECPoint publicPoint = ecPublicKey.getW();
+
+        tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag */
+        if (!isContextKnown) {
+          tlvOutputStream.writeTag(0x81);
+          tlvOutputStream.writeValue(Util.i2os(p)); /* Prime modulus */
+
+          tlvOutputStream.writeTag(0x82);
+          tlvOutputStream.writeValue(Util.i2os(a)); /* First coefficient */
+
+          tlvOutputStream.writeTag(0x83);
+          tlvOutputStream.writeValue(Util.i2os(b)); /* Second coefficient */
+          BigInteger affineX = generator.getAffineX();
+          BigInteger affineY = generator.getAffineY();
+
+          tlvOutputStream.writeTag(0x84);
+          tlvOutputStream.write(Util.i2os(affineX));
+          tlvOutputStream.write(Util.i2os(affineY));
+          tlvOutputStream.writeValueEnd(); /* Base point, FIXME: correct encoding? */
+
+          tlvOutputStream.writeTag(0x85);
+          tlvOutputStream.writeValue(Util.i2os(order)); /* Order of the base point */
+        }
+        tlvOutputStream.writeTag(0x86);
+        tlvOutputStream.writeValue(Util.ecPoint2OS(publicPoint)); /* Public point */
+
+        if (!isContextKnown) {
+          tlvOutputStream.writeTag(0x87);
+          tlvOutputStream.writeValue(Util.i2os(BigInteger.valueOf(coFactor))); /* Cofactor */
+        }
+      } else {
+        throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
+      }
+      tlvOutputStream.writeValueEnd(); /* 7F49 */
+      tlvOutputStream.flush();
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception", ioe);
+      throw new IllegalStateException("Error in encoding public key");
+    } finally {
+      try {
+        tlvOutputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
+    }
+    return byteArrayOutputStream.toByteArray();
+  }
+
+  /*
+   * FIXME: how can we be sure coords are uncompressed?
+   */
+  /**
+   * Write uncompressed coordinates (for EC) or public value (DH).
+   *
+   * @param publicKey public key
+   *
+   * @return encoding for smart card
+   *
+   * @throws InvalidKeyException if the key type is not EC or DH
+   */
+  public static byte[] encodePublicKeyForSmartCard(PublicKey publicKey) throws InvalidKeyException {
+    if (publicKey == null) {
+      throw new IllegalArgumentException("Cannot encode null public key");
+    }
+    if (publicKey instanceof ECPublicKey) {
+      ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
+      try {
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        bOut.write(Util.ecPoint2OS(ecPublicKey.getW()));
+        byte[] encodedPublicKey = bOut.toByteArray();
+        bOut.close();
+        return encodedPublicKey;
+      } catch (IOException ioe) {
+        /* NOTE: Should never happen, we're writing to a ByteArrayOutputStream. */
+        throw new IllegalStateException("Internal error writing to memory", ioe);
+      }
+    } else if (publicKey instanceof DHPublicKey) {
+      DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+      return Util.i2os(dhPublicKey.getY());
+    } else {
+      throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
+    }
+  }
+
+  public static PublicKey decodePublicKeyFromSmartCard(byte[] encodedPublicKey, AlgorithmParameterSpec params) {
+    if (params == null) {
+      throw new IllegalArgumentException("Params cannot be null");
+    }
+
+    try {
+      if (params instanceof ECParameterSpec) {
+        ECPoint w = Util.os2ECPoint(encodedPublicKey);
+        ECParameterSpec ecParams = (ECParameterSpec)params;
+        return Util.getPublicKey("EC", new ECPublicKeySpec(w, ecParams));
+      } else if (params instanceof DHParameterSpec) {
+        DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
+        try {
+          int b = dataIn.read();
+          if (b != 0x04) {
+            throw new IllegalArgumentException("Expected encoded public key to start with 0x04");
+          }
+          int length = encodedPublicKey.length - 1;
+          byte[] publicValue = new byte[length];
+          dataIn.readFully(publicValue);
+          BigInteger y = Util.os2i(publicValue);
+          DHParameterSpec dhParams = (DHParameterSpec)params;
+          return Util.getPublicKey("DH",new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
+        } finally {
+          dataIn.close();
+        }
+      }
+
+      throw new IllegalArgumentException("Expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception", ioe);
+      throw new IllegalArgumentException(ioe);
+    } catch (GeneralSecurityException gse) {
+      LOGGER.log(Level.WARNING, "Exception", gse);
+      throw new IllegalArgumentException(gse);
+    }
+  }
+  
+  public static byte[] wrapDO(int tag, byte[] data) {
+    if (data == null) {
+      throw new IllegalArgumentException("Data to wrap is null");
+    }
+
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    try {
+      TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
+      tlvOutputStream.writeTag(tag);
+      tlvOutputStream.writeValue(data);
+      tlvOutputStream.flush();
+      tlvOutputStream.close();
+      return byteArrayOutputStream.toByteArray();
+    } catch (IOException ioe) {
+      // Never happens
+      throw new IllegalStateException("Error writing stream", ioe);
+    } finally {
+      try {
+        byteArrayOutputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
+    }
+  }
+
+  public static byte[] unwrapDO(int expectedTag, byte[] wrappedData) {
+    if (wrappedData == null || wrappedData.length < 2)  {
+      throw new IllegalArgumentException("Wrapped data is null or length < 2");
+    }
+
+    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(wrappedData);
+    TLVInputStream tlvInputStream = new TLVInputStream(byteArrayInputStream);
+
+    try {
+      int actualTag = tlvInputStream.readTag();
+      if (actualTag != expectedTag) {
+        throw new IllegalArgumentException("Expected tag " + Integer.toHexString(expectedTag) + ", found tag " + Integer.toHexString(actualTag));
+      }
+
+      int length = tlvInputStream.readLength();
+      byte[] value = tlvInputStream.readValue();
+      byte[] result = new byte[length];
+      System.arraycopy(value, 0, result, 0, length);
+      return result;
+    } catch (IOException ioe) {
+      // Never happens
+      throw new IllegalStateException("Error reading from stream", ioe);
+
+    } finally {
+      try {
+        tlvInputStream.close();
+        //        byteArrayInputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
+    }
   }
 
   /**
