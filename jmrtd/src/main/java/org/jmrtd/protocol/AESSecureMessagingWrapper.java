@@ -60,7 +60,8 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private SecretKey ksEnc, ksMac;
+  private SecretKey ksEnc;
+  private SecretKey ksMac;
   private transient Cipher sscIVCipher;
   private transient Cipher cipher;
   private transient Mac mac;

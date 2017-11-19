@@ -68,7 +68,8 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   /** Initialization vector consisting of 8 zero bytes. */
   public static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
 
-  private SecretKey ksEnc, ksMac;
+  private SecretKey ksEnc;
+  private SecretKey ksMac;
   private transient Cipher cipher;
   private transient Mac mac;
 

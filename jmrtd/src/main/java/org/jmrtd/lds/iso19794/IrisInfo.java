@@ -70,64 +70,70 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
    */
   private static final int FORMAT_TYPE_VALUE = 0x0009;
 
-  /** Image format */
-  /* TODO: reference to specification. */
-  public static final int
-  IMAGEFORMAT_MONO_RAW = 2, /* (0x0002) */
-  IMAGEFORMAT_RGB_RAW = 4, /* (0x0004) */
-  IMAGEFORMAT_MONO_JPEG = 6, /* (0x0006) */
-  IMAGEFORMAT_RGB_JPEG = 8, /* (0x0008) */
-  IMAGEFORMAT_MONO_JPEG_LS = 10, /* (0x000A) */
-  IMAGEFORMAT_RGB_JPEG_LS = 12, /* (0x000C) */
-  IMAGEFORMAT_MONO_JPEG2000 = 14, /* (0x000E) */
-  IMAGEFORMAT_RGB_JPEG2000 = 16; /* (0x0010) */
+  /** Image format. */
+  public static final int IMAGEFORMAT_MONO_RAW = 2; /* (0x0002) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_RGB_RAW = 4; /* (0x0004) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_MONO_JPEG = 6; /* (0x0006) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_RGB_JPEG = 8; /* (0x0008) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_MONO_JPEG_LS = 10; /* (0x000A) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_RGB_JPEG_LS = 12; /* (0x000C) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_MONO_JPEG2000 = 14; /* (0x000E) */
+
+  /** Image format. */
+  public static final int IMAGEFORMAT_RGB_JPEG2000 = 16; /* (0x0010) */
 
   /** Constant for capture device Id, based on Table 2 in Section 5.5 in ISO 19794-6. */
-  public static final int
-  CAPTURE_DEVICE_UNDEF = 0;
+  public static final int CAPTURE_DEVICE_UNDEF = 0;
 
   /** Constant for horizontal and veritical orientation, based on Table 2 in Section 5.5 in ISO 19794-6. */
-  public static final int
-  ORIENTATION_UNDEF = 0,
-  ORIENTATION_BASE = 1,
-  ORIENTATION_FLIPPED = 2;
+  public static final int ORIENTATION_UNDEF = 0;
+  public static final int ORIENTATION_BASE = 1;
+  public static final int ORIENTATION_FLIPPED = 2;
 
   /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
-  public static final int
-  SCAN_TYPE_UNDEF = 0,
-  SCAN_TYPE_PROGRESSIVE = 1,
-  SCAN_TYPE_INTERLACE_FRAME = 2,
-  SCAN_TYPE_INTERLACE_FIELD = 3,
-  SCAN_TYPE_CORRECTED = 4;
+  public static final int SCAN_TYPE_UNDEF = 0;
+  public static final int SCAN_TYPE_PROGRESSIVE = 1;
+  public static final int SCAN_TYPE_INTERLACE_FRAME = 2;
+  public static final int SCAN_TYPE_INTERLACE_FIELD = 3;
+  public static final int SCAN_TYPE_CORRECTED = 4;
 
   /** Iris occlusion (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
-  public static final int
-  IROCC_UNDEF = 0,
-  IROCC_PROCESSED = 1;
+  public static final int IROCC_UNDEF = 0;
+  public static final int IROCC_PROCESSED = 1;
 
   /** Iris occlusion filling (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
-  public static final int
-  IROCC_ZEROFILL = 0,
-  IROC_UNITFILL = 1;
+  public static final int IROCC_ZEROFILL = 0;
+  public static final int IROC_UNITFILL = 1;
 
   /* TODO: reference to specification. */
-  public static final int
-  INTENSITY_DEPTH_UNDEF = 0;
+  public static final int INTENSITY_DEPTH_UNDEF = 0;
 
   /* TODO: reference to specification. */
-  public static final int
-  TRANS_UNDEF = 0, TRANS_STD = 1;
+  public static final int TRANS_UNDEF = 0;
+  public static final int TRANS_STD = 1;
 
   /* TODO: reference to specification. */
-  public static final int
-  IRBNDY_UNDEF = 0,
-  IRBNDY_PROCESSED = 1;
+  public static final int IRBNDY_UNDEF = 0;
+  public static final int IRBNDY_PROCESSED = 1;
 
   private long recordLength;
 
   private int captureDeviceId; /* 16 bit */
 
-  private int horizontalOrientation, verticalOrientation;
+  private int horizontalOrientation;
+  private int verticalOrientation;
   private int scanType;
   private int irisOcclusion;
   private int occlusionFilling;
@@ -135,7 +141,8 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   private int irisDiameter;
   private int imageFormat;
-  private int rawImageWidth, rawImageHeight;
+  private int rawImageWidth;
+  private int rawImageHeight;
   private int intensityDepth;
   private int imageTransformation;
 

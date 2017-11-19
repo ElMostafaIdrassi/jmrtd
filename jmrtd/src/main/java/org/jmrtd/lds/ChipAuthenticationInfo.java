@@ -95,6 +95,13 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     checkFields();
   }
 
+  /**
+   * Returns a DER object with this SecurityInfo data (DER sequence)
+   *
+   * @return a DER object with this SecurityInfo data
+   *
+   * @deprecated Remove this method from visible interface (because of dependency on BC API)
+   */
   @Override
   @Deprecated
   public ASN1Primitive getDERObject() {

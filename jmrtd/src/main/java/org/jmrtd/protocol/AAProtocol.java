@@ -23,7 +23,6 @@
 package org.jmrtd.protocol;
 
 import java.security.PublicKey;
-import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 
@@ -39,8 +38,6 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @since 0.5.6
  */
 public class AAProtocol {
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private PassportService service;
 

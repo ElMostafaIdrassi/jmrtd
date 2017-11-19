@@ -168,6 +168,13 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     }
   }
 
+  /**
+   * Returns a DER object with this SecurityInfo data (DER sequence)
+   *
+   * @return a DER object with this SecurityInfo data
+   *
+   * @deprecated Remove this method from visible interface (because of dependency on BC API)
+   */
   @Deprecated
   @Override
   public ASN1Primitive getDERObject() {
@@ -338,12 +345,12 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
     try {
       ASN1Integer versionObject = (ASN1Integer)paramSequence.getObjectAt(0);
-      BigInteger version = (versionObject).getValue();
+      /* BigInteger version = */ (versionObject).getValue();
       //        assert BigInteger.ONE.equals(version);
 
       ASN1Sequence fieldIdObject = (ASN1Sequence)paramSequence.getObjectAt(1);
       //        assert 2 == fieldIdObject.size();
-      String fieldIdOID = ((ASN1ObjectIdentifier)fieldIdObject.getObjectAt(0)).getId();
+      /* String fieldIdOID = */ ((ASN1ObjectIdentifier)fieldIdObject.getObjectAt(0)).getId();
       //        assert ID_PRIME_FIELD.equals(fieldIdOID);
       BigInteger p = ((ASN1Integer)fieldIdObject.getObjectAt(1)).getPositiveValue();
       LOGGER.info("DEBUG: p = " + p);
@@ -354,25 +361,20 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       ASN1OctetString bObject = (ASN1OctetString)curveObject.getObjectAt(1);
       BigInteger a = Util.os2i(aObject.getOctets());
       BigInteger b = Util.os2i(bObject.getOctets());
-      LOGGER.info("DEBUG: a = " + a);
-      LOGGER.info("DEBUG: b = " + b);
 
       ASN1OctetString basePointObject = (ASN1OctetString)paramSequence.getObjectAt(3);
       ECPoint g = Util.os2ECPoint(basePointObject.getOctets());
       BigInteger x = g.getAffineX();
       BigInteger y = g.getAffineY();
-      LOGGER.info("DEBUG: G = (" + x + ", " + y + ")");
       // assert G is on the curve
       BigInteger lhs = y.pow(2).mod(p);
       BigInteger xPow3 = x.pow(3);
       BigInteger rhs = xPow3.add(a.multiply(x)).add(b).mod(p);
-      LOGGER.info("DEBUG: G on curve = " + lhs.equals(rhs));
 
       EllipticCurve curve = new EllipticCurve(new ECFieldFp(p), a, b);
 
       ASN1Integer orderObject = (ASN1Integer)paramSequence.getObjectAt(4);
       BigInteger n = orderObject.getPositiveValue();
-      LOGGER.info("DEBUG: n = " + n);
 
       if (paramSequence.size() <= 5) {
         return new ECParameterSpec(curve, g, n, 1);

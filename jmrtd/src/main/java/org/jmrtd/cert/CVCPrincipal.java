@@ -24,6 +24,8 @@ package org.jmrtd.cert;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.scuba.data.Country;
 
@@ -38,6 +40,8 @@ import net.sf.scuba.data.Country;
 public class CVCPrincipal implements Principal, Serializable {
 
   private static final long serialVersionUID = -4905647207367309688L;
+  
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private Country country;
   private String mnemonic;
@@ -60,6 +64,7 @@ public class CVCPrincipal implements Principal, Serializable {
     try {
       country = Country.getInstance(alpha2Code);
     } catch (IllegalArgumentException iae) {
+      LOGGER.log(Level.FINE, "Could not find country for " + alpha2Code, iae);
       country = new Country() {
 
         @Override

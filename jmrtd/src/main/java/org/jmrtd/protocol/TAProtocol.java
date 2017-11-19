@@ -29,7 +29,6 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Signature;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
@@ -55,8 +54,6 @@ public class TAProtocol {
   private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   
   private PassportService service;
   private SecureMessagingWrapper wrapper;

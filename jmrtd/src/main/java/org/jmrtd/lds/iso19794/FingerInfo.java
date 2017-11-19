@@ -94,8 +94,10 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   private int captureDeviceId;
   private int acquisitionLevel;
   private int scaleUnits;
-  private int scanResolutionHorizontal, scanResolutionVertical;
-  private int imageResolutionHorizontal, imageResolutionVertical;
+  private int scanResolutionHorizontal;
+  private int scanResolutionVertical;
+  private int imageResolutionHorizontal;
+  private int imageResolutionVertical;
   private int depth;
   private int compressionAlgorithm;
 

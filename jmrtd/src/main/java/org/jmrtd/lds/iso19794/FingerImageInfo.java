@@ -92,35 +92,77 @@ public class FingerImageInfo extends AbstractImageInfo {
   public static final int POSITION_PLAIN_THUMBS = 15; /* 4800 50.8 2.0 76.2 3.0 */
 
   /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
-  public static final int
   /* NOTE: in comment: max image area in sq mm, sq in, with in mm, in, length in mm, in */
-  POSITION_UNKNOWN_PALM = 20, /* 283.87 13.97 5.5 20.32 8.0 */
-  POSITION_RIGHT_FULL_PALM = 21, /* 283.87 13.97 5.5 20.32 8.0 */
-  POSITION_RIGHT_WRITER_S_PALM = 22, /* 58.06 4.57 1.8 12.70 5.0 */
-  POSITION_LEFT_FULL_PALM = 23, /* 283.87 13.97 5.5 20.32 8.0 */
-  POSITION_LEFT_WRITER_S_PALM = 24, /* 58.06 4.57 1.8 12.70 5.0 */
-  POSITION_RIGHT_LOWER_PALM = 25, /* 195.16 13.97 5.5 13.97 5.5 */
-  POSITION_RIGHT_UPPER_PALM = 26, /* 195.16 13.97 5.5 13.97 5.5 */
-  POSITION_LEFT_LOWER_PALM = 27, /* 195.16 13.97 5.5 13.97 5.5 */
-  POSITION_LEFT_UPPER_PALM = 28, /* 195.16 13.97 5.5 13.97 5.5 */
-  POSITION_RIGHT_OTHER = 29, /* 283.87 13.97 5.5 20.32 8.0 */
-  POSITION_LEFT_OTHER = 30, /* 283.87 13.97 5.5 20.32 8.0 */
-  POSITION_RIGHT_INTERDIGITAL = 31, /* 106.45 13.97 5.5 7.62 3.0 */
-  POSITION_RIGHT_THENAR = 32, /* 77.42 7.62 3.0 10.16 4.0 */
-  POSITION_RIGHT_HYPOTHENAR = 33, /* 106.45 7.62 3.0 13.97 5.5 */
-  POSITION_LEFT_INTERDIGITAL = 34, /* 106.45 13.97 5.5 7.62 3.0 */
-  POSITION_LEFT_THENAR = 35, /* 77.42 7.62 3.0 10.16 4.0 */
-  POSITION_LEFT_HYPOTHENAR = 36; /* 106.45 7.62 3.0 13.97 5.5 */
+  public static final int POSITION_UNKNOWN_PALM = 20; /* 283.87 13.97 5.5 20.32 8.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_FULL_PALM = 21; /* 283.87 13.97 5.5 20.32 8.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_WRITER_S_PALM = 22; /* 58.06 4.57 1.8 12.70 5.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_FULL_PALM = 23; /* 283.87 13.97 5.5 20.32 8.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_WRITER_S_PALM = 24; /* 58.06 4.57 1.8 12.70 5.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_LOWER_PALM = 25; /* 195.16 13.97 5.5 13.97 5.5 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_UPPER_PALM = 26; /* 195.16 13.97 5.5 13.97 5.5 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_LOWER_PALM = 27; /* 195.16 13.97 5.5 13.97 5.5 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_UPPER_PALM = 28; /* 195.16 13.97 5.5 13.97 5.5 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_OTHER = 29; /* 283.87 13.97 5.5 20.32 8.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_OTHER = 30; /* 283.87 13.97 5.5 20.32 8.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_INTERDIGITAL = 31; /* 106.45 13.97 5.5 7.62 3.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_THENAR = 32; /* 77.42 7.62 3.0 10.16 4.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_RIGHT_HYPOTHENAR = 33; /* 106.45 7.62 3.0 13.97 5.5 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_INTERDIGITAL = 34; /* 106.45 13.97 5.5 7.62 3.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_THENAR = 35; /* 77.42 7.62 3.0 10.16 4.0 */
+
+  /** Palm code, according to Table 6, 7.2.2, ISO 19794-4. */
+  public static final int POSITION_LEFT_HYPOTHENAR = 36; /* 106.45 7.62 3.0 13.97 5.5 */
 
   /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
-  public static final int
-  IMPRESSION_TYPE_LIVE_SCAN_PLAIN = 0,
-  IMPRESSION_TYPE_LIVE_SCAN_ROLLED = 1,
-  IMPRESSION_TYPE_NON_LIVE_SCAN_PLAIN = 2,
-  IMPRESSION_TYPE_NON_LIVE_SCAN_ROLLED = 3,
-  IMPRESSION_TYPE_LATENT = 7,
-  IMPRESSION_TYPE_SWIPE = 8,
-  IMPRESSION_TYPE_LIVE_SCAN_CONTACTLESS = 9;
+  public static final int IMPRESSION_TYPE_LIVE_SCAN_PLAIN = 0;
+
+  /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
+  public static final int IMPRESSION_TYPE_LIVE_SCAN_ROLLED = 1;
+
+  /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
+  public static final int IMPRESSION_TYPE_NON_LIVE_SCAN_PLAIN = 2;
+
+  /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
+  public static final int IMPRESSION_TYPE_NON_LIVE_SCAN_ROLLED = 3;
+
+  /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
+  public static final int IMPRESSION_TYPE_LATENT = 7;
+
+  /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
+  public static final int IMPRESSION_TYPE_SWIPE = 8;
+
+  /** Finger or palm impression type, according to Table 7 in ISO 19794-4. */
+  public static final int IMPRESSION_TYPE_LIVE_SCAN_CONTACTLESS = 9;
 
   private static final byte[] FORMAT_TYPE_VALUE = { 0x00, 0x09 };
 
