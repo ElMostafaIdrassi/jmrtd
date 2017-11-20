@@ -84,15 +84,20 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
   /**
    * Value for parameter algorithm OID (part of parameters AlgorithmIdentifier).
-   * <code>dhpublicnumber OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) ansi-x942(10046) number-type(2) 1 }</code>.
    */
-  public static final String ID_DH_PUBLIC_NUMBER = "1.2.840.10046.2.1";
+  public static final String ID_PRIME_FIELD = "1.2.840.10045.1.1";
 
   /**
    * Value for parameter algorithm OID (part of parameters AlgorithmIdentifier).
    * <code>ecPublicKey OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) ansi-x962(10045) keyType(2) 1 }</code>.
    */
   public static final String ID_EC_PUBLIC_KEY = "1.2.840.10045.2.1";
+
+  /**
+   * Value for parameter algorithm OID (part of parameters AlgorithmIdentifier).
+   * <code>dhpublicnumber OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) ansi-x942(10046) number-type(2) 1 }</code>.
+   */
+  public static final String ID_DH_PUBLIC_NUMBER = "1.2.840.10046.2.1";
 
   private String oid;
 
@@ -240,8 +245,6 @@ public class PACEDomainParameterInfo extends SecurityInfo {
         || ID_PACE_ECDH_IM.equals(oid)
         || ID_PACE_ECDH_CAM.equals(oid);
   }
-
-  private static final String ID_PRIME_FIELD = "1.2.840.10045.1.1";
 
   /* TODO: toAlgorithmIdentifier for DH case. */
 

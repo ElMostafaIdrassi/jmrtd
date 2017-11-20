@@ -31,8 +31,7 @@ package org.jmrtd.lds;
  */
 public interface LDSFile extends LDSElement {
 
-
-/* NOTE: In EAC 1.11 documents there is also the CVCA file that has no tag. */
+  /* NOTE: In EAC 1.11 documents there is also the CVCA file that has no tag. */
 
   /** ICAO tag for document index (COM). */
   public static final int EF_COM_TAG = 0x60;

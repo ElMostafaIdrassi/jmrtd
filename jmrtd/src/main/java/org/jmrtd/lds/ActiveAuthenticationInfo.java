@@ -97,6 +97,13 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     this(ID_AA, VERSION_1, signatureAlgorithmOID);
   }
 
+  /**
+   * Returns a DER object with this SecurityInfo data (DER sequence)
+   *
+   * @return a DER object with this SecurityInfo data
+   *
+   * @deprecated Remove this method from visible interface (because of dependency on BC API)
+   */
   @Override
   @Deprecated
   public ASN1Primitive getDERObject() {
