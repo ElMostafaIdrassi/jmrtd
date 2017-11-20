@@ -43,7 +43,7 @@ import org.jmrtd.lds.iso19794.FingerInfo;
  * File structure for the EF_DG3 file.
  * Partially specified in ISO/IEC FCD 19794-4 aka Annex F.
  *
- * @author The JMRD team (info@jmrtd.org)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */

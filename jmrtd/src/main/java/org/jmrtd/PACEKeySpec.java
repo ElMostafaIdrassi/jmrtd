@@ -29,7 +29,7 @@ import org.jmrtd.protocol.PACEProtocol;
 /**
  * A key for PACE, can be CAN, MRZ, PIN, or PUK.
  *
- * @author The JMRTD Team (info@jmrtd.org)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision: $
  *

@@ -53,7 +53,7 @@ import org.jmrtd.lds.TerminalAuthenticationInfo;
  * the map of protocol identifiers which should match the key's map (not
  * checked here!), and the file identifier of the efCVCA file.
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */

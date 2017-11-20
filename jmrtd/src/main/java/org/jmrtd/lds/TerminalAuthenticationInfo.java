@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.DLSequence;
  *     identifier is not used.</li>
  * </ul>
  *
- * @author Wojciech Mostowski (woj@cs.ru.nl)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */

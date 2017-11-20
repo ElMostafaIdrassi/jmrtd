@@ -27,7 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * A key for PACE.
  *
- * @author The JMRTD Team (info@jmrtd.org)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision: $
  *

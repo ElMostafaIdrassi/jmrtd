@@ -31,7 +31,7 @@ import net.sf.scuba.data.Country;
  * Special ICAO countries not covered in {@link net.sf.scuba.data.ISOCountry}.
  * Contributed by Aleksandar Kamburov (wise_guybg).
  *
- * @author Aleksandar Kamburov (wise_guybg)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */

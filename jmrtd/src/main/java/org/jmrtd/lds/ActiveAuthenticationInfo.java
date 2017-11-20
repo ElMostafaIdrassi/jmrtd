@@ -51,7 +51,7 @@ import org.bouncycastle.asn1.DLSequence;
  * A concrete SecurityInfo structure that stores active authentication
  * info, see TR-LDS-PKI Maintenance V1.0.
  *
- * @author JMRTD team (info@jmrtd.org)
+ * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
