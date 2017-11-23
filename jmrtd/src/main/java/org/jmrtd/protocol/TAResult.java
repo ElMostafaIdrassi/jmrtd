@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -162,6 +163,69 @@ public class TAResult implements Serializable {
     result.append("cardChallenge = " + Hex.bytesToHexString(cardChallenge) + ", ");
     result.append("]");
     return result.toString();
+  }
+  
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((caReference == null) ? 0 : caReference.hashCode());
+    result = prime * result + Arrays.hashCode(cardChallenge);
+    result = prime * result + ((chipAuthenticationResult == null) ? 0 : chipAuthenticationResult.hashCode());
+    result = prime * result + ((documentNumber == null) ? 0 : documentNumber.hashCode());
+    result = prime * result + ((terminalCertificates == null) ? 0 : terminalCertificates.hashCode());
+    result = prime * result + ((terminalKey == null) ? 0 : terminalKey.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    TAResult other = (TAResult) obj;
+    if (caReference == null) {
+      if (other.caReference != null) {
+        return false;
+      }
+    } else if (!caReference.equals(other.caReference)) {
+      return false;
+    }
+    if (!Arrays.equals(cardChallenge, other.cardChallenge)) {
+      return false;
+    }
+    if (chipAuthenticationResult == null) {
+      if (other.chipAuthenticationResult != null) {
+        return false;
+      }
+    } else if (!chipAuthenticationResult.equals(other.chipAuthenticationResult)) {
+      return false;
+    }
+    if (documentNumber == null) {
+      if (other.documentNumber != null) {
+        return false;
+      }
+    } else if (!documentNumber.equals(other.documentNumber)) {
+      return false;
+    }
+    if (terminalCertificates == null) {
+      if (other.terminalCertificates != null) {
+        return false;
+      }
+    } else if (!terminalCertificates.equals(other.terminalCertificates)) {
+      return false;
+    }
+    if (terminalKey == null) {
+      return other.terminalKey == null;
+    }
+    
+    return terminalKey.equals(other.terminalKey);
   }
 
   private Object toString(CardVerifiableCertificate cert) {

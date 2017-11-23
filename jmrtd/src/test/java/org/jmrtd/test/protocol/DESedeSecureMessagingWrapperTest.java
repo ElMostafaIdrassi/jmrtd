@@ -59,6 +59,20 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     }
   }
 
+  public void testDESedeSecureMessagingWrapperEquals() {
+    try {
+      SecretKey encKey = getRandomDESedeKey();
+      SecretKey macKey = getRandomDESedeKey();
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
+      SecureMessagingWrapper anotherWrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
+      assertEquals(wrapper.hashCode(), anotherWrapper.hashCode());
+      assertEquals(wrapper, anotherWrapper);
+      assertEquals(wrapper.toString(), anotherWrapper.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+
   public void testDESedeSecureMessagingWrapperWrapUnwrap() {
     try {
       SecretKey encKey = getRandomDESedeKey();
@@ -67,7 +81,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
 
       CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x00, 0x00, new byte[] { 0x3F, 0x00 }, 0x00);
       CommandAPDU wrappedCommandAPDU = wrapper.wrap(commandAPDU);
-      
+
       assertNotNull(wrappedCommandAPDU);
       assertEquals(0x0C, wrappedCommandAPDU.getCLA());
       assertEquals(commandAPDU.getINS(), wrappedCommandAPDU.getINS());
@@ -78,7 +92,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   /*
    * See https://stackoverflow.com/q/47307716/27190.
    */
@@ -86,13 +100,13 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     try {
       Security.insertProviderAt(BC_PROVIDER, 1);
       SecretKey encKey = new SecretKeySpec(Hex.hexStringToBytes("3DE649F8AEA41C04FB6D4CD9043757AD"), "DESede");
-            
+
       SecretKey macKey = new SecretKeySpec(Hex.hexStringToBytes("8C34AD61974F68CEBA3E0EAEA1456476"), "DESede");
       SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, 0x00AB1D2F337FD997D6L);
-      
+
       CommandAPDU protectedCommandAPDU = wrapper.wrap(new CommandAPDU(Hex.hexStringToBytes("00 A4 02 0C 02 01 1E")));
       assertEquals("0CA4020C15870901FF0E241E2F94B5088E0822FF803EC310433600", Hex.bytesToHexString(protectedCommandAPDU.getBytes()));
-      
+
       CommandAPDU protectedReadBinaryCommandAPDU = wrapper.wrap(new CommandAPDU(Hex.hexStringToBytes("00 B0 00 00 04")));
       assertEquals("0CB000000D9701048E0868DD9FD88472834A00", Hex.bytesToHexString(protectedReadBinaryCommandAPDU.getBytes()));
     } catch (Exception e) {

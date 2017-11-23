@@ -155,6 +155,49 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     return "AESSecureMessagingWrapper [ " + ksEnc.toString() + ", " + ksMac.toString() + ", " + ssc + "]";
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((ksEnc == null) ? 0 : ksEnc.hashCode());
+    result = prime * result + ((ksMac == null) ? 0 : ksMac.hashCode());
+    result = prime * result + (int) (ssc ^ (ssc >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    AESSecureMessagingWrapper other = (AESSecureMessagingWrapper) obj;
+    if (ksEnc == null) {
+      if (other.ksEnc != null) {
+        return false;
+      }
+    } else if (!ksEnc.equals(other.ksEnc)) {
+      return false;
+    }
+    if (ksMac == null) {
+      if (other.ksMac != null) {
+        return false;
+      }
+    } else if (!ksMac.equals(other.ksMac)) {
+      return false;
+    }
+    if (ssc != other.ssc) {
+      return false;
+    }
+    
+    return true;
+  }
+
   /**
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.

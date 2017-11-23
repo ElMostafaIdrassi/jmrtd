@@ -40,7 +40,7 @@ import net.sf.scuba.data.TestCountry;
 public class MRZInfoTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /* ID 1 samples. */
 
   private static final String MRZ_SUSANNA_SAMPLE_3LINE_ID1 = "IRGBRZU12345673<<<<<<<<<<<<<<<"
@@ -364,12 +364,21 @@ public class MRZInfoTest extends TestCase {
       fail(e.toString());
     }
   }
+  
+//  public void testSeanOfSITA() {
+//    try {
+//      new MRZInfo("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204159<<<<<<<6");
+//    } catch (Exception e) {
+//      LOGGER.log(Level.WARNING, "Unexpected exception", e);
+//      fail(e.getMessage());
+//    }
+//  }
 
   public void testArnjlotMalaysia() {
     String anonymizedSample =
         "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
-        + "A984726053MYS8709125M2204134880811055050<<52";
-    
+            + "A984726053MYS8709125M2204134880811055050<<52";
+
     MRZInfo mrzInfo = new MRZInfo(anonymizedSample);
     assertEquals("ABC DEFG HIJKLMNOP QRS TUV XYZABCDEFGHI", mrzInfo.getPrimaryIdentifier());
     assertEquals("", mrzInfo.getSecondaryIdentifier());

@@ -52,6 +52,17 @@ public class BACKey implements BACKeySpec {
    * Creates a BAC key.
    *
    * @param documentNumber the document number string, cannot be <code>null</code>
+   * @param dateOfBirth the date of birth, cannot be <code>null</code>
+   * @param dateOfExpiry the date of expiry, cannot be <code>null</code>
+   */
+  public BACKey(String documentNumber, Date dateOfBirth, Date dateOfExpiry) {
+    this(documentNumber, toString(dateOfBirth), toString(dateOfExpiry));
+  }
+  
+  /**
+   * Creates a BAC key.
+   *
+   * @param documentNumber the document number string, cannot be <code>null</code>
    * @param dateOfBirth the date of birth string in <i>yymmdd</i> format, cannot be <code>null</code>
    * @param dateOfExpiry the date of expiry string in <i>yymmdd</i> format, cannot be <code>null</code>
    */
@@ -65,23 +76,14 @@ public class BACKey implements BACKeySpec {
     if (dateOfExpiry == null || dateOfExpiry.length() != 6) {
       throw new IllegalArgumentException("Illegal date: " + dateOfExpiry);
     }
-    while (documentNumber.length() < 9) {
-      documentNumber += "<";
+    
+    StringBuilder documentNumberBuilder = new StringBuilder(documentNumber);
+    while (documentNumberBuilder.length() < 9) {
+      documentNumberBuilder.append('<');
     }
-    this.documentNumber = documentNumber.trim();
+    this.documentNumber = documentNumberBuilder.toString().trim();
     this.dateOfBirth = dateOfBirth;
     this.dateOfExpiry = dateOfExpiry;
-  }
-
-  /**
-   * Creates a BAC key.
-   *
-   * @param documentNumber the document number string, cannot be <code>null</code>
-   * @param dateOfBirth the date of birth, cannot be <code>null</code>
-   * @param dateOfExpiry the date of expiry, cannot be <code>null</code>
-   */
-  public BACKey(String documentNumber, Date dateOfBirth, Date dateOfExpiry) {
-    this(documentNumber, toString(dateOfBirth), toString(dateOfExpiry));
   }
 
   /**
@@ -169,16 +171,6 @@ public class BACKey implements BACKeySpec {
    */
   public String getAlgorithm() {
     return "BAC";
-  }
-
-  /* FIXME: not implemented? -- MO */
-  public byte[] getEncoded() {
-    return null;
-  }
-
-  /* FIXME: not implemented? -- MO */
-  public String getFormat() {
-    return null;
   }
 
   protected void setDocumentNumber(String documentNumber) {

@@ -220,6 +220,48 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   public long getSendSequenceCounter() {
     return ssc;
   }
+  
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((ksEnc == null) ? 0 : ksEnc.hashCode());
+    result = prime * result + ((ksMac == null) ? 0 : ksMac.hashCode());
+    result = prime * result + (int) (ssc ^ (ssc >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DESedeSecureMessagingWrapper other = (DESedeSecureMessagingWrapper) obj;
+    if (ksEnc == null) {
+      if (other.ksEnc != null) {
+        return false;
+      }
+    } else if (!ksEnc.equals(other.ksEnc)) {
+      return false;
+    }
+    if (ksMac == null) {
+      if (other.ksMac != null) {
+        return false;
+      }
+    } else if (!ksMac.equals(other.ksMac)) {
+      return false;
+    }
+    if (ssc != other.ssc) {
+      return false;
+    }
+    return true;
+  }
 
   @Override
   public String toString() {

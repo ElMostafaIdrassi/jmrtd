@@ -89,6 +89,41 @@ public class PACEResultTest extends TestCase {
     }
   }
 
+  public void testPACEResultEquals() {
+      try {
+        String oid = PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256;
+
+        AccessKeySpec paceKey = PACEKeySpec.createCANKey("12345");
+
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDH", BC_PROVIDER);
+        keyPairGenerator.initialize(256);
+        KeyPair piccKeyPair = keyPairGenerator.generateKeyPair();
+        PublicKey piccPublicKey = piccKeyPair.getPublic();
+
+        KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
+
+        SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), 0L);
+
+        MappingType mappingType = PACEInfo.toMappingType(oid);
+        String agreementType = PACEInfo.toKeyAgreementAlgorithm(oid);
+        String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
+        String digestAlg = PACEInfo.toDigestAlgorithm(oid);
+        int keyLength = PACEInfo.toKeyLength(oid);
+
+        PACEMappingResult mappingResult = null;
+        
+        PACEResult paceResult = new PACEResult(paceKey, mappingType, agreementType, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
+        PACEResult anotherPACEResult = new PACEResult(paceKey, mappingType, agreementType, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
+
+        assertEquals(paceResult.hashCode(), anotherPACEResult.hashCode());
+        assertEquals(paceResult, anotherPACEResult);
+        assertEquals(paceResult.toString(), anotherPACEResult.toString());        
+      } catch (Exception e) {
+        LOGGER.log(Level.WARNING, "Unexpected exception", e);
+        fail(e.getMessage());
+      }
+  }
+  
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();

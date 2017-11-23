@@ -22,6 +22,7 @@
 
 package org.jmrtd.test;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,16 +39,26 @@ public class PACEKeySpecTest extends TestCase {
   
   public void testPACEKeySpec() {
     try {
-      PACEKeySpec paceCANKey = PACEKeySpec.createCANKey("12345");
+      String can = "12345";
+      PACEKeySpec paceCANKey = PACEKeySpec.createCANKey(can);
+      assertEquals("PACE", paceCANKey.getAlgorithm());
+      assertNotNull(paceCANKey.getKey());
+      assertTrue(Arrays.equals(can.getBytes("UTF-8"), paceCANKey.getKey()));
       assertEquals(PassportService.CAN_PACE_KEY_REFERENCE, paceCANKey.getKeyReference());
       
       PACEKeySpec paceMRZKey = PACEKeySpec.createMRZKey(new BACKey("123456789", "710121", "331231"));
+      assertEquals("PACE", paceMRZKey.getAlgorithm());
+      assertNotNull(paceMRZKey.getKey());
       assertEquals(PassportService.MRZ_PACE_KEY_REFERENCE, paceMRZKey.getKeyReference());
 
       PACEKeySpec pacePINKey = PACEKeySpec.createPINKey("0000");
+      assertEquals("PACE", pacePINKey.getAlgorithm());
+      assertNotNull(pacePINKey.getKey());
       assertEquals(PassportService.PIN_PACE_KEY_REFERENCE, pacePINKey.getKeyReference());
 
       PACEKeySpec pacePUKKey = PACEKeySpec.createPUKKey("12345678");
+      assertEquals("PACE", pacePUKKey.getAlgorithm());
+      assertNotNull(pacePUKKey.getKey());
       assertEquals(PassportService.PUK_PACE_KEY_REFERENCE, pacePUKKey.getKeyReference());
 
     } catch (Exception e) {

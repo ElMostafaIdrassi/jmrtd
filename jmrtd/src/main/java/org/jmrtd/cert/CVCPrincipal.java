@@ -66,34 +66,31 @@ public class CVCPrincipal implements Principal, Serializable {
     } catch (IllegalArgumentException iae) {
       LOGGER.log(Level.FINE, "Could not find country for " + alpha2Code, iae);
       country = new Country() {
+        
+        private static final long serialVersionUID = 345841304964161797L;
 
         @Override
         public int valueOf() {
-          // TODO Auto-generated method stub
           return -1;
         }
 
         @Override
         public String getName() {
-          // TODO Auto-generated method stub
           return "Unknown";
         }
 
         @Override
         public String getNationality() {
-          // TODO Auto-generated method stub
           return "Unknown";
         }
 
         @Override
         public String toAlpha2Code() {
-          // TODO Auto-generated method stub
           return alpha2Code;
         }
 
         @Override
         public String toAlpha3Code() {
-          // TODO Auto-generated method stub
           return "XXX";
         }
 

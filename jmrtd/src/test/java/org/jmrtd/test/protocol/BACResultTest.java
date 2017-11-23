@@ -52,15 +52,29 @@ public class BACResultTest extends TestCase {
       BACKeySpec bacKey = bacResult.getBACKey();
       assertNotNull(bacKey);
       assertEquals(new BACKey("123456789", "700101", "171108"), bacKey);
-      
+
       SecureMessagingWrapper wrapper = bacResult.getWrapper();
       assertNotNull(wrapper);
-      
+
     } catch (Exception e) {
       fail(e.getMessage());
     }
   }
-  
+
+  public void testBACResultEquals() {
+    try {
+      SecretKey encKey = getRandomDESedeKey();
+      SecretKey macKey = getRandomDESedeKey();
+      BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(encKey, macKey));
+      BACResult anotherBACResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(encKey, macKey));
+      assertEquals(bacResult.hashCode(), anotherBACResult.hashCode());
+      assertEquals(bacResult, anotherBACResult);
+      assertEquals(bacResult.toString(), anotherBACResult.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+
   private static SecretKey getRandomDESedeKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("DESede");
     return keyFactory.generateKey();

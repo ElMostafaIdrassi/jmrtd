@@ -82,6 +82,35 @@ public class CAResultTest extends TestCase {
     }
   }
   
+  public void testCAResultEquals() {
+    try {
+      BigInteger keyId = BigInteger.valueOf(-1L);
+      
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDH", BC_PROVIDER);
+      keyPairGenerator.initialize(256);
+      KeyPair piccKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey piccPublicKey = piccKeyPair.getPublic();
+      
+      KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey pcdPublicKey = pcdKeyPair.getPublic();
+      PrivateKey pcdPrivateKey = pcdKeyPair.getPrivate();
+      
+      SecretKey encKey = getRandomAESKey();
+      SecretKey macKey = getRandomAESKey();
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      
+      CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
+      CAResult anotherCAResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);
+
+      assertEquals(caResult.hashCode(), anotherCAResult.hashCode());
+      assertEquals(caResult, anotherCAResult);
+      assertEquals(caResult.toString(), anotherCAResult.toString());      
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+  
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();

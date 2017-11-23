@@ -33,4 +33,7 @@ import java.security.spec.KeySpec;
  * @version $Revision: $
  */
 public interface AccessKeySpec extends Serializable, KeySpec {
+  
+  String getAlgorithm();
+  
 }

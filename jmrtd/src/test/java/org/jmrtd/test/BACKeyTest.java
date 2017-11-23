@@ -68,6 +68,19 @@ public class BACKeyTest extends TestCase {
     }
   }
 
+  public void testBACKeyEquals() {
+    String documentNumber = "123456789";
+    String dateOfBirthString = "710121";
+    String dateOfExpiryString = "310309";
+
+    BACKey bacKey = new BACKey(documentNumber, dateOfBirthString, dateOfExpiryString);
+    BACKey anotherBACKey = new BACKey(documentNumber, dateOfBirthString, dateOfExpiryString);
+
+    assertEquals(bacKey.hashCode(), anotherBACKey.hashCode());
+    assertEquals(bacKey, anotherBACKey);
+    assertEquals(bacKey.toString(), anotherBACKey.toString());
+  }
+
   public void testBACKeyDates() {
     try {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

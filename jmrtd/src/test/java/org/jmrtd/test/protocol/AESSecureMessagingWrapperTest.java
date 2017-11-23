@@ -52,6 +52,20 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     }
   }
   
+  public void testAESSecureMessagingWrapperEquals() {
+    try {
+      SecretKey encKey = getRandomAESKey();
+      SecretKey macKey = getRandomAESKey();
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      assertEquals(wrapper.hashCode(), anotherWrapper.hashCode());
+      assertEquals(wrapper, anotherWrapper);
+      assertEquals(wrapper.toString(), anotherWrapper.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+  
   public void testAESSecureMessagingWrapperWrapUnwrap() {
     try {
       SecretKey encKey = getRandomAESKey();
@@ -71,7 +85,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
       fail(e.getMessage());
     }
   }
-
+  
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();

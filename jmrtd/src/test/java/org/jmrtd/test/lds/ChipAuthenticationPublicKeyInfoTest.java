@@ -46,6 +46,14 @@ public class ChipAuthenticationPublicKeyInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
+  
+  public void testChipAuthenticationPublicKeyInfoEquals() {
+    ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo = getSampleObject();
+    ChipAuthenticationPublicKeyInfo anotherChipAuthenticationPublicKeyInfo = new ChipAuthenticationPublicKeyInfo(chipAuthenticationPublicKeyInfo.getSubjectPublicKey(),  chipAuthenticationPublicKeyInfo.getKeyId());
+    assertEquals(chipAuthenticationPublicKeyInfo.hashCode(), anotherChipAuthenticationPublicKeyInfo.hashCode());
+    assertEquals(chipAuthenticationPublicKeyInfo, anotherChipAuthenticationPublicKeyInfo);
+    assertEquals(chipAuthenticationPublicKeyInfo.toString(), anotherChipAuthenticationPublicKeyInfo.toString());
+  }
 
   public void testSerializable() {
     try {

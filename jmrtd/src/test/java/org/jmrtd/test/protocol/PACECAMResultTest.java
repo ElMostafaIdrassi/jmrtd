@@ -99,6 +99,47 @@ public class PACECAMResultTest extends TestCase {
       fail(e.getMessage());
     }
   }
+  
+  public void testPACECAMResultEquals() {
+    try {
+      String documentNumner = "123456789";
+      String dateOfBirth = "710121";
+      String dateOfExpiry = "331231";
+      AccessKeySpec paceKey = PACEKeySpec.createMRZKey(new BACKey(documentNumner, dateOfBirth, dateOfExpiry));
+      String agreementAlg = "ECDH";
+      String cipherAlg = "AES";
+      String digestAlg = "SHA-256";
+      int keyLength = 128;
+      PACEMappingResult mappingResult = null;
+
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDH", BC_PROVIDER);
+      keyPairGenerator.initialize(256);
+      KeyPair piccKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey piccPublicKey = piccKeyPair.getPublic();
+
+      KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
+
+      SecretKey encKey = getRandomAESKey();
+      SecretKey macKey = getRandomAESKey();
+      
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      
+      byte[] chipAuthenticationData = new byte[8]; // FIXME: Generate randomly.
+
+      byte[] encryptedChipAuthenticationData = new byte[128]; // FIXME: Encrypt chipAuthenticationData ourselves.
+
+      PACECAMResult paceCAMResult = new PACECAMResult(paceKey, agreementAlg, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
+      PACECAMResult anotherPACECAMResult = new PACECAMResult(paceKey, agreementAlg, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, encryptedChipAuthenticationData, chipAuthenticationData, anotherWrapper);
+      
+      assertEquals(paceCAMResult.hashCode(), anotherPACECAMResult.hashCode());
+      assertEquals(paceCAMResult, anotherPACECAMResult);
+      assertEquals(paceCAMResult.toString(), anotherPACECAMResult.toString());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception", e);
+      fail(e.getMessage());
+    }
+  }
 
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");

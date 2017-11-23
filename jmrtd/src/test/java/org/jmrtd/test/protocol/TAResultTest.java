@@ -94,6 +94,43 @@ public class TAResultTest extends TestCase {
     }
   }
 
+  public void testTAResultEquals() {
+    try {
+      BigInteger keyId = BigInteger.valueOf(-1L);
+
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDH", BC_PROVIDER);
+      keyPairGenerator.initialize(256);
+      KeyPair piccKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey piccPublicKey = piccKeyPair.getPublic();
+
+      KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
+      PublicKey pcdPublicKey = pcdKeyPair.getPublic();
+      PrivateKey pcdPrivateKey = pcdKeyPair.getPrivate();
+      
+      SecretKey encKey = getRandomAESKey();
+      SecretKey macKey = getRandomAESKey();
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+
+      CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
+      CAResult anotherCAResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);
+
+      CVCPrincipal cvcPrincipal = new CVCPrincipal("CAReference00001");
+      List<CardVerifiableCertificate> terminalCertificates = Collections.emptyList();
+      PrivateKey terminalKey = null;
+      String documentNumber = "123456789";
+      byte[] cardChallenge = null;
+      TAResult taResult = new TAResult(caResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
+      TAResult anotherTAResult = new TAResult(anotherCAResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
+      
+      assertEquals(taResult.hashCode(), anotherTAResult.hashCode());
+      assertEquals(taResult, anotherTAResult);
+      assertEquals(taResult.toString(), anotherTAResult.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+  }
+  
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();

@@ -68,9 +68,11 @@ public class CardSecurityFileTest extends TestCase {
   }
 
   private void testSimilar(CardSecurityFile cardSecurityFile, CardSecurityFile cardSecurityFile2) {
+    assertEquals(cardSecurityFile.hashCode(), cardSecurityFile2.hashCode());
     assertEquals(cardSecurityFile, cardSecurityFile2);
     assertEquals(cardSecurityFile.getDigestAlgorithm(), cardSecurityFile2.getDigestAlgorithm());    
     assertEquals(cardSecurityFile.getDigestEncryptionAlgorithm(), cardSecurityFile2.getDigestEncryptionAlgorithm());
+    assertEquals(cardSecurityFile.toString(), cardSecurityFile2.toString());
   }
 
   public void testAttributesSHA256withECDSASample(CardSecurityFile cardSecurityFile) {
