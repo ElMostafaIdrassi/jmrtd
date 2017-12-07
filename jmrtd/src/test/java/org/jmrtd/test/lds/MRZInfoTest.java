@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.ICAOCountry;
@@ -180,7 +181,7 @@ public class MRZInfoTest extends TestCase {
       String strEncoded = new String(bytes, "UTF-8");
       assertEquals(strEncoded, str.replace("\n", ""));
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       fail(ioe.getMessage());
     }
   }
@@ -206,8 +207,8 @@ public class MRZInfoTest extends TestCase {
       testDecodeEncode(MRZ_FRANK_AMOSS_2LINE_ID3, "P", "USA", "AMOSS", new String[] { "FRANK" }, "000078004", "500101", Gender.MALE, "151116", "USA");
       testDecodeEncode(MRZ_SUSANNA_SAMPLE_3LINE_ID1, "IR", "COU", "SAMPLE", new String[] { "SUSANNA" }, "ZU1234567", "660819", Gender.FEMALE, "080808", "GBR");
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -233,8 +234,8 @@ public class MRZInfoTest extends TestCase {
       assertEquals(mrzInfo.getGender(), gender);
       assertEquals(mrzInfo.getDateOfExpiry(), dateOfExpiry);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -325,8 +326,8 @@ public class MRZInfoTest extends TestCase {
       }
       assertEquals(mrzInfo, copy);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -360,8 +361,8 @@ public class MRZInfoTest extends TestCase {
       Country country = ICAOCountry.getInstance(code);
       assertEquals(country, expectedCountry);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
   

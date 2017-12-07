@@ -251,7 +251,7 @@ public class PACEResult implements Serializable {
     return true;
   }
 
-  public static abstract class PACEMappingResult implements Serializable {
+  public abstract static class PACEMappingResult implements Serializable {
 
     private static final long serialVersionUID = 2773111318950631118L;
 
@@ -331,7 +331,7 @@ public class PACEResult implements Serializable {
     }
   }
 
-  public static abstract class PACEGMMappingResult extends PACEMappingResult {
+  public abstract static class PACEGMMappingResult extends PACEMappingResult {
 
     private static final long serialVersionUID = -3373471956987358728L;
 

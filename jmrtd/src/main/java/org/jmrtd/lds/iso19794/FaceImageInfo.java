@@ -54,6 +54,8 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   private static final long serialVersionUID = -1751069410327594067L;
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   /** Eye color code based on Section 5.5.4 of ISO 19794-5. */
   public enum EyeColor {
     UNSPECIFIED {
@@ -377,8 +379,6 @@ public class FaceImageInfo extends AbstractImageInfo {
     super(TYPE_PORTRAIT);
     readObject(inputStream);
   }
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   @Override
   protected void readObject(InputStream inputStream) throws IOException {

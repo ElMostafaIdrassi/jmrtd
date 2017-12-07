@@ -865,7 +865,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @throws IOException if something goes wrong
    * @throws NumberFormatException if a date could not be constructed
    */
-  private String readDateOfExpiry(DataInputStream in) throws IOException, NumberFormatException {
+  private String readDateOfExpiry(DataInputStream in) throws IOException {
     return readString(in, 6);
   }
 
@@ -1075,7 +1075,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @throws NumberFormatException if <code>ch</code> is not a valid MRZ
    *                               character.
    */
-  private static int decodeMRZDigit(byte ch) throws NumberFormatException {
+  private static int decodeMRZDigit(byte ch) {
     switch (ch) {
       case '<':
       case '0':

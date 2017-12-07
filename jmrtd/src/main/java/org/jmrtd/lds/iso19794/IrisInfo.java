@@ -27,6 +27,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -558,6 +559,97 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       sbh = new StandardBiometricHeader(elements);
     }
     return sbh;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + boundaryExtraction;
+    result = prime * result + captureDeviceId;
+    result = prime * result + Arrays.hashCode(deviceUniqueId);
+    result = prime * result + horizontalOrientation;
+    result = prime * result + imageFormat;
+    result = prime * result + imageTransformation;
+    result = prime * result + intensityDepth;
+    result = prime * result + irisDiameter;
+    result = prime * result + irisOcclusion;
+    result = prime * result + occlusionFilling;
+    result = prime * result + rawImageHeight;
+    result = prime * result + rawImageWidth;
+    result = prime * result + (int) (recordLength ^ (recordLength >>> 32));
+    result = prime * result + ((sbh == null) ? 0 : sbh.hashCode());
+    result = prime * result + scanType;
+    result = prime * result + verticalOrientation;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    
+    IrisInfo other = (IrisInfo) obj;
+    if (sbh == null) {
+      if (other.sbh != null) {
+        return false;
+      }
+    } else if (!sbh.equals(other.sbh)) {
+      return false;
+    }
+    if (boundaryExtraction != other.boundaryExtraction) {
+      return false;
+    }
+    if (captureDeviceId != other.captureDeviceId) {
+      return false;
+    }
+    if (!Arrays.equals(deviceUniqueId, other.deviceUniqueId)) {
+      return false;
+    }
+    if (horizontalOrientation != other.horizontalOrientation) {
+      return false;
+    }
+    if (imageFormat != other.imageFormat) {
+      return false;
+    }
+    if (imageTransformation != other.imageTransformation) {
+      return false;
+    }
+    if (intensityDepth != other.intensityDepth) {
+      return false;
+    }
+    if (irisDiameter != other.irisDiameter) {
+      return false;
+    }
+    if (irisOcclusion != other.irisOcclusion) {
+      return false;
+    }
+    if (occlusionFilling != other.occlusionFilling) {
+      return false;
+    }
+    if (rawImageHeight != other.rawImageHeight) {
+      return false;
+    }
+    if (rawImageWidth != other.rawImageWidth) {
+      return false;
+    }
+    if (recordLength != other.recordLength) {
+      return false;
+    }
+    if (scanType != other.scanType) {
+      return false;
+    }
+    if (verticalOrientation != other.verticalOrientation) {
+      return false;
+    }
+    return true;
   }
 
   /**

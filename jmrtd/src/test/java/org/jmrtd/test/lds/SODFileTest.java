@@ -122,8 +122,8 @@ public class SODFileTest extends TestCase {
       assertEquals(sodFile, copy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -150,7 +150,7 @@ public class SODFileTest extends TestCase {
       LOGGER.info("DEBUG: cert = " + (cert == null ? "null" : cert.toString()));
       LOGGER.info("DEBUG: serial number = " + (serial == null ? "null" : serial.toString()));
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       return; // inconclusive!
     } catch (Exception e) {
       fail(e.getMessage());
@@ -202,7 +202,7 @@ public class SODFileTest extends TestCase {
       assertNotNull(digestAlgorithm);
       assertNotNull(digestEncryptionAlgorithm);
     } catch (Exception ce) {
-      ce.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", ce);
       fail(ce.getMessage());
     }
   }
@@ -217,8 +217,8 @@ public class SODFileTest extends TestCase {
       testReflexive(sodFile);
       testFields(sodFile);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -292,7 +292,7 @@ public class SODFileTest extends TestCase {
 
       return sod;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       return null;
     }
   }
@@ -310,6 +310,7 @@ public class SODFileTest extends TestCase {
     try {
       return ResourceUtil.getInputStream("/lds/bsi2008/EF_SOD.bin");
     } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
       return null;
     }

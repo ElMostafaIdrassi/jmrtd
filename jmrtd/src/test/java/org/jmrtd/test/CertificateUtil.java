@@ -66,8 +66,7 @@ public class CertificateUtil {
       certificateFactory = CertificateFactory.getInstance("X.509");
       return (X509Certificate)certificateFactory.generateCertificate(new ByteArrayInputStream(certBytes));
     } catch (Exception  e) {
-      LOGGER.log(Level.WARNING, "Unexpected exception", e);
-      throw new IllegalStateException(e.getMessage());
+      throw new IllegalStateException(e);
     }
   }
 
@@ -92,7 +91,7 @@ public class CertificateUtil {
         this.signature = Signature.getInstance(signatureAlgorithm);
         this.signature.initSign(privateKey);
       } catch (GeneralSecurityException gse) {
-        throw new IllegalArgumentException(gse.getMessage());
+        throw new IllegalArgumentException(gse);
       }
     }
 
@@ -115,7 +114,7 @@ public class CertificateUtil {
         signature.update(outputStream.toByteArray());
         return signature.sign();
       } catch (GeneralSecurityException gse) {
-        gse.printStackTrace();
+        LOGGER.log(Level.WARNING, "Exception", gse);
         return null;
       }
     }

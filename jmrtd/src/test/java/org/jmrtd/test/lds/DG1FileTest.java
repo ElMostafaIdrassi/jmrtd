@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG1File;
@@ -76,8 +77,8 @@ public class DG1FileTest extends TestCase {
       file = getSpecSampleObject(LOES_SAMPLE);
       assertEquals(file.getMRZInfo().toString().replace("\n", "").trim(), LOES_SAMPLE);			
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -103,9 +104,21 @@ public class DG1FileTest extends TestCase {
 
   public Collection<DG1File> getTestObjects() {
     List<DG1File> testObjects = new ArrayList<DG1File>();
-    try { testObjects.add(createTestObject()); } catch (Exception e) { e.printStackTrace(); }
-    try { testObjects.add(getSpecSampleObject(SMITH_SAMPLE)); } catch (Exception e) { e.printStackTrace(); }
-    try { testObjects.add(getSpecSampleObject(LOES_SAMPLE)); } catch (Exception e) { e.printStackTrace(); }
+    try {
+      testObjects.add(createTestObject());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+    try {
+      testObjects.add(getSpecSampleObject(SMITH_SAMPLE));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+    try {
+      testObjects.add(getSpecSampleObject(LOES_SAMPLE));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
     return testObjects;
   }
 
@@ -120,7 +133,7 @@ public class DG1FileTest extends TestCase {
       ByteArrayInputStream in = new ByteArrayInputStream(bytes);
       return new DG1File(in);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
     }
 
     return null;

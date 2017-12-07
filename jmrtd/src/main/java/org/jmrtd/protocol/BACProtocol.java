@@ -181,15 +181,18 @@ public class BACProtocol {
     return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", true);
   }
 
+  /**
+   * Returns the document number, including trailing '<' until length 9.
+   * 
+   * @param documentNumber the original document number
+   * 
+   * @return the documentNumber with at least length 9
+   */
   private static String fixDocumentNumber(String documentNumber) {
-    /* The document number, excluding trailing '<'. */
-    String minDocumentNumber = documentNumber.replace('<', ' ').trim().replace(' ', '<');
-
-    /* The document number, including trailing '<' until length 9. */
-    String maxDocumentNumber = minDocumentNumber;
+    StringBuilder maxDocumentNumber = new StringBuilder(documentNumber == null ? "" : documentNumber.replace('<', ' ').trim().replace(' ', '<'));
     while (maxDocumentNumber.length() < 9) {
-      maxDocumentNumber += "<";
+      maxDocumentNumber.append('<');
     }
-    return maxDocumentNumber;
+    return maxDocumentNumber.toString();
   }
 }

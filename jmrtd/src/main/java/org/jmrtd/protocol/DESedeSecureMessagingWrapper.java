@@ -378,10 +378,22 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
       while (!isFinished) {
         int tag = inputStream.readByte();
         switch (tag) {
-          case (byte)0x87: data = readDO87(inputStream, false); break;
-          case (byte)0x85: data = readDO87(inputStream, true); break;
-          case (byte)0x99: sw = readDO99(inputStream); break;
-          case (byte)0x8E: cc = readDO8E(inputStream); isFinished = true; break;
+          case (byte) 0x87:
+            data = readDO87(inputStream, false);
+            break;
+          case (byte) 0x85:
+            data = readDO87(inputStream, true);
+            break;
+          case (byte) 0x99:
+            sw = readDO99(inputStream);
+            break;
+          case (byte) 0x8E:
+            cc = readDO8E(inputStream);
+            isFinished = true;
+            break;
+          default:
+            LOGGER.warning("Unexpected tag " + Integer.toHexString(tag));
+            break;
         }
       }
     } finally {

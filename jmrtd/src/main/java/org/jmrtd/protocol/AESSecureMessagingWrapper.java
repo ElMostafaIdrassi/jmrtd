@@ -416,7 +416,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @param inputStream inputstream to read from.
    */
-  private byte[] readDO8E(DataInputStream inputStream) throws IOException, GeneralSecurityException {
+  private byte[] readDO8E(DataInputStream inputStream) throws IOException {
     int length = inputStream.readUnsignedByte();
     if (length != 8) {
       throw new IllegalStateException("DO'8E wrong length " + length);
@@ -437,7 +437,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @param ssc the SSC
    */
-  private IvParameterSpec getIV(long ssc) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+  private IvParameterSpec getIV(long ssc) throws IllegalBlockSizeException, BadPaddingException {
     byte[] sscBytes = getSSCAsBytes(ssc);
     byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
     return new IvParameterSpec(encryptedSSC);

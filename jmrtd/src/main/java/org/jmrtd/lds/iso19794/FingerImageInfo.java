@@ -434,51 +434,91 @@ public class FingerImageInfo extends AbstractImageInfo {
 
   private static String positionToString(int position) {
     switch (position) {
-      case POSITION_UNKNOWN_FINGER: return "Unknown finger";
-      case POSITION_RIGHT_THUMB: return "Right thumb";
-      case POSITION_RIGHT_INDEX_FINGER: return "Right index finger";
-      case POSITION_RIGHT_MIDDLE_FINGER: return "Right middle finger";
-      case POSITION_RIGHT_RING_FINGER: return "Right ring finger";
-      case POSITION_RIGHT_LITTLE_FINGER: return "Right little finger";
-      case POSITION_LEFT_THUMB: return "Left thumb";
-      case POSITION_LEFT_INDEX_FINGER: return "Left index finger";
-      case POSITION_LEFT_MIDDLE_FINGER: return "Left middle finger";
-      case POSITION_LEFT_RING_FINGER: return "Left ring finger";
-      case POSITION_LEFT_LITTLE_FINGER: return "Left little finger";
-      case POSITION_PLAIN_RIGHT_FOUR_FINGERS: return "Right four fingers";
-      case POSITION_PLAIN_LEFT_FOUR_FINGERS: return "Left four fingers";
-      case POSITION_PLAIN_THUMBS: return "Plain thumbs";
-      case POSITION_UNKNOWN_PALM: return "Unknown palm";
-      case POSITION_RIGHT_FULL_PALM: return "Right full palm";
-      case POSITION_RIGHT_WRITER_S_PALM: return "Right writer's palm";
-      case POSITION_LEFT_FULL_PALM: return "Left full palm";
-      case POSITION_LEFT_WRITER_S_PALM: return "Left writer's palm";
-      case POSITION_RIGHT_LOWER_PALM: return "Right lower palm";
-      case POSITION_RIGHT_UPPER_PALM: return "Right upper palm";
-      case POSITION_LEFT_LOWER_PALM: return "Left lower palm";
-      case POSITION_LEFT_UPPER_PALM: return "Left upper palm";
-      case POSITION_RIGHT_OTHER: return "Right other";
-      case POSITION_LEFT_OTHER: return "Left other";
-      case POSITION_RIGHT_INTERDIGITAL: return "Right interdigital";
-      case POSITION_RIGHT_THENAR: return "Right thenar";
-      case POSITION_RIGHT_HYPOTHENAR: return "Right hypothenar";
-      case POSITION_LEFT_INTERDIGITAL: return "Left interdigital";
-      case POSITION_LEFT_THENAR: return "Left thenar";
-      case POSITION_LEFT_HYPOTHENAR: return "Left hypothenar";
-      default: return null;
+      case POSITION_UNKNOWN_FINGER:
+        return "Unknown finger";
+      case POSITION_RIGHT_THUMB:
+        return "Right thumb";
+      case POSITION_RIGHT_INDEX_FINGER:
+        return "Right index finger";
+      case POSITION_RIGHT_MIDDLE_FINGER:
+        return "Right middle finger";
+      case POSITION_RIGHT_RING_FINGER:
+        return "Right ring finger";
+      case POSITION_RIGHT_LITTLE_FINGER:
+        return "Right little finger";
+      case POSITION_LEFT_THUMB:
+        return "Left thumb";
+      case POSITION_LEFT_INDEX_FINGER:
+        return "Left index finger";
+      case POSITION_LEFT_MIDDLE_FINGER:
+        return "Left middle finger";
+      case POSITION_LEFT_RING_FINGER:
+        return "Left ring finger";
+      case POSITION_LEFT_LITTLE_FINGER:
+        return "Left little finger";
+      case POSITION_PLAIN_RIGHT_FOUR_FINGERS:
+        return "Right four fingers";
+      case POSITION_PLAIN_LEFT_FOUR_FINGERS:
+        return "Left four fingers";
+      case POSITION_PLAIN_THUMBS:
+        return "Plain thumbs";
+      case POSITION_UNKNOWN_PALM:
+        return "Unknown palm";
+      case POSITION_RIGHT_FULL_PALM:
+        return "Right full palm";
+      case POSITION_RIGHT_WRITER_S_PALM:
+        return "Right writer's palm";
+      case POSITION_LEFT_FULL_PALM:
+        return "Left full palm";
+      case POSITION_LEFT_WRITER_S_PALM:
+        return "Left writer's palm";
+      case POSITION_RIGHT_LOWER_PALM:
+        return "Right lower palm";
+      case POSITION_RIGHT_UPPER_PALM:
+        return "Right upper palm";
+      case POSITION_LEFT_LOWER_PALM:
+        return "Left lower palm";
+      case POSITION_LEFT_UPPER_PALM:
+        return "Left upper palm";
+      case POSITION_RIGHT_OTHER:
+        return "Right other";
+      case POSITION_LEFT_OTHER:
+        return "Left other";
+      case POSITION_RIGHT_INTERDIGITAL:
+        return "Right interdigital";
+      case POSITION_RIGHT_THENAR:
+        return "Right thenar";
+      case POSITION_RIGHT_HYPOTHENAR:
+        return "Right hypothenar";
+      case POSITION_LEFT_INTERDIGITAL:
+        return "Left interdigital";
+      case POSITION_LEFT_THENAR:
+        return "Left thenar";
+      case POSITION_LEFT_HYPOTHENAR:
+        return "Left hypothenar";
+      default:
+        return null;
     }
   }
 
   private static String impressionTypeToString(int impressionType) {
     switch (impressionType) {
-      case IMPRESSION_TYPE_LIVE_SCAN_PLAIN: return "Live scan plain";
-      case IMPRESSION_TYPE_LIVE_SCAN_ROLLED: return "Live scan rolled";
-      case IMPRESSION_TYPE_NON_LIVE_SCAN_PLAIN: return "Non-live scan plain";
-      case IMPRESSION_TYPE_NON_LIVE_SCAN_ROLLED: return "Non-live scan rolled";
-      case IMPRESSION_TYPE_LATENT: return "Latent";
-      case IMPRESSION_TYPE_SWIPE: return "Swipe";
-      case IMPRESSION_TYPE_LIVE_SCAN_CONTACTLESS: return "Live scan contactless";
-      default: return null;
+      case IMPRESSION_TYPE_LIVE_SCAN_PLAIN:
+        return "Live scan plain";
+      case IMPRESSION_TYPE_LIVE_SCAN_ROLLED:
+        return "Live scan rolled";
+      case IMPRESSION_TYPE_NON_LIVE_SCAN_PLAIN:
+        return "Non-live scan plain";
+      case IMPRESSION_TYPE_NON_LIVE_SCAN_ROLLED:
+        return "Non-live scan rolled";
+      case IMPRESSION_TYPE_LATENT:
+        return "Latent";
+      case IMPRESSION_TYPE_SWIPE:
+        return "Swipe";
+      case IMPRESSION_TYPE_LIVE_SCAN_CONTACTLESS:
+        return "Live scan contactless";
+      default:
+        return null;
     }
   }
 
@@ -505,38 +545,70 @@ public class FingerImageInfo extends AbstractImageInfo {
    */
   private static int toBiometricSubtype(int position) {
     switch (position) {
-      case FingerImageInfo.POSITION_UNKNOWN_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
-      case FingerImageInfo.POSITION_RIGHT_THUMB: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
-      case FingerImageInfo.POSITION_RIGHT_INDEX_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER;
-      case FingerImageInfo.POSITION_RIGHT_MIDDLE_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER;
-      case FingerImageInfo.POSITION_RIGHT_RING_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RING_FINGER;
-      case FingerImageInfo.POSITION_RIGHT_LITTLE_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER;
-      case FingerImageInfo.POSITION_LEFT_THUMB: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
-      case FingerImageInfo.POSITION_LEFT_INDEX_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER;
-      case FingerImageInfo.POSITION_LEFT_MIDDLE_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER;
-      case FingerImageInfo.POSITION_LEFT_RING_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RING_FINGER;
-      case FingerImageInfo.POSITION_LEFT_LITTLE_FINGER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER;
-      case FingerImageInfo.POSITION_PLAIN_RIGHT_FOUR_FINGERS: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_PLAIN_LEFT_FOUR_FINGERS: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_PLAIN_THUMBS: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
-      case FingerImageInfo.POSITION_UNKNOWN_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
-      case FingerImageInfo.POSITION_RIGHT_FULL_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_RIGHT_WRITER_S_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
-      case FingerImageInfo.POSITION_LEFT_FULL_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_LEFT_WRITER_S_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_RIGHT_LOWER_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_RIGHT_UPPER_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_LEFT_LOWER_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_LEFT_UPPER_PALM: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_RIGHT_OTHER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_LEFT_OTHER: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_RIGHT_INTERDIGITAL: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_RIGHT_THENAR: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_RIGHT_HYPOTHENAR: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
-      case FingerImageInfo.POSITION_LEFT_INTERDIGITAL: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_LEFT_THENAR: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      case FingerImageInfo.POSITION_LEFT_HYPOTHENAR: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
-      default: return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+      case FingerImageInfo.POSITION_UNKNOWN_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+      case FingerImageInfo.POSITION_RIGHT_THUMB:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
+      case FingerImageInfo.POSITION_RIGHT_INDEX_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER;
+      case FingerImageInfo.POSITION_RIGHT_MIDDLE_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER;
+      case FingerImageInfo.POSITION_RIGHT_RING_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RING_FINGER;
+      case FingerImageInfo.POSITION_RIGHT_LITTLE_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER;
+      case FingerImageInfo.POSITION_LEFT_THUMB:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
+      case FingerImageInfo.POSITION_LEFT_INDEX_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER;
+      case FingerImageInfo.POSITION_LEFT_MIDDLE_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER;
+      case FingerImageInfo.POSITION_LEFT_RING_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RING_FINGER;
+      case FingerImageInfo.POSITION_LEFT_LITTLE_FINGER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER;
+      case FingerImageInfo.POSITION_PLAIN_RIGHT_FOUR_FINGERS:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_PLAIN_LEFT_FOUR_FINGERS:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_PLAIN_THUMBS:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
+      case FingerImageInfo.POSITION_UNKNOWN_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+      case FingerImageInfo.POSITION_RIGHT_FULL_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_RIGHT_WRITER_S_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+      case FingerImageInfo.POSITION_LEFT_FULL_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_LEFT_WRITER_S_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_RIGHT_LOWER_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_RIGHT_UPPER_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_LEFT_LOWER_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_LEFT_UPPER_PALM:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_RIGHT_OTHER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_LEFT_OTHER:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_RIGHT_INTERDIGITAL:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_RIGHT_THENAR:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_RIGHT_HYPOTHENAR:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+      case FingerImageInfo.POSITION_LEFT_INTERDIGITAL:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_LEFT_THENAR:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      case FingerImageInfo.POSITION_LEFT_HYPOTHENAR:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+      default:
+        return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
     }
   }
 }
