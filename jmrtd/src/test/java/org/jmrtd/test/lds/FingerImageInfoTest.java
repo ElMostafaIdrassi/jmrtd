@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -54,8 +55,8 @@ public class FingerImageInfoTest extends TestCase {
       String asString = imageInfo.toString();
       assertNotNull(asString);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -78,7 +79,7 @@ public class FingerImageInfoTest extends TestCase {
       //			LOGGER.info("DEBUG: image.getWidth() = " + image.getWidth());
       //			LOGGER.info("DEBUG: image.getHeight() = " + image.getHeight());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -90,7 +91,7 @@ public class FingerImageInfoTest extends TestCase {
       assertTrue(fingerImageInfo.getWidth() > 0);
       assertTrue(fingerImageInfo.getHeight() > 0);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -113,8 +114,8 @@ public class FingerImageInfoTest extends TestCase {
       assertNotNull(encodedCopy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -127,7 +128,7 @@ public class FingerImageInfoTest extends TestCase {
       assertNotNull(mimeType);
       assertTrue("image/x-wsq".equals(mimeType) || "image/jpeg2000".equals(mimeType) || "image/jpeg".equals(mimeType));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -189,7 +190,7 @@ public class FingerImageInfoTest extends TestCase {
 
       return imageInfo;
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       fail(ioe.getMessage());
       return null;
     }
@@ -202,8 +203,8 @@ public class FingerImageInfoTest extends TestCase {
     try {
       return ResourceUtil.getBytes("/lds/wsq/sample_image.wsq");
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
       return null;
     }
   }
@@ -225,7 +226,7 @@ public class FingerImageInfoTest extends TestCase {
   //			byte[] bytes = out.toByteArray();
   //			return bytes;
   //		} catch (Exception e) {
-  //			fail(e.toString());
+  //			fail(e.getMessage());
   //			return null;
   //		}
   //	}
@@ -247,11 +248,11 @@ public class FingerImageInfoTest extends TestCase {
       byte[] bytes = out.toByteArray();
       return bytes;
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
       return null;
     }
   }
-
 
   /*
    * A finger image object containing a JPG image with position is right index finger.
@@ -271,7 +272,7 @@ public class FingerImageInfoTest extends TestCase {
       List<FingerImageInfo> fingerImageInfos = fingerInfo.getFingerImageInfos();
       return fingerImageInfos.get(0);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
       return null;
     }

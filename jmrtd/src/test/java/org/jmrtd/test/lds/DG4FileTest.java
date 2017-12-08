@@ -31,6 +31,7 @@ import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -56,8 +57,10 @@ public class DG4FileTest extends TestCase {
   public void testConstruct() {
     try {
       DG4File dg4 = new DG4File(Arrays.asList(new IrisInfo[] { }));
+      assertNotNull(dg4.getIrisInfos());
+      assertTrue(dg4.getIrisInfos().isEmpty());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -76,7 +79,7 @@ public class DG4FileTest extends TestCase {
       InputStream inputStream = new ByteArrayInputStream(bytes);
       DG4File copy = new DG4File(inputStream);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -100,7 +103,7 @@ public class DG4FileTest extends TestCase {
 
       assertTrue(Arrays.equals(dg4Bytes, copyBytes));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -123,7 +126,7 @@ public class DG4FileTest extends TestCase {
 
       assertFalse(Arrays.equals(dg4Bytes, copyBytes));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -157,7 +160,7 @@ public class DG4FileTest extends TestCase {
     } catch (AccessControlException ace) {
       LOGGER.info("DEBUG: *************** could not get access to DG4 *********");
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -219,7 +222,7 @@ public class DG4FileTest extends TestCase {
       DG4File dg4 = new DG4File(in);
       return dg4;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       return null;
     }
   }

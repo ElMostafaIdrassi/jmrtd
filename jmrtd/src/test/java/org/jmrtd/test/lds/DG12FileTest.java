@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG12File;
@@ -79,8 +80,8 @@ public class DG12FileTest extends TestCase {
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
 
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -105,8 +106,8 @@ public class DG12FileTest extends TestCase {
       assertTrue(file.getDateOfIssue().startsWith("20020531"));
       assertEquals(file.getNamesOfOtherPersons(), Arrays.asList(new String[] { "SMITH<<BRENDA<P" }));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -133,8 +134,8 @@ public class DG12FileTest extends TestCase {
       assertTrue(file.getDateOfIssue().startsWith("20020531"));
       assertEquals(file.getNamesOfOtherPersons(), Arrays.asList(new String[] { "SMITH<<BRENDA<P" }));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -158,7 +159,7 @@ public class DG12FileTest extends TestCase {
       assertEquals(dg12, copy);
       assert(Arrays.equals(dg12.getEncoded(), copy.getEncoded()));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }

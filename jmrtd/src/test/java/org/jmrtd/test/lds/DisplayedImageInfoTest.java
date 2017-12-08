@@ -24,6 +24,8 @@ package org.jmrtd.test.lds;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -35,6 +37,8 @@ import net.sf.scuba.util.Hex;
 
 public class DisplayedImageInfoTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   public DisplayedImageInfoTest(String name) {
     super(name);
   }
@@ -50,8 +54,8 @@ public class DisplayedImageInfoTest extends TestCase {
       assertNotNull(asString);
       assertTrue("String: \"" + asString + "\"", asString.startsWith(expectedResult));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -78,8 +82,8 @@ public class DisplayedImageInfoTest extends TestCase {
       assertNotNull(encodedCopy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -115,7 +119,8 @@ public class DisplayedImageInfoTest extends TestCase {
       byte[] bytes = out.toByteArray();
       return bytes;
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
       return null;
     }
   }

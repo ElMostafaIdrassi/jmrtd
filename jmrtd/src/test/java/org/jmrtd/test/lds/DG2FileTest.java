@@ -57,7 +57,7 @@ public class DG2FileTest extends TestCase {
     try {
       DG2File dg2 = new DG2File(Arrays.asList(new FaceInfo[] { }));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -83,8 +83,8 @@ public class DG2FileTest extends TestCase {
       testReflexive(getTestObject(BSI_TEST_FILE));
       testReflexive(getTestObject(LOES_TEST_FILE));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -98,8 +98,8 @@ public class DG2FileTest extends TestCase {
       assertEquals(dg2File, copy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -108,7 +108,8 @@ public class DG2FileTest extends TestCase {
       testDecodeEncode(getTestObject(BSI_TEST_FILE), 2);
       testDecodeEncode(getTestObject(LOES_TEST_FILE), 2);
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -150,8 +151,8 @@ public class DG2FileTest extends TestCase {
       assertEquals(width, width1);
       assertEquals(height, height1);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -160,7 +161,7 @@ public class DG2FileTest extends TestCase {
       testElements(getTestObject(BSI_TEST_FILE));
       testElements(getTestObject(LOES_TEST_FILE));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -183,7 +184,7 @@ public class DG2FileTest extends TestCase {
       testImageBytes(getTestObject(BSI_TEST_FILE));
       testImageBytes(getTestObject(LOES_TEST_FILE));
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       fail(ioe.getMessage());
     }
   }
@@ -195,7 +196,7 @@ public class DG2FileTest extends TestCase {
       byte[] b1 = new byte[l1];
       (new DataInputStream(i1.getImageInputStream())).readFully(b1);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }		
   }
@@ -215,7 +216,7 @@ public class DG2FileTest extends TestCase {
       byte[] b1 = new byte[l1];
       (new DataInputStream(i1.getImageInputStream())).readFully(b1);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -227,7 +228,7 @@ public class DG2FileTest extends TestCase {
       System.arraycopy(dg2.getEncoded(), 0, header, 0, header.length);
       //			LOGGER.info(Hex.bytesToPrettyString(header));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -251,7 +252,7 @@ public class DG2FileTest extends TestCase {
       DG2File dg2 = new DG2File(Arrays.asList(new FaceInfo[] { faceInfo }));
       return dg2;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
       return null;
     }
@@ -269,7 +270,7 @@ public class DG2FileTest extends TestCase {
     try {
       testDecodeEncode(new DG2File(in), 3);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }

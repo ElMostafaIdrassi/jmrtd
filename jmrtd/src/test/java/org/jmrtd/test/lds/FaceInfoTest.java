@@ -54,8 +54,8 @@ public class FaceInfoTest extends TestCase {
       String asString = info.toString();
       assertNotNull(asString);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 

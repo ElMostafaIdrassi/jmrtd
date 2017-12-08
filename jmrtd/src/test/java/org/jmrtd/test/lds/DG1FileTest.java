@@ -62,7 +62,8 @@ public class DG1FileTest extends TestCase {
       assertEquals(dg1File, copy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -148,7 +149,8 @@ public class DG1FileTest extends TestCase {
     try {
       testReflexive(new DG1File(in));
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 }

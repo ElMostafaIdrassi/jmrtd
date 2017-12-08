@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG11File;
@@ -67,7 +68,7 @@ public class DG11FileTest extends TestCase {
 
       assertEquals(Hex.bytesToHexString(simpleDG11), Hex.bytesToHexString(encoded));
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -99,8 +100,8 @@ public class DG11FileTest extends TestCase {
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
 
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -131,8 +132,8 @@ public class DG11FileTest extends TestCase {
       //				assertEquals(file.getFullNameSecondaryIdentifiers().get(1), "JOHANNES");
       //				assertEquals(file.getFullNameSecondaryIdentifiers().get(2), "MARIA");
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -177,8 +178,8 @@ public class DG11FileTest extends TestCase {
       assertEquals(file.getTelephone(), "1-612-555-1212");
       assertEquals(file.getProfession(), "TRAVEL<AGENT");
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -192,7 +193,7 @@ public class DG11FileTest extends TestCase {
       //			LOGGER.info("DEBUG: copy encoded = \n" + Hex.bytesToPrettyString(copy.getEncoded()));
       assert(Arrays.equals(encoded, copyEncoded));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }

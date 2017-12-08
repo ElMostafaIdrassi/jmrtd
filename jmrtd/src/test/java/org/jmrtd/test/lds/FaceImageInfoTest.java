@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -55,8 +56,8 @@ public class FaceImageInfoTest extends TestCase {
       String asString = imageInfo.toString();
       assertNotNull(asString);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -82,8 +83,8 @@ public class FaceImageInfoTest extends TestCase {
       assertNotNull(encodedCopy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -111,7 +112,7 @@ public class FaceImageInfoTest extends TestCase {
       assertTrue(imageMimeType.toLowerCase().startsWith("image"));
       imageInputStream.close();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -151,7 +152,7 @@ public class FaceImageInfoTest extends TestCase {
       imageInputStream.close();
       LOGGER.info("DEBUG: imageBytes.length = " + imageBytes.length);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -188,7 +189,7 @@ public class FaceImageInfoTest extends TestCase {
           new ByteArrayInputStream(imageBytes), imageBytes.length, imageDataType);
       return imageInfo;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       return null;
     }
   }
@@ -202,7 +203,8 @@ public class FaceImageInfoTest extends TestCase {
       byte[] bytes = out.toByteArray();
       return bytes;
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
       return null;
     }
   }

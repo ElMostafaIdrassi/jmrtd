@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
@@ -36,6 +38,8 @@ import junit.framework.TestCase;
 
 public class IrisInfoTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   public IrisInfoTest(String name) {
     super(name);
   }
@@ -48,8 +52,8 @@ public class IrisInfoTest extends TestCase {
       assertNotNull(asString);
       assertTrue(asString.startsWith("IrisInfo"));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 

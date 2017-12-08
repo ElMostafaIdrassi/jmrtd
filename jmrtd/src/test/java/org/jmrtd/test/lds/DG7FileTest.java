@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -56,8 +57,8 @@ public class DG7FileTest extends TestCase {
       assertNotNull(dg7File);
       assertEquals(dg7File.toString(), expectedResult);
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -76,7 +77,7 @@ public class DG7FileTest extends TestCase {
         assertEquals(displayedImageInfo.getType(), DisplayedImageInfo.TYPE_SIGNATURE_OR_MARK);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -123,8 +124,8 @@ public class DG7FileTest extends TestCase {
       assertNotNull(encodedCopy);
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -135,7 +136,7 @@ public class DG7FileTest extends TestCase {
       System.arraycopy(dg7.getEncoded(), 0, header, 0, header.length);
       LOGGER.info(Hex.bytesToPrettyString(header));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -167,7 +168,8 @@ public class DG7FileTest extends TestCase {
     try {
       testEncodeDecode(new DG7File(in));
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -180,7 +182,8 @@ public class DG7FileTest extends TestCase {
       byte[] bytes = out.toByteArray();
       return bytes;
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
       return null;
     }
   }

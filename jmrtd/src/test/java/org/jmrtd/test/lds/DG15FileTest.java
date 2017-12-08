@@ -32,6 +32,8 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jmrtd.Util;
 import org.jmrtd.lds.icao.DG15File;
@@ -41,8 +43,9 @@ import net.sf.scuba.util.Hex;
 
 public class DG15FileTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-  private static final String BC_PROVIDER_NAME = BC_PROVIDER == null ? null : BC_PROVIDER.getName();
 
   public DG15FileTest(String name) {
     super(name);
@@ -66,7 +69,7 @@ public class DG15FileTest extends TestCase {
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(encodedCopy));
 
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -79,7 +82,8 @@ public class DG15FileTest extends TestCase {
       PublicKey otherPublicKey = dg15File.getPublicKey();
       assertEquals(publicKey, otherPublicKey);
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -119,7 +123,7 @@ public class DG15FileTest extends TestCase {
       PublicKey publicKey = kf.generatePublic(spec);
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -143,7 +147,7 @@ public class DG15FileTest extends TestCase {
     try {
       testReflexive(new DG15File(in));
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", ioe);
       fail(ioe.getMessage());
     }
   }

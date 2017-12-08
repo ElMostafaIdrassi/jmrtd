@@ -122,7 +122,7 @@ public class DG14FileTest extends TestCase {
       assertNotNull(dg14File2.getSecurityInfos());
       assertNotNull(dg14File2.getTerminalAuthenticationInfos());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -143,7 +143,7 @@ public class DG14FileTest extends TestCase {
       assertEquals(dg14, copyOfCopy);
       assertEquals(copyOfCopy, copy);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -170,7 +170,7 @@ public class DG14FileTest extends TestCase {
       byte[] copyEncoded = copy.getEncoded();
       assert(Arrays.equals(encoded, copyEncoded));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -232,10 +232,8 @@ public class DG14FileTest extends TestCase {
       assertEquals(securityInfos, copySecurityInfos);
 
       assertEquals(dg14, copy);
-
-
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -251,7 +249,7 @@ public class DG14FileTest extends TestCase {
       LOGGER.info("encoded1: " + encoded1.length);
       LOGGER.info("encoded2: " + encoded2.length);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -269,7 +267,8 @@ public class DG14FileTest extends TestCase {
       //			fileOutputStream.flush();
       //			fileOutputStream.close();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -285,8 +284,8 @@ public class DG14FileTest extends TestCase {
         testLDS_E_1(dg14);
       }
     } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
-      e.printStackTrace();
     }
   }
 
@@ -309,8 +308,8 @@ public class DG14FileTest extends TestCase {
         testLDS_E_2(dg14);
       }
     } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
-      e.printStackTrace();
     }
   }
 
@@ -346,8 +345,8 @@ public class DG14FileTest extends TestCase {
         testLDS_E_3(dg14);
       }
     } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
-      e.printStackTrace();
     }
   }
 
@@ -364,7 +363,7 @@ public class DG14FileTest extends TestCase {
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -492,9 +491,22 @@ public class DG14FileTest extends TestCase {
 
   public Collection<DG14File> getSampleObjects() {
     List<DG14File> dg14s = new ArrayList<DG14File>();
-    try { dg14s.add(getSampleObject()); } catch (Exception e) { e.printStackTrace(); }
-    try { dg14s.add(getGWSample()); } catch (Exception e) { e.printStackTrace(); }
-    try { dg14s.add(new DG14File(ResourceUtil.getInputStream("/lds/bsi2008/Datagroup14.bin"))); } catch (Exception e) { e.printStackTrace(); }
+    try {
+      dg14s.add(getSampleObject());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+    try {
+      dg14s.add(getGWSample());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+    try {
+      dg14s.add(new DG14File(ResourceUtil.getInputStream("/lds/bsi2008/Datagroup14.bin")));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+    
     return dg14s;
   }
 

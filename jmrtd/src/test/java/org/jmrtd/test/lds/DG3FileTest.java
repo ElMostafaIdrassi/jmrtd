@@ -28,6 +28,7 @@ import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG3File;
@@ -51,8 +52,10 @@ public class DG3FileTest extends TestCase {
   public void testConstruct() {
     try {
       DG3File dg3 = new DG3File(Arrays.asList(new FingerInfo[] { }));
+      assertNotNull(dg3.getFingerInfos());
+      assertTrue(dg3.getFingerInfos().isEmpty());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -80,7 +83,7 @@ public class DG3FileTest extends TestCase {
     } catch (AccessControlException ace) {
       LOGGER.info("DEBUG: *************** could not get access to DG3 *********");
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -89,8 +92,8 @@ public class DG3FileTest extends TestCase {
     try {
       testDecodeEncode(ResourceUtil.getInputStream(TEST_FILE));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -153,7 +156,7 @@ public class DG3FileTest extends TestCase {
     } catch (AccessControlException ace) {
       LOGGER.info("DEBUG: could not access DG3, ignoring this DG3 file");
     } catch(Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -181,7 +184,8 @@ public class DG3FileTest extends TestCase {
     try {
       testDecodeEncode(in);
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -197,7 +201,7 @@ public class DG3FileTest extends TestCase {
       byte[] b2 = new byte[l2];
       (new DataInputStream(i2.getImageInputStream())).readFully(b2);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -217,7 +221,7 @@ public class DG3FileTest extends TestCase {
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -243,7 +247,7 @@ public class DG3FileTest extends TestCase {
       imgDataIn.readFully(imgBytes);
       assertEquals("FFA0FFA4003A0907000932D3263C000AE0F31A84010A41EFF1BC010B8E27653F000BE179A4DD00092EFF55D3010AF933D1B6010BF2871F37000A2677DA0CFFA5", Hex.bytesToHexString(imgBytes, 0, 64));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
 
@@ -334,7 +338,7 @@ public class DG3FileTest extends TestCase {
       assertTrue(Arrays.equals(bytes, encodedFromFileStream));
 
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -398,7 +402,7 @@ public class DG3FileTest extends TestCase {
 
       assertTrue(Arrays.equals(dg3Bytes, copyBytes));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -421,7 +425,7 @@ public class DG3FileTest extends TestCase {
 
       assertFalse(Arrays.equals(dg3Bytes, copyBytes));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -438,7 +442,7 @@ public class DG3FileTest extends TestCase {
       InputStream inputStream = ResourceUtil.getInputStream(TEST_FILE);
       DG3File dg3 = new DG3File(inputStream);						
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -451,8 +455,9 @@ public class DG3FileTest extends TestCase {
       DG3File dg3 = new DG3File(fingerInfos);
       return dg3;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
+      
       return null;
     }
   }
@@ -463,7 +468,7 @@ public class DG3FileTest extends TestCase {
       DG3File dg3 = new DG3File(in);
       return dg3;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       return null;
     }
   }

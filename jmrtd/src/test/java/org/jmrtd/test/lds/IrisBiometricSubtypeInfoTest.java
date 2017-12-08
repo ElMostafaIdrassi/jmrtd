@@ -2,6 +2,8 @@ package org.jmrtd.test.lds;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jmrtd.lds.iso19794.IrisBiometricSubtypeInfo;
 import org.jmrtd.lds.iso19794.IrisImageInfo;
@@ -11,6 +13,8 @@ import junit.framework.TestCase;
 
 public class IrisBiometricSubtypeInfoTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   public void testCreate() {
     IrisBiometricSubtypeInfo irisSubtypeInfo = createTestObject();
     int subtypeId = irisSubtypeInfo.getBiometricSubtype();
@@ -29,8 +33,8 @@ public class IrisBiometricSubtypeInfoTest extends TestCase {
       assertNotNull(asString);
       assertTrue(asString.startsWith("IrisBiometricSubtypeInfo"));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 

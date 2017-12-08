@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.CBEFFInfo;
@@ -51,8 +52,8 @@ public class FingerInfoTest extends TestCase {
       assertNotNull(asString);
       assertTrue(asString.startsWith("FingerInfo ["));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -86,7 +87,7 @@ public class FingerInfoTest extends TestCase {
       assertEquals(fingerInfo, fingerInfo2);
       testReflexiveReconstruct(fingerInfo2);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }

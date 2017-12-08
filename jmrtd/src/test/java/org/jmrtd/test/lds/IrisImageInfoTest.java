@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -14,6 +16,8 @@ import junit.framework.TestCase;
 
 public class IrisImageInfoTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   public void testToString() {
     try {
       IrisImageInfo info = createTestObject();
@@ -22,8 +26,8 @@ public class IrisImageInfoTest extends TestCase {
       assertNotNull(asString);
       assertTrue(asString.startsWith("IrisImageInfo"));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -44,7 +48,7 @@ public class IrisImageInfoTest extends TestCase {
       IrisImageInfo irisImageInfo = new IrisImageInfo(1, image.getWidth(), image.getHeight(), new ByteArrayInputStream(imageBytes), imageBytes.length, IrisInfo.IMAGEFORMAT_MONO_JPEG);
       return irisImageInfo;
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
       return null;
     }

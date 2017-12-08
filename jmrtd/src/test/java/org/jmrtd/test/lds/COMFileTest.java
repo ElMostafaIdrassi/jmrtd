@@ -24,6 +24,8 @@ package org.jmrtd.test.lds;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jmrtd.lds.LDSFile;
 import org.jmrtd.lds.icao.COMFile;
@@ -32,6 +34,8 @@ import junit.framework.TestCase;
 
 public class COMFileTest extends TestCase {
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  
   public COMFileTest(String name) {
     super(name);
   }
@@ -58,8 +62,8 @@ public class COMFileTest extends TestCase {
       assertEquals(encoded.length, encodedCopy.length);
       assertTrue(java.util.Arrays.equals(encoded, encodedCopy));
     } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -86,7 +90,8 @@ public class COMFileTest extends TestCase {
       assertEquals(tagList[2], COMFile.EF_DG4_TAG);
       assertEquals(tagList[3], COMFile.EF_DG12_TAG);
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 
@@ -120,7 +125,8 @@ public class COMFileTest extends TestCase {
     try {
       testReflexive(new COMFile(in));
     } catch (Exception e) {
-      fail(e.toString());
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
     }
   }
 }

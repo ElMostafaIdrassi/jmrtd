@@ -335,7 +335,7 @@ public class PACEProtocolTest extends TestCase {
       assertTrue(Arrays.equals(expectedPCDAuthenticationToken, pcdToken));
       assertTrue(Arrays.equals(expectedPICCAuthenticationToken, piccToken));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
@@ -581,7 +581,7 @@ public class PACEProtocolTest extends TestCase {
       assertTrue(Arrays.equals(expectedPCDAuthenticationToken, pcdAuthenticationToken));
       assertTrue(Arrays.equals(expectedPICCAuthenticationToken, piccAuthenticationToken));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
