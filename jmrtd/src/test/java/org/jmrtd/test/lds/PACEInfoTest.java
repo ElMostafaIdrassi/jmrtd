@@ -35,7 +35,21 @@ public class PACEInfoTest extends TestCase {
   //	PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   //	PARAM_ID_ECP_NIST_P512_R1 = 18;
 
-
+  public void testPACEInfo() {
+    PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
+    
+    assertEquals(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, paceInfo.getObjectIdentifier());
+    assertEquals("id-PACE-ECDH-GM-AES-CBC-CMAC-256", paceInfo.getProtocolOIDString());
+    assertEquals(PACEInfo.PARAM_ID_ECP_NIST_P256_R1, paceInfo.getParameterId().intValue()); // 12
+    assertEquals(12, paceInfo.getParameterId().intValue()); // ID-ECP-NST-P256-R1
+    assertEquals(2, paceInfo.getVersion());
+    
+    PACEInfo anotherPACEInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
+    assertEquals(paceInfo.hashCode(), anotherPACEInfo.hashCode());
+    assertEquals(paceInfo, anotherPACEInfo);
+    assertEquals(paceInfo.toString(), anotherPACEInfo.toString());
+  }
+  
   public void testToParameterSpecNotNull() {
 
     //		Enumeration names = ECNamedCurveTable.getNames();
@@ -93,7 +107,7 @@ public class PACEInfoTest extends TestCase {
   }
 
   public void testECDHPrime() {
-    AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_NST_P256_R1);
+    AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     LOGGER.info("DEBUG: paramSpec: " + paramSpec.getClass().getCanonicalName());
     assertTrue(paramSpec instanceof ECParameterSpec);
   }

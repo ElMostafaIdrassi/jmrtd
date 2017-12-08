@@ -38,7 +38,7 @@ public class CardAccessFileTest extends TestCase {
 
   public void testCardAccessFile() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID);
-    PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NST_P256_R1);
+    PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     List<SecurityInfo> securityInfos = Arrays.asList(new SecurityInfo[] { aaInfo, paceInfo });
     CardAccessFile cardAccessFile = new CardAccessFile(securityInfos);
 
@@ -48,12 +48,12 @@ public class CardAccessFileTest extends TestCase {
   
   public void testCardAccessFileEquals() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID);
-    PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NST_P256_R1);
+    PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     List<SecurityInfo> securityInfos = Arrays.asList(new SecurityInfo[] { aaInfo, paceInfo });
     CardAccessFile cardAccessFile = new CardAccessFile(securityInfos);
 
     ActiveAuthenticationInfo anotherAAInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID);
-    PACEInfo anotherPACEInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NST_P256_R1);
+    PACEInfo anotherPACEInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     List<SecurityInfo> anotherSecurityInfos = Arrays.asList(new SecurityInfo[] { anotherAAInfo, anotherPACEInfo });
 
     CardAccessFile anotherCardAccessFile = new CardAccessFile(anotherSecurityInfos);

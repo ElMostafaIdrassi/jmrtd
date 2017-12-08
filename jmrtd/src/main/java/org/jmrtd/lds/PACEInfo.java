@@ -113,7 +113,7 @@ public class PACEInfo extends SecurityInfo {
   public static final int PARAM_ID_ECP_BRAINPOOL_P224_R1 = 11;
 
   /** Standardized domain parameters. Based on Table 6. */
-  public static final int PARAM_ID_ECP_NST_P256_R1 = 12;
+  public static final int PARAM_ID_ECP_NIST_P256_R1 = 12;
 
   /** Standardized domain parameters. Based on Table 6. */
   public static final int  PARAM_ID_ECP_BRAINPOOL_P256_R1 = 13;
@@ -462,7 +462,7 @@ public class PACEInfo extends SecurityInfo {
         return PARAMS_ECP_NIST_P224_R1;
       case PARAM_ID_ECP_BRAINPOOL_P224_R1:
         return PARAMS_ECP_BRAINPOOL_P224_R1;
-      case PARAM_ID_ECP_NST_P256_R1:
+      case PARAM_ID_ECP_NIST_P256_R1:
         return PARAMS_ECP_NIST_P256_R1;
       case PARAM_ID_ECP_BRAINPOOL_P256_R1:
         return PARAMS_ECP_BRAINPOOL_P256_R1;
@@ -502,7 +502,7 @@ public class PACEInfo extends SecurityInfo {
         return "NIST P-224 (secp224r1)";
       case PARAM_ID_ECP_BRAINPOOL_P224_R1: /* 11 */
         return "BrainpoolP224r1";
-      case PARAM_ID_ECP_NST_P256_R1: /* 12 */
+      case PARAM_ID_ECP_NIST_P256_R1: /* 12 */
         return "NIST P-256 (secp256r1)";
       case PARAM_ID_ECP_BRAINPOOL_P256_R1: /* 13 */
         return "BrainpoolP256r1";

@@ -75,6 +75,7 @@ public class DG11FileTest extends TestCase {
 
   public void testReflexive() {
     testReflexive(createTestObject());
+    testReflexive(createComplexTestObject());
   }
 
   public void testReflexive(DG11File dg11File) {
