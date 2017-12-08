@@ -60,6 +60,7 @@ public class AAResultTest extends TestCase {
       byte[] challenge = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
       signature.update(challenge);
       byte[] response = signature.sign();
+      assertNotNull(response);
 
       AAResult aaResult = new AAResult(publicKey, digAlg, sigAlg, challenge, response);
       assertEquals(digAlg, aaResult.getDigestAlgorithm());
@@ -67,11 +68,14 @@ public class AAResultTest extends TestCase {
       assertEquals(publicKey, aaResult.getPublicKey());
       assertTrue(Arrays.equals(challenge, aaResult.getChallenge()));
       assertTrue(Arrays.equals(response, aaResult.getResponse()));
-      
+   
+      AAResult anotherAAResult = new AAResult(publicKey, digAlg, sigAlg, Arrays.copyOf(challenge, challenge.length), Arrays.copyOf(response, response.length));
+      assertEquals(aaResult.hashCode(), anotherAAResult.hashCode());
+      assertEquals(aaResult, anotherAAResult);
+      assertEquals(aaResult.toString(), anotherAAResult.toString());
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
     }
   }
-
 }

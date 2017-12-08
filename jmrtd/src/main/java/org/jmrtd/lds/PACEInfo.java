@@ -25,6 +25,9 @@ package org.jmrtd.lds;
 import java.math.BigInteger;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.crypto.spec.DHParameterSpec;
 
@@ -49,6 +52,8 @@ import org.jmrtd.Util;
  */
 public class PACEInfo extends SecurityInfo {
 
+  private static final long serialVersionUID = 7960925013249578359L;
+  
   public static class DHCParameterSpec extends DHParameterSpec {
 
     private BigInteger q;
@@ -74,9 +79,7 @@ public class PACEInfo extends SecurityInfo {
       return q;
     }
   }
-
-  private static final long serialVersionUID = 7960925013249578359L;
-
+  
   /** Generic mapping and Integrated mapping and CAM mapping. */
   public enum MappingType {
     /** Generic Mapping. */
@@ -150,19 +153,49 @@ public class PACEInfo extends SecurityInfo {
   private static final ECParameterSpec PARAMS_ECP_BRAINPOOL_P384_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("brainpoolp384r1"));
   private static final ECParameterSpec PARAMS_ECP_BRAINPOOL_P512_R1 = Util.toExplicitECParameterSpec(ECNamedCurveTable.getParameterSpec("brainpoolp512r1"));
 
+  private static final Set<String> ALLOWED_REQUIRED_IDENTIFIERS = new TreeSet<String>(Arrays.asList(new String[] {
+      ID_PACE_DH_GM_3DES_CBC_CBC,
+      ID_PACE_DH_GM_AES_CBC_CMAC_128,
+      ID_PACE_DH_GM_AES_CBC_CMAC_192,
+      ID_PACE_DH_GM_AES_CBC_CMAC_256,
+      ID_PACE_DH_IM_3DES_CBC_CBC,
+      ID_PACE_DH_IM_AES_CBC_CMAC_128,
+      ID_PACE_DH_IM_AES_CBC_CMAC_192,
+      ID_PACE_DH_IM_AES_CBC_CMAC_256,
+      ID_PACE_ECDH_GM_3DES_CBC_CBC,
+      ID_PACE_ECDH_GM_AES_CBC_CMAC_128,
+      ID_PACE_ECDH_GM_AES_CBC_CMAC_192,
+      ID_PACE_ECDH_GM_AES_CBC_CMAC_256,
+      ID_PACE_ECDH_IM_3DES_CBC_CBC,
+      ID_PACE_ECDH_IM_AES_CBC_CMAC_128,
+      ID_PACE_ECDH_IM_AES_CBC_CMAC_192,
+      ID_PACE_ECDH_IM_AES_CBC_CMAC_256,
+      ID_PACE_ECDH_CAM_AES_CBC_CMAC_128,
+      ID_PACE_ECDH_CAM_AES_CBC_CMAC_192,
+      ID_PACE_ECDH_CAM_AES_CBC_CMAC_256 }));
+  
   private String protocolOID;
   private int version;
   private BigInteger parameterId;
 
+  /**
+   * Constructs a PACE info object.
+   * 
+   * @param oid the object identifier, indicating what PACE variant
+   *        is to be used (agreement protocol, mapping type, and secure channel properties)
+   * @param version a version number, which should be 2
+   * @param parameterId either a standardized domain parameter id from table 6 or a proprietary domain parameter
+   */
   public PACEInfo(String oid, int version, int parameterId) {
     this(oid, version, BigInteger.valueOf(parameterId));
   }
 
   /**
-   * Creates a PACEInfo instance.
+   * Creates a PACE info object
    *
-   * @param oid the OID
-   * @param version should be 2
+   * @param oid the object identifier, indicating what PACE variant
+   *        is to be used (agreement protocol, mapping type, and secure channel properties)
+   * @param version a version number, which should be 2
    * @param parameterId either a standardized domain parameter id from table 6 or a proprietary domain parameter
    */
   public PACEInfo(String oid, int version, BigInteger parameterId) {
@@ -199,25 +232,40 @@ public class PACEInfo extends SecurityInfo {
     return new PACEInfo(oid, version, parameterId);
   }
 
+  /**
+   * Returns the PACE protocol object identifier.
+   * 
+   * @return the PACE protocol object identifier
+   */
   @Override
   public String getObjectIdentifier() {
     return protocolOID;
   }
 
   /**
-   * Gets the protocol object identifier as a human readable string.
+   * Returns the protocol object identifier as a human readable string.
    *
-   * @return a string
+   * @return a string describing the PACE protocol object identifier
    */
   @Override
   public String getProtocolOIDString() {
     return toProtocolOIDString(protocolOID);
   }
 
+  /**
+   * Returns the version.
+   * 
+   * @return the version
+   */
   public int getVersion() {
     return version;
   }
 
+  /**
+   * Returns the parameter identifier.
+   * 
+   * @return the parameter identifier
+   */
   public BigInteger getParameterId() {
     return parameterId;
   }
@@ -278,25 +326,7 @@ public class PACEInfo extends SecurityInfo {
   }
 
   public static boolean checkRequiredIdentifier(String oid) {
-    return ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
-        || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
-        || ID_PACE_DH_GM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_DH_GM_AES_CBC_CMAC_256.equals(oid)
-        || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
-        || ID_PACE_DH_IM_AES_CBC_CMAC_128.equals(oid)
-        || ID_PACE_DH_IM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_DH_IM_AES_CBC_CMAC_256.equals(oid)
-        || ID_PACE_ECDH_GM_3DES_CBC_CBC.equals(oid)
-        || ID_PACE_ECDH_GM_AES_CBC_CMAC_128.equals(oid)
-        || ID_PACE_ECDH_GM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_ECDH_GM_AES_CBC_CMAC_256.equals(oid)
-        || ID_PACE_ECDH_IM_3DES_CBC_CBC.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_128.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_ECDH_IM_AES_CBC_CMAC_256.equals(oid)
-        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_128.equals(oid)
-        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_192.equals(oid)
-        || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid);
+    return ALLOWED_REQUIRED_IDENTIFIERS.contains(oid);
   }
 
   /*

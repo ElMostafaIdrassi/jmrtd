@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.Provider;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.spec.DHParameterSpec;
@@ -37,26 +38,48 @@ public class PACEInfoTest extends TestCase {
 
   public void testPACEInfo() {
     PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
-    
+
     assertEquals(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, paceInfo.getObjectIdentifier());
     assertEquals("id-PACE-ECDH-GM-AES-CBC-CMAC-256", paceInfo.getProtocolOIDString());
     assertEquals(PACEInfo.PARAM_ID_ECP_NIST_P256_R1, paceInfo.getParameterId().intValue()); // 12
     assertEquals(12, paceInfo.getParameterId().intValue()); // ID-ECP-NST-P256-R1
     assertEquals(2, paceInfo.getVersion());
-    
+
     PACEInfo anotherPACEInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     assertEquals(paceInfo.hashCode(), anotherPACEInfo.hashCode());
     assertEquals(paceInfo, anotherPACEInfo);
     assertEquals(paceInfo.toString(), anotherPACEInfo.toString());
   }
+
+  public void testPACEInfoCanCreate() {
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128, 2, PACEInfo.PARAM_ID_ECP_NIST_P224_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P320_R1); 
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1); 
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_GFP_1024_160);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_128, 2, PACEInfo.PARAM_ID_GFP_1024_160);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_GFP_2048_224);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_GFP_2048_224);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_GFP_2048_256);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_IM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_GFP_2048_224);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_GFP_2048_224);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_GFP_2048_256);
+  }
   
+  public void testPACEInfoCanCreate(String oid, int version, int paramId) {
+    try {
+      /* PACEInfo paceInfo = */ new PACEInfo(oid, version, paramId);      
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
   public void testToParameterSpecNotNull() {
-
-    //		Enumeration names = ECNamedCurveTable.getNames();
-    //		while (names.hasMoreElements()) {
-    //			LOGGER.info(names.nextElement());
-    //		}
-
     testToParameterSpecNotNull(0);
     testToParameterSpecNotNull(1);
     testToParameterSpecNotNull(2);
@@ -79,12 +102,6 @@ public class PACEInfoTest extends TestCase {
   }
 
   public void testToParameterSpecDHParameterSpecOrECParameterSpec() {
-
-    //		Enumeration names = ECNamedCurveTable.getNames();
-    //		while (names.hasMoreElements()) {
-    //			LOGGER.info(names.nextElement());
-    //		}
-
     testGetParameterSpecDHParameterSpecOrECParameterSpec(0);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(1);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(2);

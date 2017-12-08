@@ -269,7 +269,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends a <code>SELECT APPLET</code> command to the card.
+   * Sends a {@code SELECT APPLET} command to the card.
    *
    * @param wrapper the secure messaging wrapper to use
    * @param aid the applet to select
@@ -298,7 +298,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends a <code>SELECT FILE</code> command to the passport. Secure
+   * Sends a {@code SELECT FILE} command to the passport. Secure
    * messaging will be applied to the command and response apdu.
    *
    * @param wrapper the secure messaging wrapper to use
@@ -319,13 +319,13 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends a <code>READ BINARY</code> command to the passport.
+   * Sends a {@code READ BINARY} command to the passport.
    *
    * @param offset offset into the file
    * @param le the expected length of the file to read
    * @param isExtendedLength whether to use extended length APDUs
    *
-   * @return a byte array of length <code>le</code> with (the specified part of) the contents of the currently selected file
+   * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException if the command was not successful
    */
@@ -355,9 +355,12 @@ class PassportAPDUService extends CardService {
       return null;
     }
     
-    // In the case of long read 2/3 less bytes of the actual data will be returned,
-    // because a tag and length will be sent along, here we need to account for this
+    byte offsetHi = (byte)((offset & 0xFF00) >> 8);
+    byte offsetLo = (byte)(offset & 0xFF);
+
     if (isExtendedLength) {
+      // In the case of long read 2 or 3 bytes lees of the actual data will be returned,
+      // because a tag and length will be sent along, here we need to account for this.
       if (le < 128) {
         le += 2;
       } else if (le < 256) {
@@ -366,10 +369,7 @@ class PassportAPDUService extends CardService {
       if (le > 256) {
         le = 256;
       }
-    }
-    byte offsetHi = (byte)((offset & 0xFF00) >> 8);
-    byte offsetLo = (byte)(offset & 0xFF);
-    if (isExtendedLength) {
+      
       byte[] data = new byte[] { 0x54, 0x02, offsetHi, offsetLo };
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
     } else {
@@ -414,7 +414,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends a <code>GET CHALLENGE</code> command to the passport.
+   * Sends a {@code GET CHALLENGE} command to the passport.
    *
    * @return a byte array of length 8 containing the challenge
    *
@@ -425,7 +425,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends a <code>GET CHALLENGE</code> command to the passport.
+   * Sends a {@code GET CHALLENGE} command to the passport.
    *
    * @param wrapper secure messaging wrapper
    *
@@ -440,7 +440,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends an <code>INTERNAL AUTHENTICATE</code> command to the passport.
+   * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
    * This is part of AA.
    *
    * @param wrapper secure messaging wrapper
@@ -460,11 +460,11 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sends an <code>EXTERNAL AUTHENTICATE</code> command to the passport.
+   * Sends an {@code EXTERNAL AUTHENTICATE} command to the passport.
    * This is part of BAC.
-   * The resulting byte array has length 32 and contains <code>rndICC</code>
-   * (first 8 bytes), <code>rndIFD</code> (next 8 bytes), their key material "
-   * <code>kICC</code>" (last 16 bytes).
+   * The resulting byte array has length 32 and contains {@code rndICC}
+   * (first 8 bytes), {@code rndIFD} (next 8 bytes), their key material
+   * {@code kICC} (last 16 bytes).
    *
    * @param rndIFD our challenge
    * @param rndICC their challenge
@@ -473,8 +473,8 @@ class PassportAPDUService extends CardService {
    * @param kMac the static mac key
    *
    * @return a byte array of length 32 containing the response that was sent
-   *         by the passport, decrypted (using <code>kEnc</code>) and verified
-   *         (using <code>kMac</code>)
+   *         by the passport, decrypted (using {@code kEnc}) and verified
+   *         (using {@code kMac})
    *
    * @throws CardServiceException on tranceive error
    */
@@ -684,9 +684,9 @@ class PassportAPDUService extends CardService {
    * Note that (for now) caller is responsible for prefixing the byte[] params with specified tags.
    *
    * @param wrapper secure messaging wrapper
-   * @param oid OID of the protocol to select (this method will prefix <code>0x80</code>)
-   * @param refPublicKeyOrSecretKey value specifying whether to use MRZ (<code>0x01</code>) or CAN (<code>0x02</code>) (this method will prefix <code>0x83</code>)
-   * @param refPrivateKeyOrForComputingSessionKey indicates a private key or reference for computing a session key (this method will prefix <code>0x84</code>)
+   * @param oid OID of the protocol to select (this method will prefix {@code 0x80})
+   * @param refPublicKeyOrSecretKey value specifying whether to use MRZ ({@code 0x01}) or CAN ({@code 0x02}) (this method will prefix {@code 0x83})
+   * @param refPrivateKeyOrForComputingSessionKey indicates a private key or reference for computing a session key (this method will prefix {@code 0x84})
    *
    * @throws CardServiceException on error
    */
