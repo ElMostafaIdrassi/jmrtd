@@ -147,18 +147,18 @@ class MRTDFileSystem implements FileSystemStructured {
 
           /* Update buffer with newly read bytes. */
           fileInfo.addFragment(fragment.getOffset(), bytes);
-
-          /*
-           * If we request a block of data, create the return buffer from the actual response length, not the requested Le.
-           * The latter causes issues when the returned block has a one byte padding (only 0x80) which ends up being removed but
-           * the length is not kept track of, leaving an unwanted 0-byte at the end of the data block, which now has a length
-           * of Le, but actually contained Le - 1 data bytes.
-           *
-           * Bug reproduced using org.jmrtd.AESSecureMessagingWrapper with AES-256.
-           */
-
-          responseLength = bytes.length;
         }
+        
+        /*
+         * If we request a block of data, create the return buffer from the actual response length, not the requested Le.
+         * The latter causes issues when the returned block has a one byte padding (only 0x80) which ends up being removed but
+         * the length is not kept track of, leaving an unwanted 0-byte at the end of the data block, which now has a length
+         * of Le, but actually contained Le - 1 data bytes.
+         *
+         * Bug reproduced using org.jmrtd.AESSecureMessagingWrapper with AES-256.
+         */
+        
+        responseLength = bytes == null ? 0 : bytes.length;
       }
       /* Shrink wrap the bytes that are now buffered. */
       /* FIXME: that arraycopy looks costly, consider using dest array and offset params instead of byte[] result... -- MO */
