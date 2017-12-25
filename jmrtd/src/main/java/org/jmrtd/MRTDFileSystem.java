@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import org.jmrtd.io.FragmentBuffer;
 import org.jmrtd.io.FragmentBuffer.Fragment;
 import org.jmrtd.lds.CVCAFile;
+import org.jmrtd.lds.LDSFileUtil;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.smartcards.FileInfo;
@@ -41,6 +42,9 @@ import net.sf.scuba.tlv.TLVInputStream;
 
 /**
  * A file system for ICAO MRTDs.
+ * This translates abstract high level selection and read binary commands to
+ * concrete low level file related APDUs which are sent to the ICC through the
+ * card service.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -56,10 +60,16 @@ class MRTDFileSystem implements FileSystemStructured {
   /** Indicates the file that is (or should be) selected. */
   private short selectedFID;
 
-  /** Indicates whether we actually already sent the SELECT command to select <code>selectedFID</code>. */
+  private boolean isShortFIDsEnabled;
+
+  /**
+   * A boolean indicating whether we actually already
+   * sent the SELECT command to select {@ code selectedFID}.
+   */
   private boolean isSelected;
 
   private PassportService service;
+
   private Map<Short, MRTDFileInfo> fileInfos;
 
   /**
@@ -68,10 +78,21 @@ class MRTDFileSystem implements FileSystemStructured {
    * @param service the card service
    */
   public MRTDFileSystem(PassportService service) {
+    this(service, false);
+  }
+
+  /**
+   * Creates a file system.
+   *
+   * @param service the card service
+   * @param isShortFIDsEnabled whether the file system should use short file identifiers in READ BINARY commands
+   */
+  public MRTDFileSystem(PassportService service, boolean isShortFIDsEnabled) {
     this.service = service;
     this.fileInfos = new HashMap<Short, MRTDFileInfo>();
     this.selectedFID = 0;
     this.isSelected = false;
+    this.isShortFIDsEnabled = isShortFIDsEnabled;
   }
 
   /**
@@ -113,7 +134,7 @@ class MRTDFileSystem implements FileSystemStructured {
   /**
    * Reads a block of bytes.
    *
-   * @param offset offset index
+   * @param offset offset index in the selected file
    * @param length the number of bytes to read
    *
    * @return a copy of the bytes read
@@ -125,11 +146,6 @@ class MRTDFileSystem implements FileSystemStructured {
         throw new CardServiceException("No file selected");
       }
 
-      boolean isExtendedLength = (offset > 0x7FFF);
-      if (!isSelected) {
-        service.sendSelectFile(selectedFID);
-        isSelected = true;
-      }
 
       /* Check buffer to see if we already have some of the bytes. */
       fileInfo = getFileInfo();
@@ -140,15 +156,25 @@ class MRTDFileSystem implements FileSystemStructured {
 
       int responseLength = length;
 
+      byte[] bytes = null;
       if (fragment.getLength() > 0) {
-        byte[] bytes = service.sendReadBinary(fragment.getOffset(), fragment.getLength(), isExtendedLength);
+        boolean isExtendedLength = (offset > 0x7FFF);
+        if (isShortFIDsEnabled) {
+          bytes = service.sendReadBinary(LDSFileUtil.lookupSFIByFID(selectedFID), fragment.getOffset(), fragment.getLength(), isExtendedLength);
+        } else {
+          if (!isSelected) {
+            service.sendSelectFile(selectedFID);
+            isSelected = true;
+          }
+          bytes = service.sendReadBinary(fragment.getOffset(), fragment.getLength(), isExtendedLength);
+        }
 
         if (bytes != null && bytes.length > 0) {
 
           /* Update buffer with newly read bytes. */
           fileInfo.addFragment(fragment.getOffset(), bytes);
         }
-        
+
         /*
          * If we request a block of data, create the return buffer from the actual response length, not the requested Le.
          * The latter causes issues when the returned block has a one byte padding (only 0x80) which ends up being removed but
@@ -157,11 +183,11 @@ class MRTDFileSystem implements FileSystemStructured {
          *
          * Bug reproduced using org.jmrtd.AESSecureMessagingWrapper with AES-256.
          */
-        
+
         responseLength = bytes == null ? 0 : bytes.length;
       }
       /* Shrink wrap the bytes that are now buffered. */
-      /* FIXME: that arraycopy looks costly, consider using dest array and offset params instead of byte[] result... -- MO */
+      /* NOTE: That arraycopy looks costly, consider using dest array and offset params instead of byte[] result... -- MO */
       byte[] buffer = fileInfo.getBuffer();
 
       byte[] result = new byte[responseLength];
@@ -198,16 +224,20 @@ class MRTDFileSystem implements FileSystemStructured {
 
     /* Not cached, actually read some bytes to determine file info. */
     try {
-      if (!isSelected) {
-        service.sendSelectFile(selectedFID);
-        isSelected = true;
-      }
-
       /*
        * Each passport file consists of a TLV structure, read ahead to determine length.
        * EF.CVCA is the exception and has a fixed length of CVCAFile.LENGTH.
        */
-      byte[] prefix = service.sendReadBinary(0, READ_AHEAD_LENGTH, false);
+      byte[] prefix = null;
+      if (isShortFIDsEnabled) {
+        prefix = service.sendReadBinary(LDSFileUtil.lookupSFIByFID(selectedFID), 0, READ_AHEAD_LENGTH, false);
+      } else {
+        if (!isSelected) {
+          service.sendSelectFile(selectedFID);
+          isSelected = true;          
+        }
+        prefix = service.sendReadBinary(0, READ_AHEAD_LENGTH, false);
+      }
       if (prefix == null || prefix.length != READ_AHEAD_LENGTH) {
         LOGGER.warning("Something is wrong with prefix, prefix = " + Arrays.toString(prefix));
         return null;

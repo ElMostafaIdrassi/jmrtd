@@ -146,6 +146,12 @@ public class PassportService extends PassportAPDUService {
    */
   public static final short EF_CVCA = 0x011C;
 
+  /** Short file identifier for card access file. */
+  public static final byte SF_CARD_ACCESS = 0x1C;
+
+  /** Short file identifier for card security file. */  
+  public static final byte SF_CARD_SECURITY = 0x1D;
+  
   /** Short file identifier for file. */
   public static final byte SF_DG1 = 0x01;
 
@@ -338,7 +344,8 @@ public class PassportService extends PassportAPDUService {
   }
 
   /**
-   * Sends a {@code READ BINARY} command to the passport, use wrapper when secure channel set up.
+   * Sends a {@code READ BINARY} command using a short file identifier to the passport,
+   * using the wrapper when a secure channel has been set up.
    *
    * @param offset offset into the file
    * @param le the expected length of the file to read
@@ -349,7 +356,24 @@ public class PassportService extends PassportAPDUService {
    * @throws CardServiceException on tranceive error
    */
   public synchronized byte[] sendReadBinary(int offset, int le, boolean isExtendedLength) throws CardServiceException {
-    return sendReadBinary(wrapper, offset, le, isExtendedLength);
+    return sendReadBinary(wrapper, NO_SFI, offset, le, false, isExtendedLength);
+  }
+  
+  /**
+   * Sends a {@code READ BINARY} command using a short file identifier to the passport,
+   * using the wrapper when a secure channel has been set up.
+   *
+   * @param sfi the short file identifier byte as int value (between 0 and 255)
+   * @param offset offset into the file
+   * @param le the expected length of the file to read
+   * @param isExtendedLength whether to use extended length APDUs
+   *
+   * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
+   *
+   * @throws CardServiceException on tranceive error
+   */
+  public synchronized byte[] sendReadBinary(int sfi, int offset, int le, boolean isExtendedLength) throws CardServiceException {
+    return sendReadBinary(wrapper, sfi, offset, le, true, isExtendedLength);
   }
 
   /**

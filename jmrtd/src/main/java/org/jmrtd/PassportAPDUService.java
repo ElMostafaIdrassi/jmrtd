@@ -84,8 +84,11 @@ class PassportAPDUService extends CardService {
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte PUK_PACE_KEY_REFERENCE = 0x04;
 
+  /** Invalid short identifier. */
+  public int NO_SFI = -1;
+  
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
+  
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /** The applet we select when we start a session. */
@@ -320,33 +323,23 @@ class PassportAPDUService extends CardService {
 
   /**
    * Sends a {@code READ BINARY} command to the passport.
+   * Secure messaging will be applied to the command and response APDU.
    *
+   * @param wrapper the secure messaging wrapper to use, or {@code null} for none
+   * @param sfi the short file identifier byte of the file to read as an int value (between 0 and 255)
+   *            only if {@code isShortFIDsEnabled} is {@code true}, if not any value)
    * @param offset offset into the file
+   *        (either a value between 0 and 255 if {@code isShortFIDsEnabled} is {@code true},
+   *        of a value between 0 and 65535 if not)
    * @param le the expected length of the file to read
-   * @param isExtendedLength whether to use extended length APDUs
-   *
-   * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
-   *
-   * @throws CardServiceException if the command was not successful
-   */
-  public synchronized byte[] sendReadBinary(short offset, int le, boolean isExtendedLength) throws CardServiceException {
-    return sendReadBinary(null, offset, le, isExtendedLength);
-  }
-
-  /**
-   * Sends a {@code READ BINARY} command to the passport. Secure
-   * messaging will be applied to the command and response apdu.
-   *
-   * @param wrapper the secure messaging wrapper to use
-   * @param offset offset into the file
-   * @param le the expected length of the file to read
-   * @param isExtendedLength whether it should be a long ({@code INS == 0xB1}) read
+   * @param isShortFIDsEnabled a boolean indicating whether short file identifiers are used
+   * @param isExtendedLength a boolean indicating whether it should be a long ({@code INS == 0xB1}) read
    *
    * @return a byte array of length at most {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException if the command was not successful
    */
-  public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int offset, int le, boolean isExtendedLength) throws CardServiceException {
+  public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int sfi, int offset, int le, boolean isShortFIDsEnabled, boolean isExtendedLength) throws CardServiceException {
     CommandAPDU capdu = null;
     ResponseAPDU rapdu = null;
 
@@ -355,11 +348,11 @@ class PassportAPDUService extends CardService {
       return null;
     }
     
-    byte offsetHi = (byte)((offset & 0xFF00) >> 8);
-    byte offsetLo = (byte)(offset & 0xFF);
+    byte offsetMSB = (byte)((offset & 0xFF00) >> 8);
+    byte offsetLSB = (byte)(offset & 0xFF);
 
     if (isExtendedLength) {
-      // In the case of long read 2 or 3 bytes lees of the actual data will be returned,
+      // In the case of long read 2 or 3 bytes less of the actual data will be returned,
       // because a tag and length will be sent along, here we need to account for this.
       if (le < 128) {
         le += 2;
@@ -370,10 +363,12 @@ class PassportAPDUService extends CardService {
         le = 256;
       }
       
-      byte[] data = new byte[] { 0x54, 0x02, offsetHi, offsetLo };
+      byte[] data = new byte[] { 0x54, 0x02, offsetMSB, offsetLSB };
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
+    } else if (isShortFIDsEnabled) {
+      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, (byte)sfi, offsetLSB, le);      
     } else {
-      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetHi, offsetLo, le);
+      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetMSB, offsetLSB, le);
     }
 
     short sw = ISO7816.SW_UNKNOWN;
