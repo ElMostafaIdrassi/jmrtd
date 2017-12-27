@@ -517,43 +517,43 @@ public class LDSFileUtil {
   public static int lookupSFIByFID(short fid) {
     switch(fid) {
       case PassportService.EF_COM:
-        return PassportService.SF_COM;
+        return PassportService.SFI_COM;
       case PassportService.EF_DG1:
-        return PassportService.SF_DG1;
+        return PassportService.SFI_DG1;
       case PassportService.EF_DG2:
-        return PassportService.SF_DG2;
+        return PassportService.SFI_DG2;
       case PassportService.EF_DG3:
-        return PassportService.SF_DG3;
+        return PassportService.SFI_DG3;
       case PassportService.EF_DG4:
-        return PassportService.SF_DG4;
+        return PassportService.SFI_DG4;
       case PassportService.EF_DG5:
-        return PassportService.SF_DG5;
+        return PassportService.SFI_DG5;
       case PassportService.EF_DG6:
-        return PassportService.SF_DG6;
+        return PassportService.SFI_DG6;
       case PassportService.EF_DG7:
-        return PassportService.SF_DG7;
+        return PassportService.SFI_DG7;
       case PassportService.EF_DG8:
-        return PassportService.SF_DG8;
+        return PassportService.SFI_DG8;
       case PassportService.EF_DG9:
-        return PassportService.SF_DG9;
+        return PassportService.SFI_DG9;
       case PassportService.EF_DG10:
-        return PassportService.SF_DG10;
+        return PassportService.SFI_DG10;
       case PassportService.EF_DG11:
-        return PassportService.SF_DG11;
+        return PassportService.SFI_DG11;
       case PassportService.EF_DG12:
-        return PassportService.SF_DG12;
+        return PassportService.SFI_DG12;
       case PassportService.EF_DG13:
-        return PassportService.SF_DG13;
+        return PassportService.SFI_DG13;
       case PassportService.EF_DG14:
-        return PassportService.SF_DG14;
+        return PassportService.SFI_DG14;
       case PassportService.EF_DG15:
-        return PassportService.SF_DG15;
+        return PassportService.SFI_DG15;
       case PassportService.EF_DG16:
-        return PassportService.SF_DG16;
+        return PassportService.SFI_DG16;
       case PassportService.EF_SOD:
-        return PassportService.SF_SOD;
+        return PassportService.SFI_SOD;
       case PassportService.EF_CVCA:
-        return PassportService.SF_CVCA;
+        return PassportService.SFI_CVCA;
       default:
         throw new NumberFormatException("Unknown FID " + Integer.toHexString(fid));
     }

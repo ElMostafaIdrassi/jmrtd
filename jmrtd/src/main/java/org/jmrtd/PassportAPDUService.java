@@ -85,7 +85,7 @@ class PassportAPDUService extends CardService {
   public static final byte PUK_PACE_KEY_REFERENCE = 0x04;
 
   /** Invalid short identifier. */
-  public int NO_SFI = -1;
+  public static final int NO_SFI = -1;
   
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
   

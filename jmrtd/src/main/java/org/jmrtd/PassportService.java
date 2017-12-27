@@ -147,67 +147,67 @@ public class PassportService extends PassportAPDUService {
   public static final short EF_CVCA = 0x011C;
 
   /** Short file identifier for card access file. */
-  public static final byte SF_CARD_ACCESS = 0x1C;
+  public static final byte SFI_CARD_ACCESS = 0x1C;
 
   /** Short file identifier for card security file. */  
-  public static final byte SF_CARD_SECURITY = 0x1D;
+  public static final byte SFI_CARD_SECURITY = 0x1D;
   
   /** Short file identifier for file. */
-  public static final byte SF_DG1 = 0x01;
+  public static final byte SFI_DG1 = 0x01;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG2 = 0x02;
+  public static final byte SFI_DG2 = 0x02;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG3 = 0x03;
+  public static final byte SFI_DG3 = 0x03;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG4 = 0x04;
+  public static final byte SFI_DG4 = 0x04;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG5 = 0x05;
+  public static final byte SFI_DG5 = 0x05;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG6 = 0x06;
+  public static final byte SFI_DG6 = 0x06;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG7 = 0x07;
+  public static final byte SFI_DG7 = 0x07;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG8 = 0x08;
+  public static final byte SFI_DG8 = 0x08;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG9 = 0x09;
+  public static final byte SFI_DG9 = 0x09;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG10 = 0x0A;
+  public static final byte SFI_DG10 = 0x0A;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG11 = 0x0B;
+  public static final byte SFI_DG11 = 0x0B;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG12 = 0x0C;
+  public static final byte SFI_DG12 = 0x0C;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG13 = 0x0D;
+  public static final byte SFI_DG13 = 0x0D;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG14 = 0x0E;
+  public static final byte SFI_DG14 = 0x0E;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG15 = 0x0F;
+  public static final byte SFI_DG15 = 0x0F;
 
   /** Short file identifier for file. */
-  public static final byte SF_DG16 = 0x10;
+  public static final byte SFI_DG16 = 0x10;
 
   /** Short file identifier for file. */
-  public static final byte SF_COM = 0x1E;
+  public static final byte SFI_COM = 0x1E;
 
   /** Short file identifier for file. */
-  public static final byte SF_SOD = 0x1D;
+  public static final byte SFI_SOD = 0x1D;
 
   /** Short file identifier for file. */
-  public static final byte SF_CVCA = 0x1C;
+  public static final byte SFI_CVCA = 0x1C;
 
   /** The default maximal blocksize used for unencrypted APDUs. */
   public static final int DEFAULT_MAX_BLOCKSIZE = 224;
