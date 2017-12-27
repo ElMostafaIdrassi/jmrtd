@@ -236,7 +236,7 @@ public class PassportService extends PassportAPDUService {
   private SecureMessagingWrapper wrapper;
 
   private boolean isICAOAppletSelected;
-
+  
   private MRTDFileSystem rootFileSystem;
   private MRTDFileSystem icaoFileSystem;
 
@@ -272,13 +272,31 @@ public class PassportService extends PassportAPDUService {
    *             </ul>
    */
   public PassportService(CardService service, int maxBlockSize) throws CardServiceException {
+    this(service, maxBlockSize, false);
+  }
+  
+  /**
+   * Creates a new passport service for accessing the passport.
+   *
+   * @param service another service which will deal with sending the APDUs to the card
+   * @param maxBlockSize maximum size for plain text APDUs
+   * @param isShortFIDsEnabled whether short file identifiers should be used for read binaries when possible
+   *
+   * @throws CardServiceException
+   *             when the available JCE providers cannot provide the necessary
+   *             cryptographic primitives:
+   *             <ul>
+   *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
+   *                 <li>Mac: "ISO9797Alg3Mac"</li>
+   *             </ul>
+   */
+  public PassportService(CardService service, int maxBlockSize, boolean isShortFIDsEnabled) throws CardServiceException {
     super(service);
     this.maxBlockSize = maxBlockSize;
-    rootFileSystem = new MRTDFileSystem(this);
-    icaoFileSystem = new MRTDFileSystem(this);
-    isICAOAppletSelected = false;
-
-    state = State.SESSION_STOPPED_STATE;
+    this.rootFileSystem = new MRTDFileSystem(this, isShortFIDsEnabled);
+    this.icaoFileSystem = new MRTDFileSystem(this, isShortFIDsEnabled);
+    this.isICAOAppletSelected = false;
+    this.state = State.SESSION_STOPPED_STATE;
   }
 
   /**

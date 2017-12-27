@@ -76,7 +76,10 @@ class MRTDFileSystem implements FileSystemStructured {
    * Creates a file system.
    *
    * @param service the card service
+   * 
+   * @deprecated Use the constructor with explicit short file identifier preference parameter
    */
+  @Deprecated
   public MRTDFileSystem(PassportService service) {
     this(service, false);
   }
@@ -146,7 +149,6 @@ class MRTDFileSystem implements FileSystemStructured {
         throw new CardServiceException("No file selected");
       }
 
-
       /* Check buffer to see if we already have some of the bytes. */
       fileInfo = getFileInfo();
       if (fileInfo == null) {
@@ -169,8 +171,11 @@ class MRTDFileSystem implements FileSystemStructured {
           bytes = service.sendReadBinary(fragment.getOffset(), fragment.getLength(), isExtendedLength);
         }
 
-        if (bytes != null && bytes.length > 0) {
-
+        if (bytes == null) {
+          throw new IllegalStateException("Could not read bytes");
+        }
+        
+        if (bytes.length > 0) {
           /* Update buffer with newly read bytes. */
           fileInfo.addFragment(fragment.getOffset(), bytes);
         }
@@ -184,7 +189,7 @@ class MRTDFileSystem implements FileSystemStructured {
          * Bug reproduced using org.jmrtd.AESSecureMessagingWrapper with AES-256.
          */
 
-        responseLength = bytes == null ? 0 : bytes.length;
+        responseLength = bytes.length;
       }
       /* Shrink wrap the bytes that are now buffered. */
       /* NOTE: That arraycopy looks costly, consider using dest array and offset params instead of byte[] result... -- MO */
