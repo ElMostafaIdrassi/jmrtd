@@ -160,15 +160,14 @@ class MRTDFileSystem implements FileSystemStructured {
 
       byte[] bytes = null;
       if (fragment.getLength() > 0) {
-        boolean isExtendedLength = (offset > 0x7FFF);
-        if (isShortFIDsEnabled) {
-          bytes = service.sendReadBinary(LDSFileUtil.lookupSFIByFID(selectedFID), fragment.getOffset(), fragment.getLength(), isExtendedLength);
+        if (isShortFIDsEnabled && offset < 256) {
+          bytes = service.sendReadBinary(0x80 | LDSFileUtil.lookupSFIByFID(selectedFID), fragment.getOffset(), fragment.getLength(), false);
         } else {
           if (!isSelected) {
             service.sendSelectFile(selectedFID);
             isSelected = true;
           }
-          bytes = service.sendReadBinary(fragment.getOffset(), fragment.getLength(), isExtendedLength);
+          bytes = service.sendReadBinary(fragment.getOffset(), fragment.getLength(), offset > 32767);
         }
 
         if (bytes == null) {

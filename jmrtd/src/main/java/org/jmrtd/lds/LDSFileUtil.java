@@ -559,4 +559,55 @@ public class LDSFileUtil {
     }
   }
 
+  /**
+   * Looks up a file identifier for a given short file identifier.
+   * 
+   * @param sfi the short file identifier
+   * 
+   * @return a file identifier
+   */
+  public static short lookupFIDBySFI(byte sfi) {
+    switch (sfi) {
+      case PassportService.SFI_COM:
+        return PassportService.EF_COM;
+      case PassportService.SFI_DG1:
+        return PassportService.EF_DG1;
+      case PassportService.SFI_DG2:
+        return PassportService.EF_DG2;
+      case PassportService.SFI_DG3:
+        return PassportService.EF_DG3;
+      case PassportService.SFI_DG4:
+        return PassportService.EF_DG4;
+      case PassportService.SFI_DG5:
+        return PassportService.EF_DG5;
+      case PassportService.SFI_DG6:
+        return PassportService.EF_DG6;
+      case PassportService.SFI_DG7:
+        return PassportService.EF_DG7;
+      case PassportService.SFI_DG8:
+        return PassportService.EF_DG8;
+      case PassportService.SFI_DG9:
+        return PassportService.EF_DG9;
+      case PassportService.SFI_DG10:
+        return PassportService.EF_DG10;
+      case PassportService.SFI_DG11:
+        return PassportService.EF_DG11;
+      case PassportService.SFI_DG12:
+        return PassportService.EF_DG12;
+      case PassportService.SFI_DG13:
+        return PassportService.EF_DG13;
+      case PassportService.SFI_DG14:
+        return PassportService.EF_DG14;
+      case PassportService.SFI_DG15:
+        return PassportService.EF_DG15;
+      case PassportService.SFI_DG16:
+        return PassportService.EF_DG16;
+      case PassportService.SFI_SOD:
+        return PassportService.EF_SOD;
+      case PassportService.SFI_CVCA:
+        return PassportService.EF_CVCA;
+      default:
+        throw new NumberFormatException("Unknown SFI " + Integer.toHexString(sfi));
+    }
+  }
 }

@@ -29,7 +29,9 @@ import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,9 +88,9 @@ class PassportAPDUService extends CardService {
 
   /** Invalid short identifier. */
   public static final int NO_SFI = -1;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   /** The applet we select when we start a session. */
@@ -128,12 +130,16 @@ class PassportAPDUService extends CardService {
    *                              </ul>
    */
   public PassportAPDUService(CardService service) throws CardServiceException {
+    if (service == null) {
+      throw new IllegalArgumentException("Card service cannot be null");
+    }
+
     this.service = service;
-    plainTextAPDUListeners = new HashSet<APDUListener>();
-    plainAPDUCount = 0;
+    this.plainTextAPDUListeners = new HashSet<APDUListener>();
+    this.plainAPDUCount = 0;
     try {
-      mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
-      cipher = Util.getCipher("DESede/CBC/NoPadding");
+      this.mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
+      this.cipher = Util.getCipher("DESede/CBC/NoPadding");
     } catch (GeneralSecurityException gse) {
       throw new CardServiceException("Unexpected security exception during initialization", gse);
     }
@@ -202,18 +208,6 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Sets the service.
-   *
-   * @param service the carrier service that is decorated by this service
-   *
-   * @param service the carrier service
-   */
-  /* FIXME: why is this here? -- MO */
-  public void setService(CardService service) {
-    this.service = service;
-  }
-
-  /**
    * Adds a listener.
    *
    * @param l a listener
@@ -249,22 +243,23 @@ class PassportAPDUService extends CardService {
       capdu = wrapper.wrap(capdu);
     }
     ResponseAPDU rapdu = transmit(capdu);
+    ResponseAPDU rawRapdu = rapdu;
     short sw = (short)rapdu.getSW();
     if (wrapper != null) {
       try {
-        if (rapdu.getBytes().length == 2) {
+        if (rapdu.getBytes().length <= 2) {
           throw new CardServiceException("Exception during transmission of wrapped APDU"
-              + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);
-        } else {
-          rapdu = wrapper.unwrap(rapdu);
+              + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);
         }
+
+        rapdu = wrapper.unwrap(rapdu);
       } catch (CardServiceException cse) {
         throw cse;
       } catch (Exception e) {
         throw new CardServiceException("Exception during transmission of wrapped APDU"
-            + "\nC=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
+            + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
       } finally {
-        notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu);
+        notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu, capdu, rawRapdu);
       }
     }
 
@@ -314,7 +309,7 @@ class PassportAPDUService extends CardService {
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte) 0x02, (byte) 0x0c, fiddle, 0);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
 
-    if ( rapdu == null ) {
+    if (rapdu == null) {
       return;
     }
 
@@ -333,13 +328,13 @@ class PassportAPDUService extends CardService {
    *        of a value between 0 and 65535 if not)
    * @param le the expected length of the file to read
    * @param isShortFIDsEnabled a boolean indicating whether short file identifiers are used
-   * @param isExtendedLength a boolean indicating whether it should be a long ({@code INS == 0xB1}) read
+   * @param isTLVEncodedOffsetNeeded a boolean indicating whether it should be a long ({@code INS == 0xB1}) read
    *
    * @return a byte array of length at most {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException if the command was not successful
    */
-  public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int sfi, int offset, int le, boolean isShortFIDsEnabled, boolean isExtendedLength) throws CardServiceException {
+  public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int sfi, int offset, int le, boolean isShortFIDsEnabled, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
     CommandAPDU capdu = null;
     ResponseAPDU rapdu = null;
 
@@ -347,11 +342,11 @@ class PassportAPDUService extends CardService {
     if (le == 0) {
       return null;
     }
-    
+
     byte offsetMSB = (byte)((offset & 0xFF00) >> 8);
     byte offsetLSB = (byte)(offset & 0xFF);
 
-    if (isExtendedLength) {
+    if (isTLVEncodedOffsetNeeded) {
       // In the case of long read 2 or 3 bytes less of the actual data will be returned,
       // because a tag and length will be sent along, here we need to account for this.
       if (le < 128) {
@@ -362,7 +357,7 @@ class PassportAPDUService extends CardService {
       if (le > 256) {
         le = 256;
       }
-      
+
       byte[] data = new byte[] { 0x54, 0x02, offsetMSB, offsetLSB };
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
     } else if (isShortFIDsEnabled) {
@@ -382,7 +377,7 @@ class PassportAPDUService extends CardService {
 
     byte[] rapduBytes = rapdu == null ? null : rapdu.getData();
 
-    if (isExtendedLength && sw == ISO7816.SW_NO_ERROR) {
+    if (isTLVEncodedOffsetNeeded && sw == ISO7816.SW_NO_ERROR) {
       /* Strip the response off the tag 0x53 and the length field. */
       byte[] data = rapduBytes;
       if (data == null) {
@@ -890,12 +885,13 @@ class PassportAPDUService extends CardService {
    * @param capdu command APDU
    * @param rapdu response APDU
    */
-  protected void notifyExchangedPlainTextAPDU(int count, CommandAPDU capdu, ResponseAPDU rapdu) {
+  protected void notifyExchangedPlainTextAPDU(int count, CommandAPDU capdu, ResponseAPDU rapdu, CommandAPDU rawCapdu, ResponseAPDU rawRapdu) {
     if (plainTextAPDUListeners == null || plainTextAPDUListeners.isEmpty()) {
       return;
     }
 
-    APDUEvent event = new APDUEvent(this, "PLAINTEXT", count, capdu, rapdu);
+    APDUEvent rawEvent = new APDUEvent(this, "RAW", count, rawCapdu, rawRapdu);
+    APDUEvent event = new APDUEvent(rawEvent, "PLAINTEXT", count, capdu, rapdu);
     for (APDUListener listener: plainTextAPDUListeners) {
       listener.exchangedAPDU(event);
     }

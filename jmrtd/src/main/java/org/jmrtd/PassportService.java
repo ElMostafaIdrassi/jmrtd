@@ -384,14 +384,14 @@ public class PassportService extends PassportAPDUService {
    * @param sfi the short file identifier byte as int value (between 0 and 255)
    * @param offset offset into the file
    * @param le the expected length of the file to read
-   * @param isExtendedLength whether to use extended length APDUs
+   * @param isTLVEncodedOffsetNeeded whether to encode the offset in a TLV object (typically for offset larger than 32767)
    *
    * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException on tranceive error
    */
-  public synchronized byte[] sendReadBinary(int sfi, int offset, int le, boolean isExtendedLength) throws CardServiceException {
-    return sendReadBinary(wrapper, sfi, offset, le, true, isExtendedLength);
+  public synchronized byte[] sendReadBinary(int sfi, int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
+    return sendReadBinary(wrapper, sfi, offset, le, true, isTLVEncodedOffsetNeeded);
   }
 
   /**
