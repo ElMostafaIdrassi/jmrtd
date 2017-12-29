@@ -111,7 +111,7 @@ class PassportAPDUService extends CardService {
   /** ISO9797Alg3Mac. */
   private Mac mac;
 
-  private int plainAPDUCount;
+  private int apduCount;
 
   /**
    * Creates a new passport APDU sending service.
@@ -131,7 +131,7 @@ class PassportAPDUService extends CardService {
     }
 
     this.service = service;
-    this.plainAPDUCount = 0;
+    this.apduCount = 0;
     try {
       this.mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
       this.cipher = Util.getCipher("DESede/CBC/NoPadding");
@@ -180,7 +180,7 @@ class PassportAPDUService extends CardService {
   @Override
   public synchronized ResponseAPDU transmit(CommandAPDU commandAPDU) throws CardServiceException {
     ResponseAPDU responseAPDU = service.transmit(commandAPDU);
-    notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++plainAPDUCount, commandAPDU, responseAPDU));
+    notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++apduCount, commandAPDU, responseAPDU));
     return responseAPDU;
   }
 
@@ -208,41 +208,41 @@ class PassportAPDUService extends CardService {
    * Transmits an APDU.
    *
    * @param wrapper the secure messaging wrapper
-   * @param capdu the APDU to send
+   * @param commandAPDU the APDU to send
    *
    * @return the APDU received from the PICC
    *
    * @throws CardServiceException if tranceiving failed
    */
-  private ResponseAPDU transmit(APDUWrapper wrapper, CommandAPDU capdu) throws CardServiceException {
-    CommandAPDU plainCapdu = capdu;
+  private ResponseAPDU transmit(APDUWrapper wrapper, CommandAPDU commandAPDU) throws CardServiceException {
+    CommandAPDU plainCapdu = commandAPDU;
     if (wrapper != null) {
-      capdu = wrapper.wrap(capdu);
+      commandAPDU = wrapper.wrap(commandAPDU);
     }
-    ResponseAPDU rapdu = service.transmit(capdu);
-    ResponseAPDU rawRapdu = rapdu;
-    short sw = (short)rapdu.getSW();
+    ResponseAPDU responseAPDU = service.transmit(commandAPDU);
+    ResponseAPDU rawRapdu = responseAPDU;
+    short sw = (short)responseAPDU.getSW();
     if (wrapper == null) {
-      notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++plainAPDUCount, capdu, rapdu));
+      notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++apduCount, commandAPDU, responseAPDU));
     } else {
       try {
-        if (rapdu.getBytes().length <= 2) {
+        if (responseAPDU.getBytes().length <= 2) {
           throw new CardServiceException("Exception during transmission of wrapped APDU"
               + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);
         }
 
-        rapdu = wrapper.unwrap(rapdu);
+        responseAPDU = wrapper.unwrap(responseAPDU);
       } catch (CardServiceException cse) {
         throw cse;
       } catch (Exception e) {
         throw new CardServiceException("Exception during transmission of wrapped APDU"
             + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
       } finally {
-        notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), ++plainAPDUCount, plainCapdu, rapdu, capdu, rawRapdu));
+        notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), ++apduCount, plainCapdu, responseAPDU, commandAPDU, rawRapdu));
       }
     }
 
-    return rapdu;
+    return responseAPDU;
   }
 
   /**
