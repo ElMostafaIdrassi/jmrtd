@@ -156,6 +156,10 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     cipher = Util.getCipher(cipherAlg);
     mac = Util.getMac(macAlg);
   }
+  
+  public String getType() {
+    return "DESede";
+  }
 
   /**
    * Wraps the APDU buffer <code>capdu</code> of a command APDU.

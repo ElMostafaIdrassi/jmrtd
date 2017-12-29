@@ -88,6 +88,10 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     mac = Util.getMac("AESCMAC", ksMac);
   }
 
+  public String getType() {
+    return "AES";
+  }
+  
   /**
    * Gets the current value of the send sequence counter.
    *

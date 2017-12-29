@@ -29,9 +29,7 @@ import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,8 +111,6 @@ class PassportAPDUService extends CardService {
   /** ISO9797Alg3Mac. */
   private Mac mac;
 
-  private Collection<APDUListener> plainTextAPDUListeners;
-
   private int plainAPDUCount;
 
   /**
@@ -135,7 +131,6 @@ class PassportAPDUService extends CardService {
     }
 
     this.service = service;
-    this.plainTextAPDUListeners = new HashSet<APDUListener>();
     this.plainAPDUCount = 0;
     try {
       this.mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
@@ -175,16 +170,18 @@ class PassportAPDUService extends CardService {
    * If the card responds with a status word other than {@code 0x9000} this method does
    * NOT throw a {@linkplain CardServiceException}, but it returns this as error code
    * as result.
-
-   * @param capdu the command APDU
+   * 
+   * @param commandAPDU the command APDU
    *
    * @return the response APDU
    *
    * @throws CardServiceException on error
    */
   @Override
-  public synchronized ResponseAPDU transmit(CommandAPDU capdu) throws CardServiceException {
-    return service.transmit(capdu);
+  public synchronized ResponseAPDU transmit(CommandAPDU commandAPDU) throws CardServiceException {
+    ResponseAPDU responseAPDU = service.transmit(commandAPDU);
+    notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++plainAPDUCount, commandAPDU, responseAPDU));
+    return responseAPDU;
   }
 
   /**
@@ -208,26 +205,6 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * Adds a listener.
-   *
-   * @param l a listener
-   */
-  @Override
-  public void addAPDUListener(APDUListener l) {
-    service.addAPDUListener(l);
-  }
-
-  /**
-   * Removes a listener.
-   *
-   * @param l a listener
-   */
-  @Override
-  public void removeAPDUListener(APDUListener l) {
-    service.removeAPDUListener(l);
-  }
-
-  /**
    * Transmits an APDU.
    *
    * @param wrapper the secure messaging wrapper
@@ -242,10 +219,12 @@ class PassportAPDUService extends CardService {
     if (wrapper != null) {
       capdu = wrapper.wrap(capdu);
     }
-    ResponseAPDU rapdu = transmit(capdu);
+    ResponseAPDU rapdu = service.transmit(capdu);
     ResponseAPDU rawRapdu = rapdu;
     short sw = (short)rapdu.getSW();
-    if (wrapper != null) {
+    if (wrapper == null) {
+      notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++plainAPDUCount, capdu, rapdu));
+    } else {
       try {
         if (rapdu.getBytes().length <= 2) {
           throw new CardServiceException("Exception during transmission of wrapped APDU"
@@ -259,7 +238,7 @@ class PassportAPDUService extends CardService {
         throw new CardServiceException("Exception during transmission of wrapped APDU"
             + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
       } finally {
-        notifyExchangedPlainTextAPDU(++plainAPDUCount, plainCapdu, rapdu, capdu, rawRapdu);
+        notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), ++plainAPDUCount, plainCapdu, rapdu, capdu, rawRapdu));
       }
     }
 
@@ -278,7 +257,7 @@ class PassportAPDUService extends CardService {
     if (aid == null) {
       throw new IllegalArgumentException("AID cannot be null");
     }
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816,ISO7816.INS_SELECT_FILE, (byte) 0x04, (byte) 0x0C, aid);
+    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte) 0x04, (byte) 0x0C, aid);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
 
     checkStatusWordAfterFileOperation(capdu, rapdu);
@@ -855,48 +834,7 @@ class PassportAPDUService extends CardService {
       throw new CardServiceException("Sending PSO failed", sw);
     }
   }
-
-  /**
-   * Adds a plain text listener.
-   *
-   * @param l a listener
-   */
-  public void addPlainTextAPDUListener(APDUListener l) {
-    if (plainTextAPDUListeners != null) {
-      plainTextAPDUListeners.add(l);
-    }
-  }
-
-  /**
-   * Removes a plain text listener.
-   *
-   * @param l a listener
-   */
-  public void removePlainTextAPDUListener(APDUListener l) {
-    if (plainTextAPDUListeners != null) {
-      plainTextAPDUListeners.remove(l);
-    }
-  }
-
-  /**
-   * Notifies listeners about APDU event.
-   *
-   * @param count count
-   * @param capdu command APDU
-   * @param rapdu response APDU
-   */
-  protected void notifyExchangedPlainTextAPDU(int count, CommandAPDU capdu, ResponseAPDU rapdu, CommandAPDU rawCapdu, ResponseAPDU rawRapdu) {
-    if (plainTextAPDUListeners == null || plainTextAPDUListeners.isEmpty()) {
-      return;
-    }
-
-    APDUEvent rawEvent = new APDUEvent(this, "RAW", count, rawCapdu, rawRapdu);
-    APDUEvent event = new APDUEvent(rawEvent, "PLAINTEXT", count, capdu, rapdu);
-    for (APDUListener listener: plainTextAPDUListeners) {
-      listener.exchangedAPDU(event);
-    }
-  }
-
+  
   private static void checkStatusWordAfterFileOperation(CommandAPDU capdu, ResponseAPDU rapdu) throws CardServiceException {
     short sw = (short)rapdu.getSW();
     String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(capdu.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(rapdu.getBytes());

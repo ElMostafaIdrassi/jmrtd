@@ -39,7 +39,7 @@
     <dependency>
       <groupId>net.sf.scuba</groupId>
       <artifactId>scuba-smartcards</artifactId>
-      <version>0.0.13</version>
+      <version>0.0.14</version>
     </dependency>
 
     <dependency>
@@ -129,7 +129,7 @@
               <links>
                 <link>https://bouncycastle.org/docs/docs1.5on</link>
                 <link>https://docs.oracle.com/javase/8/docs/api</link>
-                <link>https://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.13</link>
+                <link>https://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.14</link>
               </links>
             </configuration>
             <executions>
