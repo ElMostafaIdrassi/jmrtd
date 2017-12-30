@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: $
+ * $Id$
  */
 
 package org.jmrtd;
@@ -31,7 +31,7 @@ import net.sf.scuba.smartcards.ResponseAPDU;
  * 
  * @author The JMRTD team (info@jmrtd.org)
  *
- * @version $Revision: $
+ * @version $Revision$
  * 
  * @since 0.6.4
  */

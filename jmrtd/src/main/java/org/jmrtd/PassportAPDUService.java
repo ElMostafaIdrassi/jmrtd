@@ -28,8 +28,6 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +39,6 @@ import javax.crypto.spec.IvParameterSpec;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 import net.sf.scuba.smartcards.APDUEvent;
-import net.sf.scuba.smartcards.APDUListener;
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
