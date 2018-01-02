@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2006 - 2017  The JMRTD team
+ * Copyright (C) 2006 - 2018  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -298,19 +298,19 @@ class PassportAPDUService extends CardService {
    *
    * @param wrapper the secure messaging wrapper to use, or {@code null} for none
    * @param sfi the short file identifier byte of the file to read as an int value (between 0 and 255)
-   *            only if {@code isShortFIDsEnabled} is {@code true}, if not any value)
+   *            only if {@code isSFIEnabled} is {@code true}, if not any value)
    * @param offset offset into the file
-   *        (either a value between 0 and 255 if {@code isShortFIDsEnabled} is {@code true},
+   *        (either a value between 0 and 255 if {@code isSFIEnabled} is {@code true},
    *        of a value between 0 and 65535 if not)
    * @param le the expected length of the file to read
-   * @param isShortFIDsEnabled a boolean indicating whether short file identifiers are used
+   * @param isSFIEnabled a boolean indicating whether short file identifiers are used
    * @param isTLVEncodedOffsetNeeded a boolean indicating whether it should be a long ({@code INS == 0xB1}) read
    *
    * @return a byte array of length at most {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException if the command was not successful
    */
-  public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int sfi, int offset, int le, boolean isShortFIDsEnabled, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
+  public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int sfi, int offset, int le, boolean isSFIEnabled, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
     CommandAPDU capdu = null;
     ResponseAPDU rapdu = null;
 
@@ -336,7 +336,7 @@ class PassportAPDUService extends CardService {
 
       byte[] data = new byte[] { 0x54, 0x02, offsetMSB, offsetLSB };
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
-    } else if (isShortFIDsEnabled) {
+    } else if (isSFIEnabled) {
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, (byte)sfi, offsetLSB, le);      
     } else {
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetMSB, offsetLSB, le);

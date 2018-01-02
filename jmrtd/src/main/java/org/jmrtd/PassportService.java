@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2017  The JMRTD team
+ * Copyright (C) 2006 - 2018  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -280,7 +280,7 @@ public class PassportService extends PassportAPDUService {
    *
    * @param service another service which will deal with sending the APDUs to the card
    * @param maxBlockSize maximum size for plain text APDUs
-   * @param isShortFIDsEnabled whether short file identifiers should be used for read binaries when possible
+   * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
    *
    * @throws CardServiceException
    *             when the available JCE providers cannot provide the necessary
@@ -290,11 +290,11 @@ public class PassportService extends PassportAPDUService {
    *                 <li>Mac: "ISO9797Alg3Mac"</li>
    *             </ul>
    */
-  public PassportService(CardService service, int maxBlockSize, boolean isShortFIDsEnabled) throws CardServiceException {
+  public PassportService(CardService service, int maxBlockSize, boolean isSFIEnabled) throws CardServiceException {
     super(service);
     this.maxBlockSize = maxBlockSize;
-    this.rootFileSystem = new MRTDFileSystem(this, isShortFIDsEnabled);
-    this.icaoFileSystem = new MRTDFileSystem(this, isShortFIDsEnabled);
+    this.rootFileSystem = new MRTDFileSystem(this, isSFIEnabled);
+    this.icaoFileSystem = new MRTDFileSystem(this, isSFIEnabled);
     this.isICAOAppletSelected = false;
     this.state = State.SESSION_STOPPED_STATE;
   }

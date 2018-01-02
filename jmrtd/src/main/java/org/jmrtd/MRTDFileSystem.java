@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2017  The JMRTD team
+ * Copyright (C) 2006 - 2018  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ class MRTDFileSystem implements FileSystemStructured {
   /** Indicates the file that is (or should be) selected. */
   private short selectedFID;
 
-  private boolean isShortFIDsEnabled;
+  private boolean isSFIEnabled;
 
   /**
    * A boolean indicating whether we actually already
@@ -88,14 +88,14 @@ class MRTDFileSystem implements FileSystemStructured {
    * Creates a file system.
    *
    * @param service the card service
-   * @param isShortFIDsEnabled whether the file system should use short file identifiers in READ BINARY commands
+   * @param isSFIEnabled whether the file system should use short file identifiers in READ BINARY commands
    */
-  public MRTDFileSystem(PassportService service, boolean isShortFIDsEnabled) {
+  public MRTDFileSystem(PassportService service, boolean isSFIEnabled) {
     this.service = service;
     this.fileInfos = new HashMap<Short, MRTDFileInfo>();
     this.selectedFID = 0;
     this.isSelected = false;
-    this.isShortFIDsEnabled = isShortFIDsEnabled;
+    this.isSFIEnabled = isSFIEnabled;
   }
 
   /**
@@ -160,8 +160,10 @@ class MRTDFileSystem implements FileSystemStructured {
 
       byte[] bytes = null;
       if (fragment.getLength() > 0) {
-        if (isShortFIDsEnabled && offset < 256) {
-          bytes = service.sendReadBinary(0x80 | LDSFileUtil.lookupSFIByFID(selectedFID), fragment.getOffset(), fragment.getLength(), false);
+        if (isSFIEnabled && offset < 256) {
+          int sfi = LDSFileUtil.lookupSFIByFID(selectedFID);
+          bytes = service.sendReadBinary(0x80 | sfi , fragment.getOffset(), fragment.getLength(), false);
+          isSelected = true;
         } else {
           if (!isSelected) {
             service.sendSelectFile(selectedFID);
@@ -233,8 +235,10 @@ class MRTDFileSystem implements FileSystemStructured {
        * EF.CVCA is the exception and has a fixed length of CVCAFile.LENGTH.
        */
       byte[] prefix = null;
-      if (isShortFIDsEnabled) {
-        prefix = service.sendReadBinary(LDSFileUtil.lookupSFIByFID(selectedFID), 0, READ_AHEAD_LENGTH, false);
+      if (isSFIEnabled) {
+        int sfi = LDSFileUtil.lookupSFIByFID(selectedFID);
+        prefix = service.sendReadBinary(0x80 | sfi, 0, READ_AHEAD_LENGTH, false);
+        isSelected = true; // DEBUG: HIER
       } else {
         if (!isSelected) {
           service.sendSelectFile(selectedFID);
