@@ -175,7 +175,7 @@ class MRTDFileSystem implements FileSystemStructured {
         if (bytes == null) {
           throw new IllegalStateException("Could not read bytes");
         }
-        
+
         if (bytes.length > 0) {
           /* Update buffer with newly read bytes. */
           fileInfo.addFragment(fragment.getOffset(), bytes);
@@ -238,7 +238,7 @@ class MRTDFileSystem implements FileSystemStructured {
       if (isSFIEnabled) {
         int sfi = LDSFileUtil.lookupSFIByFID(selectedFID);
         prefix = service.sendReadBinary(0x80 | sfi, 0, READ_AHEAD_LENGTH, false);
-        isSelected = true; // DEBUG: HIER
+        isSelected = true;
       } else {
         if (!isSelected) {
           service.sendSelectFile(selectedFID);
@@ -252,19 +252,23 @@ class MRTDFileSystem implements FileSystemStructured {
       }
       ByteArrayInputStream baInputStream = new ByteArrayInputStream(prefix);
       TLVInputStream tlvInputStream = new TLVInputStream(baInputStream);
-      int fileLength = 0;
-      int tag = tlvInputStream.readTag();
-      if (tag == CVCAFile.CAR_TAG) {
-        fileLength = CVCAFile.LENGTH;
-      } else {
-        int vLength = tlvInputStream.readLength();
-        int tlLength = prefix.length - baInputStream.available(); /* NOTE: we're using a specific property of ByteArrayInputStream's available method here! */
-        fileLength = tlLength + vLength;
+      try {
+        int fileLength = 0;
+        int tag = tlvInputStream.readTag();
+        if (tag == CVCAFile.CAR_TAG) {
+          fileLength = CVCAFile.LENGTH;
+        } else {
+          int vLength = tlvInputStream.readLength();
+          int tlLength = prefix.length - baInputStream.available(); /* NOTE: we're using a specific property of ByteArrayInputStream's available method here! */
+          fileLength = tlLength + vLength;
+        }
+        fileInfo = new MRTDFileInfo(selectedFID, fileLength);
+        fileInfo.addFragment(0, prefix);
+        fileInfos.put(selectedFID, fileInfo);
+        return fileInfo;
+      } finally {
+        tlvInputStream.close();
       }
-      fileInfo = new MRTDFileInfo(selectedFID, fileLength);
-      fileInfo.addFragment(0, prefix);
-      fileInfos.put(selectedFID, fileInfo);
-      return fileInfo;
     } catch (IOException ioe) {
       throw new CardServiceException("Error getting file info for " + Integer.toHexString(selectedFID), ioe);
     }
