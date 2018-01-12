@@ -155,14 +155,14 @@ class MRTDFileSystem implements FileSystemStructured {
         throw new IllegalStateException("Could not get file info");
       }
       Fragment fragment = fileInfo.getSmallestUnbufferedFragment(offset, length);
-
+      
       int responseLength = length;
 
       byte[] bytes = null;
       if (fragment.getLength() > 0) {
         if (isSFIEnabled && offset < 256) {
           int sfi = LDSFileUtil.lookupSFIByFID(selectedFID);
-          bytes = service.sendReadBinary(0x80 | sfi , fragment.getOffset(), fragment.getLength(), false);
+          bytes = service.sendReadBinary(0x80 | sfi, fragment.getOffset(), fragment.getLength(), false);
           isSelected = true;
         } else {
           if (!isSelected) {

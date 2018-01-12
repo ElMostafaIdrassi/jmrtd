@@ -46,6 +46,7 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;
 
 /**
@@ -311,8 +312,8 @@ class PassportAPDUService extends CardService {
    * @throws CardServiceException if the command was not successful
    */
   public synchronized byte[] sendReadBinary(APDUWrapper wrapper, int sfi, int offset, int le, boolean isSFIEnabled, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
-    CommandAPDU capdu = null;
-    ResponseAPDU rapdu = null;
+    CommandAPDU commandAPDU = null;
+    ResponseAPDU responseAPDU = null;
 
     // In case the data ended right on the block boundary
     if (le == 0) {
@@ -335,50 +336,62 @@ class PassportAPDUService extends CardService {
       }
 
       byte[] data = new byte[] { 0x54, 0x02, offsetMSB, offsetLSB };
-      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
+      commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
     } else if (isSFIEnabled) {
-      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, (byte)sfi, offsetLSB, le);      
+      commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, (byte)sfi, offsetLSB, le);      
     } else {
-      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetMSB, offsetLSB, le);
+      commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetMSB, offsetLSB, le);
     }
 
     short sw = ISO7816.SW_UNKNOWN;
     try {
-      rapdu = transmit(wrapper, capdu);
-      sw = (short)rapdu.getSW();
+      responseAPDU = transmit(wrapper, commandAPDU);
+      sw = (short)responseAPDU.getSW();
     } catch (CardServiceException cse) {
       LOGGER.log(Level.FINE, "Exception during READ BINARY", cse);
       sw = (short)cse.getSW();
     }
 
-    byte[] rapduBytes = rapdu == null ? null : rapdu.getData();
-
-    if (isTLVEncodedOffsetNeeded && sw == ISO7816.SW_NO_ERROR) {
-      /* Strip the response off the tag 0x53 and the length field. */
-      byte[] data = rapduBytes;
-      if (data == null) {
-        throw new CardServiceException("Malformed read binary long response data");
-      }
-      int index = 0;
-      if (data[index++] != (byte)0x53) { // FIXME: Constant for 0x53.
-        throw new CardServiceException("Malformed read binary long response data", sw);
-      }
-      if ((byte)(data[index] & 0x80) == (byte)0x80) {
-        index += (data[index] & 0xF);
-      }
-      index ++;
-      rapduBytes = new byte[data.length - index];
-      System.arraycopy(data, index, rapduBytes, 0, rapduBytes.length);
-    }
-
-    if (rapduBytes == null || rapduBytes.length == 0) {
-      LOGGER.warning("DEBUG: rapduBytes = " + Arrays.toString(rapduBytes) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
+    byte[] responseData = getResponseData(responseAPDU, isTLVEncodedOffsetNeeded);
+    if (responseData == null || responseData.length == 0) {
+      LOGGER.warning("DEBUG: rapduBytes = " + Arrays.toString(responseData) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
     } else {
-      checkStatusWordAfterFileOperation(capdu, rapdu);
+      checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
     }
-    return rapduBytes;
+    return responseData;
   }
 
+  private byte[] getResponseData(ResponseAPDU responseAPDU, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
+    if (responseAPDU == null) {
+      return null;
+    }
+
+    byte[] responseData = responseAPDU.getData();
+    if (responseData == null) {
+      throw new CardServiceException("Malformed read binary long response data");      
+    }
+    if (!isTLVEncodedOffsetNeeded) {
+      return responseData;
+    }
+
+    /* 
+     * Strip the response off the tag 0x53 and the length field.
+     * FIXME: Use TLVUtil.tlvEncode(...) here. -- MO
+     */
+    byte[] data = responseData;
+    int index = 0;
+    if (data[index++] != (byte)0x53) { // FIXME: Constant for 0x53.
+      throw new CardServiceException("Malformed read binary long response data");
+    }
+    if ((byte)(data[index] & 0x80) == (byte)0x80) {
+      index += (data[index] & 0xF);
+    }
+    index ++;
+    responseData = new byte[data.length - index];
+    System.arraycopy(data, index, responseData, 0, responseData.length);
+    return responseData;
+  }
+    
   /**
    * Sends a {@code GET CHALLENGE} command to the passport.
    *
@@ -716,28 +729,6 @@ class PassportAPDUService extends CardService {
     }
   }
 
-
-  /*
-   * 0x80 Cryptographic mechanism reference
-   * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
-   */
-  private byte[] toOIDBytes(String oid) {
-    byte[] oidBytes = null;
-    try {
-      TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
-      try {
-        oidTLVIn.readTag(); /* Should be 0x06 */
-        oidTLVIn.readLength();
-        oidBytes = oidTLVIn.readValue();
-      } finally {
-        oidTLVIn.close();
-      }
-      return Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
-    } catch (IOException ioe) {
-      throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
-    }
-  }
-
   /**
    * Sends a General Authenticate command.
    *
@@ -831,7 +822,28 @@ class PassportAPDUService extends CardService {
       throw new CardServiceException("Sending PSO failed", sw);
     }
   }
-  
+
+  /*
+   * 0x80 Cryptographic mechanism reference
+   * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
+   */
+  private byte[] toOIDBytes(String oid) {
+    byte[] oidBytes = null;
+    try {
+      TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
+      try {
+        oidTLVIn.readTag(); /* Should be 0x06 */
+        oidTLVIn.readLength();
+        oidBytes = oidTLVIn.readValue();
+      } finally {
+        oidTLVIn.close();
+      }
+      return Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
+    } catch (IOException ioe) {
+      throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
+    }
+  }
+
   private static void checkStatusWordAfterFileOperation(CommandAPDU capdu, ResponseAPDU rapdu) throws CardServiceException {
     short sw = (short)rapdu.getSW();
     String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(capdu.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(rapdu.getBytes());

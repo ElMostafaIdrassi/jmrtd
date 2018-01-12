@@ -1202,6 +1202,17 @@ public class PACEProtocol {
     }
   }
   
+  /**
+   * TLV encoded data with a tag.
+   * 
+   * @param tag the tag
+   * @param data the data to encode
+   * 
+   * @return the TLV encoded data
+   * 
+   * @deprecated Use version in TLVUtil instead
+   */
+  @Deprecated
   public static byte[] wrapDO(int tag, byte[] data) {
     if (data == null) {
       throw new IllegalArgumentException("Data to wrap is null");
@@ -1227,6 +1238,17 @@ public class PACEProtocol {
     }
   }
 
+  /**
+   * TLV decodes tagged TLV data
+   * 
+   * @param expectedTag the tag to expect
+   * @param wrappedData the encoded data
+   * 
+   * @return the decoded data
+   * 
+   * @deprecated use the variant in TLVUtil instead
+   */
+  @Deprecated
   public static byte[] unwrapDO(int expectedTag, byte[] wrappedData) {
     if (wrappedData == null || wrappedData.length < 2)  {
       throw new IllegalArgumentException("Wrapped data is null or length < 2");

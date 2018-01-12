@@ -27,7 +27,6 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.KeySpec;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -214,11 +213,8 @@ public class PassportService extends PassportAPDUService {
 
   /**
    * The file read block size, some passports cannot handle large values
-   *
-   * @deprecated hack
    */
-  @Deprecated
-  public int maxBlockSize;
+  private int maxBlockSize;
 
   enum State {
     SESSION_STOPPED_STATE,
@@ -367,14 +363,14 @@ public class PassportService extends PassportAPDUService {
    *
    * @param offset offset into the file
    * @param le the expected length of the file to read
-   * @param isExtendedLength whether to use extended length APDUs
+   * @param isTLVEncodedOffsetNeeded whether to encode the offset in a TLV object (typically for offset larger than 32767)
    *
    * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
    *
    * @throws CardServiceException on tranceive error
    */
-  public synchronized byte[] sendReadBinary(int offset, int le, boolean isExtendedLength) throws CardServiceException {
-    return sendReadBinary(wrapper, NO_SFI, offset, le, false, isExtendedLength);
+  public synchronized byte[] sendReadBinary(int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
+    return sendReadBinary(wrapper, NO_SFI, offset, le, false, isTLVEncodedOffsetNeeded);
   }
   
   /**
@@ -447,7 +443,7 @@ public class PassportService extends PassportAPDUService {
    *
    * @throws PACEException on error
    */
-  public synchronized PACEResult doPACE(KeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
     state = State.PACE_AUTHENTICATED_STATE;
