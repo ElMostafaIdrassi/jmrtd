@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2017  The JMRTD team
+ * Copyright (C) 2006 - 2018  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: $
+ * $Id$
  */
 
 package org.jmrtd.test;
@@ -36,7 +36,7 @@ import junit.framework.TestCase;
  * 
  * @author The JMRTD team (info@jmrtd.org)
  * 
- * @version $Revision: $
+ * @version $Revision$
  * 
  * @since 0.6.2
  */
