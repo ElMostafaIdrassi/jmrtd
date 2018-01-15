@@ -46,7 +46,6 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVInputStream;
-import net.sf.scuba.tlv.TLVOutputStream;
 import net.sf.scuba.util.Hex;
 
 /**

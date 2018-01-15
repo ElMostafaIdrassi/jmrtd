@@ -21,6 +21,8 @@
 
 package org.jmrtd;
 
+import java.io.Serializable;
+
 import net.sf.scuba.smartcards.APDUEvent;
 import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ResponseAPDU;
@@ -54,7 +56,7 @@ public class WrappedAPDUEvent extends APDUEvent {
    * @param wrappedCommandAPDU the protected command APDU
    * @param wrappedResponseAPDU the protected command APDU
    */
-  public WrappedAPDUEvent(Object source, Object type, int sequenceNumber,
+  public WrappedAPDUEvent(Object source, Serializable type, int sequenceNumber,
       CommandAPDU plainTextCommandAPDU, ResponseAPDU plainTextResponseAPDU,
       CommandAPDU wrappedCommandAPDU, ResponseAPDU wrappedResponseAPDU) {
     super(source, type, sequenceNumber, wrappedCommandAPDU, wrappedResponseAPDU);
