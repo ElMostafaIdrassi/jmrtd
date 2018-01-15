@@ -82,6 +82,7 @@ import org.jmrtd.protocol.PACEResult.PACEMappingResult;
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
+import net.sf.scuba.tlv.TLVUtil;
 import net.sf.scuba.util.Hex;
 
 /**
@@ -367,7 +368,7 @@ public class PACEProtocol {
       byte[] step1Data = new byte[] { };
       /* Command data is empty. This implies an empty dynamic authentication object. */
       byte[] step1Response = service.sendGeneralAuthenticate(wrapper, step1Data, false);
-      byte[] step1EncryptedNonce = unwrapDO(0x80, step1Response);
+      byte[] step1EncryptedNonce = TLVUtil.unwrapDO(0x80, step1Response);
 
       /* (Re)initialize the K_pi cipher for decryption. */
       staticPACECipher.init(Cipher.DECRYPT_MODE, staticPACEKey, new IvParameterSpec(new byte[staticPACECipher.getBlockSize()])); // Fix proposed by Halvdan Grelland (halvdanhg@gmail.com)
@@ -440,9 +441,9 @@ public class PACEProtocol {
       PrivateKey pcdMappingPrivateKey = pcdMappingKeyPair.getPrivate();
 
       byte[] pcdMappingEncodedPublicKey = encodePublicKeyForSmartCard(pcdMappingPublicKey);
-      byte[] step2Data = wrapDO(0x81, pcdMappingEncodedPublicKey);
+      byte[] step2Data = TLVUtil.wrapDO(0x81, pcdMappingEncodedPublicKey);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
-      byte[] piccMappingEncodedPublicKey = unwrapDO(0x82, step2Response);
+      byte[] piccMappingEncodedPublicKey = TLVUtil.unwrapDO(0x82, step2Response);
       PublicKey piccMappingPublicKey = decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
 
       if ("ECDH".equals(agreementAlg)) {
@@ -505,7 +506,7 @@ public class PACEProtocol {
       byte[] pcdNonce = new byte[piccNonce.length];
       random.nextBytes(pcdNonce);
 
-      byte[] step2Data = wrapDO(0x81, pcdNonce);
+      byte[] step2Data = TLVUtil.wrapDO(0x81, pcdNonce);
       byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
 
       /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */
@@ -547,9 +548,9 @@ public class PACEProtocol {
   public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {
     try {
       byte[] pcdEncodedPublicKey = encodePublicKeyForSmartCard(pcdPublicKey);
-      byte[] step3Data = wrapDO(0x83, pcdEncodedPublicKey);
+      byte[] step3Data = TLVUtil.wrapDO(0x83, pcdEncodedPublicKey);
       byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, false);
-      byte[] piccEncodedPublicKey = unwrapDO(0x84, step3Response);
+      byte[] piccEncodedPublicKey = TLVUtil.unwrapDO(0x84, step3Response);
       PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 
       if (pcdPublicKey.equals(piccPublicKey)) {
@@ -591,7 +592,7 @@ public class PACEProtocol {
   public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
     try {
       byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
-      byte[] step4Data = wrapDO(0x85, pcdToken);
+      byte[] step4Data = TLVUtil.wrapDO(0x85, pcdToken);
       byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, true);
       TLVInputStream step4ResponseInputStream = new TLVInputStream(new ByteArrayInputStream(step4Response));
       try {
@@ -1199,86 +1200,6 @@ public class PACEProtocol {
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.WARNING, "Exception", gse);
       throw new IllegalArgumentException(gse);
-    }
-  }
-  
-  /**
-   * TLV encoded data with a tag.
-   * 
-   * @param tag the tag
-   * @param data the data to encode
-   * 
-   * @return the TLV encoded data
-   * 
-   * @deprecated Use version in TLVUtil instead
-   */
-  @Deprecated
-  public static byte[] wrapDO(int tag, byte[] data) {
-    if (data == null) {
-      throw new IllegalArgumentException("Data to wrap is null");
-    }
-
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    try {
-      TLVOutputStream tlvOutputStream = new TLVOutputStream(byteArrayOutputStream);
-      tlvOutputStream.writeTag(tag);
-      tlvOutputStream.writeValue(data);
-      tlvOutputStream.flush();
-      tlvOutputStream.close();
-      return byteArrayOutputStream.toByteArray();
-    } catch (IOException ioe) {
-      // Never happens
-      throw new IllegalStateException("Error writing stream", ioe);
-    } finally {
-      try {
-        byteArrayOutputStream.close();
-      } catch (IOException ioe) {
-        LOGGER.log(Level.FINE, "Error closing stream", ioe);
-      }
-    }
-  }
-
-  /**
-   * TLV decodes tagged TLV data
-   * 
-   * @param expectedTag the tag to expect
-   * @param wrappedData the encoded data
-   * 
-   * @return the decoded data
-   * 
-   * @deprecated use the variant in TLVUtil instead
-   */
-  @Deprecated
-  public static byte[] unwrapDO(int expectedTag, byte[] wrappedData) {
-    if (wrappedData == null || wrappedData.length < 2)  {
-      throw new IllegalArgumentException("Wrapped data is null or length < 2");
-    }
-
-    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(wrappedData);
-    TLVInputStream tlvInputStream = new TLVInputStream(byteArrayInputStream);
-
-    try {
-      int actualTag = tlvInputStream.readTag();
-      if (actualTag != expectedTag) {
-        throw new IllegalArgumentException("Expected tag " + Integer.toHexString(expectedTag) + ", found tag " + Integer.toHexString(actualTag));
-      }
-
-      int length = tlvInputStream.readLength();
-      byte[] value = tlvInputStream.readValue();
-      byte[] result = new byte[length];
-      System.arraycopy(value, 0, result, 0, length);
-      return result;
-    } catch (IOException ioe) {
-      // Never happens
-      throw new IllegalStateException("Error reading from stream", ioe);
-
-    } finally {
-      try {
-        tlvInputStream.close();
-        //        byteArrayInputStream.close();
-      } catch (IOException ioe) {
-        LOGGER.log(Level.FINE, "Error closing stream", ioe);
-      }
     }
   }
 
