@@ -39,6 +39,7 @@ import org.jmrtd.lds.icao.MRZInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVOutputStream;
+import net.sf.scuba.tlv.TLVUtil;
 
 /**
  * The EAC Terminal Authentication protocol.
@@ -184,7 +185,7 @@ public class TAProtocol {
            * Manage Security Environment: Set for verification: Digital Signature
            * Template, indicate authority of cert to check.
            */
-          byte[] authorityRefBytes = Util.wrapDO((byte) 0x83, authorityReference.getName().getBytes("ISO-8859-1"));
+          byte[] authorityRefBytes = TLVUtil.wrapDO(0x83, authorityReference.getName().getBytes("ISO-8859-1"));
           service.sendMSESetDST(wrapper, authorityRefBytes);
 
           /* Cert body is already in TLV format. */
@@ -215,7 +216,7 @@ public class TAProtocol {
 
       /* Step 3: MSE Set AT */
       CVCPrincipal holderRef = terminalCert.getHolderReference();
-      byte[] holderRefBytes = Util.wrapDO((byte) 0x83, holderRef.getName().getBytes("ISO-8859-1"));
+      byte[] holderRefBytes = TLVUtil.wrapDO(0x83, holderRef.getName().getBytes("ISO-8859-1"));
       /*
        * Manage Security Environment: Set for external authentication: Authentication
        * Template

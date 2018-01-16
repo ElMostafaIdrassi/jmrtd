@@ -46,6 +46,7 @@ import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.SecurityInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
+import net.sf.scuba.tlv.TLVUtil;
 
 /**
  * The EAC Chip Authentication protocol.
@@ -164,12 +165,12 @@ public class CAProtocol {
       byte[] idData = null;
       if (keyId != null) {
         byte[] keyIdBytes = keyId.toByteArray(); // FIXME: Shouldn't this be  Util.i2os(keyId); ? -- MO 20170926
-        idData = Util.wrapDO((byte)0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
+        idData = TLVUtil.wrapDO(0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
       }
-      service.sendMSEKAT(wrapper, Util.wrapDO((byte)0x91, keyData), idData); /* FIXME: Constant for 0x91. */
+      service.sendMSEKAT(wrapper, TLVUtil.wrapDO(0x91, keyData), idData); /* FIXME: Constant for 0x91. */
     } else if (cipherAlg.startsWith("AES")) {
       service.sendMSESetATIntAuth(wrapper, oid, keyId);
-      service.sendGeneralAuthenticate(wrapper, Util.wrapDO((byte)0x80, keyData), true); /* FIXME: Constant for 0x80. */
+      service.sendGeneralAuthenticate(wrapper, TLVUtil.wrapDO(0x80, keyData), true); /* FIXME: Constant for 0x80. */
     } else {
       throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
     }

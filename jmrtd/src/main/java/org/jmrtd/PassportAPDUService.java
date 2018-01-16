@@ -46,6 +46,7 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVUtil;
 import net.sf.scuba.util.Hex;
 
 /**
@@ -639,7 +640,7 @@ class PassportAPDUService extends CardService {
       rapdu = transmit(wrapper, capdu);
     } else {
       byte[] oidBytes = toOIDBytes(oid);
-      byte[] keyIdBytes = Util.wrapDO((byte)0x84, Util.i2os(keyId));
+      byte[] keyIdBytes = TLVUtil.wrapDO(0x84, Util.i2os(keyId));
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       try {
         byteArrayOutputStream.write(oidBytes);
@@ -688,7 +689,7 @@ class PassportAPDUService extends CardService {
       throw new IllegalArgumentException("Unsupported key type reference (MRZ, CAN, etc), found " + refPublicKeyOrSecretKey);
     }
 
-    byte[] refPublicKeyOrSecretKeyBytes = Util.wrapDO((byte)0x83, new byte[] { (byte)refPublicKeyOrSecretKey }); /* FIXME: define constant for 0x83 */
+    byte[] refPublicKeyOrSecretKeyBytes = TLVUtil.wrapDO(0x83, new byte[] { (byte)refPublicKeyOrSecretKey }); /* FIXME: define constant for 0x83 */
 
     /*
      * 0x84 Reference of a private key / Reference for computing a
@@ -699,7 +700,7 @@ class PassportAPDUService extends CardService {
      * domain parameters is available for PACE.
      */
     if (refPrivateKeyOrForComputingSessionKey != null) {
-      refPrivateKeyOrForComputingSessionKey = Util.wrapDO((byte)0x84, refPrivateKeyOrForComputingSessionKey);
+      refPrivateKeyOrForComputingSessionKey = TLVUtil.wrapDO(0x84, refPrivateKeyOrForComputingSessionKey);
     }
 
     /* Construct data. */
@@ -741,7 +742,7 @@ class PassportAPDUService extends CardService {
    */
   public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException {
     /* Tranceive APDU. */
-    byte[] commandData = Util.wrapDO((byte)0x7C, data); // FIXME: constant for 0x7C
+    byte[] commandData = TLVUtil.wrapDO(0x7C, data); // FIXME: constant for 0x7C
     CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_PACE_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 256);
     ResponseAPDU rapdu = transmit(wrapper, capdu);
 
@@ -751,7 +752,7 @@ class PassportAPDUService extends CardService {
       throw new CardServiceException("Sending general authenticate failed", sw);
     }
     byte[] responseData = rapdu.getData();
-    responseData = Util.unwrapDO((byte)0x7C, responseData);
+    responseData = TLVUtil.unwrapDO(0x7C, responseData);
     return responseData;
   }
 
@@ -837,7 +838,7 @@ class PassportAPDUService extends CardService {
       } finally {
         oidTLVIn.close();
       }
-      return Util.wrapDO((byte)0x80, oidBytes); /* FIXME: define constant for 0x80. */
+      return TLVUtil.wrapDO(0x80, oidBytes); /* FIXME: define constant for 0x80. */
     } catch (IOException ioe) {
       throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
     }

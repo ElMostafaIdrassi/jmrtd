@@ -813,7 +813,7 @@ public class Util {
             /* Reconstruct the parameters. */
             org.bouncycastle.math.ec.ECPoint generator = params.getG();
             org.bouncycastle.math.ec.ECCurve curve = generator.getCurve();
-            generator = curve.createPoint(generator.getX().toBigInteger(), generator.getY().toBigInteger(), false);
+            generator = curve.createPoint(generator.getAffineXCoord().toBigInteger(), generator.getAffineYCoord().toBigInteger());
             params = new X9ECParameters(params.getCurve(), generator, params.getN(), params.getH(), params.getSeed());
           } else {
             /* It's not a named curve, we can just return the decoded public key info. */
@@ -829,7 +829,7 @@ public class Util {
             // p = p.getCurve().createPoint(p.getX().toBigInteger(), p.getY().toBigInteger(), true);
 
             LOGGER.info("DEBUG: =====> q " + q);
-            subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded());
+            subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded(false));
             return subjectPublicKeyInfo;
           } else {
             return subjectPublicKeyInfo;
@@ -1037,30 +1037,6 @@ public class Util {
     }
   }
 
-  public static byte[] wrapDO(byte tag, byte[] data) {
-    if (data == null) {
-      throw new IllegalArgumentException("Data to wrap is null");
-    }
-    byte[] result = new byte[data.length + 2];
-    result[0] = tag;
-    result[1] = (byte)data.length;
-    System.arraycopy(data, 0, result, 2, data.length);
-    return result;
-  }
-
-  public static byte[] unwrapDO(byte expectedTag, byte[] wrappedData) {
-    if (wrappedData == null || wrappedData.length < 2)  {
-      throw new IllegalArgumentException("Wrapped data is null or length < 2");
-    }
-    byte actualTag = wrappedData[0];
-    if (actualTag != expectedTag) {
-      throw new IllegalArgumentException("Expected tag " + Integer.toHexString(expectedTag) + ", found tag " + Integer.toHexString(actualTag));
-    }
-    byte[] result = new byte[wrappedData.length - 2];
-    System.arraycopy(wrappedData, 2, result, 0, result.length);
-    return result;
-  }
-
   public static String inferKeyAgreementAlgorithm(PublicKey publicKey) {
     if (publicKey instanceof ECPublicKey) {
       return "ECDH";
@@ -1092,7 +1068,7 @@ public class Util {
 
   public static org.bouncycastle.math.ec.ECPoint toBouncyCastleECPoint(ECPoint point, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECCurve bcCurve = toBouncyCastleECCurve(params);
-    return bcCurve.createPoint(point.getAffineX(), point.getAffineY(), false);
+    return bcCurve.createPoint(point.getAffineX(), point.getAffineY());
   }
 
   public static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
@@ -1157,7 +1133,7 @@ public class Util {
       return md.digest(getKeyData(agreementAlg, pcdPublicKey));
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      byte[] t = Util.i2os(pcdECPublicKey.getQ().getX().toBigInteger());
+      byte[] t = Util.i2os(pcdECPublicKey.getQ().getAffineXCoord().toBigInteger());
       return Util.alignKeyDataToSize(t, (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0)); // TODO: Interop Ispra for SecP521r1 20170925.
 //      return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
     }
@@ -1171,7 +1147,7 @@ public class Util {
       return pcdDHPublicKey.getY().toByteArray();
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      return pcdECPublicKey.getQ().getEncoded();
+      return pcdECPublicKey.getQ().getEncoded(false);
     }
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
