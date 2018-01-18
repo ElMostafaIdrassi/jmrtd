@@ -783,17 +783,32 @@ public class MRZInfo extends AbstractLDSInfo {
 
   private String nameToString(int width) {
     String[] primaryComponents = primaryIdentifier.split(" |<");
-    String[] secondaryComponents = secondaryIdentifier.split(" |<");
+    String[] secondaryComponents = secondaryIdentifier == null || secondaryIdentifier.trim().isEmpty() ? new String[0] : secondaryIdentifier.split(" |<");
 
     StringBuilder name = new StringBuilder();
-    for (String component : primaryComponents) {
-      name.append(component);
-      name.append('<');
+    boolean isFirstPrimaryComponent = true;
+    for (String primaryComponent: primaryComponents) {
+      if (isFirstPrimaryComponent) {
+        isFirstPrimaryComponent = false;
+      } else {
+        name.append('<');        
+      }
+      name.append(primaryComponent);
     }
-    for (String secondaryComponent : secondaryComponents) {
-      name.append('<');
-      name.append(secondaryComponent);
+
+    if (secondaryIdentifier != null && !secondaryIdentifier.trim().isEmpty()) {
+      name.append("<<");
+      boolean isFirstSecondaryComponent = true; 
+      for (String secondaryComponent: secondaryComponents) {
+        if (isFirstSecondaryComponent) {
+          isFirstSecondaryComponent = false;
+        } else {
+          name.append('<');        
+        }
+        name.append(secondaryComponent);
+      }
     }
+
     return mrzFormat(name.toString(), width);
   }
 

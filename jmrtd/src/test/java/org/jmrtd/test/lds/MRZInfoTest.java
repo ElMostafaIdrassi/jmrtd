@@ -45,64 +45,92 @@ public class MRZInfoTest extends TestCase {
 
   /* ID 1 samples. */
 
-  private static final String MRZ_SUSANNA_SAMPLE_3LINE_ID1 = "IRGBRZU12345673<<<<<<<<<<<<<<<"
-      + "6608198F0808088COU<<<<<<<<<<<6"
-      + "SAMPLE<<SUSANNA<<<<<<<<<<<<<<<",
-      MRZ_MICHAEL_VAN_PASSEL_3LINE_ID1 = /*
-       * FIXME: line length = 28, not
-       * 30?
-       */
-      "I<BEL0000000000<<<<<<<<<<<<<" + "5001013F0806017BEL<<<<<<<<<<"
-      + "VAN<PASSEL<<MICHAEL<<<<<<<<<",
-      MRZ_PETER_STEVENSON_3LINE_ID1 = "CIUT0D231458907A123X5328434D23" /*
-       * FIXME
-       * :
-       * 3
-       * ?
-       */
-      + "3407127M9507122UTO<<<<<<<<<<<6"
-      + "STEVENSON<<PETER<<<<<<<<<<<<<<",
-      MRZ_CARVALHO_FERNANDA_SILVA_3LINE_ID1 = "IDUTO00000000032<<<<<<<<<<<<<<"
-          + "7507123F1510212UTO<<<<<<<<<<<2"
-          + "SILVA<<CARVALHO<FERNANDA<<<<<<",
-          MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1 = /*
-           * NOTE: optional data 2, right
-           * alligned
-           */
-          "IDBRA123456789712345R00F456912"
-          + "7006012F0212311UTO<<<HDFDTR091"
-          + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<",
-          MRZ_ANNA_KOWALSKA_3LINE_ID1 =
-          "I<POLABA3000004<<<<<<<<<<<<<<<"
-              + "7203305F1208227POL<<<<<<<<<<<2"
-              + "KOWALSKA<<ANNA<<<<<<<<<<<<<<<<";
+  private static final String MRZ_SUSANNA_SAMPLE_3LINE_ID1 =
+      "IRGBRZU12345673<<<<<<<<<<<<<<<"
+    + "6608198F0808088COU<<<<<<<<<<<6"
+    + "SAMPLE<<SUSANNA<<<<<<<<<<<<<<<";
+
+  /*
+   * FIXME: line length = 28, not 30?
+   */
+  private static final String MRZ_MICHAEL_VAN_PASSEL_3LINE_ID1 =
+      "I<BEL0000000000<<<<<<<<<<<<<"
+    + "5001013F0806017BEL<<<<<<<<<<"
+    + "VAN<PASSEL<<MICHAEL<<<<<<<<<";
+
+  /*
+   * FIXME: 3?
+   */
+  private static final String MRZ_PETER_STEVENSON_3LINE_ID1 =
+      "CIUT0D231458907A123X5328434D23"
+    + "3407127M9507122UTO<<<<<<<<<<<6"
+    + "STEVENSON<<PETER<<<<<<<<<<<<<<";
+
+  private static final String MRZ_CARVALHO_FERNANDA_SILVA_3LINE_ID1 =
+      "IDUTO00000000032<<<<<<<<<<<<<<"
+    + "7507123F1510212UTO<<<<<<<<<<<2"
+    + "SILVA<<CARVALHO<FERNANDA<<<<<<";
+
+  /*
+   * NOTE: optional data 2, right
+   * alligned
+   */
+  private static final String MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1 = 
+      "IDBRA123456789712345R00F456912"
+    + "7006012F0212311UTO<<<HDFDTR091"
+    + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
+
+  private static final String MRZ_ANNA_KOWALSKA_3LINE_ID1 =
+      "I<POLABA3000004<<<<<<<<<<<<<<<"
+    + "7203305F1208227POL<<<<<<<<<<<2"
+    + "KOWALSKA<<ANNA<<<<<<<<<<<<<<<<";
 
   /* ID 3 samples. */
 
-  private static final String MRZ_ANNA_ERIKSSON_2LINE_ID3 = "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
-      + "L898902C<3UTO6908061F9406236ZE184226B<<<<<14",
-      MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT = "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<"
-          + "XX00000000NLD7110195F1108280123456782<<<<<02",
-          MRZ_LOES_MEULENDIJK_2LINE_ID3_FILLER_CHECKDIGIT = "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<"
-              + "XX00000000NLD7110195F1108280123456782<<<<<<2",
-              MRZ_GERARD_ROBBERT_MARTINUS_SEBASTIAAN_VAN_NIEUWENHUIZEN_2LINE_ID3 = "P<NLDVAN<NIEUWENHUIZEN<<GERARD<ROBBERT<MARTI"
-                  + "XN01BC0150NLD7112247M1108268123456782<<<<<02",
-                  MRZ_ERIKA_MUSTERMAN_2LINE_ID3 = "P<D<<MUSTERMANN<<ERIKA<<<<<<<<<<<<<<<<<<<<<<"
-                      + "C11T002JM4D<<9608122F1310317<<<<<<<<<<<<<<<6",
-                      MRZ_CHRISTIAN_MUSTERMAN_2LINE_ID3 = "P<D<<MUSTERMAN<<CHRISTIAN<<<<<<<<<<<<<<<<<<<"
-                          + "0000000000D<<8601067M1111156<<<<<<<<<<<<<<<2",
-                          MRZ_VZOR_SPECIMEN_2LINE_ID3 = "P<CZESPECIMEN<<VZOR<<<<<<<<<<<<<<<<<<<<<<<<<"
-                              + "99009054<4CZE6906229F16072996956220612<<<<74",
-                              MRZ_HAPPY_TRAVELER_2LINE_ID3 = "P<USATRAVELER<<HAPPY<<<<<<<<<<<<<<<<<<<<<<<<"
-                                  + "1500000035USA5609165M0811150<<<<<<<<<<<<<<08",
-                                  MRZ_FRANK_AMOSS_2LINE_ID3 = "P<USAAMOSS<<FRANK<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-                                      + "0000780043USA5001013M1511169100000000<381564",
-                                      MRZ_LORENA_FERNANDEZ_2LINE_ID3 =
-                                      "P<ARGFERNANDEZ<<LORENA<<<<<<<<<<<<<<<<<<<<<<"
-                                          + "00000000A0ARG7903122F081210212300004<<<<<<86",
-                                          MRZ_KWOK_SUM_CHNCHUNG_2LINE_ID3 =
-                                          "P<CHNCHUNG<<KWOK<SUM<<<<<<<<<<<<<<<<<<<<<<<<"
-                                              + "K123455994CHN8008080F1702057HK8888888<<<<<36";
+  private static final String MRZ_ANNA_ERIKSSON_2LINE_ID3 =
+      "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
+    + "L898902C<3UTO6908061F9406236ZE184226B<<<<<14";
+  
+  private static final String MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT =
+      "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<"
+    + "XX00000000NLD7110195F1108280123456782<<<<<02";
+
+
+  private static final String MRZ_LOES_MEULENDIJK_2LINE_ID3_FILLER_CHECKDIGIT =
+      "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<"
+    + "XX00000000NLD7110195F1108280123456782<<<<<<2";
+
+  private static final String MRZ_GERARD_ROBBERT_MARTINUS_SEBASTIAAN_VAN_NIEUWENHUIZEN_2LINE_ID3 =
+      "P<NLDVAN<NIEUWENHUIZEN<<GERARD<ROBBERT<MARTI"
+    + "XN01BC0150NLD7112247M1108268123456782<<<<<02";
+
+  private static final String MRZ_ERIKA_MUSTERMAN_2LINE_ID3 =
+      "P<D<<MUSTERMANN<<ERIKA<<<<<<<<<<<<<<<<<<<<<<"
+    + "C11T002JM4D<<9608122F1310317<<<<<<<<<<<<<<<6";
+
+  private static final String MRZ_CHRISTIAN_MUSTERMAN_2LINE_ID3 =
+      "P<D<<MUSTERMAN<<CHRISTIAN<<<<<<<<<<<<<<<<<<<"
+    + "0000000000D<<8601067M1111156<<<<<<<<<<<<<<<2";
+
+  private static final String MRZ_VZOR_SPECIMEN_2LINE_ID3 =
+      "P<CZESPECIMEN<<VZOR<<<<<<<<<<<<<<<<<<<<<<<<<"
+    + "99009054<4CZE6906229F16072996956220612<<<<74";
+
+  private static final String MRZ_HAPPY_TRAVELER_2LINE_ID3 =
+      "P<USATRAVELER<<HAPPY<<<<<<<<<<<<<<<<<<<<<<<<"
+    + "1500000035USA5609165M0811150<<<<<<<<<<<<<<08";
+
+  private static final String MRZ_FRANK_AMOSS_2LINE_ID3 =
+      "P<USAAMOSS<<FRANK<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    + "0000780043USA5001013M1511169100000000<381564";
+
+  private static final String MRZ_LORENA_FERNANDEZ_2LINE_ID3 =
+      "P<ARGFERNANDEZ<<LORENA<<<<<<<<<<<<<<<<<<<<<<"
+    + "00000000A0ARG7903122F081210212300004<<<<<<86";
+
+  private static final String MRZ_KWOK_SUM_CHNCHUNG_2LINE_ID3 =
+      "P<CHNCHUNG<<KWOK<SUM<<<<<<<<<<<<<<<<<<<<<<<<"
+    + "K123455994CHN8008080F1702057HK8888888<<<<<36";
 
   private static final String[] MRZ_SAMPLES = { MRZ_ANNA_ERIKSSON_2LINE_ID3,
       MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT,
@@ -332,27 +360,11 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
-  public void testConcreteMRZ() {
-    //		String str = /* ... concrete test MRZ here ...*/
-    //
-    //		LOGGER.info("DEBUG: str.length() = " + str.length());
-    //		MRZInfo mrz = new MRZInfo(str);
-    //		testToString(mrz, str);
-    //		
-    //		LOGGER.info("DoB = " + mrz.getDateOfBirth());
-    //		LOGGER.info("DoE = " + mrz.getDateOfExpiry());
-    //		LOGGER.info("First names = " + mrz.getSecondaryIdentifier().replace("<", " ").trim());
-    //		LOGGER.info("Last name = " + mrz.getPrimaryIdentifier().replace("<", " ").trim());
-    //		LOGGER.info("Doc num = " + mrz.getDocumentNumber() + " (length = " + mrz.getDocumentNumber().length() + ")");
-    //		LOGGER.info("Personal num = " + mrz.getPersonalNumber());
-  }
-
   public void testNationality() {
     testNationality(MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT, Country.getInstance("NL"));
     testNationality(MRZ_HAPPY_TRAVELER_2LINE_ID3, Country.getInstance("US"));
     testNationality(MRZ_CHRISTIAN_MUSTERMAN_2LINE_ID3, ICAOCountry.DE);
     testNationality(MRZ_ANNA_ERIKSSON_2LINE_ID3, TestCountry.UT);
-    // testNationality(MRZ_SUSANNA_SAMPLE_3LINE_ID1, ISOCountry.GB);
   }
 
   public void testNationality(String mrz, Country expectedCountry) {
@@ -366,24 +378,34 @@ public class MRZInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
-//  public void testSeanOfSITA() {
-//    try {
-//      new MRZInfo("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204159<<<<<<<6");
-//    } catch (Exception e) {
-//      LOGGER.log(Level.WARNING, "Unexpected exception", e);
-//      fail(e.getMessage());
-//    }
-//  }
 
   public void testArnjlotMalaysia() {
     String anonymizedSample =
         "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
-            + "A984726053MYS8709125M2204134880811055050<<52";
+      + "A984726053MYS8709125M2204134880811055050<<52";
 
     MRZInfo mrzInfo = new MRZInfo(anonymizedSample);
     assertEquals("ABC DEFG HIJKLMNOP QRS TUV XYZABCDEFGHI", mrzInfo.getPrimaryIdentifier());
     assertEquals("", mrzInfo.getSecondaryIdentifier());
+  }
+
+  public void testArnjlotLongPrimaryIdenfitier() {
+    String sampleWithLongPrimaryIdentifier =
+        "P<MYSMEGAN<ELLA<RUTH<BIN<ISMAELAR<EZZAHUDDIN"
+      + "A001122338MYS0911267M2010153<<<<<<<<<<<<<<<8";
+
+    try {
+      MRZInfo mrzInfo = new MRZInfo(sampleWithLongPrimaryIdentifier);
+
+      assertEquals("MEGAN ELLA RUTH BIN ISMAELAR EZZAHUDDIN", mrzInfo.getPrimaryIdentifier());
+      assertEquals("", mrzInfo.getSecondaryIdentifier());
+
+      String mrzAsString = mrzInfo.toString();
+      assertEquals(sampleWithLongPrimaryIdentifier, mrzAsString.replace("\n", ""));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
   }
 
   public static MRZInfo createTestObject() {
