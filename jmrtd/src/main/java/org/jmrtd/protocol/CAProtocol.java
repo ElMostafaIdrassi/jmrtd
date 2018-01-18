@@ -124,7 +124,6 @@ public class CAProtocol {
 
       /* Generate the inspection system's ephemeral key pair. */
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER); // FIXME: Shouldn't we use "EC" instead of "ECDH"?
-      LOGGER.info("DEBUG: ====> keyPairGenerator.getProvider() = " + keyPairGenerator.getProvider());
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
