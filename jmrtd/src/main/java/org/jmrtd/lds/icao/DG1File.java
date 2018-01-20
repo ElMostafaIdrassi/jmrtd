@@ -61,17 +61,17 @@ public class DG1File extends DataGroup {
   /**
    * Creates a new file based on an input stream.
    *
-   * @param in an input stream
+   * @param inputStream an input stream
    *
    * @throws IOException if something goes wrong
    */
-  public DG1File(InputStream in) throws IOException {
-    super(EF_DG1_TAG, in);
+  public DG1File(InputStream inputStream) throws IOException {
+    super(EF_DG1_TAG, inputStream);
   }
 
   @Override
-  protected void readContent(InputStream in) throws IOException {
-    TLVInputStream tlvIn = in instanceof TLVInputStream ? (TLVInputStream)in : new TLVInputStream(in);
+  protected void readContent(InputStream inputStream) throws IOException {
+    TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     tlvIn.skipToTag(MRZ_INFO_TAG);
     int length = tlvIn.readLength();
     this.mrzInfo = new MRZInfo(tlvIn, length);

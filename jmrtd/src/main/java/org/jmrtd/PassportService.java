@@ -443,7 +443,7 @@ public class PassportService extends PassportAPDUService {
    *
    * @throws PACEException on error
    */
-  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid,  AlgorithmParameterSpec params) throws PACEException {
+  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
     state = State.PACE_AUTHENTICATED_STATE;

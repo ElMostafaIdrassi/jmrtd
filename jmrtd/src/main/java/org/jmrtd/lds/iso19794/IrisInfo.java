@@ -100,22 +100,38 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /** Constant for horizontal and veritical orientation, based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int ORIENTATION_UNDEF = 0;
+
+  /** Constant for horizontal and veritical orientation, based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int ORIENTATION_BASE = 1;
+
+  /** Constant for horizontal and veritical orientation, based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int ORIENTATION_FLIPPED = 2;
 
   /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int SCAN_TYPE_UNDEF = 0;
+
+  /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int SCAN_TYPE_PROGRESSIVE = 1;
+
+  /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int SCAN_TYPE_INTERLACE_FRAME = 2;
+
+  /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int SCAN_TYPE_INTERLACE_FIELD = 3;
+
+  /** Scan type (rectilinear only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int SCAN_TYPE_CORRECTED = 4;
 
   /** Iris occlusion (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int IROCC_UNDEF = 0;
+
+  /** Iris occlusion (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int IROCC_PROCESSED = 1;
 
   /** Iris occlusion filling (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int IROCC_ZEROFILL = 0;
+
+  /** Iris occlusion filling (polar only), based on Table 2 in Section 5.5 in ISO 19794-6. */
   public static final int IROC_UNITFILL = 1;
 
   /* TODO: reference to specification. */
@@ -131,7 +147,8 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   private long recordLength;
 
-  private int captureDeviceId; /* 16 bit */
+  /* 16 bit */
+  private int captureDeviceId;
 
   private int horizontalOrientation;
   private int verticalOrientation;
@@ -595,7 +612,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     IrisInfo other = (IrisInfo) obj;
     if (sbh == null) {
       if (other.sbh != null) {

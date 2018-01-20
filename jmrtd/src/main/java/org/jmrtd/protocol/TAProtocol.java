@@ -160,7 +160,7 @@ public class TAProtocol {
       CVCPrincipal firstCertAuthorityReference = firstCert.getAuthorityReference();
       if (caReference != null && !caReference.equals(firstCertAuthorityReference)) {
         throw new CardServiceException("First certificate not signed by expected CA, found "
-            + firstCertAuthorityReference.getName() + ",  expected " + caReference.getName());
+            + firstCertAuthorityReference.getName() + ", expected " + caReference.getName());
       }
       if (caReference == null) {
         caReference = firstCertAuthorityReference;

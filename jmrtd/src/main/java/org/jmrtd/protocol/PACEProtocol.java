@@ -1012,7 +1012,7 @@ public class PACEProtocol {
   }
 
   public static byte[] computeKeySeedForPACE(String cardAccessNumber) throws GeneralSecurityException {
-    return Util.computeKeySeed(cardAccessNumber,  "SHA-1", false);
+    return Util.computeKeySeed(cardAccessNumber, "SHA-1", false);
   }
 
   /**

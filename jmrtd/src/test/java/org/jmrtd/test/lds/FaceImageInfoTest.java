@@ -176,7 +176,7 @@ public class FaceImageInfoTest extends TestCase {
       int imageDataType = FaceImageInfo.IMAGE_DATA_TYPE_JPEG;	
       FeaturePoint[] featurePoints = new FeaturePoint[0];
       FaceImageInfo imageInfo = new FaceImageInfo(
-          gender,  eyeColor, hairColor,
+          gender, eyeColor, hairColor,
           featureMask,
           expression,
           poseAngle, poseAngleUncertainty,

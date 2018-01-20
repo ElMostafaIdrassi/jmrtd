@@ -466,7 +466,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @return the ssc as a 16 byte array
    */
-  private byte[] getSSCAsBytes(long ssc) {
+  private static byte[] getSSCAsBytes(long ssc) {
     try {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(16);
       byteArrayOutputStream.write(0x00);

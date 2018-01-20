@@ -105,7 +105,7 @@ public class DG12File extends DataGroup {
       byte[] imageOfRear, Date dateAndTimeOfPersonalization,
       String personalizationSystemSerialNumber) {
     this(issuingAuthority, new SimpleDateFormat(SDF).format(dateOfIssue),
-        namesOfOtherPersons,  endorsementsAndObservations,
+        namesOfOtherPersons, endorsementsAndObservations,
         taxOrExitRequirements, imageOfFront,
         imageOfRear, new SimpleDateFormat(SDTF).format(dateAndTimeOfPersonalization),
         personalizationSystemSerialNumber);

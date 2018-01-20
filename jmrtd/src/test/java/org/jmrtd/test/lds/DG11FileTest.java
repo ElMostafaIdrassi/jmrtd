@@ -219,7 +219,7 @@ public class DG11FileTest extends TestCase {
     List<String> otherValidTDNumbers = new ArrayList<String>();
     String custodyInformation = "";
     return new DG11File(nameOfHolder, otherNames, personalNumber,
-        fullDateOfBirth, placeOfBirth,  permanentAddress,
+        fullDateOfBirth, placeOfBirth, permanentAddress,
         telephone, profession, title,
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
@@ -242,7 +242,7 @@ public class DG11FileTest extends TestCase {
     List<String> otherValidTDNumbers = new ArrayList<String>();
     String custodyInformation = "";
     return new DG11File(nameOfHolder, otherNames, personalNumber,
-        fullDateOfBirth, placeOfBirth,  permanentAddress,
+        fullDateOfBirth, placeOfBirth, permanentAddress,
         telephone, profession, title,
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);

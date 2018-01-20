@@ -70,6 +70,9 @@ import net.sf.scuba.util.Hex;
  */
 class PassportAPDUService extends CardService {
 
+  /** Shared secret type for non-PACE key. */
+  public static final byte NO_PACE_KEY_REFERENCE = 0x00;
+  
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte MRZ_PACE_KEY_REFERENCE = 0x01;
 

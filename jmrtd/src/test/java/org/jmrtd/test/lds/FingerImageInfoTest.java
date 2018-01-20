@@ -186,8 +186,8 @@ public class FingerImageInfoTest extends TestCase {
       else if (WSQ_MIME_TYPE.equals(mimeType)) {compressionType = FingerInfo.COMPRESSION_WSQ; }
       else if (JPEG2000_MIME_TYPE.equals(mimeType) || JPEG2000_ALT_MIME_TYPE.equals(mimeType)) {compressionType = FingerInfo.COMPRESSION_JPEG2000; }
 
-      FingerImageInfo imageInfo = new FingerImageInfo(position, viewCount,  viewNumber,  quality,  impressionType,
-          width,  height, new ByteArrayInputStream(imageBytes), imageBytes.length, compressionType);
+      FingerImageInfo imageInfo = new FingerImageInfo(position, viewCount, viewNumber, quality, impressionType,
+          width, height, new ByteArrayInputStream(imageBytes), imageBytes.length, compressionType);
 
       return imageInfo;
     } catch (IOException ioe) {

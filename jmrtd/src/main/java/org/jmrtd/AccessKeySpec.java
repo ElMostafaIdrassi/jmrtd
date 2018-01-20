@@ -34,6 +34,12 @@ import java.security.spec.KeySpec;
  */
 public interface AccessKeySpec extends Serializable, KeySpec {
   
+  /**
+   * Returns the type of access key.
+   * Typical values are {@code "BAC"}, and {@code "PACE"}.
+   * 
+   * @return the type of access key
+   */
   String getAlgorithm();
   
 }

@@ -49,13 +49,19 @@ public interface ISO781611 {
    * Difference between primitive/constructed.
    */
 
-  /**
-   * From ISO7816-11: Secure Messaging Template tags.
-   */
+  /** From ISO7816-11: Secure Messaging Template tag. */
   static final int SMT_TAG = 0x7D;
+
+  /** From ISO7816-11: Secure Messaging Template tag. */
   static final int SMT_DO_PV = 0x81;
+
+  /** From ISO7816-11: Secure Messaging Template tag. */
   static final int SMT_DO_CG = 0x85;
+
+  /** From ISO7816-11: Secure Messaging Template tag. */
   static final int SMT_DO_CC = 0x8E;
+
+  /** From ISO7816-11: Secure Messaging Template tag. */
   static final int SMT_DO_DS = 0x9E;
 
   /**

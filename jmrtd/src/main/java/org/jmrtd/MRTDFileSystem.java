@@ -347,7 +347,7 @@ class MRTDFileSystem implements FileSystemStructured {
      * Adds a fragment of bytes at a specific offset to this file.
      *
      * @param offset the offset
-     * @param bytes the bytes
+     * @param bytes the bytes to be added
      */
     public void addFragment(int offset, byte[] bytes) {
       buffer.addFragment(offset, bytes);

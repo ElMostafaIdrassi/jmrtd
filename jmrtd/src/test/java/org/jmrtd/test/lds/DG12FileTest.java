@@ -25,7 +25,6 @@ package org.jmrtd.test.lds;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,8 +40,6 @@ import net.sf.scuba.util.Hex;
 public class DG12FileTest extends TestCase {
 
   Logger LOGGER = Logger.getLogger("org.jmrtd");
-
-  private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
 
   public DG12FileTest(String name) {
     super(name);
@@ -63,10 +60,9 @@ public class DG12FileTest extends TestCase {
       if (dg12File == null) {
         fail("Input file is null");
       }
-      
+
       byte[] encoded = dg12File.getEncoded();
       assertNotNull(encoded);
-      //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encoded));
 
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
       DG12File copy = new DG12File(in);
@@ -180,7 +176,7 @@ public class DG12FileTest extends TestCase {
 
     return new DG12File(issuingAuthority, dateOfIssue, namesOfOtherPersons,
         endorseMentsAndObservations, taxOrExitRequirements, imageOfFront,
-        imageOfRear,  dateAndTimeOfPersonalization,
+        imageOfRear, dateAndTimeOfPersonalization,
         personalizationSystemSerialNumber);
   }
 
@@ -199,7 +195,7 @@ public class DG12FileTest extends TestCase {
 
     return new DG12File(issuingAuthority, dateOfIssue, namesOfOtherPersons,
         endorseMentsAndObservations, taxOrExitRequirements, imageOfFront,
-        imageOfRear,  dateAndTimeOfPersonalization,
+        imageOfRear, dateAndTimeOfPersonalization,
         personalizationSystemSerialNumber);
   }
 

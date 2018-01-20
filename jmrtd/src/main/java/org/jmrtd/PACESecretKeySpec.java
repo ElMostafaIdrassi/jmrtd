@@ -25,7 +25,7 @@ package org.jmrtd;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * A key for PACE.
+ * A secret key for PACE.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -39,16 +39,38 @@ public class PACESecretKeySpec extends SecretKeySpec implements AccessKeySpec {
 
   private byte keyReference;
 
+  /**
+   * Constructs a secret key from the given byte array, using the first {@code len}
+   * bytes of {@code key}, starting at {@code offset} inclusive.
+   * 
+   * @param key the key bytes
+   * @param offset the offset with {@code key}
+   * @param len the length of the key within {@code key}
+   * @param algorithm the name of the secret-key algorithm to be associated with the given key material
+   * @param paceKeyReference a reference specifying the type of key from BSI TR-03110 (Appendix B)
+   */
   public PACESecretKeySpec(byte[] key, int offset, int len, String algorithm, byte paceKeyReference) {
     super(key, offset, len, algorithm);
     this.keyReference = paceKeyReference;
   }
 
+  /**
+   * Constructs a secret key from the given byte array.
+   * 
+   * @param key the key bytes
+   * @param algorithm the name of the secret-key algorithm to be associated with the given key material
+   * @param paceKeyReference a reference specifying the type of key from BSI TR-03110 (Appendix B)
+   */
   public PACESecretKeySpec(byte[] key, String algorithm, byte paceKeyReference) {
     super(key, algorithm);
     this.keyReference = paceKeyReference;
   }
 
+  /**
+   * Returns reference specifying the type of key from BSI TR-03110 (Appendix B).
+
+   * @return a key reference
+   */
   public byte getKeyReference() {
     return keyReference;
   }
