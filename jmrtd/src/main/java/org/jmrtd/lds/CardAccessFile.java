@@ -96,8 +96,8 @@ public class CardAccessFile implements Serializable {
   /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
   protected void writeContent(OutputStream outputStream) throws IOException {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    for (SecurityInfo si : securityInfos) {
-      vector.add(si.getDERObject());
+    for (SecurityInfo securityInfo: securityInfos) {
+      vector.add(securityInfo.getDERObject());
     }
     ASN1Set derSet = new DLSet(vector);
     outputStream.write(derSet.getEncoded(ASN1Encoding.DER));

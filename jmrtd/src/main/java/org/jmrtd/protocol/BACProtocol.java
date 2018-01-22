@@ -50,6 +50,7 @@ public class BACProtocol {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private PassportService service;
+  
   private Random random;
 
   /**
@@ -126,7 +127,7 @@ public class BACProtocol {
     SecretKey ksMac = Util.deriveKey(keySeed, Util.MAC_MODE);
     long ssc = computeSendSequenceCounter(rndICC, rndIFD);
 
-    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, ssc);
+    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, service.getMaxTranceiveLength(), true, ssc);
   }
 
   public static byte[] computeKeySeedForBAC(BACKeySpec bacKey) throws GeneralSecurityException {

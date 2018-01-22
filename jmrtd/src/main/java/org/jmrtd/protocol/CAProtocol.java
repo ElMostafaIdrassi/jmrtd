@@ -135,7 +135,7 @@ public class CAProtocol {
 
       byte[] sharedSecret = computeSharedSecret(agreementAlg, piccPublicKey, pcdPrivateKey);
 
-      wrapper = restartSecureMessaging(oid, sharedSecret);
+      wrapper = restartSecureMessaging(oid, sharedSecret, service.getMaxTranceiveLength());
 
       return new CAResult(keyId, piccPublicKey, keyHash, pcdPublicKey, pcdPrivateKey, wrapper);
     } catch (GeneralSecurityException e) {
@@ -200,12 +200,13 @@ public class CAProtocol {
    *
    * @param oid the Chip Authentication object identifier
    * @param sharedSecret the shared secret
+   * @param maxTranceiveLength the maximum APDU tranceive length
    *
    * @return the secure messaging wrapper
    *
    * @throws GeneralSecurityException on error
    */
-  public static SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret) throws GeneralSecurityException {
+  public static SecureMessagingWrapper restartSecureMessaging(String oid, byte[] sharedSecret, int maxTranceiveLength) throws GeneralSecurityException {
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
     int keyLength = ChipAuthenticationInfo.toKeyLength(oid);
 
@@ -214,10 +215,9 @@ public class CAProtocol {
     SecretKey ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE);
 
     if (cipherAlg.startsWith("DESede")) {
-      return new DESedeSecureMessagingWrapper(ksEnc, ksMac, 0L);
+      return new DESedeSecureMessagingWrapper(ksEnc, ksMac, maxTranceiveLength, true, 0L);
     } else if (cipherAlg.startsWith("AES")) {
-      long ssc = 0L; // wrapper == null ? 0L : wrapper.getSendSequenceCounter();
-      return new AESSecureMessagingWrapper(ksEnc, ksMac, ssc);
+      return new AESSecureMessagingWrapper(ksEnc, ksMac, maxTranceiveLength, true, 0L);
     } else {
       throw new IllegalStateException("Unsupported cipher algorithm " + cipherAlg);
     }

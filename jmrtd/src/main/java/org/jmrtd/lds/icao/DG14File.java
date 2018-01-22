@@ -114,7 +114,7 @@ public class DG14File extends DataGroup {
   @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    for (SecurityInfo securityInfo : securityInfos) {
+    for (SecurityInfo securityInfo: securityInfos) {
       ASN1Primitive derObject = securityInfo.getDERObject();
       vector.add(derObject);
     }
@@ -132,7 +132,7 @@ public class DG14File extends DataGroup {
   @Deprecated
   public List<TerminalAuthenticationInfo> getTerminalAuthenticationInfos() {
     List<TerminalAuthenticationInfo> terminalAuthenticationInfos = new ArrayList<TerminalAuthenticationInfo>();
-    for (SecurityInfo securityInfo : securityInfos) {
+    for (SecurityInfo securityInfo: securityInfos) {
       if (securityInfo instanceof TerminalAuthenticationInfo) {
         terminalAuthenticationInfos.add((TerminalAuthenticationInfo)securityInfo);
       }
@@ -150,7 +150,7 @@ public class DG14File extends DataGroup {
   @Deprecated
   public List<ChipAuthenticationInfo> getChipAuthenticationInfos() {
     List<ChipAuthenticationInfo> map = new ArrayList<ChipAuthenticationInfo>();
-    for (SecurityInfo securityInfo : securityInfos) {
+    for (SecurityInfo securityInfo: securityInfos) {
       if (securityInfo instanceof ChipAuthenticationInfo) {
         ChipAuthenticationInfo chipAuthNInfo = (ChipAuthenticationInfo)securityInfo;
         map.add(chipAuthNInfo);
@@ -191,7 +191,7 @@ public class DG14File extends DataGroup {
   @Deprecated
   public List<ActiveAuthenticationInfo> getActiveAuthenticationInfos() {
     List<ActiveAuthenticationInfo> resultList = new ArrayList<ActiveAuthenticationInfo>();
-    for (SecurityInfo securityInfo : securityInfos) {
+    for (SecurityInfo securityInfo: securityInfos) {
       if (securityInfo instanceof ActiveAuthenticationInfo) {
         ActiveAuthenticationInfo activeAuthenticationInfo = (ActiveAuthenticationInfo)securityInfo;
         resultList.add(activeAuthenticationInfo);

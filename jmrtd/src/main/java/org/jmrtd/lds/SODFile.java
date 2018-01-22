@@ -247,7 +247,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   public Map<Integer, byte[]> getDataGroupHashes() {
     DataGroupHash[] hashObjects = getLDSSecurityObject(signedData).getDatagroupHash();
     Map<Integer, byte[]> hashMap = new TreeMap<Integer, byte[]>(); /* HashMap... get it? :D (not funny anymore, now that it's a TreeMap.) */
-    for (DataGroupHash hashObject : hashObjects) {
+    for (DataGroupHash hashObject: hashObjects) {
       int number = hashObject.getDataGroupNumber();
       byte[] hashValue = hashObject.getDataGroupHashValue().getOctets();
       hashMap.put(number, hashValue);

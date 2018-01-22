@@ -639,7 +639,8 @@ public class Util {
   }
 
   /**
-   * The public key algorithm (like RSA or) with some extra information (like 1024 bits).
+   * Return detailed information about the given public key (like RSA or) with some extra
+   * information (like 1024 bits).
    *
    * @param publicKey a public key
    *
@@ -675,6 +676,13 @@ public class Util {
     return algorithm;
   }
 
+  /**
+   * Returns detailed algorithm information (including key length) about the given private key.
+   * 
+   * @param privateKey a private key
+   * 
+   * @return detailed information about the given private key
+   */
   public static String getDetailedPrivateKeyAlgorithm(PrivateKey privateKey) {
     if (privateKey == null) {
       return "null";

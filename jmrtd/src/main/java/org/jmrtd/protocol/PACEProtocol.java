@@ -303,11 +303,11 @@ public class PACEProtocol {
      *  - The new session keys and the new SSC are used to protect subsequent commands/responses.
      */
     try {
+      long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
       if (cipherAlg.startsWith("DESede")) {
-        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
+        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), true, 0L);
       } else if (cipherAlg.startsWith("AES")) {
-        long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
-        wrapper = new AESSecureMessagingWrapper(encKey, macKey, ssc);
+        wrapper = new AESSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), true, ssc);
       } else {
         LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }

@@ -311,8 +311,8 @@ public class CardSecurityFile implements Serializable {
   private static ContentInfo toContentInfo(String contentTypeOID, Collection<SecurityInfo> securityInfos) {
     try {
       ASN1EncodableVector vector = new ASN1EncodableVector();
-      for (SecurityInfo si : securityInfos) {
-        vector.add(si.getDERObject());
+      for (SecurityInfo securityInfo: securityInfos) {
+        vector.add(securityInfo.getDERObject());
       }
       ASN1Set derSet = new DLSet(vector);
 

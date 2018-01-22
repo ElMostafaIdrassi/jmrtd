@@ -125,7 +125,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     public abstract int toInt();
 
     static EyeColor toEyeColor(int i) {
-      for (EyeColor c : EyeColor.values()) {
+      for (EyeColor c: EyeColor.values()) {
         if (c.toInt() == i) {
           return c;
         }
@@ -640,7 +640,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     if (featurePoints == null || featurePoints.length == 0) {
       out.append("   (none)\n");
     } else {
-      for (FeaturePoint featurePoint : featurePoints) {
+      for (FeaturePoint featurePoint: featurePoints) {
         out.append("   ").append(featurePoint.toString()).append("\n");
       }
     }
@@ -722,7 +722,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /* Feature Point(s) (optional) (8 * featurePointCount) */
-    for (FeaturePoint fp : featurePoints) {
+    for (FeaturePoint fp: featurePoints) {
       dataOut.writeByte(fp.getType());
       dataOut.writeByte((fp.getMajorCode() << 4) | fp.getMinorCode());
       dataOut.writeShort(fp.getX());

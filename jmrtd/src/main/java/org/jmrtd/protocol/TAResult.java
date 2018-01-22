@@ -72,8 +72,8 @@ public class TAResult implements Serializable {
       String documentNumber, byte[] cardChallenge) {
     this.chipAuthenticationResult = caResult;
     this.caReference = caReference;
-    for (CardVerifiableCertificate c : terminalCertificates) {
-      this.terminalCertificates.add(c);
+    for (CardVerifiableCertificate terinalCertificate: terminalCertificates) {
+      this.terminalCertificates.add(terinalCertificate);
     }
     this.terminalKey = terminalKey;
     this.documentNumber = documentNumber;

@@ -62,10 +62,12 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
   private SecretKey ksEnc;
   private SecretKey ksMac;
+  
   private transient Cipher sscIVCipher;
   private transient Cipher cipher;
   private transient Mac mac;
 
+  /** The send sequence counter. */
   private long ssc;
 
   /**
@@ -80,6 +82,24 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
    */
   public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
+    this(ksEnc, ksMac, 256, true, ssc);
+  }
+  
+  /**
+   * Constructs a secure messaging wrapper based on the secure messaging
+   * session keys and the initial value of the send sequence counter.
+   * Used in BAC and EAC 1.
+   *
+   * @param ksEnc the session key for encryption
+   * @param ksMac the session key for macs
+   * @param maxTranceiveLength the maximum tranceive length, typical values are 256 or 65536
+   * @param shouldCheckMAC a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs
+   * @param ssc the initial value of the send sequence counter
+   *
+   * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
+   */
+  public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, int maxTranceiveLength, boolean shouldCheckMAC, long ssc) throws GeneralSecurityException {
+    super(maxTranceiveLength, shouldCheckMAC);
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
     this.ssc = ssc;
@@ -132,9 +152,8 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     try {
       byte[] rapdu = responseAPDU.getBytes();
       if (rapdu.length == 2) {
-        // no sense in unwrapping - card indicates some kind of error
+        // No sense in unwrapping - card indicates some kind of error.
         throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
-        /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
       }
       return new ResponseAPDU(unwrapResponseAPDU(rapdu));
     } catch (GeneralSecurityException gse) {
@@ -342,11 +361,11 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       if (!checkMac(rapdu, cc)) {
         throw new IllegalStateException("Invalid MAC");
       }
-      ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-      bOut.write(data, 0, data.length);
-      bOut.write((sw & 0xFF00) >> 8);
-      bOut.write(sw & 0x00FF);
-      return bOut.toByteArray();
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      byteArrayOutputStream.write(data, 0, data.length);
+      byteArrayOutputStream.write((sw & 0xFF00) >> 8);
+      byteArrayOutputStream.write(sw & 0x00FF);
+      return byteArrayOutputStream.toByteArray();
     } finally {
       /*
        * If we fail to unwrap, at least make sure we have the same counter
@@ -422,16 +441,17 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    */
   private byte[] readDO8E(DataInputStream inputStream) throws IOException {
     int length = inputStream.readUnsignedByte();
-    if (length != 8) {
-      throw new IllegalStateException("DO'8E wrong length " + length);
+    if (length != 8 && length != 16) {
+      throw new IllegalStateException("DO'8E wrong length for MAC: " + length);
     }
-    byte[] cc1 = new byte[8];
-    inputStream.readFully(cc1);
-    return cc1;
+    byte[] cc = new byte[length];
+    inputStream.readFully(cc);
+    return cc;
   }
 
-  private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
-    return true; // FIXME: Note this will be a 16 byte Mac?
+  private boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
+//    LOGGER.info("DEBUG: shouldCheckMAC(" + Hex.bytesToHexString(rapdu) + ", " + Hex.bytesToHexString(cc));
+    return true;
   }
 
   /**

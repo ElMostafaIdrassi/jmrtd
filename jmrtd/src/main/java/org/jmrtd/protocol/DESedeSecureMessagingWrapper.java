@@ -70,13 +70,13 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
 
   private SecretKey ksEnc;
   private SecretKey ksMac;
+  
   private transient Cipher cipher;
   private transient Mac mac;
 
+  /** The send sequence counter. */
   private long ssc;
-
-  private boolean shouldCheckMAC;
-
+  
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys. The initial value of the send sequence counter is set to
@@ -88,7 +88,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @throws GeneralSecurityException
    *             when the available JCE providers cannot provide the necessary
    *             cryptographic primitives
-   *             ("DESede/CBC/Nopadding" Cipher, "ISO9797Alg3Mac" Mac).
+   *             ({@code "DESede/CBC/Nopadding"} Cipher, {@code "ISO9797Alg3Mac"} Mac).
    */
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac) throws GeneralSecurityException {
     this(ksEnc, ksMac, true);
@@ -97,19 +97,19 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys. The initial value of the send sequence counter is set to
-   * <code>0L</code>.
+   * {@code 0L}.
    *
    * @param ksEnc the session key for encryption
    * @param ksMac the session key for macs
-   * @param doCheckMAC whether to check the MAC when unwrapping response APDUs
+   * @param shouldCheckMAC a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs
    *
    * @throws GeneralSecurityException
    *             when the available JCE providers cannot provide the necessary
    *             cryptographic primitives
-   *             ("DESede/CBC/Nopadding" Cipher, "ISO9797Alg3Mac" Mac).
+   *             ({@code "DESede/CBC/Nopadding"} Cipher, {@code "ISO9797Alg3Mac"} Mac).
    */
-  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC) throws GeneralSecurityException {
-    this(ksEnc, ksMac, doCheckMAC, 0L);
+  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean shouldCheckMAC) throws GeneralSecurityException {
+    this(ksEnc, ksMac, 256, shouldCheckMAC, 0L);
   }
 
   /**
@@ -126,7 +126,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    *
    */
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
-    this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", true, ssc);
+    this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", 256, true, ssc);
   }
 
   /**
@@ -136,27 +136,34 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    *
    * @param ksEnc the session key for encryption
    * @param ksMac the session key for macs
-   * @param doCheckMAC whether to check the MAC when unwrapping response APDUs
+   * @param maxTranceiveLength the maximum tranceive length, typical values are 256 or 65536
+   * @param shouldCheckMAC a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs
    * @param ssc the initial value of the send sequence counter
    *
    * @throws NoSuchPaddingException when the available JCE providers cannot provide the necessary cryptographic primitives
    * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
    *
    */
-  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, boolean doCheckMAC, long ssc) throws GeneralSecurityException {
-    this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", doCheckMAC, ssc);
+  public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, int maxTranceiveLength, boolean shouldCheckMAC, long ssc) throws GeneralSecurityException {
+    this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", maxTranceiveLength, shouldCheckMAC, ssc);
   }
 
-  private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, boolean doCheckMAC, long ssc) throws GeneralSecurityException {
+  private DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, String cipherAlg, String macAlg, int maxTranceiveLength, boolean shouldCheckMAC, long ssc) throws GeneralSecurityException {
+    super(maxTranceiveLength, shouldCheckMAC);
     this.ksEnc = ksEnc;
     this.ksMac = ksMac;
-    this.shouldCheckMAC = doCheckMAC;
     this.ssc = ssc;
 
     cipher = Util.getCipher(cipherAlg);
     mac = Util.getMac(macAlg);
   }
   
+  /**
+   * Returns the type of secure messaging wrapper.
+   * In this case {@code "DESede"} will be returned.
+   * 
+   * @return the type of secure messaging wrapper
+   */
   public String getType() {
     return "DESede";
   }
@@ -351,10 +358,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
 
-    return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
-
-    /* FIXME: If extended length APDUs are supported (they must for EAC, that 256 should be 65536). See bug #26 in SF bugtracker. -- MO */
-    // new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
+    return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, getMaxTranceiveLength());
   }
 
   /**
@@ -403,7 +407,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
     } finally {
       inputStream.close();
     }
-    if (shouldCheckMAC && !checkMac(rapdu, cc, ssc)) {
+    if (shouldCheckMAC() && !checkMac(rapdu, cc, ssc)) {
       throw new IllegalStateException("Invalid MAC");
     }
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -414,11 +418,9 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /*
-   *
    * The SM Data Objects (see [ISO/IEC 7816-4]) MUST be used in the following order:
    *   - Command APDU: [DO‘85’ or DO‘87’] [DO‘97’] DO‘8E’.
    *   - Response APDU: [DO‘85’ or DO‘87’] [DO‘99’] DO‘8E’.
-   *
    */
 
   /**

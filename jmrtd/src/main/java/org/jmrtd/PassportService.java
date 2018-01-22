@@ -211,6 +211,12 @@ public class PassportService extends PassportAPDUService {
   /** The default maximal blocksize used for unencrypted APDUs. */
   public static final int DEFAULT_MAX_BLOCKSIZE = 224;
 
+  /** The normal maximal tranceive length of APDUs. */
+  public static final int NORMAL_MAX_TRANCEIVE_LENGTH = 256;
+
+  /** The extended maximal tranceive length of APDUs. */
+  public static final int EXTENDED_MAX_TRANCEIVE_LENGTH = 65536;
+  
   /**
    * The file read block size, some passports cannot handle large values
    */
@@ -231,51 +237,20 @@ public class PassportService extends PassportAPDUService {
 
   private SecureMessagingWrapper wrapper;
 
+  private int maxTranceiveSize;
+  
   private boolean isICAOAppletSelected;
   
   private MRTDFileSystem rootFileSystem;
+  
   private MRTDFileSystem icaoFileSystem;
-
-  /**
-   * Creates a new passport service for accessing the passport.
-   *
-   * @param service another service which will deal with sending the apdus to the card
-   *
-   * @throws CardServiceException
-   *             when the available JCE providers cannot provide the necessary
-   *             cryptographic primitives:
-   *             <ul>
-   *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
-   *                 <li>Mac: "ISO9797Alg3Mac"</li>
-   *             </ul>
-   */
-  public PassportService(CardService service) throws CardServiceException {
-    this(service, DEFAULT_MAX_BLOCKSIZE);
-  }
-
-  /**
-   * Creates a new passport service for accessing the passport.
-   *
-   * @param service another service which will deal with sending the APDUs to the card
-   * @param maxBlockSize maximum size for plain text APDUs
-   *
-   * @throws CardServiceException
-   *             when the available JCE providers cannot provide the necessary
-   *             cryptographic primitives:
-   *             <ul>
-   *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
-   *                 <li>Mac: "ISO9797Alg3Mac"</li>
-   *             </ul>
-   */
-  public PassportService(CardService service, int maxBlockSize) throws CardServiceException {
-    this(service, maxBlockSize, false);
-  }
   
   /**
    * Creates a new passport service for accessing the passport.
    *
    * @param service another service which will deal with sending the APDUs to the card
-   * @param maxBlockSize maximum size for plain text APDUs
+   * @param maxTranceiveSize maximum length for APDUs
+   * @param maxBlockSize maximum buffer size for plain text APDUs
    * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
    *
    * @throws CardServiceException
@@ -286,8 +261,9 @@ public class PassportService extends PassportAPDUService {
    *                 <li>Mac: "ISO9797Alg3Mac"</li>
    *             </ul>
    */
-  public PassportService(CardService service, int maxBlockSize, boolean isSFIEnabled) throws CardServiceException {
+  public PassportService(CardService service, int maxTranceiveSize, int maxBlockSize, boolean isSFIEnabled) throws CardServiceException {
     super(service);
+    this.maxTranceiveSize = maxTranceiveSize;
     this.maxBlockSize = maxBlockSize;
     this.rootFileSystem = new MRTDFileSystem(this, isSFIEnabled);
     this.icaoFileSystem = new MRTDFileSystem(this, isSFIEnabled);
@@ -568,6 +544,10 @@ public class PassportService extends PassportAPDUService {
     }
   }
 
+  public int getMaxTranceiveLength() {
+    return maxTranceiveSize;
+  }
+  
   /**
    * Gets the wrapper. Returns {@code null} until access control has been performed.
    *

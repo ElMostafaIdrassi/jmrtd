@@ -176,7 +176,7 @@ public class TAProtocol {
       CardVerifiableCertificate terminalCert = lastCert;
 
       /* Have the MRTD check our chain. */
-      for (CardVerifiableCertificate cert : terminalCertificates) {
+      for (CardVerifiableCertificate cert: terminalCertificates) {
         try {
           CVCPrincipal authorityReference = cert.getAuthorityReference();
 
