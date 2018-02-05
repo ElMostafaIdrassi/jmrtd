@@ -35,12 +35,13 @@ import javax.crypto.SecretKey;
 
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.PACEKeySpec;
+import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.MappingType;
 import org.jmrtd.protocol.AESSecureMessagingWrapper;
+import org.jmrtd.protocol.PACEMappingResult;
 import org.jmrtd.protocol.PACEResult;
-import org.jmrtd.protocol.PACEResult.PACEMappingResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import junit.framework.TestCase;
@@ -64,7 +65,7 @@ public class PACEResultTest extends TestCase {
 
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
 
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
       MappingType mappingType = PACEInfo.toMappingType(oid);
       String agreementType = PACEInfo.toKeyAgreementAlgorithm(oid);
@@ -102,7 +103,7 @@ public class PACEResultTest extends TestCase {
 
         KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
 
-        SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), 0L);
+        SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
         MappingType mappingType = PACEInfo.toMappingType(oid);
         String agreementType = PACEInfo.toKeyAgreementAlgorithm(oid);

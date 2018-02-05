@@ -169,13 +169,13 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * Wraps the APDU buffer <code>capdu</code> of a command APDU.
+   * Wraps the APDU buffer of a command APDU.
    * As a side effect, this method increments the internal send
    * sequence counter maintained by this wrapper.
    *
    * @param commandAPDU buffer containing the command APDU
    *
-   * @return length of the command apdu after wrapping
+   * @return length of the command APDU after wrapping
    */
   public CommandAPDU wrap(CommandAPDU commandAPDU) {
     ssc++;
@@ -189,7 +189,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * Unwraps the apdu buffer <code>rapdu</code> of a response apdu.
+   * Unwraps the APDU buffer of a response APDU.
    *
    * @param responseAPDU the response APDU
    *
@@ -286,7 +286,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @param commandAPDU the command APDU
    * @param ssc the send sequence counter which, is assumed, has already been increased
    *
-   * @return a byte array containing the wrapped apdu buffer
+   * @return a byte array containing the wrapped APDU buffer
    */
   private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU, long ssc) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();

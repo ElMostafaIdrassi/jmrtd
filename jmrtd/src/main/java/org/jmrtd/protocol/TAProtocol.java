@@ -24,11 +24,15 @@ package org.jmrtd.protocol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.util.List;
+
+import javax.crypto.interfaces.DHPublicKey;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
@@ -55,10 +59,16 @@ public class TAProtocol {
   private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-  
+
   private PassportService service;
   private SecureMessagingWrapper wrapper;
 
+  /**
+   * Creates a protocol instance.
+   * 
+   * @param service the card service for APDU communication
+   * @param wrapper the secure messaging wrapper
+   */
   public TAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
@@ -67,55 +77,64 @@ public class TAProtocol {
   /*
    * From BSI-03110 v1.1, B.2:
    *
-   * <pre> The following sequence of commands SHALL be used to implement Terminal
-   * Authentication: 1. MSE:Set DST 2. PSO:Verify Certificate 3. MSE:Set AT 4. Get
-   * Challenge 5. External Authenticate Steps 1 and 2 are repeated for every CV
-   * certificate to be verified (CVCA Link Certificates, DV Certificate, IS
-   * Certificate). </pre>
+   * <pre>
+   * The following sequence of commands SHALL be used to implement Terminal
+   * Authentication:
+   *    1. MSE:Set DST
+   *    2. PSO:Verify Certificate
+   *    3. MSE:Set AT
+   *    4. Get Challenge
+   *    5. External Authenticate
+   *    
+   * Steps 1 and 2 are repeated for every CV certificate to be verified
+   * (CVCA Link Certificates, DV Certificate, IS Certificate).
+   * </pre>
    */
+
   /**
    * Perform TA (Terminal Authentication) part of EAC (version 1). For details see
    * TR-03110 ver. 1.11. In short, we feed the sequence of terminal certificates
    * to the card for verification, get a challenge from the card, sign it with
    * terminal private key, and send back to the card for verification.
    *
-   * @param caReference
-   *            reference issuer
-   * @param terminalCertificates
-   *            terminal certificate chain
-   * @param terminalKey
-   *            terminal private key
-   * @param taAlg
-   *            algorithm
-   * @param chipAuthenticationResult
-   *            the chip authentication result
-   * @param documentNumber
-   *            the document number
+   * @param caReference reference issuer
+   * @param terminalCertificates terminal certificate chain
+   * @param terminalKey terminal private key
+   * @param taAlg  algorithm
+   * @param chipAuthenticationResult the chip authentication result
+   * @param documentNumber the document number from which the chip key hash will be derived
    *
-   * @return the challenge from the card
+   * @return the Terminal Authentication result
    *
-   * @throws CardServiceException
-   *             on error
+   * @throws CardServiceException on error
    */
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber)
-      throws CardServiceException {
-    byte[] idPICC = new byte[documentNumber.length() + 1];
-    try {
-      System.arraycopy(documentNumber.getBytes("ISO-8859-1"), 0, idPICC, 0, documentNumber.length());
-    } catch (UnsupportedEncodingException e) {
-      /* NOTE: Never happens, ISO-8859-1 is supported. */
-      throw new CardServiceException("Unsupported encoding", e);
-    }
-    idPICC[idPICC.length - 1] = (byte)MRZInfo.checkDigit(documentNumber);
+      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
+    byte[] idPICC = deriveIdentifier(documentNumber);
     return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
   }
 
+  /**
+   * Perform TA (Terminal Authentication) part of EAC (version 1). For details see
+   * TR-03110 ver. 1.11. In short, we feed the sequence of terminal certificates
+   * to the card for verification, get a challenge from the card, sign it with
+   * terminal private key, and send back to the card for verification.
+   *
+   * @param caReference reference issuer
+   * @param terminalCertificates terminal certificate chain
+   * @param terminalKey terminal private key
+   * @param taAlg  algorithm
+   * @param chipAuthenticationResult the chip authentication result
+   * @param paceResult the PACE result from which the chip key hash will be derived
+   *
+   * @return the Terminal Authentication result
+   *
+   * @throws CardServiceException on error
+   */
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult)
-      throws CardServiceException {
+      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
     try {
-      byte[] idPICC = Util.getKeyHash(paceResult.getAgreementAlg(), paceResult.getPICCPublicKey());
+      byte[] idPICC = deriveIdentifier(paceResult);
       return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
     } catch (NoSuchAlgorithmException e) {
       throw new CardServiceException("No such algorithm", e);
@@ -236,9 +255,7 @@ public class TAProtocol {
 
       String sigAlg = terminalCert.getSigAlgName();
       if (sigAlg == null) {
-        throw new IllegalStateException(
-            "ERROR: Could not determine signature algorithm for terminal certificate "
-                + terminalCert.getHolderReference().getName());
+        throw new IllegalStateException("Could not determine signature algorithm for terminal certificate " + terminalCert.getHolderReference().getName());
       }
       Signature sig = Signature.getInstance(sigAlg, BC_PROVIDER);
       sig.initSign(terminalKey);
@@ -256,6 +273,47 @@ public class TAProtocol {
     } catch (Exception e) {
       throw new CardServiceException("Exception", e);
     }
+  }
+
+  private static byte[] deriveIdentifier(String documentNumber) {
+    int documentNumberLength = documentNumber.length();
+    byte[] idPICC = new byte[documentNumberLength + 1];
+    try {
+      System.arraycopy(documentNumber.getBytes("ISO-8859-1"), 0, idPICC, 0, documentNumberLength);
+      idPICC[documentNumberLength] = (byte)MRZInfo.checkDigit(documentNumber);
+      return idPICC;
+    } catch (UnsupportedEncodingException e) {
+      /* NOTE: Never happens, ISO-8859-1 is always supported. */
+      throw new IllegalStateException("Unsupported encoding", e);      
+    }
+  }
+
+  private static byte[] deriveIdentifier(PACEResult paceResult) throws NoSuchAlgorithmException {
+    String agreementAlg = paceResult.getAgreementAlg();
+    PublicKey pcdPublicKey = paceResult.getPICCPublicKey();
+    if ("DH".equals(agreementAlg)) {
+      /* TODO: this is probably wrong, what should be hashed? */
+      MessageDigest md = MessageDigest.getInstance("SHA-1");
+      return md.digest(getKeyData(agreementAlg, pcdPublicKey));
+    } else if ("ECDH".equals(agreementAlg)) {
+      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
+      byte[] t = Util.i2os(pcdECPublicKey.getQ().getAffineXCoord().toBigInteger());
+      return Util.alignKeyDataToSize(t, (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0)); // TODO: Interop Ispra for SecP521r1 20170925.
+    }
+
+    throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + agreementAlg);
+  }
+
+  private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
+    if ("DH".equals(agreementAlg)) {
+      DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
+      return pcdDHPublicKey.getY().toByteArray();
+    } else if ("ECDH".equals(agreementAlg)) {
+      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
+      return pcdECPublicKey.getQ().getEncoded(false);
+    }
+
+    throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
 }
 

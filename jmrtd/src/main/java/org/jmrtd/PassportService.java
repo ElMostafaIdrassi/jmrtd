@@ -437,7 +437,7 @@ public class PassportService extends PassportAPDUService {
    * @param publicKeyOID the object identifier indicating the public key algorithm used
    * @param publicKey passport's public key (stored in DG14)
    *
-   * @return the chip authentication result
+   * @return the Chip Authentication result
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
@@ -476,7 +476,7 @@ public class PassportService extends PassportAPDUService {
    * @param chipAuthenticationResult the chip authentication result
    * @param documentNumber the document number
    *
-   * @return the challenge from the card
+   * @return the Terminal Authentication result
    *
    * @throws CardServiceException on error
    */
@@ -502,7 +502,7 @@ public class PassportService extends PassportAPDUService {
    * @param chipAuthenticationResult the chip authentication result
    * @param paceResult the PACE result
    *
-   * @return the challenge from the card
+   * @return the Terminal Authentication result
    *
    * @throws CardServiceException on error
    */
@@ -555,16 +555,6 @@ public class PassportService extends PassportAPDUService {
    */
   public APDUWrapper getWrapper() {
     return wrapper;
-  }
-
-  /**
-   * @deprecated hack
-   *
-   * @param wrapper wrapper
-   */
-  @Deprecated
-  public void setWrapper(SecureMessagingWrapper wrapper) {
-    this.wrapper = wrapper;
   }
 
   /**

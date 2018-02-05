@@ -40,6 +40,5 @@ public interface AccessKeySpec extends Serializable, KeySpec {
    * 
    * @return the type of access key
    */
-  String getAlgorithm();
-  
+  String getAlgorithm(); 
 }

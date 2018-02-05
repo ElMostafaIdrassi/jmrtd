@@ -137,17 +137,15 @@ public class TAResult implements Serializable {
   }
 
   /**
-   * Gets a textual representation of this terminal authentication result.
+   * Returns a textual representation of this terminal authentication result.
    *
    * @return a textual representation of this terminal authentication result
    */
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    result.append("TAResult [chipAuthenticationResult: " + chipAuthenticationResult + ", ");
-    //    	result.append("cardKey = " + cardKey + ", ");
-    //    	result.append("keyPair = " + keyPair + ", ");
-    result.append("caReference: " + caReference + ", ");
+    result.append("TAResult [chipAuthenticationResult: " + chipAuthenticationResult).append(", ");
+    result.append("caReference: " + caReference).append(", ");
     result.append("terminalCertificates: [");
     boolean isFirst = true;
     for (CardVerifiableCertificate cert: terminalCertificates) {
@@ -158,9 +156,9 @@ public class TAResult implements Serializable {
       }
       result.append(toString(cert));
     }
-    result.append("terminalKey = " + Util.getDetailedPrivateKeyAlgorithm(terminalKey) + ", ");
-    result.append("documentNumber = " + documentNumber + ", ");
-    result.append("cardChallenge = " + Hex.bytesToHexString(cardChallenge) + ", ");
+    result.append("terminalKey = ").append(Util.getDetailedPrivateKeyAlgorithm(terminalKey)).append(", ");
+    result.append("documentNumber = ").append(documentNumber).append(", ");
+    result.append("cardChallenge = ").append(Hex.bytesToHexString(cardChallenge)).append(", ");
     result.append("]");
     return result.toString();
   }

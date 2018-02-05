@@ -37,11 +37,12 @@ import javax.crypto.SecretKey;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKey;
 import org.jmrtd.PACEKeySpec;
+import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo.MappingType;
 import org.jmrtd.protocol.AESSecureMessagingWrapper;
 import org.jmrtd.protocol.PACECAMResult;
-import org.jmrtd.protocol.PACEResult.PACEMappingResult;
+import org.jmrtd.protocol.PACEMappingResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import junit.framework.TestCase;
@@ -71,7 +72,7 @@ public class PACECAMResultTest extends TestCase {
 
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
 
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
       byte[] chipAuthenticationData = new byte[8]; // FIXME: Generate randomly.
 
@@ -122,7 +123,7 @@ public class PACECAMResultTest extends TestCase {
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
       
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
       
       byte[] chipAuthenticationData = new byte[8]; // FIXME: Generate randomly.

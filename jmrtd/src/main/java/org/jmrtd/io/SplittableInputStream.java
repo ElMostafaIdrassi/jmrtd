@@ -50,6 +50,11 @@ public class SplittableInputStream extends InputStream {
     this.carrier = inputStreamBuffer.getInputStream();
   }
 
+  /**
+   * Updates this stream's buffer based on some other stream's buffer.
+   *
+   * @param other the other stream
+   */
   public void updateFrom(SplittableInputStream other) {
     inputStreamBuffer.updateFrom(other.inputStreamBuffer);
   }
@@ -58,6 +63,7 @@ public class SplittableInputStream extends InputStream {
    * Gets a copy of the inputstream positioned at <code>position</code>.
    *
    * @param position a position between <code>0</code> and {@link #getPosition()}
+   * 
    * @return a fresh input stream
    */
   public InputStream getInputStream(int position) {
@@ -74,9 +80,9 @@ public class SplittableInputStream extends InputStream {
   }
 
   /**
-   * The position of the input stream (the number of bytes read since this input stream was constructed)
+   * Returns the position within the input stream (the number of bytes read since this input stream was constructed)
    *
-   * @return the position of this input stream
+   * @return the position within this input stream
    */
   public int getPosition() {
     return carrier.getPosition();
@@ -91,8 +97,9 @@ public class SplittableInputStream extends InputStream {
    * or an exception is thrown.
    *
    * @return     the next byte of data, or <code>-1</code> if the end of the
-   *             stream is reached.
-   * @exception  IOException  if an I/O error occurs.
+   *             stream is reached
+   *             
+   * @throws IOException if an I/O error occurs
    */
   @Override
   public int read() throws IOException {
@@ -108,9 +115,11 @@ public class SplittableInputStream extends InputStream {
    * The actual number of bytes skipped is returned.  If <code>n</code> is
    * negative, no bytes are skipped.
    *
-   * @param n the number of bytes to be skipped.
-   * @return the actual number of bytes skipped.
-   * @throws IOException if the stream does not support seek, or if some other I/O error occurs.
+   * @param n the number of bytes to be skipped
+   * 
+   * @return the actual number of bytes skipped
+   * 
+   * @throws IOException if the stream does not support seek, or if some other I/O error occurs
    */
   @Override
   public long skip(long n) throws IOException {
@@ -125,8 +134,9 @@ public class SplittableInputStream extends InputStream {
    * many bytes will not block, but may read or skip fewer bytes.
    *
    * @return an estimate of the number of bytes that can be read (or skipped
-   *         over) from this input stream without blocking or {@code 0} when
-   *         it reaches the end of the input stream.
+   *         over) from this input stream without blocking or <code>0</code> when
+   *         it reaches the end of the input stream
+   *         
    * @throws IOException on error
    */
   @Override
@@ -162,9 +172,9 @@ public class SplittableInputStream extends InputStream {
    * remember any data at all if more than <code>readlimit</code> bytes are
    * read from the stream before <code>reset</code> is called.</p>
    *
-   * @param   readlimit   the maximum limit of bytes that can be read before the mark position becomes invalid.
+   * @param readlimit the maximum limit of bytes that can be read before the mark position becomes invalid
    *
-   * @see     java.io.InputStream#reset()
+   * @see java.io.InputStream#reset()
    */
   @Override
   public synchronized void mark(int readlimit) {
@@ -208,7 +218,7 @@ public class SplittableInputStream extends InputStream {
    *     to subsequent callers of the <code>read</code> method depend on the
    *     particular type of the input stream. </ul></ul>
    *
-   * @exception  IOException  if this stream has not been marked or if the mark has been invalidated.
+   * @throws IOException if this stream has not been marked or if the mark has been invalidated
    *
    * @see java.io.InputStream#mark(int)
    * @see java.io.IOException
@@ -227,20 +237,31 @@ public class SplittableInputStream extends InputStream {
    * particular input stream instance. The <code>markSupported</code> method
    * of <code>InputStream</code> returns <code>false</code>.
    *
-   * @return  <code>true</code> if this stream instance supports the mark
-   *          and reset methods; <code>false</code> otherwise.
-   * @see     java.io.InputStream#mark(int)
-   * @see     java.io.InputStream#reset()
+   * @return <code>true</code> if this stream instance supports the mark 
+   *          and reset methods and <code>false</code> otherwise
+   *
+   * @see java.io.InputStream#mark(int)
+   * @see java.io.InputStream#reset()
    */
   @Override
   public boolean markSupported() {
     return carrier.markSupported();
   }
 
+  /**
+   * Returns the length of the underlying buffer.
+   * 
+   * @return the length of the underlying buffer
+   */
   public int getLength() {
     return inputStreamBuffer.getLength();
   }
 
+  /**
+   * Returns the number of buffered bytes in the underlying buffer.
+   * 
+   * @return the number of buffered bytes in the underlying buffer
+   */
   public int getBytesBuffered() {
     return inputStreamBuffer.getBytesBuffered();
   }

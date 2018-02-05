@@ -36,6 +36,7 @@ public class PACECAMResult extends PACEResult {
   private static final long serialVersionUID = -4288710920347109329L;
 
   private byte[] encryptedChipAuthenticationData;
+  
   private byte[] chipAuthenticationData;
 
   public PACECAMResult(AccessKeySpec paceKey,

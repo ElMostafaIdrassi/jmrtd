@@ -29,6 +29,7 @@ import javax.crypto.SecretKey;
 
 import org.jmrtd.BACKey;
 import org.jmrtd.BACKeySpec;
+import org.jmrtd.PassportService;
 import org.jmrtd.protocol.BACResult;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
@@ -48,7 +49,7 @@ public class BACResultTest extends TestCase {
 
   public void testBACResult() {
     try {
-      BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(getRandomDESedeKey(), getRandomDESedeKey()));
+      BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(getRandomDESedeKey(), getRandomDESedeKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L));
       BACKeySpec bacKey = bacResult.getBACKey();
       assertNotNull(bacKey);
       assertEquals(new BACKey("123456789", "700101", "171108"), bacKey);
@@ -65,8 +66,8 @@ public class BACResultTest extends TestCase {
     try {
       SecretKey encKey = getRandomDESedeKey();
       SecretKey macKey = getRandomDESedeKey();
-      BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(encKey, macKey));
-      BACResult anotherBACResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(encKey, macKey));
+      BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L));
+      BACResult anotherBACResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L));
       assertEquals(bacResult.hashCode(), anotherBACResult.hashCode());
       assertEquals(bacResult, anotherBACResult);
       assertEquals(bacResult.toString(), anotherBACResult.toString());

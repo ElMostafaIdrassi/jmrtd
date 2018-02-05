@@ -43,7 +43,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     try {
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 256, true, 0L);
 
       assertEquals(encKey, wrapper.getEncryptionKey());
       assertEquals(macKey, wrapper.getMACKey());
@@ -56,7 +56,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     try {
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 256, true, 0L);
       SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
       assertEquals(wrapper.hashCode(), anotherWrapper.hashCode());
       assertEquals(wrapper, anotherWrapper);
@@ -70,7 +70,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     try {
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 256, true, 0L);
 
       CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x00, 0x00, new byte[] { 0x3F, 0x00 }, 0x00);
       CommandAPDU wrappedCommandAPDU = wrapper.wrap(commandAPDU);

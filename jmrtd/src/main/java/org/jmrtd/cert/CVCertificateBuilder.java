@@ -92,20 +92,28 @@ public class CVCertificateBuilder {
 
   private static org.ejbca.cvc.AuthorizationRoleEnum getRole(Role role) {
     switch (role) {
-      case CVCA: return org.ejbca.cvc.AuthorizationRoleEnum.CVCA;
-      case DV_D: return org.ejbca.cvc.AuthorizationRoleEnum.DV_D;
-      case DV_F: return org.ejbca.cvc.AuthorizationRoleEnum.DV_F;
-      case IS: return org.ejbca.cvc.AuthorizationRoleEnum.IS;
+      case CVCA:
+        return org.ejbca.cvc.AuthorizationRoleEnum.CVCA;
+      case DV_D:
+        return org.ejbca.cvc.AuthorizationRoleEnum.DV_D;
+      case DV_F:
+        return org.ejbca.cvc.AuthorizationRoleEnum.DV_F;
+      case IS:
+        return org.ejbca.cvc.AuthorizationRoleEnum.IS;
     }
     throw new NumberFormatException("Cannot decode role " + role);
   }
 
   private static org.ejbca.cvc.AccessRightEnum getAccessRight(Permission accessRight) {
     switch (accessRight) {
-      case READ_ACCESS_NONE: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_NONE;
-      case READ_ACCESS_DG3: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3;
-      case READ_ACCESS_DG4: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG4;
-      case READ_ACCESS_DG3_AND_DG4: return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3_AND_DG4;
+      case READ_ACCESS_NONE:
+        return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_NONE;
+      case READ_ACCESS_DG3:
+        return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3;
+      case READ_ACCESS_DG4:
+        return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG4;
+      case READ_ACCESS_DG3_AND_DG4:
+        return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3_AND_DG4;
     }
     throw new NumberFormatException("Cannot decode access right " + accessRight);
   }

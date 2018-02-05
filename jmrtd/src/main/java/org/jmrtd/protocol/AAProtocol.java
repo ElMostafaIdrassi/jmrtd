@@ -43,6 +43,12 @@ public class AAProtocol {
 
   private SecureMessagingWrapper wrapper;
 
+  /**
+   * Creates a protocol instance
+   * 
+   * @param service the service for APDU communication
+   * @param wrapper the secure messaging wrapper
+   */
   public AAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;

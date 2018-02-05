@@ -76,18 +76,6 @@ class MRTDFileSystem implements FileSystemStructured {
    * Creates a file system.
    *
    * @param service the card service
-   * 
-   * @deprecated Use the constructor with explicit short file identifier preference parameter
-   */
-  @Deprecated
-  public MRTDFileSystem(PassportService service) {
-    this(service, false);
-  }
-
-  /**
-   * Creates a file system.
-   *
-   * @param service the card service
    * @param isSFIEnabled whether the file system should use short file identifiers in READ BINARY commands
    */
   public MRTDFileSystem(PassportService service, boolean isSFIEnabled) {

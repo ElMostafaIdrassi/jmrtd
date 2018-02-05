@@ -33,7 +33,6 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
@@ -1152,34 +1151,6 @@ public class Util {
     BigInteger h = BigInteger.valueOf(params.getCofactor());
     byte[] seed = params.getCurve().getSeed();
     return new ECDomainParameters(curve, g, n, h, seed);
-  }
-
-  public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
-    if ("DH".equals(agreementAlg)) {
-      /* TODO: this is probably wrong, what should be hashed? */
-      MessageDigest md = MessageDigest.getInstance("SHA-1");
-      md = MessageDigest.getInstance("SHA-1");
-      return md.digest(getKeyData(agreementAlg, pcdPublicKey));
-    } else if ("ECDH".equals(agreementAlg)) {
-      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      byte[] t = Util.i2os(pcdECPublicKey.getQ().getAffineXCoord().toBigInteger());
-      return Util.alignKeyDataToSize(t, (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0)); // TODO: Interop Ispra for SecP521r1 20170925.
-//      return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
-    }
-
-    throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + agreementAlg);
-  }
-
-  public static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
-    if ("DH".equals(agreementAlg)) {
-      DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
-      return pcdDHPublicKey.getY().toByteArray();
-    } else if ("ECDH".equals(agreementAlg)) {
-      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      return pcdECPublicKey.getQ().getEncoded(false);
-    }
-
-    throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
 
   /* Get standard crypto primitives from default provider or (if that fails) from BC. */

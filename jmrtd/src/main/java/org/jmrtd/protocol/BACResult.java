@@ -26,6 +26,13 @@ import java.io.Serializable;
 
 import org.jmrtd.BACKeySpec;
 
+/**
+ * Result of a Basic Access Control protocol run.
+ * 
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ */
 public class BACResult implements Serializable {
 
   private static final long serialVersionUID = -7114911372181772099L;
@@ -33,27 +40,53 @@ public class BACResult implements Serializable {
   private BACKeySpec bacKey;
   private SecureMessagingWrapper wrapper;
 
+  /**
+   * Creates a BAC result without specifying the initial access key.
+   * 
+   * @param wrapper the secure messaging wrapper that resulted from the BAC protocol run
+   */
   public BACResult(SecureMessagingWrapper wrapper) {
     this(null, wrapper);
   }
 
+  /**
+   * Creates a BAC result.
+   * 
+   * @param bacKey the initial access key
+   * @param wrapper the secure messaging wrapper that resulted from the BAC protocol run
+   */  
   public BACResult(BACKeySpec bacKey, SecureMessagingWrapper wrapper) {
     this.bacKey = bacKey;
     this.wrapper = wrapper;
   }
 
+  /**
+   * Returns the initial access key or {@code null}.
+   * 
+   * @return the initial access key or {@code null}
+   */
   public BACKeySpec getBACKey() {
     return bacKey;
   }
 
+  /**
+   * Returns the secure messaging wrapper.
+   * 
+   * @return the secure messaging wrapper
+   */
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }
 
+  /**
+   * Returns a textual representation of this terminal authentication result.
+   *
+   * @return a textual representation of this terminal authentication result
+   */
   @Override
   public String toString() {
     return new StringBuilder()
-        .append("BACResult [bacKey: " + bacKey)
+        .append("BACResult [bacKey: " + (bacKey == null ? "-" : bacKey))
         .append(", wrapper: " + wrapper)
         .append("]")
         .toString();

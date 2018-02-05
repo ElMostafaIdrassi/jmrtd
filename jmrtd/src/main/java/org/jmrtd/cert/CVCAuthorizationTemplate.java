@@ -58,7 +58,7 @@ public class CVCAuthorizationTemplate {
      *
      * @return a bitmap
      */
-    public byte getValue(){
+    public byte getValue() {
       return value;
     }
   }
@@ -78,7 +78,7 @@ public class CVCAuthorizationTemplate {
 
     private byte value;
 
-    private Permission(int value){
+    private Permission(int value) {
       this.value = (byte)value;
     }
 

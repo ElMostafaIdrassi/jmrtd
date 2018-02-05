@@ -49,7 +49,7 @@ public class FragmentBuffer implements Serializable {
    * Creates a fragment buffer.
    */
   public FragmentBuffer() {
-    this(1024);
+    this(2000);
   }
 
   /**

@@ -95,7 +95,7 @@ public class PACESecretKeySpec extends SecretKeySpec implements AccessKeySpec {
       return false;
     }
 
-    PACESecretKeySpec other = (PACESecretKeySpec) obj;
+    PACESecretKeySpec other = (PACESecretKeySpec)obj;
     return keyReference == other.keyReference;
   }
 }

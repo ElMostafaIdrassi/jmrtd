@@ -33,6 +33,7 @@ import java.security.PublicKey;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.protocol.AESSecureMessagingWrapper;
 import org.jmrtd.protocol.CAProtocol;
@@ -67,7 +68,7 @@ public class CAResultTest extends TestCase {
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
       PrivateKey pcdPrivateKey = pcdKeyPair.getPrivate();
       
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       
       CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
       
@@ -97,8 +98,8 @@ public class CAResultTest extends TestCase {
       
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
-      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
-      SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
+      SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
+      SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 256, true, 0L);
       
       CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
       CAResult anotherCAResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);

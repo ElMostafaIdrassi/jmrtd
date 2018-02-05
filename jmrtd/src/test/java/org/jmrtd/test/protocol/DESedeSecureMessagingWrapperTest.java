@@ -32,6 +32,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
@@ -50,7 +51,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     try {
       SecretKey encKey = getRandomDESedeKey();
       SecretKey macKey = getRandomDESedeKey();
-      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
       assertEquals(encKey, wrapper.getEncryptionKey());
       assertEquals(macKey, wrapper.getMACKey());
@@ -63,8 +64,8 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     try {
       SecretKey encKey = getRandomDESedeKey();
       SecretKey macKey = getRandomDESedeKey();
-      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
-      SecureMessagingWrapper anotherWrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
+      SecureMessagingWrapper anotherWrapper = new DESedeSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       assertEquals(wrapper.hashCode(), anotherWrapper.hashCode());
       assertEquals(wrapper, anotherWrapper);
       assertEquals(wrapper.toString(), anotherWrapper.toString());
@@ -77,7 +78,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     try {
       SecretKey encKey = getRandomDESedeKey();
       SecretKey macKey = getRandomDESedeKey();
-      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey);
+      SecureMessagingWrapper wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
       CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x00, 0x00, new byte[] { 0x3F, 0x00 }, 0x00);
       CommandAPDU wrappedCommandAPDU = wrapper.wrap(commandAPDU);

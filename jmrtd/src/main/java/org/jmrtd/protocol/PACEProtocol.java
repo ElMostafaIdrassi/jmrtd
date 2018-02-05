@@ -73,11 +73,6 @@ import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.lds.PACEInfo.MappingType;
-import org.jmrtd.protocol.PACEResult.PACEGMMappingResult;
-import org.jmrtd.protocol.PACEResult.PACEGMWithDHMappingResult;
-import org.jmrtd.protocol.PACEResult.PACEGMWithECDHMappingResult;
-import org.jmrtd.protocol.PACEResult.PACEIMMappingResult;
-import org.jmrtd.protocol.PACEResult.PACEMappingResult;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVInputStream;
@@ -153,28 +148,6 @@ public class PACEProtocol {
     this.service = service;
     this.wrapper = wrapper;
     this.random = new SecureRandom();
-  }
-
-  /**
-   * Performs the PACE 2.0 / SAC protocol.
-   *
-   * @param accessKey the MRZ or CAN based access key
-   * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
-   * @param params explicit static domain parameters the domain params for DH or ECDH
-   *
-   * @return a PACE result
-   *
-   * @throws PACEException on error
-   *
-   * @deprecated Use the variant of this method that takes an AccessKeySpec
-   */
-  @Deprecated
-  public PACEResult doPACE(KeySpec accessKey, String oid, AlgorithmParameterSpec params) throws PACEException {
-    if (!(accessKey instanceof AccessKeySpec)) {
-      throw new IllegalArgumentException("Wrong key type: " + accessKey.getClass().getSimpleName());
-    }
-
-    return doPACE((AccessKeySpec)accessKey, oid, params);
   }
 
   /**
@@ -507,9 +480,11 @@ public class PACEProtocol {
       random.nextBytes(pcdNonce);
 
       byte[] step2Data = TLVUtil.wrapDO(0x81, pcdNonce);
-      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
 
-      /* NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2). */
+      /*
+       * NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2).
+       */
+      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, false);
 
       if ("ECDH".equals(agreementAlg)) {
         AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
@@ -909,8 +884,8 @@ public class PACEProtocol {
     /* 4. */
     BigInteger h2 = x2.modPow(BigInteger.valueOf(3), p).add(a.multiply(x2)).add(b).mod(p);
 
-    /* 5. */
-    BigInteger h3 = x3.modPow(BigInteger.valueOf(3), p).add(a.multiply(x3)).add(b).mod(p);
+    /* 5. (Why are we calculating this?) */
+//    BigInteger h3 = x3.modPow(BigInteger.valueOf(3), p).add(a.multiply(x3)).add(b).mod(p);
 
     /* 6. */
     BigInteger u = t.modPow(BigInteger.valueOf(3), p).multiply(h2).mod(p);

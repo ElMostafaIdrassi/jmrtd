@@ -44,6 +44,11 @@ public class PositionInputStream extends InputStream {
   private long position;
   private long markedPosition;
 
+  /**
+   * Constructs a position input stream by decorating an existing input stream.
+   * 
+   * @param carrier the existing input stream
+   */
   public PositionInputStream(InputStream carrier) {
     this.carrier = carrier;
     position = 0L;
@@ -99,6 +104,11 @@ public class PositionInputStream extends InputStream {
     return carrier.markSupported();
   }
 
+  /**
+   * Returns the position within the input stream.
+   * 
+   * @return the position within the input stream
+   */
   public long getPosition() {
     return position;
   }

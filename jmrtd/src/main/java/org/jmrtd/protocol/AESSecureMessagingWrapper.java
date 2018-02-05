@@ -123,7 +123,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * Wraps the apdu buffer <code>capdu</code> of a command apdu.
+   * Wraps the APDU buffer of a command apdu.
    * As a side effect, this method increments the internal send
    * sequence counter maintained by this wrapper.
    *
@@ -228,7 +228,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param capdu buffer containing the APDU data. It must be large enough to receive the wrapped APDU
    * @param len length of the APDU data
    *
-   * @return a byte array containing the wrapped apdu buffer
+   * @return a byte array containing the wrapped APDU buffer
    */
   private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();
@@ -308,17 +308,17 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     bOut.write(do8E);
     byte[] data = bOut.toByteArray();
 
-    return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
+    return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, getMaxTranceiveLength());
   }
 
   /**
-   * Does the actual decoding of a response apdu. Based on Section E.3 of
+   * Does the actual decoding of a response APDU. Based on Section E.3 of
    * TR-PKI, especially the examples.
    *
-   * @param rapdu buffer containing the apdu data
-   * @param len length of the apdu data
+   * @param rapdu buffer containing the APDU data
+   * @param len length of the APDU data
    *
-   * @return a byte array containing the unwrapped apdu buffer
+   * @return a byte array containing the unwrapped APDU buffer
    */
   private byte[] unwrapResponseAPDU(byte[] rapdu) throws GeneralSecurityException, IOException {
     long oldssc = ssc;
