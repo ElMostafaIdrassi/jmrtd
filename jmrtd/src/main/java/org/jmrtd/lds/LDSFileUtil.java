@@ -25,6 +25,9 @@ package org.jmrtd.lds;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,13 +55,13 @@ import org.jmrtd.lds.icao.DG7File;
 public class LDSFileUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /**
    * Objects of this class should not be constructed.
    */
   private LDSFileUtil() {
   }
-  
+
   /**
    * Factory method for creating LDS files for a given input stream.
    *
@@ -513,7 +516,7 @@ public class LDSFileUtil {
         return "File with FID 0x" + Integer.toHexString(fid);
     }
   }
-  
+
   public static int lookupSFIByFID(short fid) {
     switch(fid) {
       case PassportService.EF_COM:
@@ -609,5 +612,66 @@ public class LDSFileUtil {
       default:
         throw new NumberFormatException("Unknown SFI " + Integer.toHexString(sfi));
     }
+  }
+
+  /**
+   * Returns the data group list from the security object (SOd).
+   * 
+   * @param sodFile the security object
+   * 
+   * @return the list of data group numbers
+   */
+  public static List<Integer> getDataGroupNumbers(SODFile sodFile) {
+    /* Get the list of DGs from EF.SOd, we don't trust EF.COM. */
+    List<Integer> dgNumbers = new ArrayList<Integer>();
+    if (sodFile == null) {
+      return dgNumbers;
+    }
+
+    dgNumbers.addAll(sodFile.getDataGroupHashes().keySet());
+    Collections.sort(dgNumbers); /* NOTE: need to sort it, since we get keys as a set. */
+    return dgNumbers;
+  }
+
+  /**
+   * Returns the data group list from the document index file (COM).
+   * 
+   * @param comFile the document index file
+   * 
+   * @return the list with data group number according to the document index file
+   */
+  public static List<Integer> getDataGroupNumbers(COMFile comFile) {
+    List<Integer> dgNumbers = new ArrayList<Integer>();
+    if (comFile == null) {
+      return dgNumbers;
+    }
+    
+    int[] tagList = comFile.getTagList();
+    dgNumbers.addAll(toDataGroupList(tagList));
+    Collections.sort(dgNumbers); // NOTE: sort it, just in case.
+    return dgNumbers;
+  }
+  
+  /**
+   * Converts a list with ICAO tags into a list of ICAO data group numbers.
+   * 
+   * @param tagList a list of tags specified in ICAO Doc 9303
+   * 
+   * @return the list with data group number according to the security object
+   */
+  private static List<Integer> toDataGroupList(int[] tagList) {
+    if (tagList == null) {
+      return Collections.emptyList();
+    }
+    List<Integer> dgNumberList = new ArrayList<Integer>(tagList.length);
+    for (int tag: tagList) {
+      try {
+        int dgNumber = LDSFileUtil.lookupDataGroupNumberByTag(tag);
+        dgNumberList.add(dgNumber);
+      } catch (NumberFormatException nfe) {
+        LOGGER.log(Level.WARNING, "Could not find DG number for tag: " + Integer.toHexString(tag), nfe);
+      }
+    }
+    return dgNumberList;
   }
 }

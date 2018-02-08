@@ -215,7 +215,7 @@ class PassportAPDUService extends CardService {
    *
    * @throws CardServiceException if tranceiving failed
    */
-  private ResponseAPDU transmit(APDUWrapper wrapper, CommandAPDU commandAPDU) throws CardServiceException {
+  public ResponseAPDU transmit(APDUWrapper wrapper, CommandAPDU commandAPDU) throws CardServiceException {
     CommandAPDU plainCapdu = commandAPDU;
     if (wrapper != null) {
       commandAPDU = wrapper.wrap(commandAPDU);
@@ -361,37 +361,6 @@ class PassportAPDUService extends CardService {
     } else {
       checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
     }
-    return responseData;
-  }
-
-  private byte[] getResponseData(ResponseAPDU responseAPDU, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
-    if (responseAPDU == null) {
-      return null;
-    }
-
-    byte[] responseData = responseAPDU.getData();
-    if (responseData == null) {
-      throw new CardServiceException("Malformed read binary long response data");      
-    }
-    if (!isTLVEncodedOffsetNeeded) {
-      return responseData;
-    }
-
-    /* 
-     * Strip the response off the tag 0x53 and the length field.
-     * FIXME: Use TLVUtil.tlvEncode(...) here. -- MO
-     */
-    byte[] data = responseData;
-    int index = 0;
-    if (data[index++] != (byte)0x53) { // FIXME: Constant for 0x53.
-      throw new CardServiceException("Malformed read binary long response data");
-    }
-    if ((byte)(data[index] & 0x80) == (byte)0x80) {
-      index += (data[index] & 0xF);
-    }
-    index ++;
-    responseData = new byte[data.length - index];
-    System.arraycopy(data, index, responseData, 0, responseData.length);
     return responseData;
   }
     
@@ -826,6 +795,37 @@ class PassportAPDUService extends CardService {
     }
   }
 
+  private byte[] getResponseData(ResponseAPDU responseAPDU, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
+    if (responseAPDU == null) {
+      return null;
+    }
+
+    byte[] responseData = responseAPDU.getData();
+    if (responseData == null) {
+      throw new CardServiceException("Malformed read binary long response data");      
+    }
+    if (!isTLVEncodedOffsetNeeded) {
+      return responseData;
+    }
+
+    /* 
+     * Strip the response off the tag 0x53 and the length field.
+     * FIXME: Use TLVUtil.tlvEncode(...) here. -- MO
+     */
+    byte[] data = responseData;
+    int index = 0;
+    if (data[index++] != (byte)0x53) { // FIXME: Constant for 0x53.
+      throw new CardServiceException("Malformed read binary long response data");
+    }
+    if ((byte)(data[index] & 0x80) == (byte)0x80) {
+      index += (data[index] & 0xF);
+    }
+    index ++;
+    responseData = new byte[data.length - index];
+    System.arraycopy(data, index, responseData, 0, responseData.length);
+    return responseData;
+  }
+  
   /*
    * 0x80 Cryptographic mechanism reference
    * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
