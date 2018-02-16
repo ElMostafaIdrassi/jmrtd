@@ -149,32 +149,48 @@ public class DisplayedImageInfo extends AbstractImageInfo {
   /**
    * As per A1.11.4 in Doc 9303 Part 3 Vol 2:
    *
-   * Displayed Facial Image: ISO 10918, JFIF option
-   * Displayed Finger: ANSI/NIST-ITL 1-2000
-   * Displayed Signature/ usual mark: ISO 10918, JFIF option
+   * <ul>
+   *   <li>Displayed Facial Image: ISO 10918, JFIF option.</li>
+   *   <li>Displayed Finger: ANSI/NIST-ITL 1-2000.</li>
+   *   <li>Displayed Signature/ usual mark: ISO 10918, JFIF option.</li>
+   * </ul>
+   *
+   * @param type the type
+   * 
+   * @return the mime-type
    */
   private static String getMimeTypeFromType(int type) {
     switch (type) {
-      case TYPE_PORTRAIT: return "image/jpeg";
-      case TYPE_FINGER: return "image/x-wsq";
-      case TYPE_SIGNATURE_OR_MARK: return "image/jpeg";
-      default: throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
+      case TYPE_PORTRAIT:
+        return "image/jpeg";
+      case TYPE_FINGER:
+        return "image/x-wsq";
+      case TYPE_SIGNATURE_OR_MARK:
+        return "image/jpeg";
+      default:
+        throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }
   }
 
   private static int getDisplayedImageTagFromType(int type) {
-    switch(type) {
-      case TYPE_PORTRAIT: return DISPLAYED_PORTRAIT_TAG;
-      case TYPE_SIGNATURE_OR_MARK: return DISPLAYED_SIGNATURE_OR_MARK_TAG;
-      default: throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
+    switch (type) {
+      case TYPE_PORTRAIT:
+        return DISPLAYED_PORTRAIT_TAG;
+      case TYPE_SIGNATURE_OR_MARK:
+        return DISPLAYED_SIGNATURE_OR_MARK_TAG;
+      default:
+        throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }
   }
 
   private static int getTypeFromDisplayedImageTag(int tag) {
-    switch(tag) {
-      case DISPLAYED_PORTRAIT_TAG: return ImageInfo.TYPE_PORTRAIT;
-      case DISPLAYED_SIGNATURE_OR_MARK_TAG: return ImageInfo.TYPE_SIGNATURE_OR_MARK;
-      default: throw new NumberFormatException("Unknown tag: " + Integer.toHexString(tag));
+    switch (tag) {
+      case DISPLAYED_PORTRAIT_TAG:
+        return ImageInfo.TYPE_PORTRAIT;
+      case DISPLAYED_SIGNATURE_OR_MARK_TAG:
+        return ImageInfo.TYPE_SIGNATURE_OR_MARK;
+      default:
+        throw new NumberFormatException("Unknown tag: " + Integer.toHexString(tag));
     }
   }
 }

@@ -79,7 +79,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    *
    * @param oid the id_AA identifier
    * @param version has to be 1
-   * @param the signature algorithm OID
+   * @param signatureAlgorithmOID the signature algorithm OID
    */
   ActiveAuthenticationInfo(String oid, int version, String signatureAlgorithmOID) {
     this.oid = oid;

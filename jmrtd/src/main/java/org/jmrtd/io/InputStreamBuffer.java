@@ -264,6 +264,8 @@ public class InputStreamBuffer {
      * If necessary, resets the carrier (which must support mark) and
      * skips to the current position in the buffer.
      *
+     * @param position the position to skip to
+     *
      * @throws IOException on error
      */
     private void syncCarrierPosition(int position) throws IOException {

@@ -225,10 +225,12 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * Does the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
    *
-   * @param capdu buffer containing the APDU data. It must be large enough to receive the wrapped APDU
-   * @param len length of the APDU data
+   * @param commandAPDU buffer containing the APDU data. It must be large enough to receive the wrapped APDU
    *
-   * @return a byte array containing the wrapped APDU buffer
+   * @return the wrapped command APDU
+   * 
+   * @throws GeneralSecurityException on error wrapping the command APDU
+   * @throws IOException on error
    */
   private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();
@@ -319,6 +321,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param len length of the APDU data
    *
    * @return a byte array containing the unwrapped APDU buffer
+   * 
+   * @throws GeneralSecurityException on error unwrapping
+   * @throws IOException on error
    */
   private byte[] unwrapResponseAPDU(byte[] rapdu) throws GeneralSecurityException, IOException {
     long oldssc = ssc;
@@ -379,9 +384,13 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * The <code>0x87</code> tag has already been read.
+   * Reads a data object.
+   * The {@code 0x87} tag has already been read.
    *
-   * @param inputStream inputstream to read from
+   * @param inputStream the stream to read from
+   * @param do85 whether to expect a {@code 0x85} (including an extra 1 length) data object.
+   * 
+   * @return the bytes that were read
    */
   private byte[] readDO87(DataInputStream inputStream, boolean do85) throws IOException, GeneralSecurityException {
     /* Read length... */
@@ -420,24 +429,32 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * The <code>0x99</code> tag has already been read.
+   * Reads a data object.
+   * The {@code 0x99} tag has already been read.
    *
-   * @param in inputstream to read from.
+   * @param inputStream the stream to read from
+   * 
+   * @return the status word
    */
-  private short readDO99(DataInputStream in) throws IOException {
-    int length = in.readUnsignedByte();
+  private short readDO99(DataInputStream inputStream) throws IOException {
+    int length = inputStream.readUnsignedByte();
     if (length != 2) {
       throw new IllegalStateException("DO'99 wrong length");
     }
-    byte sw1 = in.readByte();
-    byte sw2 = in.readByte();
+    byte sw1 = inputStream.readByte();
+    byte sw2 = inputStream.readByte();
     return (short)(((sw1 & 0x000000FF) << 8) | (sw2 & 0x000000FF));
   }
 
   /**
-   * The <code>0x8E</code> tag has already been read.
+   * Reads a data object.
+   * The {@code 0x8E} tag has already been read.
    *
-   * @param inputStream inputstream to read from.
+   * @param inputStream the stream to read from
+   * 
+   * @return the bytes that were read
+   * 
+   * @throws IOException on error
    */
   private byte[] readDO8E(DataInputStream inputStream) throws IOException {
     int length = inputStream.readUnsignedByte();
@@ -449,17 +466,29 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     return cc;
   }
 
+  /**
+   * Checks the message authentication code.
+   * 
+   * @param rapdu the data of a response APDU
+   * @param cc the message authentication code
+   * 
+   * @return a boolean indicating whether the message authentication code was ok
+   * 
+   * @throws GeneralSecurityException on error
+   */
   private boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
 //    LOGGER.info("DEBUG: shouldCheckMAC(" + Hex.bytesToHexString(rapdu) + ", " + Hex.bytesToHexString(cc));
     return true;
   }
 
   /**
-   * Gets the IV by encrypting the SSC.
+   * Returns the IV by encrypting the send sequence counter.
    *
    * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
    *
    * @param ssc the SSC
+   * 
+   * @return the initialization vector specification
    */
   private IvParameterSpec getIV(long ssc) throws IllegalBlockSizeException, BadPaddingException {
     byte[] sscBytes = getSSCAsBytes(ssc);
@@ -468,11 +497,13 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * Gets the IV by encrypting the SSC.
+   * Returns the IV by encrypting the send sequence counter.
    *
    * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
    *
    * @param sscBytes the SSC as blocksize aligned byte array
+   * 
+   * @return the initialization vector specification
    */
   private IvParameterSpec getIV(byte[] sscBytes) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
@@ -482,7 +513,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   /**
    * Gets the SSC as bytes.
    *
-   * @param ssc
+   * @param ssc the send sequence counter
    *
    * @return the ssc as a 16 byte array
    */

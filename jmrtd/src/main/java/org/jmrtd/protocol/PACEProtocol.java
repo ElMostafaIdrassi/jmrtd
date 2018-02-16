@@ -1181,7 +1181,10 @@ public class PACEProtocol {
   /**
    * Checks consistency of input parameters.
    *
-   * @param agreementAlg the agreement algorithm derived from the OID
+   * @param agreementAlg the agreement algorithm derived from the object identifier
+   * @param cipherAlg the cipher algorithm derived from the object identifier
+   * @param digestAlg the digest algorithm derived from the object identifier
+   * @param keyLength the key length algorithm derived from the object identifier
    * @param params the parameters
    */
   private void checkConsistency(String agreementAlg, String cipherAlg, String digestAlg, int keyLength, AlgorithmParameterSpec params) {

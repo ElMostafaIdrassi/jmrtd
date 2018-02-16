@@ -302,6 +302,8 @@ import org.jmrtd.Util;
    *
    * FIXME: Maybe throw an exception instead of issuing warnings
    * on logger if signed attributes do not check out.
+   * 
+   * @param signedData the signed data
    *
    * @return the contents of the security object over which the
    *         signature is to be computed
@@ -341,6 +343,8 @@ import org.jmrtd.Util;
 
   /**
    * Gets the stored signature of the security object.
+   *
+   * @param signedData the signed data
    *
    * @see #getDocSigningCertificate()
    *
@@ -480,9 +484,11 @@ import org.jmrtd.Util;
   }
 
   /**
-   * Gets the common mnemonic string (such as "SHA1", "SHA256withRSA") given an OID.
+   * Returns the common mnemonic string (such as "SHA1", "SHA256withRSA") given an OID.
    *
-   * @param oid an OID
+   * @param oid an object identifier
+   * 
+   * @return a mnemonic string
    *
    * @throws NoSuchAlgorithmException if the provided OID is not yet supported
    */

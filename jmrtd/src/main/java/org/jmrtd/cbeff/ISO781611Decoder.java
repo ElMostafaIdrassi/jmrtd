@@ -157,6 +157,15 @@ public class ISO781611Decoder implements ISO781611 {
   /**
    *  A1, A2, ...
    *  Will contain DOs as described in ISO 7816-11 Annex C.
+   *  
+   *  @param inputStream the stream to read from
+   *  @param bhtTag the tag of the biometric header
+   *  @param bhtLength the length of the header
+   *  @param index the index
+   *  
+   *  @return the standard biometric header
+   *  
+   *  @throws IOException on error reading from the stream
    */
   private StandardBiometricHeader readBHT(InputStream inputStream, int bhtTag, int bhtLength, int index) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);

@@ -539,7 +539,7 @@ public class FingerImageInfo extends AbstractImageInfo {
    * <tr> <td>Left little</td>  <td>22</td>         <td>10</td> </tr>
    * </table>
    *
-   * @param an ISO finger position
+   * @param position an ISO finger position
    *
    * @return an ICAO biometric subtype
    */

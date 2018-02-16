@@ -459,11 +459,13 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   /**
    * Reads the security object (containing the hashes
-   * of the data groups) found in the SignedData field.
+   * of the data groups) found in the {@code SignedData} field.
+   *
+   * @param signedData the signed data to read from
    *
    * @return the security object
    *
-   * @throws IOException
+   * @throws IOException on error parsing the signed data
    */
   private static LDSSecurityObject getLDSSecurityObject(SignedData signedData) {
     try {

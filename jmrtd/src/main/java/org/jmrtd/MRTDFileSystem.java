@@ -129,6 +129,8 @@ class MRTDFileSystem implements FileSystemStructured {
    * @param length the number of bytes to read
    *
    * @return a copy of the bytes read
+   * 
+   * @throws CardServiceException on error
    */
   public synchronized byte[] readBinary(int offset, int length) throws CardServiceException {
     MRTDFileInfo fileInfo = null;

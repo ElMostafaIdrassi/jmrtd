@@ -120,8 +120,6 @@ public class BACKey implements BACKeySpec {
    */
   @Override
   public String toString() {
-    assert(dateOfBirth != null && dateOfBirth.length() == 6);
-    assert(dateOfExpiry != null && dateOfExpiry.length() == 6);
     return documentNumber + ", " + dateOfBirth + ", " + dateOfExpiry;
   }
 

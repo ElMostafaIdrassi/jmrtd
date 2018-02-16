@@ -533,9 +533,13 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    * 4 Compressed, JPEG2000
    * 5 PNG
    *
-   * @param imageDataType
+   * @param imageDataType an image data type constant, one of
+   *        {@code COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING},
+   *        {@code COMPRESSION_UNCOMPRESSED_BIT_PACKED},
+   *        {@code COMPRESSION_WSQ}, {@code COMPRESSION_JPEG},
+   *        {@code COMPRESSION_JPEG2000}, or {@code COMPRESSION_PNG}
    *
-   * @return MIME type string
+   * @return a mime-type string
    */
   static String toMimeType(int imageDataType) {
     switch (imageDataType) {

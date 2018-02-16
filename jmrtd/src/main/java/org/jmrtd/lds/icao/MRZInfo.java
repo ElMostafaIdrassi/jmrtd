@@ -825,6 +825,8 @@ public class MRZInfo extends AbstractLDSInfo {
   /**
    * Reads the issuing state as a three letter string.
    *
+   * @param inputStream the stream to read from
+   *
    * @return a string of length 3 containing an abbreviation
    *         of the issuing state or organization
    *
@@ -860,13 +862,15 @@ public class MRZInfo extends AbstractLDSInfo {
    * the assumption that this is a date in the recent
    * past is made.
    *
+   * @param inputStream the stream to read from
+   *
    * @return the date of birth
    *
    * @throws IOException if something goes wrong
    * @throws NumberFormatException if a data could not be constructed
    */
-  private String readDateOfBirth(DataInputStream in) throws IOException, NumberFormatException {
-    return readString(in, 6);
+  private String readDateOfBirth(DataInputStream inputStream) throws IOException, NumberFormatException {
+    return readString(inputStream, 6);
   }
 
   /**
@@ -875,13 +879,15 @@ public class MRZInfo extends AbstractLDSInfo {
    * the assumption that this is a date in the near
    * future is made.
    *
+   * @param inputStream the stream to read from
+   *
    * @return the date of expiry
    *
    * @throws IOException if something goes wrong
    * @throws NumberFormatException if a date could not be constructed
    */
-  private String readDateOfExpiry(DataInputStream in) throws IOException {
-    return readString(in, 6);
+  private String readDateOfExpiry(DataInputStream inputStream) throws IOException {
+    return readString(inputStream, 6);
   }
 
   /**
@@ -982,8 +988,9 @@ public class MRZInfo extends AbstractLDSInfo {
   /**
    * Replaces '<' with ' ' and trims leading and trailing whitespace.
    *
-   * @param str
-   * @return trimmed string
+   * @param str the string to read from
+   * 
+   * @return a trimmed string
    */
   private static String trimFillerChars(String str) {
     byte[] chars = str.trim().getBytes();
@@ -1044,10 +1051,11 @@ public class MRZInfo extends AbstractLDSInfo {
 
   /**
    * Computes the 7-3-1 check digit for part of the MRZ.
-   * If <code>preferFillerOverZero</code> is <code>true</code> then '<' will be
+   * If {@code preferFillerOverZero} is {@code true} then '<' will be
    * returned on check digit 0.
    *
-   * @param str a part of the MRZ.
+   * @param str a part of the MRZ
+   * @param preferFillerOverZero a boolean indicating whether fillers should be preferred
    *
    * @return the resulting check digit (in '0' - '9', '<')
    */
