@@ -105,7 +105,7 @@ public class CVCAuthorizationTemplate {
     }
 
     /**
-     * Returns the tag as a bitmap
+     * Returns the tag as a bitmap.
      *
      * @return a bitmap
      */

@@ -315,7 +315,6 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * TR-PKI, especially the examples.
    *
    * @param rapdu buffer containing the APDU data
-   * @param len length of the APDU data
    *
    * @return a byte array containing the unwrapped APDU buffer
    * 

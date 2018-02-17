@@ -98,7 +98,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Returns a DER object with this SecurityInfo data (DER sequence)
+   * Returns a DER object with this SecurityInfo data (DER sequence).
    *
    * @return a DER object with this SecurityInfo data
    *
@@ -250,7 +250,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Checks the correctness of the data for this instance of SecurityInfo
+   * Checks the correctness of the data for this instance of {@code SecurityInfo}.
    */
   private void checkFields() {
     try {

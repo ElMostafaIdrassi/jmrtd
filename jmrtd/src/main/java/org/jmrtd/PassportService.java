@@ -218,7 +218,7 @@ public class PassportService extends PassportAPDUService {
   public static final int EXTENDED_MAX_TRANCEIVE_LENGTH = 65536;
   
   /**
-   * The file read block size, some passports cannot handle large values
+   * The file read block size, some passports cannot handle large values.
    */
   private int maxBlockSize;
 

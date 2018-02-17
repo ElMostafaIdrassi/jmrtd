@@ -96,7 +96,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Returns a DER object with this SecurityInfo data (DER sequence)
+   * Returns a DER object with this SecurityInfo data (DER sequence).
    *
    * @return a DER object with this SecurityInfo data
    *
@@ -149,7 +149,8 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Checks the correctness of the data for this instance of SecurityInfo
+   * Checks the correctness of the data for this instance of SecurityInfo.
+   * Throws an {@code IllegalArgumentException} when not correct.
    */
   protected void checkFields() {
     try {

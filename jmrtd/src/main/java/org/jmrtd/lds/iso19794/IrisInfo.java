@@ -439,7 +439,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the horizontal orientation
+   * Returns the horizontal orientation.
    *
    * @return the horizontalOrientation, one of {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
    */
@@ -448,7 +448,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the vertical orientation
+   * Returns the vertical orientation.
    *
    * @return the verticalOrientation, one of {@link #ORIENTATION_UNDEF}, {@link #ORIENTATION_BASE}, or {@link #ORIENTATION_FLIPPED}
    */

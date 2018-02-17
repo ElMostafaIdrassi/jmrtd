@@ -81,7 +81,7 @@ public class TAResult implements Serializable {
   }
 
   /**
-   * Gets the chip authentication result;
+   * Returns the chip authentication result.
    *
    * @return the chip authenticaiton result
    */

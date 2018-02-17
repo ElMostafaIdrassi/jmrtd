@@ -232,9 +232,9 @@ public class COMFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Inserts a tag in a proper place if not already present
+   * Inserts a tag in a proper place if not already present.
    *
-   * @param tag tag to insert
+   * @param tag the tag to insert
    */
   public void insertTag(Integer tag) {
     if (tagList.contains(tag)) {

@@ -70,7 +70,7 @@ public class CAResult implements Serializable {
   }
 
   /**
-   * Gets the ICC's public key identifier
+   * Returns the ICC's public key identifier.
    *
    * @return the key id or -1
    */
@@ -79,7 +79,7 @@ public class CAResult implements Serializable {
   }
 
   /**
-   * Gets the ICC's public key that was used as input to chip authentication protocol
+   * Returns the ICC's public key that was used as input to chip authentication protocol.
    *
    * @return the public key
    */

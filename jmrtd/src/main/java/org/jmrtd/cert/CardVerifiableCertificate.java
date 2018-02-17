@@ -150,9 +150,9 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets the signature algorithm OID
+   * Returns the signature algorithm object identifier.
    *
-   * @return an OID
+   * @return an object identifier
    */
   public String getSigAlgOID() {
     try {

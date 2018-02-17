@@ -527,7 +527,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * The MSE KAT APDU, see EAC 1.11 spec, Section B.1
+   * The MSE KAT APDU, see EAC 1.11 spec, Section B.1.
    *
    * @param wrapper secure messaging wrapper
    * @param keyData key data object (tag 0x91)
@@ -551,7 +551,7 @@ class PassportAPDUService extends CardService {
   }
 
   /**
-   * The MSE DST APDU, see EAC 1.11 spec, Section B.2
+   * The MSE DST APDU, see EAC 1.11 spec, Section B.2.
    *
    * @param wrapper secure messaging wrapper
    * @param data public key reference data object (tag 0x83)

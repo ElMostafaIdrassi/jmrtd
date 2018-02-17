@@ -196,7 +196,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
   }
 
   /**
-   * Gets the standard biometric header of this biometric data block
+   * Returns the standard biometric header of this biometric data block.
    *
    * @return the standard biometric header
    */

@@ -157,7 +157,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Returns the efCVCA file identifier stored in this file, -1 if none
+   * Returns the efCVCA file identifier stored in this file, -1 if none.
    *
    * @return the efCVCA file identifier stored in this file
    */
@@ -167,7 +167,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
 
   /**
    * Returns the efCVCA short file identifier stored in this file, -1 if none
-   * or not present
+   * or not present.
    *
    * @return the efCVCA short file identifier stored in this file
    */
@@ -232,7 +232,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Checks the correctness of the data for this instance of SecurityInfo
+   * Checks the correctness of the data for this instance of {@code SecurityInfo}.
    */
   private void checkFields() {
     try {

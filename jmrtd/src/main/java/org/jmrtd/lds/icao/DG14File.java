@@ -63,7 +63,7 @@ public class DG14File extends DataGroup {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  /** The security infos that make up this file */
+  /** The security infos that make up this file. */
   private Set<SecurityInfo> securityInfos;
 
   /**

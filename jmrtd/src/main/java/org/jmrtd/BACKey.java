@@ -171,14 +171,29 @@ public class BACKey implements BACKeySpec {
     return "BAC";
   }
 
+  /**
+   * Sets the document number.
+   * 
+   * @param documentNumber the document number to set
+   */
   protected void setDocumentNumber(String documentNumber) {
     this.documentNumber = documentNumber;
   }
 
+  /**
+   * Sets the date of birth.
+   * 
+   * @param dateOfBirth the date of birth to set
+   */
   protected void setDateOfBirth(String dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
   }
 
+  /**
+   * Sets the date of expiry.
+   * 
+   * @param dateOfExpiry the date of expiry to set
+   */
   protected void setDateOfExpiry(String dateOfExpiry) {
     this.dateOfExpiry = dateOfExpiry;
   }

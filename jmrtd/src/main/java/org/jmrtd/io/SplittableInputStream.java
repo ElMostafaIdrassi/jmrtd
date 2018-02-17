@@ -80,7 +80,7 @@ public class SplittableInputStream extends InputStream {
   }
 
   /**
-   * Returns the position within the input stream (the number of bytes read since this input stream was constructed)
+   * Returns the position within the input stream (the number of bytes read since this input stream was constructed).
    *
    * @return the position within this input stream
    */

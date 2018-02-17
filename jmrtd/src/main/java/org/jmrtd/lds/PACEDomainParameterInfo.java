@@ -174,9 +174,9 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
 
   /**
-   * Returns a DER object with this SecurityInfo data (DER sequence)
+   * Returns a DER object with this {@code SecurityInfo} data (DER sequence).
    *
-   * @return a DER object with this SecurityInfo data
+   * @return a DER object with this {@code SecurityInfo} data
    *
    * @deprecated Remove this method from visible interface (because of dependency on BC API)
    */

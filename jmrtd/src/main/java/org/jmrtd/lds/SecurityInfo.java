@@ -158,7 +158,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   public static final String ID_PACE_ECDH_CAM_AES_CBC_CMAC_256 = ID_PACE_ECDH_CAM + ".4"; /* 0.4.0.127.0.7.2.2.4.6.4, id-PACE-ECDH-CAM-AES-CBC-CMAC-256 */
 
   /**
-   * Returns a DER object with this SecurityInfo data (DER sequence)
+   * Returns a DER object with this SecurityInfo data (DER sequence).
    *
    * @return a DER object with this SecurityInfo data
    *

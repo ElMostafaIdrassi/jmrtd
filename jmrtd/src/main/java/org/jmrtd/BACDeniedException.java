@@ -52,9 +52,9 @@ public class BACDeniedException extends CardServiceException {
   }
 
   /**
-   * Gets the BAC entries that were tried before BAC failed
+   * Returns the BAC key that was tried before BAC failed.
    *
-   * @return a list
+   * @return a BAC key
    */
   public BACKeySpec getBACKey() {
     return bacKey;

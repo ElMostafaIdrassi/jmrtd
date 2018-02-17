@@ -44,7 +44,7 @@ public class AAProtocol {
   private SecureMessagingWrapper wrapper;
 
   /**
-   * Creates a protocol instance
+   * Creates a protocol instance.
    * 
    * @param service the service for APDU communication
    * @param wrapper the secure messaging wrapper

@@ -32,6 +32,8 @@ import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * ISO 7816-11 encoder for BIR.
+ * 
+ * @param <B> the biometric data block type to use
  *
  * @author The JMRTD team (info@jmrtd.org)
  *

@@ -446,7 +446,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
   }
 
   /**
-   * Gets the standard biometric header of this biometric data block
+   * Returns the standard biometric header of this biometric data block.
    *
    * @return the standard biometric header
    */

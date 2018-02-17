@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import org.jmrtd.PassportService;
 import org.jmrtd.cert.CVCPrincipal;
 
+/* TODO: Use CVCPrincipal instead of String for references? */
 /**
  * File structure for CVCA file (on EAC protected documents).
  *
@@ -37,7 +38,6 @@ import org.jmrtd.cert.CVCPrincipal;
  *
  * @version $Revision$
  */
-/* TODO: Use CVCPrincipal instead of String for references? */
 public class CVCAFile extends AbstractLDSFile {
 
   private static final long serialVersionUID = -1100904058684365703L;
@@ -168,7 +168,7 @@ public class CVCAFile extends AbstractLDSFile {
   }
 
   /**
-   * Returns the CA Certificate identifier
+   * Returns the CA Certificate identifier.
    *
    * @return the CA Certificate identifier
    */

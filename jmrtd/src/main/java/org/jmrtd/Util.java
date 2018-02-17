@@ -142,7 +142,7 @@ public class Util {
   }
 
   /**
-   * Derives the ENC or MAC key for BAC or PACE
+   * Derives the ENC or MAC key for BAC or PACE.
    *
    * @param keySeed the key seed.
    * @param cipherAlgName either AES or DESede
@@ -911,7 +911,7 @@ public class Util {
   }
 
   /**
-   * Reconstructs the public key to use explicit domain params for EC public keys
+   * Reconstructs the public key to use explicit domain params for EC public keys.
    *
    * @param publicKey the public key
    *

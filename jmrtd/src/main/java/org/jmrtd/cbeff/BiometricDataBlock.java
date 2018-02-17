@@ -36,7 +36,7 @@ import java.io.Serializable;
 public interface BiometricDataBlock extends Serializable {
 
   /**
-   * Gets the standard biometric header of this biometric data block
+   * Returns the standard biometric header of this biometric data block.
    *
    * @return the standard biometric header
    */

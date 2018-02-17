@@ -393,9 +393,9 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the date of expiry
+   * Returns the date of expiry.
    *
-   * @return date of expiry
+   * @return the date of expiry
    */
   public String getDateOfExpiry() {
     return dateOfExpiry;
@@ -458,9 +458,9 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the issuing state as a 3 letter code
+   * Returns the issuing state as a 3 letter code.
    *
-   * @return issuing state
+   * @return the issuing state
    */
   public String getIssuingState() {
     return issuingState;
