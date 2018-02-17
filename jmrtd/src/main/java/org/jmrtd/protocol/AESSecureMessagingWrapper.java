@@ -29,13 +29,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -391,6 +388,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param do85 whether to expect a {@code 0x85} (including an extra 1 length) data object.
    * 
    * @return the bytes that were read
+   * 
+   * @throws IOException on error reading from the stream
+   * @throws GeneralSecurityException on error decrypting the data
    */
   private byte[] readDO87(DataInputStream inputStream, boolean do85) throws IOException, GeneralSecurityException {
     /* Read length... */
@@ -435,6 +435,8 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param inputStream the stream to read from
    * 
    * @return the status word
+   * 
+   * @throws IOException on error reading from the stream
    */
   private short readDO99(DataInputStream inputStream) throws IOException {
     int length = inputStream.readUnsignedByte();
@@ -489,8 +491,10 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param ssc the SSC
    * 
    * @return the initialization vector specification
+   * 
+   * @throws GeneralSecurityException on error
    */
-  private IvParameterSpec getIV(long ssc) throws IllegalBlockSizeException, BadPaddingException {
+  private IvParameterSpec getIV(long ssc) throws GeneralSecurityException {
     byte[] sscBytes = getSSCAsBytes(ssc);
     byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
     return new IvParameterSpec(encryptedSSC);
@@ -504,8 +508,10 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param sscBytes the SSC as blocksize aligned byte array
    * 
    * @return the initialization vector specification
+   *
+   * @throws GeneralSecurityException on error
    */
-  private IvParameterSpec getIV(byte[] sscBytes) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+  private IvParameterSpec getIV(byte[] sscBytes) throws GeneralSecurityException {
     byte[] encryptedSSC = sscIVCipher.doFinal(sscBytes);
     return new IvParameterSpec(encryptedSSC);
   }

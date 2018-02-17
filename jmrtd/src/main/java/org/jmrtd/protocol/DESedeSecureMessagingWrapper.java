@@ -29,14 +29,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
@@ -121,9 +119,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @param ksMac the session key for macs
    * @param ssc the initial value of the send sequence counter
    *
-   * @throws NoSuchPaddingException when the available JCE providers cannot provide the necessary cryptographic primitives
-   * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
-   *
+   * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
    */
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", 256, true, ssc);
@@ -140,9 +136,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @param shouldCheckMAC a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs
    * @param ssc the initial value of the send sequence counter
    *
-   * @throws NoSuchPaddingException when the available JCE providers cannot provide the necessary cryptographic primitives
-   * @throws NoSuchAlgorithmException when the available JCE providers cannot provide the necessary cryptographic primitives
-   *
+   * @throws GeneralSecurityException when the available JCE providers cannot provide the necessary cryptographic primitives
    */
   public DESedeSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, int maxTranceiveLength, boolean shouldCheckMAC, long ssc) throws GeneralSecurityException {
     this(ksEnc, ksMac, "DESede/CBC/NoPadding", "ISO9797Alg3Mac", maxTranceiveLength, shouldCheckMAC, ssc);
@@ -287,6 +281,9 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @param ssc the send sequence counter which, is assumed, has already been increased
    *
    * @return a byte array containing the wrapped APDU buffer
+   * 
+   * @throws GeneralSecurityException on error wrapping the APDU
+   * @throws IOException on error writing the result to memory
    */
   private CommandAPDU wrapCommandAPDU(CommandAPDU commandAPDU, long ssc) throws GeneralSecurityException, IOException {
     int lc = commandAPDU.getNc();
@@ -369,6 +366,9 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    * @param ssc the send sequence counter which, it is assumed, has already been incremented by the caller
    *
    * @return a byte array containing the unwrapped APDU buffer
+   * 
+   * @throws GeneralSecurityException on error unwrapping the APDU
+   * @throws IOException on error writing the result to memory
    */
   private ResponseAPDU unwrapResponseAPDU(ResponseAPDU responseAPDU, long ssc) throws GeneralSecurityException, IOException {
     byte[] rapdu = responseAPDU.getBytes();
@@ -424,9 +424,16 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
    */
 
   /**
-   * The <code>0x87</code> tag has already been read.
+   * Reads a data object.
+   * The {@code 0x87} tag has already been read.
    *
-   * @param inputStream inputstream to read from
+   * @param inputStream the stream to read from
+   * @param do85 whether to expect a {@code 0x85} tagged data object
+   * 
+   * @return the data that was read
+   * 
+   * @throws IOException on error reading from the stream
+   * @throws GeneralSecurityException on error decrypting the data
    */
   private byte[] readDO87(DataInputStream inputStream, boolean do85) throws IOException, GeneralSecurityException {
     /* Read length... */
@@ -460,9 +467,14 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * The <code>0x99</code> tag has already been read.
+   * Reads a data object.
+   * The {@code 0x99} tag has already been read.
    *
-   * @param inputStream inputstream to read from.
+   * @param inputStream the stream to read from
+   * 
+   * @return the status word
+   * 
+   * @throws IOException on error reading from the stream
    */
   private short readDO99(DataInputStream inputStream) throws IOException {
     int length = inputStream.readUnsignedByte();
@@ -475,11 +487,16 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * The <code>0x8E</code> tag has already been read.
+   * Reads a data object.
+   * The {@code 0x8E} tag has already been read.
    *
-   * @param inputStream inputstream to read from.
+   * @param inputStream the stream to read from
+   * 
+   * @return the data that was read
+   * 
+   * @throws IOException on error reading from the stream
    */
-  private byte[] readDO8E(DataInputStream inputStream) throws IOException, GeneralSecurityException {
+  private byte[] readDO8E(DataInputStream inputStream) throws IOException {
     int length = inputStream.readUnsignedByte();
     if (length != 8) {
       throw new IllegalStateException("DO'8E wrong length");
@@ -490,11 +507,12 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * Check the MAC.
+   * Checks the MAC.
    *
    * @param rapdu the bytes of the response APDU, including the {@code 0x8E} tag, the length of the MAC, the MAC itself, and the status word
    * @param cc1 the MAC sent by the other party
    * @param ssc the send sequence counter
+   * 
    * @return whether the computed MAC is identical
    *
    * @throws GeneralSecurityException on security related error
