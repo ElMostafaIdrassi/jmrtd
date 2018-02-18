@@ -90,6 +90,17 @@ public class ISO781611Decoder implements ISO781611 {
     return readBITGroup(tag, length, inputStream);
   }
 
+  /**
+   * Reads a BIT group value from an input stream.
+   *
+   * @param tag the tag that was already read, which should be a BIT group tag ({@code 7F61})
+   * @param length the length that was already read
+   * @param inputStream the input stream from which to read the value
+   *
+   * @return CBEFF info representing the BIT group that was read
+   *
+   * @throws IOException on error reading from the stream
+   */
   private ComplexCBEFFInfo readBITGroup(int tag, int length, InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     ComplexCBEFFInfo result = new ComplexCBEFFInfo();
@@ -115,7 +126,7 @@ public class ISO781611Decoder implements ISO781611 {
   }
 
   /**
-   * Reads a BIT from the input stream.
+   * Reads a single BIT from the input stream.
    *
    * @param inputStream the input stream to read from
    * @param index index of this BIT within the BIT group
@@ -131,6 +142,18 @@ public class ISO781611Decoder implements ISO781611 {
     return readBIT(tag, length, inputStream, index);
   }
 
+  /**
+   * Reads a single BIT from the input stream.
+   *
+   * @param tag the tag that was already read
+   * @param length the length that was already read
+   * @param inputStream the stream to read the BIT value from
+   * @param index the index of the BIT withing the BIT group
+   *
+   * @return a CBEFF info representing the BIT
+   *
+   * @throws IOException on error reading from the stream
+   */
   private CBEFFInfo readBIT(int tag, int length, InputStream inputStream, int index) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     if (tag != BIOMETRIC_INFORMATION_TEMPLATE_TAG /* 7F60 */) {
@@ -155,16 +178,17 @@ public class ISO781611Decoder implements ISO781611 {
   }
 
   /**
+   * Reads the biometric header template from an input stream.
    *  A1, A2, ...
    *  Will contain DOs as described in ISO 7816-11 Annex C.
-   *  
+   *
    *  @param inputStream the stream to read from
    *  @param bhtTag the tag of the biometric header
    *  @param bhtLength the length of the header
    *  @param index the index
-   *  
+   *
    *  @return the standard biometric header
-   *  
+   *
    *  @throws IOException on error reading from the stream
    */
   private StandardBiometricHeader readBHT(InputStream inputStream, int bhtTag, int bhtLength, int index) throws IOException {
@@ -211,6 +235,16 @@ public class ISO781611Decoder implements ISO781611 {
     }
   } /* FIXME: return type??? */
 
+  /**
+   * Decodes a (protected) data object.
+   * Encrypted payloads are not currently supported.
+   *
+   * @param inputStream the stream to read from
+   *
+   * @return the decoded value
+   *
+   * @throws IOException on error reading from the stream
+   */
   private byte[] decodeSMTValue(InputStream inputStream) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int doTag = tlvIn.readTag();
@@ -242,6 +276,17 @@ public class ISO781611Decoder implements ISO781611 {
     }
   }
 
+  /**
+   * Reads a biometric data block from an input stream.
+   *
+   * @param inputStream the stream to read from
+   * @param sbh the niometric header that was already read
+   * @param index the index of the biometric data block within the BIT group
+   *
+   * @return the biometric data block
+   *
+   * @throws IOException on error reading from the stream
+   */
   private BiometricDataBlock readBiometricDataBlock(InputStream inputStream, StandardBiometricHeader sbh, int index) throws IOException {
     TLVInputStream tlvIn = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
     int bioDataBlockTag = tlvIn.readTag();
@@ -249,7 +294,6 @@ public class ISO781611Decoder implements ISO781611 {
         bioDataBlockTag != BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG /* 7F2E */) {
       throw new IllegalArgumentException("Expected tag BIOMETRIC_DATA_BLOCK_TAG (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_TAG) + ") or BIOMETRIC_DATA_BLOCK_TAG_ALT (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG) + "), found " + Integer.toHexString(bioDataBlockTag));
     }
-    // this.biometricDataBlockTag = bioDataBlockTag;
     int length = tlvIn.readLength();
     return bdbDecoder.decode(inputStream, sbh, index, length);
   }

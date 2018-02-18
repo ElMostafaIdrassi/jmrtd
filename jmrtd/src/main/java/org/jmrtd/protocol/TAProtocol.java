@@ -100,7 +100,7 @@ public class TAProtocol {
    * @param caReference reference issuer
    * @param terminalCertificates terminal certificate chain
    * @param terminalKey terminal private key
-   * @param taAlg  algorithm
+   * @param taAlg the algorithm
    * @param chipAuthenticationResult the chip authentication result
    * @param documentNumber the document number from which the chip key hash will be derived
    *
@@ -123,7 +123,7 @@ public class TAProtocol {
    * @param caReference reference issuer
    * @param terminalCertificates terminal certificate chain
    * @param terminalKey terminal private key
-   * @param taAlg  algorithm
+   * @param taAlg the algorithm
    * @param chipAuthenticationResult the chip authentication result
    * @param paceResult the PACE result from which the chip key hash will be derived
    *
@@ -141,6 +141,20 @@ public class TAProtocol {
     }
   }
 
+  /**
+   * Executes the Terminal Authentication protocol.
+   * 
+   * @param caReference the certificate authority
+   * @param terminalCertificates the chain of certificates to send
+   * @param terminalKey the inspection system's private key
+   * @param taAlg the algorithm
+   * @param chipAuthenticationResult the result of the Chip Authentication protocol execution
+   * @param idPICC the chip identifier
+   * 
+   * @return the result of Terminal Authentication
+   * 
+   * @throws CardServiceException on error
+   */
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, byte[] idPICC) throws CardServiceException {
     try {
@@ -275,6 +289,13 @@ public class TAProtocol {
     }
   }
 
+  /**
+   * Derives a chip identifier from the document number (BAC MRZ based case).
+   * 
+   * @param documentNumber the document number that was used for primary access control (typically BAC)
+   * 
+   * @return the chip identifier
+   */
   private static byte[] deriveIdentifier(String documentNumber) {
     int documentNumberLength = documentNumber.length();
     byte[] idPICC = new byte[documentNumberLength + 1];
@@ -288,6 +309,15 @@ public class TAProtocol {
     }
   }
 
+  /**
+   * Derives a chip identifier from a PACE result (PACE case).
+   * 
+   * @param paceResult the PACE result
+   * 
+   * @return the chip identifier
+   * 
+   * @throws NoSuchAlgorithmException on error
+   */
   private static byte[] deriveIdentifier(PACEResult paceResult) throws NoSuchAlgorithmException {
     String agreementAlg = paceResult.getAgreementAlg();
     PublicKey pcdPublicKey = paceResult.getPICCPublicKey();
@@ -304,6 +334,14 @@ public class TAProtocol {
     throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + agreementAlg);
   }
 
+  /**
+   * Gets the public key data to be sent.
+   * 
+   * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
+   * @param pcdPublicKey the inspection system's public key
+   * 
+   * @return the key data
+   */
   private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
     if ("DH".equals(agreementAlg)) {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;

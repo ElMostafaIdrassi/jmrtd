@@ -226,11 +226,18 @@ public class TAResult implements Serializable {
     return terminalKey.equals(other.terminalKey);
   }
 
-  private Object toString(CardVerifiableCertificate cert) {
+  /**
+   * Returns a textual representation of the certificate.
+   * 
+   * @param certificate the certificate
+   * 
+   * @return a textual representation of the certificate
+   */
+  private Object toString(CardVerifiableCertificate certificate) {
     StringBuilder result = new StringBuilder();
     result.append("CardVerifiableCertificate [");
     try {
-      CVCPrincipal reference = cert.getHolderReference();
+      CVCPrincipal reference = certificate.getHolderReference();
       if (!caReference.equals(reference)) {
         result.append("holderReference: " + reference);
       }

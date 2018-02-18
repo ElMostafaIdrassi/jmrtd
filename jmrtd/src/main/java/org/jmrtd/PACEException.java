@@ -36,7 +36,7 @@ public class PACEException extends CardServiceException {
   private static final long serialVersionUID = 8383980807753919040L;
 
   /**
-   * Creates a PACEException.
+   * Creates a {@code PACEException}.
    *
    * @param msg a message
    */
@@ -44,6 +44,12 @@ public class PACEException extends CardServiceException {
     super(msg);
   }
 
+  /**
+   * Creates a {@code PACEException}.
+   *
+   * @param msg a message
+   * @param cause the exception causing this exception
+   */
   public PACEException(String msg, Throwable cause) {
     super(msg, cause);
   }
@@ -62,7 +68,7 @@ public class PACEException extends CardServiceException {
    * Creates a PACEException with a specific status word.
    *
    * @param msg a message
-   * @param cause the cause
+   * @param cause the exception causing this exception
    * @param sw the status word that caused this CardServiceException
    */
   public PACEException(String msg, Throwable cause, int sw) {

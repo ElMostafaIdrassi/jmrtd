@@ -39,6 +39,9 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
 
   private List<CBEFFInfo> subRecords;
 
+  /**
+   * Constructs a default complex info, with an empty list of sub-records.
+   */
   public ComplexCBEFFInfo() {
     this.subRecords = new ArrayList<CBEFFInfo>();
   }

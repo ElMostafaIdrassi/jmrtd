@@ -102,16 +102,16 @@ class MRTDFileSystem implements FileSystemStructured {
     }
   }
 
+  /*
+   * NOTE: This doesn't actually send a select file command. ReadBinary will do so
+   * if needed.
+   */
   /**
    * Selects a file.
    *
    * @param fid indicates the file to select
    *
    * @throws CardServiceException on error communicating over the service
-   */
-  /*
-   * NOTE: This doesn't actually send a select file command. ReadBinary will do so
-   * if needed.
    */
   public synchronized void selectFile(short fid) throws CardServiceException {
     if (selectedFID == fid) {
@@ -145,7 +145,7 @@ class MRTDFileSystem implements FileSystemStructured {
         throw new IllegalStateException("Could not get file info");
       }
       Fragment fragment = fileInfo.getSmallestUnbufferedFragment(offset, length);
-      
+
       int responseLength = length;
 
       byte[] bytes = null;
@@ -264,6 +264,13 @@ class MRTDFileSystem implements FileSystemStructured {
     }
   }
 
+  /**
+   * A file info for the ICAO MRTD file system.
+   * 
+   * @author The JMRTD team (info@jmrtd.org)
+   *
+   * @version $Revision$
+   */
   private static class MRTDFileInfo extends FileInfo implements Serializable {
 
     private static final long serialVersionUID = 6727369753765119839L;
@@ -283,7 +290,7 @@ class MRTDFileSystem implements FileSystemStructured {
     }
 
     /**
-     * Gets the buffer.
+     * Returns the buffer.
      *
      * @return the buffer
      */
@@ -292,7 +299,7 @@ class MRTDFileSystem implements FileSystemStructured {
     }
 
     /**
-     * Gets the file identifier.
+     * Returns the file identifier.
      *
      * @return file identifier
      */
@@ -302,7 +309,7 @@ class MRTDFileSystem implements FileSystemStructured {
     }
 
     /**
-     * Gets the length of the file.
+     * Returns the length of the file.
      *
      * @return the length of the file
      */
@@ -312,7 +319,7 @@ class MRTDFileSystem implements FileSystemStructured {
     }
 
     /**
-     * Gets a textual representation of this file info.
+     * Returns a textual representation of this file info.
      *
      * @return a textual representation of this file info
      */
@@ -322,7 +329,7 @@ class MRTDFileSystem implements FileSystemStructured {
     }
 
     /**
-     * Gets the smallest unbuffered fragment included in <code>offset</code> and <code>offset + length - 1</code>.
+     * Returns the smallest unbuffered fragment included in <code>offset</code> and <code>offset + length - 1</code>.
      *
      * @param offset the offset
      * @param length the length

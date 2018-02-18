@@ -232,6 +232,16 @@ public class CAProtocol {
     return wrapper;
   }
 
+  /**
+   * Returns the key hash.
+   * 
+   * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
+   * @param pcdPublicKey the inspection system's public key
+   * 
+   * @return the key hash
+   * 
+   * @throws NoSuchAlgorithmException on error
+   */
   public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
     if ("DH".equals(agreementAlg)) {
       /* TODO: this is probably wrong, what should be hashed? */
@@ -246,6 +256,14 @@ public class CAProtocol {
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
   }
 
+  /**
+   * Gets the public key data to be sent.
+   * 
+   * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
+   * @param pcdPublicKey the inspection system's public key
+   * 
+   * @return the key data
+   */
   private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
     if ("DH".equals(agreementAlg)) {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;

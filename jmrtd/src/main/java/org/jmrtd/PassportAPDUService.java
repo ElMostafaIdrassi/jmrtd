@@ -72,7 +72,7 @@ class PassportAPDUService extends CardService {
 
   /** Shared secret type for non-PACE key. */
   public static final byte NO_PACE_KEY_REFERENCE = 0x00;
-  
+
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte MRZ_PACE_KEY_REFERENCE = 0x01;
 
@@ -171,7 +171,7 @@ class PassportAPDUService extends CardService {
    * If the card responds with a status word other than {@code 0x9000} this method does
    * NOT throw a {@linkplain CardServiceException}, but it returns this as error code
    * as result.
-   * 
+   *
    * @param commandAPDU the command APDU
    *
    * @return the response APDU
@@ -341,7 +341,7 @@ class PassportAPDUService extends CardService {
       byte[] data = new byte[] { 0x54, 0x02, offsetMSB, offsetLSB };
       commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY2, 0, 0, data, le);
     } else if (isSFIEnabled) {
-      commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, (byte)sfi, offsetLSB, le);      
+      commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, (byte)sfi, offsetLSB, le);
     } else {
       commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_READ_BINARY, offsetMSB, offsetLSB, le);
     }
@@ -363,7 +363,7 @@ class PassportAPDUService extends CardService {
     }
     return responseData;
   }
-    
+
   /**
    * Sends a {@code GET CHALLENGE} command to the passport.
    *
@@ -802,13 +802,13 @@ class PassportAPDUService extends CardService {
 
     byte[] responseData = responseAPDU.getData();
     if (responseData == null) {
-      throw new CardServiceException("Malformed read binary long response data");      
+      throw new CardServiceException("Malformed read binary long response data");
     }
     if (!isTLVEncodedOffsetNeeded) {
       return responseData;
     }
 
-    /* 
+    /*
      * Strip the response off the tag 0x53 and the length field.
      * FIXME: Use TLVUtil.tlvEncode(...) here. -- MO
      */
@@ -825,7 +825,7 @@ class PassportAPDUService extends CardService {
     System.arraycopy(data, index, responseData, 0, responseData.length);
     return responseData;
   }
-  
+
   /*
    * 0x80 Cryptographic mechanism reference
    * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).

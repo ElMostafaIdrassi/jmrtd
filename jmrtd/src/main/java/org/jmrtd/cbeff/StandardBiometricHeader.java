@@ -91,6 +91,14 @@ public class StandardBiometricHeader implements Serializable {
     return equals(elements, other.elements);
   }
 
+  /**
+   * Determines whether the two maps have equal entry sets.
+   *
+   * @param elements1 the first map
+   * @param elements2 the second map
+   *
+   * @return a boolean indicating equality
+   */
   private static boolean equals(Map<Integer, byte[]> elements1, Map<Integer, byte[]> elements2) {
     if (elements1 == null && elements2 != null) {
       return false;
@@ -101,7 +109,14 @@ public class StandardBiometricHeader implements Serializable {
 
     return elements1 == elements2 || elements1.entrySet().equals(elements2.entrySet());
   }
-  
+
+  /**
+   * Returns a textual representation of the given map.
+   *
+   * @param elements a map with elements
+   *
+   * @return a textual representation of th emap
+   */
   private static String toString(SortedMap<Integer, byte[]> elements) {
     StringBuilder result = new StringBuilder();
     result.append("[");
@@ -117,5 +132,4 @@ public class StandardBiometricHeader implements Serializable {
     result.append("]");
     return result.toString();
   }
-
 }

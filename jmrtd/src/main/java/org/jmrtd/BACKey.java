@@ -58,7 +58,7 @@ public class BACKey implements BACKeySpec {
   public BACKey(String documentNumber, Date dateOfBirth, Date dateOfExpiry) {
     this(documentNumber, toString(dateOfBirth), toString(dateOfExpiry));
   }
-  
+
   /**
    * Creates a BAC key.
    *
@@ -76,7 +76,7 @@ public class BACKey implements BACKeySpec {
     if (dateOfExpiry == null || dateOfExpiry.length() != 6) {
       throw new IllegalArgumentException("Illegal date: " + dateOfExpiry);
     }
-    
+
     StringBuilder documentNumberBuilder = new StringBuilder(documentNumber);
     while (documentNumberBuilder.length() < 9) {
       documentNumberBuilder.append('<');
@@ -173,7 +173,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Sets the document number.
-   * 
+   *
    * @param documentNumber the document number to set
    */
   protected void setDocumentNumber(String documentNumber) {
@@ -182,7 +182,7 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Sets the date of birth.
-   * 
+   *
    * @param dateOfBirth the date of birth to set
    */
   protected void setDateOfBirth(String dateOfBirth) {
@@ -191,13 +191,20 @@ public class BACKey implements BACKeySpec {
 
   /**
    * Sets the date of expiry.
-   * 
+   *
    * @param dateOfExpiry the date of expiry to set
    */
   protected void setDateOfExpiry(String dateOfExpiry) {
     this.dateOfExpiry = dateOfExpiry;
   }
 
+  /**
+   * Renders a date as a string.
+   *
+   * @param date the date
+   *
+   * @return a string representing the given date
+   */
   private static synchronized String toString(Date date) {
     return new SimpleDateFormat(SDF).format(date);
   }
