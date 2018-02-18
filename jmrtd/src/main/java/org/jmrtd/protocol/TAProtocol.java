@@ -65,7 +65,7 @@ public class TAProtocol {
 
   /**
    * Creates a protocol instance.
-   * 
+   *
    * @param service the card service for APDU communication
    * @param wrapper the secure messaging wrapper
    */
@@ -85,7 +85,7 @@ public class TAProtocol {
    *    3. MSE:Set AT
    *    4. Get Challenge
    *    5. External Authenticate
-   *    
+   *
    * Steps 1 and 2 are repeated for every CV certificate to be verified
    * (CVCA Link Certificates, DV Certificate, IS Certificate).
    * </pre>
@@ -143,16 +143,16 @@ public class TAProtocol {
 
   /**
    * Executes the Terminal Authentication protocol.
-   * 
+   *
    * @param caReference the certificate authority
    * @param terminalCertificates the chain of certificates to send
    * @param terminalKey the inspection system's private key
    * @param taAlg the algorithm
    * @param chipAuthenticationResult the result of the Chip Authentication protocol execution
    * @param idPICC the chip identifier
-   * 
+   *
    * @return the result of Terminal Authentication
-   * 
+   *
    * @throws CardServiceException on error
    */
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
@@ -291,9 +291,9 @@ public class TAProtocol {
 
   /**
    * Derives a chip identifier from the document number (BAC MRZ based case).
-   * 
+   *
    * @param documentNumber the document number that was used for primary access control (typically BAC)
-   * 
+   *
    * @return the chip identifier
    */
   private static byte[] deriveIdentifier(String documentNumber) {
@@ -305,17 +305,17 @@ public class TAProtocol {
       return idPICC;
     } catch (UnsupportedEncodingException e) {
       /* NOTE: Never happens, ISO-8859-1 is always supported. */
-      throw new IllegalStateException("Unsupported encoding", e);      
+      throw new IllegalStateException("Unsupported encoding", e);
     }
   }
 
   /**
    * Derives a chip identifier from a PACE result (PACE case).
-   * 
+   *
    * @param paceResult the PACE result
-   * 
+   *
    * @return the chip identifier
-   * 
+   *
    * @throws NoSuchAlgorithmException on error
    */
   private static byte[] deriveIdentifier(PACEResult paceResult) throws NoSuchAlgorithmException {
@@ -336,10 +336,10 @@ public class TAProtocol {
 
   /**
    * Gets the public key data to be sent.
-   * 
+   *
    * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
    * @param pcdPublicKey the inspection system's public key
-   * 
+   *
    * @return the key data
    */
   private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {

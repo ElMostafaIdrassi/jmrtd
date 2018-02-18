@@ -76,7 +76,7 @@ public class CardVerifiableCertificate extends Certificate {
   private org.ejbca.cvc.CVCertificate cvCertificate;
 
   private transient KeyFactory rsaKeyFactory;
-  
+
   /**
    * Constructs a wrapper.
    *

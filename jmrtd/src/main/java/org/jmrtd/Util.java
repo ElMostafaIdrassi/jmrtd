@@ -101,7 +101,7 @@ import net.sf.scuba.util.Hex;
  *
  * @version $Revision$
  */
-public class Util {
+public final class Util {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 

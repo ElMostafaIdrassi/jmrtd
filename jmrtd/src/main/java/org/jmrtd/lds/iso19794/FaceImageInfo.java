@@ -55,7 +55,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   private static final long serialVersionUID = -1751069410327594067L;
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   /** Eye color code based on Section 5.5.4 of ISO 19794-5. */
   public enum EyeColor {
     UNSPECIFIED {
@@ -681,9 +681,9 @@ public class FaceImageInfo extends AbstractImageInfo {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     FaceImageInfo other = (FaceImageInfo)obj;
-    return colorSpace == other.colorSpace 
+    return colorSpace == other.colorSpace
         && deviceType == other.deviceType
         && expression == other.expression
         && eyeColor == other.eyeColor

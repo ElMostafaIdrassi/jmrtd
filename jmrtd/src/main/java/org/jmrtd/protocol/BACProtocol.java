@@ -50,7 +50,7 @@ public class BACProtocol {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private PassportService service;
-  
+
   private Random random;
 
   /**
@@ -184,9 +184,9 @@ public class BACProtocol {
 
   /**
    * Returns the document number, including trailing '<' until length 9.
-   * 
+   *
    * @param documentNumber the original document number
-   * 
+   *
    * @return the documentNumber with at least length 9
    */
   private static String fixDocumentNumber(String documentNumber) {

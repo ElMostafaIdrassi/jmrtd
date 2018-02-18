@@ -297,7 +297,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     if (imageBytes == null) {
       throw new IllegalArgumentException("Cannot set null image bytes");
     }
-    
+
     try {
       readImage(new ByteArrayInputStream(imageBytes), imageBytes.length);
     } catch (IOException e) {

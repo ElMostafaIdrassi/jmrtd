@@ -49,7 +49,7 @@ public class AAResult implements Serializable {
 
   /**
    * The result of an Active Authentication protocol run.
-   * 
+   *
    * @param publicKey the AA public key that was used
    * @param digestAlgorithm the digest algorithm that was used
    * @param signatureAlgorithm the signature algorithm that was used
@@ -66,7 +66,7 @@ public class AAResult implements Serializable {
 
   /**
    * Returns the challenge that was initially used.
-   * 
+   *
    * @return the challenge
    */
   public byte[] getChallenge() {
@@ -75,7 +75,7 @@ public class AAResult implements Serializable {
 
   /**
    * Returns the response that was sent back by the ICC.
-   * 
+   *
    * @return the response that was sent back by the ICC
    */
   public byte[] getResponse() {
@@ -84,7 +84,7 @@ public class AAResult implements Serializable {
 
   /**
    * Returns the public key for verifying the result.
-   * 
+   *
    * @return the public key for verofying the result
    */
   public PublicKey getPublicKey() {
@@ -93,7 +93,7 @@ public class AAResult implements Serializable {
 
   /**
    * Returns the digest algorithm used by the ICC.
-   * 
+   *
    * @return the digest algorithm used by the ICC
    */
   public String getDigestAlgorithm() {
@@ -102,7 +102,7 @@ public class AAResult implements Serializable {
 
   /**
    * Returns the signature algorithm used by the ICC.
-   * 
+   *
    * @return the signature algorithm used by the ICC
    */
   public String getSignatureAlgorithm() {

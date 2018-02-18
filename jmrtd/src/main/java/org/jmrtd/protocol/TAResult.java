@@ -162,7 +162,7 @@ public class TAResult implements Serializable {
     result.append("]");
     return result.toString();
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -222,15 +222,15 @@ public class TAResult implements Serializable {
     if (terminalKey == null) {
       return other.terminalKey == null;
     }
-    
+
     return terminalKey.equals(other.terminalKey);
   }
 
   /**
    * Returns a textual representation of the certificate.
-   * 
+   *
    * @param certificate the certificate
-   * 
+   *
    * @return a textual representation of the certificate
    */
   private Object toString(CardVerifiableCertificate certificate) {

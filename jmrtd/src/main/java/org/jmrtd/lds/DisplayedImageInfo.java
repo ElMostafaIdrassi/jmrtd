@@ -156,7 +156,7 @@ public class DisplayedImageInfo extends AbstractImageInfo {
    * </ul>
    *
    * @param type the type
-   * 
+   *
    * @return the mime-type
    */
   private static String getMimeTypeFromType(int type) {

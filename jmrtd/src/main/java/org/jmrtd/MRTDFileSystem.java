@@ -129,7 +129,7 @@ class MRTDFileSystem implements FileSystemStructured {
    * @param length the number of bytes to read
    *
    * @return a copy of the bytes read
-   * 
+   *
    * @throws CardServiceException on error
    */
   public synchronized byte[] readBinary(int offset, int length) throws CardServiceException {
@@ -232,7 +232,7 @@ class MRTDFileSystem implements FileSystemStructured {
       } else {
         if (!isSelected) {
           service.sendSelectFile(selectedFID);
-          isSelected = true;          
+          isSelected = true;
         }
         prefix = service.sendReadBinary(0, READ_AHEAD_LENGTH, false);
       }
@@ -266,7 +266,7 @@ class MRTDFileSystem implements FileSystemStructured {
 
   /**
    * A file info for the ICAO MRTD file system.
-   * 
+   *
    * @author The JMRTD team (info@jmrtd.org)
    *
    * @version $Revision$

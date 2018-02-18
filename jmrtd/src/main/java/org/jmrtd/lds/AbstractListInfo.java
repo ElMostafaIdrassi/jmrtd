@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 public abstract class AbstractListInfo<R extends Serializable> extends AbstractLDSInfo {
 
   private static final long serialVersionUID = 2970076896364365191L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private List<R> subRecords;

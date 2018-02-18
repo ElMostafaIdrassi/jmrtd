@@ -90,7 +90,7 @@ import org.jmrtd.Util;
  *
  * @version $Revision$
  */
-/* package-visible */ class SignedDataUtil {
+/* package-visible */ final class SignedDataUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -302,7 +302,7 @@ import org.jmrtd.Util;
    *
    * FIXME: Maybe throw an exception instead of issuing warnings
    * on logger if signed attributes do not check out.
-   * 
+   *
    * @param signedData the signed data
    *
    * @return the contents of the security object over which the
@@ -487,7 +487,7 @@ import org.jmrtd.Util;
    * Returns the common mnemonic string (such as "SHA1", "SHA256withRSA") given an OID.
    *
    * @param oid an object identifier
-   * 
+   *
    * @return a mnemonic string
    *
    * @throws NoSuchAlgorithmException if the provided OID is not yet supported

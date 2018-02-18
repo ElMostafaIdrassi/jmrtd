@@ -123,7 +123,7 @@ public class DG11File extends DataGroup {
   public DG11File(InputStream inputStream) throws IOException {
     super(EF_DG11_TAG, inputStream);
   }
-  
+
   /**
    * Constructs a new file. Use <code>null</code> if data element is not present.
    * Use <code>&#39;&lt;&#39;</code> as separator.
@@ -155,7 +155,7 @@ public class DG11File extends DataGroup {
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
   }
-  
+
   /**
    * Constructs a new file. Use <code>null</code> if data element is not present.
    * Use <code>&#39;&lt;&#39;</code> as separator.
@@ -417,9 +417,9 @@ public class DG11File extends DataGroup {
   public int hashCode() {
     return 13 * toString().hashCode() + 111;
   }
-  
+
   /* Reading and writing content of this data group. */
-  
+
   @Override
   protected void readContent(InputStream inputStream) throws IOException {
     TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
@@ -450,7 +450,7 @@ public class DG11File extends DataGroup {
       readField(t, tlvInputStream);
     }
   }
-  
+
   @Override
   protected void writeContent(OutputStream out) throws IOException {
     TLVOutputStream tlvOut = out instanceof TLVOutputStream ? (TLVOutputStream)out : new TLVOutputStream(out);
@@ -564,7 +564,7 @@ public class DG11File extends DataGroup {
       }
     }
   }
-  
+
   /* Field parsing and interpretation below. */
 
   private void parseCustodyInformation(byte[] value) {

@@ -40,7 +40,7 @@ import net.sf.scuba.data.Country;
 public class CVCPrincipal implements Principal, Serializable {
 
   private static final long serialVersionUID = -4905647207367309688L;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private Country country;
@@ -66,7 +66,7 @@ public class CVCPrincipal implements Principal, Serializable {
     } catch (IllegalArgumentException iae) {
       LOGGER.log(Level.FINE, "Could not find country for " + alpha2Code, iae);
       country = new Country() {
-        
+
         private static final long serialVersionUID = 345841304964161797L;
 
         @Override

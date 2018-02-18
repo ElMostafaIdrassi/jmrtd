@@ -234,12 +234,12 @@ public class CAProtocol {
 
   /**
    * Returns the key hash.
-   * 
+   *
    * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
    * @param pcdPublicKey the inspection system's public key
-   * 
+   *
    * @return the key hash
-   * 
+   *
    * @throws NoSuchAlgorithmException on error
    */
   public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
@@ -258,10 +258,10 @@ public class CAProtocol {
 
   /**
    * Gets the public key data to be sent.
-   * 
+   *
    * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
    * @param pcdPublicKey the inspection system's public key
-   * 
+   *
    * @return the key data
    */
   private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {

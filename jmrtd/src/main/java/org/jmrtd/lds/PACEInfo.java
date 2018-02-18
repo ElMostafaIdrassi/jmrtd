@@ -53,7 +53,7 @@ import org.jmrtd.Util;
 public class PACEInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 7960925013249578359L;
-  
+
   public static class DHCParameterSpec extends DHParameterSpec {
 
     private BigInteger q;
@@ -79,7 +79,7 @@ public class PACEInfo extends SecurityInfo {
       return q;
     }
   }
-  
+
   /** Generic mapping and Integrated mapping and CAM mapping. */
   public enum MappingType {
     /** Generic Mapping. */
@@ -173,14 +173,14 @@ public class PACEInfo extends SecurityInfo {
       ID_PACE_ECDH_CAM_AES_CBC_CMAC_128,
       ID_PACE_ECDH_CAM_AES_CBC_CMAC_192,
       ID_PACE_ECDH_CAM_AES_CBC_CMAC_256 }));
-  
+
   private String protocolOID;
   private int version;
   private BigInteger parameterId;
 
   /**
    * Constructs a PACE info object.
-   * 
+   *
    * @param oid the object identifier, indicating what PACE variant
    *        is to be used (agreement protocol, mapping type, and secure channel properties)
    * @param version a version number, which should be 2
@@ -234,7 +234,7 @@ public class PACEInfo extends SecurityInfo {
 
   /**
    * Returns the PACE protocol object identifier.
-   * 
+   *
    * @return the PACE protocol object identifier
    */
   @Override
@@ -254,7 +254,7 @@ public class PACEInfo extends SecurityInfo {
 
   /**
    * Returns the version.
-   * 
+   *
    * @return the version
    */
   public int getVersion() {
@@ -263,7 +263,7 @@ public class PACEInfo extends SecurityInfo {
 
   /**
    * Returns the parameter identifier.
-   * 
+   *
    * @return the parameter identifier
    */
   public BigInteger getParameterId() {
@@ -358,7 +358,7 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return MappingType.CAM;
     }
-    
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -385,7 +385,7 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "ECDH";
     }
-    
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -413,7 +413,7 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "AES";
     }
-    
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -440,7 +440,7 @@ public class PACEInfo extends SecurityInfo {
         || ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "SHA-256";
     }
-    
+
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
@@ -610,7 +610,7 @@ public class PACEInfo extends SecurityInfo {
     if (ID_PACE_ECDH_CAM_AES_CBC_CMAC_256.equals(oid)) {
       return "id-PACE-ECDH-CAM-AES-CBC-CMAC-256";
     }
-    
+
     return oid;
   }
 }

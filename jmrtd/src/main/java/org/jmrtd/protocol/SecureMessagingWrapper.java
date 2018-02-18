@@ -36,16 +36,16 @@ import net.sf.scuba.smartcards.APDUWrapper;
  * @version $Revision$
  */
 public abstract class SecureMessagingWrapper implements Serializable, APDUWrapper {
-  
+
   private static final long serialVersionUID = 4709645514566992414L;
 
   private int maxTranceiveLength;
-  
+
   private boolean shouldCheckMAC;
-  
+
   /**
    * Creates a secure messaging wrapper.
-   * 
+   *
    * @param maxTranceiveLength  Returns the maximum tranceive length of wrapped command and response APDUs, typical values are 256 and 65536
    * @param shouldCheckMAC a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs
    */
@@ -53,7 +53,7 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
     this.maxTranceiveLength = maxTranceiveLength;
     this.shouldCheckMAC = shouldCheckMAC;
   }
-  
+
   /**
    * Gets the send sequence counter.
    *
@@ -74,20 +74,20 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
    * @return the MAC key
    */
   public abstract SecretKey getMACKey();
-  
+
   /**
    * Returns a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs.
-   * 
+   *
    * @return a boolean indicating whether this wrapper will check the MAC in wrapped response APDUs
    */
   public boolean shouldCheckMAC() {
     return shouldCheckMAC;
   }
-  
+
   /**
    * Returns the maximum tranceive length of wrapped command and response APDUs,
    * typical values are 256 and 65536.
-   * 
+   *
    * @return the maximum tranceive length of wrapped command and response APDUs
    */
   public int getMaxTranceiveLength() {

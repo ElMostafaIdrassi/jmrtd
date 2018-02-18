@@ -59,7 +59,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
   private SecretKey ksEnc;
   private SecretKey ksMac;
-  
+
   private transient Cipher sscIVCipher;
   private transient Cipher cipher;
   private transient Mac mac;
@@ -81,7 +81,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   public AESSecureMessagingWrapper(SecretKey ksEnc, SecretKey ksMac, long ssc) throws GeneralSecurityException {
     this(ksEnc, ksMac, 256, true, ssc);
   }
-  
+
   /**
    * Constructs a secure messaging wrapper based on the secure messaging
    * session keys and the initial value of the send sequence counter.
@@ -108,7 +108,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   public String getType() {
     return "AES";
   }
-  
+
   /**
    * Gets the current value of the send sequence counter.
    *
@@ -214,7 +214,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     if (ssc != other.ssc) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -225,7 +225,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param commandAPDU buffer containing the APDU data. It must be large enough to receive the wrapped APDU
    *
    * @return the wrapped command APDU
-   * 
+   *
    * @throws GeneralSecurityException on error wrapping the command APDU
    * @throws IOException on error
    */
@@ -317,7 +317,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * @param rapdu buffer containing the APDU data
    *
    * @return a byte array containing the unwrapped APDU buffer
-   * 
+   *
    * @throws GeneralSecurityException on error unwrapping
    * @throws IOException on error
    */
@@ -385,9 +385,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @param inputStream the stream to read from
    * @param do85 whether to expect a {@code 0x85} (including an extra 1 length) data object.
-   * 
+   *
    * @return the bytes that were read
-   * 
+   *
    * @throws IOException on error reading from the stream
    * @throws GeneralSecurityException on error decrypting the data
    */
@@ -432,9 +432,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * The {@code 0x99} tag has already been read.
    *
    * @param inputStream the stream to read from
-   * 
+   *
    * @return the status word
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   private short readDO99(DataInputStream inputStream) throws IOException {
@@ -452,9 +452,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * The {@code 0x8E} tag has already been read.
    *
    * @param inputStream the stream to read from
-   * 
+   *
    * @return the bytes that were read
-   * 
+   *
    * @throws IOException on error
    */
   private byte[] readDO8E(DataInputStream inputStream) throws IOException {
@@ -469,12 +469,12 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
 
   /**
    * Checks the message authentication code.
-   * 
+   *
    * @param rapdu the data of a response APDU
    * @param cc the message authentication code
-   * 
+   *
    * @return a boolean indicating whether the message authentication code was ok
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   private boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
@@ -488,9 +488,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
    *
    * @param ssc the SSC
-   * 
+   *
    * @return the initialization vector specification
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   private IvParameterSpec getIV(long ssc) throws GeneralSecurityException {
@@ -505,7 +505,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    * AES uses IV = E K_Enc , SSC), see ICAO SAC TR Section 4.6.3.
    *
    * @param sscBytes the SSC as blocksize aligned byte array
-   * 
+   *
    * @return the initialization vector specification
    *
    * @throws GeneralSecurityException on error

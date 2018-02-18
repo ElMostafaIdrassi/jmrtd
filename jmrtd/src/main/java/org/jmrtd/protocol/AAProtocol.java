@@ -45,7 +45,7 @@ public class AAProtocol {
 
   /**
    * Creates a protocol instance.
-   * 
+   *
    * @param service the service for APDU communication
    * @param wrapper the secure messaging wrapper
    */

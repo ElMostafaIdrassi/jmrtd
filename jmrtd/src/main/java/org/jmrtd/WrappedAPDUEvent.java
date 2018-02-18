@@ -30,11 +30,11 @@ import net.sf.scuba.smartcards.ResponseAPDU;
 /**
  * An event signifying an exchange of wrapped (protected) command and response APDUs.
  * This makes the underlying unprotected APDUs available.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.6.4
  */
 public class WrappedAPDUEvent extends APDUEvent {
@@ -42,12 +42,12 @@ public class WrappedAPDUEvent extends APDUEvent {
   private static final long serialVersionUID = 5958662425525890224L;
 
   private CommandAPDU plainTextCommandAPDU;
-  
+
   private ResponseAPDU plainTextResponseAPDU;
-  
+
   /**
    * Creates an APDU exchange event.
-   * 
+   *
    * @param source the source of the event, typically a card service
    * @param type the type of event, typically this identifies the APDU wrapper somehow
    * @param sequenceNumber the sequence number of the APDU exchange within a session
@@ -63,19 +63,19 @@ public class WrappedAPDUEvent extends APDUEvent {
     this.plainTextCommandAPDU = plainTextCommandAPDU;
     this.plainTextResponseAPDU = plainTextResponseAPDU;
   }
-  
+
   /**
    * Returns the unprotected, plain-text Command APDU.
-   * 
+   *
    * @return the unprotected, plain-text Command APDU
    */
   public CommandAPDU getPlainTextCommandAPDU() {
     return plainTextCommandAPDU;
   }
-  
+
   /**
    * Returns the unprotected, plain-text Response APDU.
-   * 
+   *
    * @return the unprotected, plain-text Response APDU
    */
   public ResponseAPDU getPlainTextResponseAPDU() {

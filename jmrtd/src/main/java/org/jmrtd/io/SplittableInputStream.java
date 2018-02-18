@@ -63,7 +63,7 @@ public class SplittableInputStream extends InputStream {
    * Gets a copy of the inputstream positioned at <code>position</code>.
    *
    * @param position a position between <code>0</code> and {@link #getPosition()}
-   * 
+   *
    * @return a fresh input stream
    */
   public InputStream getInputStream(int position) {
@@ -98,7 +98,7 @@ public class SplittableInputStream extends InputStream {
    *
    * @return     the next byte of data, or <code>-1</code> if the end of the
    *             stream is reached
-   *             
+   *
    * @throws IOException if an I/O error occurs
    */
   @Override
@@ -116,9 +116,9 @@ public class SplittableInputStream extends InputStream {
    * negative, no bytes are skipped.
    *
    * @param n the number of bytes to be skipped
-   * 
+   *
    * @return the actual number of bytes skipped
-   * 
+   *
    * @throws IOException if the stream does not support seek, or if some other I/O error occurs
    */
   @Override
@@ -136,7 +136,7 @@ public class SplittableInputStream extends InputStream {
    * @return an estimate of the number of bytes that can be read (or skipped
    *         over) from this input stream without blocking or <code>0</code> when
    *         it reaches the end of the input stream
-   *         
+   *
    * @throws IOException on error
    */
   @Override
@@ -237,7 +237,7 @@ public class SplittableInputStream extends InputStream {
    * particular input stream instance. The <code>markSupported</code> method
    * of <code>InputStream</code> returns <code>false</code>.
    *
-   * @return <code>true</code> if this stream instance supports the mark 
+   * @return <code>true</code> if this stream instance supports the mark
    *          and reset methods and <code>false</code> otherwise
    *
    * @see java.io.InputStream#mark(int)
@@ -250,7 +250,7 @@ public class SplittableInputStream extends InputStream {
 
   /**
    * Returns the length of the underlying buffer.
-   * 
+   *
    * @return the length of the underlying buffer
    */
   public int getLength() {
@@ -259,7 +259,7 @@ public class SplittableInputStream extends InputStream {
 
   /**
    * Returns the number of buffered bytes in the underlying buffer.
-   * 
+   *
    * @return the number of buffered bytes in the underlying buffer
    */
   public int getBytesBuffered() {

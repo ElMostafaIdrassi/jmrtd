@@ -399,7 +399,7 @@ public class FingerImageInfo extends AbstractImageInfo {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     FingerImageInfo other = (FingerImageInfo)obj;
     return compressionAlgorithm == other.compressionAlgorithm
         && impressionType == other.impressionType

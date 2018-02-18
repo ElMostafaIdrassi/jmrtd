@@ -39,7 +39,7 @@ import org.jmrtd.io.FragmentBuffer.Fragment;
 public class InputStreamBuffer {
 
   private PositionInputStream carrier;
-  
+
   private FragmentBuffer buffer;
 
   /**

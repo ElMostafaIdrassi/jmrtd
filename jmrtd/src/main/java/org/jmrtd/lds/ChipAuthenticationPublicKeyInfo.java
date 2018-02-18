@@ -103,7 +103,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
     this.keyId = keyId;
     checkFields();
   }
-  
+
   /**
    * Returns a DER object with this SecurityInfo data (DER sequence).
    *

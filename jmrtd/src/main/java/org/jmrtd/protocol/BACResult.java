@@ -28,7 +28,7 @@ import org.jmrtd.BACKeySpec;
 
 /**
  * Result of a Basic Access Control protocol run.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -42,7 +42,7 @@ public class BACResult implements Serializable {
 
   /**
    * Creates a BAC result without specifying the initial access key.
-   * 
+   *
    * @param wrapper the secure messaging wrapper that resulted from the BAC protocol run
    */
   public BACResult(SecureMessagingWrapper wrapper) {
@@ -51,10 +51,10 @@ public class BACResult implements Serializable {
 
   /**
    * Creates a BAC result.
-   * 
+   *
    * @param bacKey the initial access key
    * @param wrapper the secure messaging wrapper that resulted from the BAC protocol run
-   */  
+   */
   public BACResult(BACKeySpec bacKey, SecureMessagingWrapper wrapper) {
     this.bacKey = bacKey;
     this.wrapper = wrapper;
@@ -62,7 +62,7 @@ public class BACResult implements Serializable {
 
   /**
    * Returns the initial access key or {@code null}.
-   * 
+   *
    * @return the initial access key or {@code null}
    */
   public BACKeySpec getBACKey() {
@@ -71,7 +71,7 @@ public class BACResult implements Serializable {
 
   /**
    * Returns the secure messaging wrapper.
-   * 
+   *
    * @return the secure messaging wrapper
    */
   public SecureMessagingWrapper getWrapper() {

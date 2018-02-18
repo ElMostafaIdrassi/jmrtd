@@ -116,13 +116,13 @@ public class PACEKeySpec implements AccessKeySpec {
 
   /**
    * Returns the algorithm.
-   * 
+   *
    * @return the algorithm
    */
   public String getAlgorithm() {
     return "PACE";
   }
-  
+
   /**
    * Returns the type of key, valid values are
    * {@code MRZ_PACE_KEY_REFERENCE}, {@code CAN_PACE_KEY_REFERENCE},

@@ -142,7 +142,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
     }
     return result;
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -163,7 +163,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     IrisBiometricSubtypeInfo other = (IrisBiometricSubtypeInfo) obj;
     return biometricSubtype == other.biometricSubtype
         && imageFormat == other.imageFormat;

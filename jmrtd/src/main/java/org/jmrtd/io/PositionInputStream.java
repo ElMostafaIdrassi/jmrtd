@@ -46,7 +46,7 @@ public class PositionInputStream extends InputStream {
 
   /**
    * Constructs a position input stream by decorating an existing input stream.
-   * 
+   *
    * @param carrier the existing input stream
    */
   public PositionInputStream(InputStream carrier) {
@@ -106,7 +106,7 @@ public class PositionInputStream extends InputStream {
 
   /**
    * Returns the position within the input stream.
-   * 
+   *
    * @return the position within the input stream
    */
   public long getPosition() {

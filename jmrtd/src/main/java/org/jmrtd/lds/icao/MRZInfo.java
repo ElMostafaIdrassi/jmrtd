@@ -791,19 +791,19 @@ public class MRZInfo extends AbstractLDSInfo {
       if (isFirstPrimaryComponent) {
         isFirstPrimaryComponent = false;
       } else {
-        name.append('<');        
+        name.append('<');
       }
       name.append(primaryComponent);
     }
 
     if (secondaryIdentifier != null && !secondaryIdentifier.trim().isEmpty()) {
       name.append("<<");
-      boolean isFirstSecondaryComponent = true; 
+      boolean isFirstSecondaryComponent = true;
       for (String secondaryComponent: secondaryComponents) {
         if (isFirstSecondaryComponent) {
           isFirstSecondaryComponent = false;
         } else {
-          name.append('<');        
+          name.append('<');
         }
         name.append(secondaryComponent);
       }
@@ -989,7 +989,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * Replaces '<' with ' ' and trims leading and trailing whitespace.
    *
    * @param str the string to read from
-   * 
+   *
    * @return a trimmed string
    */
   private static String trimFillerChars(String str) {

@@ -31,7 +31,7 @@ public abstract class PACEGMMappingResult extends PACEMappingResult {
   private static final long serialVersionUID = -3373471956987358728L;
 
   private PublicKey piccMappingPublicKey;
-  
+
   private KeyPair pcdMappingKeyPair;
 
   public PACEGMMappingResult(AlgorithmParameterSpec staticParameters, byte[] piccNonce,

@@ -284,7 +284,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
       return 256;
     }
 
-    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");   
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
   private static String toProtocolOIDString(String oid) {

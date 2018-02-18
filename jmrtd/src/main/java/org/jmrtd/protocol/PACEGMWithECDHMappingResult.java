@@ -33,7 +33,7 @@ public class PACEGMWithECDHMappingResult extends PACEGMMappingResult {
   private static final long serialVersionUID = -3892431861957032423L;
 
   private BigInteger sharedSecretPointX;
-  
+
   private BigInteger sharedSecretPointY;
 
   public PACEGMWithECDHMappingResult(AlgorithmParameterSpec staticParameters,

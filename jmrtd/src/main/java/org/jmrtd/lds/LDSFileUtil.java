@@ -52,7 +52,7 @@ import org.jmrtd.lds.icao.DG7File;
  *
  * @version $Revision$
  */
-public class LDSFileUtil {
+public final class LDSFileUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -564,9 +564,9 @@ public class LDSFileUtil {
 
   /**
    * Looks up a file identifier for a given short file identifier.
-   * 
+   *
    * @param sfi the short file identifier
-   * 
+   *
    * @return a file identifier
    */
   public static short lookupFIDBySFI(byte sfi) {
@@ -616,9 +616,9 @@ public class LDSFileUtil {
 
   /**
    * Returns the data group list from the security object (SOd).
-   * 
+   *
    * @param sodFile the security object
-   * 
+   *
    * @return the list of data group numbers
    */
   public static List<Integer> getDataGroupNumbers(SODFile sodFile) {
@@ -635,9 +635,9 @@ public class LDSFileUtil {
 
   /**
    * Returns the data group list from the document index file (COM).
-   * 
+   *
    * @param comFile the document index file
-   * 
+   *
    * @return the list with data group number according to the document index file
    */
   public static List<Integer> getDataGroupNumbers(COMFile comFile) {
@@ -645,18 +645,18 @@ public class LDSFileUtil {
     if (comFile == null) {
       return dgNumbers;
     }
-    
+
     int[] tagList = comFile.getTagList();
     dgNumbers.addAll(toDataGroupList(tagList));
     Collections.sort(dgNumbers); // NOTE: sort it, just in case.
     return dgNumbers;
   }
-  
+
   /**
    * Converts a list with ICAO tags into a list of ICAO data group numbers.
-   * 
+   *
    * @param tagList a list of tags specified in ICAO Doc 9303
-   * 
+   *
    * @return the list with data group number according to the security object
    */
   private static List<Integer> toDataGroupList(int[] tagList) {

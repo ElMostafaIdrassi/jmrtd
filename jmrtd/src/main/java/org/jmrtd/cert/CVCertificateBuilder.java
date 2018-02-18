@@ -51,7 +51,7 @@ public class CVCertificateBuilder {
    */
   private CVCertificateBuilder() {
   }
-  
+
   /**
    * Produces card verifiable certificates.
    *

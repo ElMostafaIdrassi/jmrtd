@@ -148,9 +148,9 @@ public class PassportService extends PassportAPDUService {
   /** Short file identifier for card access file. */
   public static final byte SFI_CARD_ACCESS = 0x1C;
 
-  /** Short file identifier for card security file. */  
+  /** Short file identifier for card security file. */
   public static final byte SFI_CARD_SECURITY = 0x1D;
-  
+
   /** Short file identifier for file. */
   public static final byte SFI_DG1 = 0x01;
 
@@ -216,7 +216,7 @@ public class PassportService extends PassportAPDUService {
 
   /** The extended maximal tranceive length of APDUs. */
   public static final int EXTENDED_MAX_TRANCEIVE_LENGTH = 65536;
-  
+
   /**
    * The file read block size, some passports cannot handle large values.
    */
@@ -238,13 +238,13 @@ public class PassportService extends PassportAPDUService {
   private SecureMessagingWrapper wrapper;
 
   private int maxTranceiveSize;
-  
+
   private boolean isICAOAppletSelected;
-  
+
   private MRTDFileSystem rootFileSystem;
-  
+
   private MRTDFileSystem icaoFileSystem;
-  
+
   /**
    * Creates a new passport service for accessing the passport.
    *
@@ -348,7 +348,7 @@ public class PassportService extends PassportAPDUService {
   public synchronized byte[] sendReadBinary(int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
     return sendReadBinary(wrapper, NO_SFI, offset, le, false, isTLVEncodedOffsetNeeded);
   }
-  
+
   /**
    * Sends a {@code READ BINARY} command using a short file identifier to the passport,
    * using the wrapper when a secure channel has been set up.
@@ -547,7 +547,7 @@ public class PassportService extends PassportAPDUService {
   public int getMaxTranceiveLength() {
     return maxTranceiveSize;
   }
-  
+
   /**
    * Gets the wrapper. Returns {@code null} until access control has been performed.
    *

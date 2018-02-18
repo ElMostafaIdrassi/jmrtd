@@ -191,7 +191,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   public long getRecordLength() {
     return 11L + getImageLength();
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -215,7 +215,7 @@ public class IrisImageInfo extends AbstractImageInfo {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    
+
     IrisImageInfo other = (IrisImageInfo) obj;
     return imageFormat == other.imageFormat
         && imageNumber == other.imageNumber
