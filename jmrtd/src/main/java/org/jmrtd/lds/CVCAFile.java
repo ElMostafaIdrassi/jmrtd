@@ -51,6 +51,13 @@ public class CVCAFile extends AbstractLDSFile {
 
   private String altCaReference = null;
 
+  /**
+   * Constructs a CVCA file by reading from a stream.
+   *
+   * @param inputStream the stream to read from
+   *
+   * @throws IOException on error reading from the stream
+   */
   public CVCAFile(InputStream inputStream) throws IOException {
     this(PassportService.EF_CVCA, inputStream);
   }

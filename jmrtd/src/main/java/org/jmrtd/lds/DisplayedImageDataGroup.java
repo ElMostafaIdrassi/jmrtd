@@ -108,6 +108,13 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     }
   }
 
+  /**
+   * Writes the contents of this structure to a stream.
+   *
+   * @param outputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
   @Override
   protected void writeContent(OutputStream outputStream) throws IOException {
     TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
@@ -171,7 +178,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
 
   /**
    * Adds an image info to this data group.
-   * 
+   *
    * @param image the image to add
    */
   private void add(DisplayedImageInfo image) {

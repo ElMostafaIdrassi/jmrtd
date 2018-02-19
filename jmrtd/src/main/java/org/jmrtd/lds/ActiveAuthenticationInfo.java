@@ -128,7 +128,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
   /**
    * Returns the version of the Active Authentication protocol (should be 1).
-   * 
+   *
    * @return the version
    */
   public int getVersion() {
@@ -283,9 +283,9 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
   /**
    * Returns a human readable rendering of the given object identifier string.
-   * 
+   *
    * @param oid the object identifier (dotted notation)
-   * 
+   *
    * @return a human readable string representing the given object identifier
    */
   private String toProtocolOIDString(String oid) {
@@ -298,9 +298,9 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
 
   /**
    * Returns a human readable rendering of the given object identifier string.
-   * 
+   *
    * @param oid the object identifier (dotted notation)
-   * 
+   *
    * @return a human readable string representing the given object identifier
    */
   public static String toSignatureAlgorithmOIDString(String oid) {

@@ -528,7 +528,7 @@ public class PassportService extends PassportAPDUService {
 
   /**
    * Returns the maximum tranceive length of (protected) APDUs.
-   * 
+   *
    * @return the maximum APDU tranceive length
    */
   public int getMaxTranceiveLength() {

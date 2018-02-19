@@ -315,6 +315,15 @@ public class PACEProtocol {
         mappingResult, ephemeralPCDKeyPair, ephemeralPICCPublicKey, wrapper);
   }
 
+  /*
+   * 1. Encrypted Nonce     - --- Absent        - 0x80 Encrypted Nonce
+   *
+   * Receive encrypted nonce z = E(K_pi, s).
+   * (This is steps 1-3 in Table 4.4 in BSI 03111 2.0.)
+   *
+   * Decrypt nonce s = D(K_pi, z).
+   * (This is step 4 in Table 4.4 in BSI 03111 2.0.)
+   */
   /**
    * The first step in the PACE protocol receives an encrypted nonce from the PICC
    * and decrypts it.
@@ -325,15 +334,6 @@ public class PACEProtocol {
    * @return the decrypted encrypted PICC nonce
    *
    * @throws PACEException on error
-   */
-  /*
-   * 1. Encrypted Nonce     - --- Absent        - 0x80 Encrypted Nonce
-   *
-   * Receive encrypted nonce z = E(K_pi, s).
-   * (This is steps 1-3 in Table 4.4 in BSI 03111 2.0.)
-   *
-   * Decrypt nonce s = D(K_pi, z).
-   * (This is step 4 in Table 4.4 in BSI 03111 2.0.)
    */
   public byte[] doPACEStep1(SecretKey staticPACEKey, Cipher staticPACECipher) throws PACEException {
     byte[] piccNonce = null;
@@ -355,6 +355,15 @@ public class PACEProtocol {
     }
   }
 
+  /*
+   * 2. Map Nonce       - 0x81 Mapping Data     - 0x82 Mapping Data
+   *
+   * (This is step 3.a) in the protocol in TR-SAC.)
+   * (This is step 5 in Table 4.4 in BSI 03111 2.0.)
+   *
+   * Receive additional data required for map (i.e. a public key from PICC, and (conditionally) a nonce t).
+   * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
+   */
   /**
    * The second step in the PACE protocol computes ephemeral domain parameters
    * by mapping the PICC generated nonce (and optionally the PCD generated nonce,
@@ -369,15 +378,6 @@ public class PACEProtocol {
    * @return the newly computed ephemeral domain parameters
    *
    * @throws PACEException on error
-   */
-  /*
-   * 2. Map Nonce       - 0x81 Mapping Data     - 0x82 Mapping Data
-   *
-   * (This is step 3.a) in the protocol in TR-SAC.)
-   * (This is step 5 in Table 4.4 in BSI 03111 2.0.)
-   *
-   * Receive additional data required for map (i.e. a public key from PICC, and (conditionally) a nonce t).
-   * Compute ephemeral domain parameters D~ = Map(D_PICC, s).
    */
   public PACEMappingResult doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
     switch(mappingType) {
@@ -444,20 +444,6 @@ public class PACEProtocol {
     }
   }
 
-  /**
-   * The second step in the PACE protocol computes ephemeral domain parameters
-   * by performing a key agreement protocol with the PICC and PCD nonces as
-   * input.
-   *
-   * @param agreementAlg the agreement algorithm, either DH or ECDH
-   * @param params the static domain parameters
-   * @param piccNonce the received nonce from the PICC
-   * @param staticPACECipher the cipher to use for IM
-   *
-   * @return the computed ephemeral domain parameters
-   *
-   * @throws PACEException on error
-   */
   /*
    * The function Map:G -> G_Map is defined as
    * G_Map = f_G(R_p(s,t)),
@@ -472,6 +458,20 @@ public class PACEProtocol {
    *      Tibouch, Mehdi, Efficient Indifferentiable Hashing into Ordinary Elliptic Curves, Advances in
    *      Cryptology – CRYPTO 2010, Springer-Verlag, 2010.
    * [25]: Sagem, MorphoMapping Patents FR09-54043 and FR09-54053, 2009
+   */
+  /**
+   * The second step in the PACE protocol computes ephemeral domain parameters
+   * by performing a key agreement protocol with the PICC and PCD nonces as
+   * input.
+   *
+   * @param agreementAlg the agreement algorithm, either DH or ECDH
+   * @param params the static domain parameters
+   * @param piccNonce the received nonce from the PICC
+   * @param staticPACECipher the cipher to use for IM
+   *
+   * @return the computed ephemeral domain parameters
+   *
+   * @throws PACEException on error
    */
   public PACEIMMappingResult doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
     try {
@@ -503,7 +503,17 @@ public class PACEProtocol {
     }
   }
 
-  /* Choose random ephemeral key pair (SK_PCD~, PK_PCD~, D~). */
+  /* Choose a random ephemeral key pair. (SK_PCD~, PK_PCD~, D~). */
+  /**
+   * Chooses a random ephemeral key pair.
+   *
+   * @param agreementAlg the agreement algorithm
+   * @param ephemeralParams the parameters
+   *
+   * @return the key pair
+   *
+   * @throws PACEException on error
+   */
   public KeyPair doPACEStep3GenerateKeyPair(String agreementAlg, AlgorithmParameterSpec ephemeralParams) throws PACEException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
@@ -519,6 +529,16 @@ public class PACEProtocol {
    *
    * Exchange PK_PCD~ and PK_PICC~ with PICC.
    * Check that PK_PCD~ and PK_PICC~ differ.
+   */
+  /**
+   * Sends the PCD's public key to the PICC and receives and interprets the PICC's public key in exchange.
+   *
+   * @param pcdPublicKey the PCD's public key
+   * @param ephemeralParams the ephemeral parameters to interpret the PICC's public key
+   *
+   * @return the PICC's public key
+   *
+   * @throws PACEException on error
    */
   public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {
     try {
@@ -543,6 +563,17 @@ public class PACEProtocol {
   }
 
   /* Key agreement K = KA(SK_PCD~, PK_PICC~, D~). */
+  /**
+   * Performs the key agreement.
+   *
+   * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
+   * @param pcdPrivateKey the PCD's private key
+   * @param piccPublicKey the PICC's public key
+   *
+   * @return the shared secret
+   *
+   * @throws PACEException on error
+   */
   public byte[] doPACEStep3KeyAgreement(String agreementAlg, PrivateKey pcdPrivateKey, PublicKey piccPublicKey) throws PACEException {
     try {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
@@ -563,6 +594,19 @@ public class PACEProtocol {
    * Check authentication token T_PICC.
    *
    * Extracts encryptedChipAuthenticationData, if mapping type id CAM.
+   */
+  /**
+   * Exchanges authentication tokens.
+   *
+   * @param oid the object identifier
+   * @param mappingType the mapping type (GM or IM)
+   * @param pcdKeyPair the PCD's key pair
+   * @param piccPublicKey the PICC's public key
+   * @param macKey the MAC key to use
+   *
+   * @return possible encrypted chip authentication data (PACE-CAM case)
+   *
+   * @throws PACEException on error
    */
   public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
     try {
@@ -614,27 +658,36 @@ public class PACEProtocol {
   /**
    * Derives the static key K_pi.
    *
-   * @param keySpec the key material from the MRZ
+   * @param accessKey the key material from the MRZ
    * @param oid the PACE object identifier is needed to determine the cipher algorithm and the key length
    *
    * @return the derived key
    *
    * @throws GeneralSecurityException on error
    */
-  public static SecretKey deriveStaticPACEKey(KeySpec keySpec, String oid) throws GeneralSecurityException {
+  public static SecretKey deriveStaticPACEKey(AccessKeySpec accessKey, String oid) throws GeneralSecurityException {
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
     int keyLength = PACEInfo.toKeyLength(oid); /* Of the enc cipher. Either 128, 192, or 256. */
-    byte[] keySeed = computeKeySeedForPACE(keySpec);
+    byte[] keySeed = computeKeySeedForPACE(accessKey);
 
     byte paceKeyReference = 0;
-    if (keySpec instanceof PACEKeySpec) {
-      paceKeyReference = ((PACEKeySpec)keySpec).getKeyReference();
+    if (accessKey instanceof PACEKeySpec) {
+      paceKeyReference = ((PACEKeySpec)accessKey).getKeyReference();
     }
 
     return Util.deriveKey(keySeed, cipherAlg, keyLength, null, Util.PACE_MODE, paceKeyReference);
   }
 
-  public static byte[] computeKeySeedForPACE(KeySpec accessKey) throws GeneralSecurityException {
+  /**
+   * Computes a key seed based on an access key.
+   *
+   * @param accessKey the access key
+   *
+   * @return a key seed for secure messaging keys
+   *
+   * @throws GeneralSecurityException on error
+   */
+  public static byte[] computeKeySeedForPACE(AccessKeySpec accessKey) throws GeneralSecurityException {
     if (accessKey == null) {
       throw new IllegalArgumentException("Access key cannot be null");
     }
@@ -670,6 +723,17 @@ public class PACEProtocol {
 
   /* Generic Mapping. */
 
+  /**
+   * Maps the nonce  for the ECDH case
+   * using Generic Mapping to get new parameters
+   * (notably a new generator).
+   *
+   * @param nonceS the nonce received from the PICC
+   * @param sharedSecretPointH the shared secret
+   * @param staticParameters the static parameters
+   *
+   * @return the new parameters
+   */
   public static ECParameterSpec mapNonceGMWithECDH(byte[] nonceS, ECPoint sharedSecretPointH, ECParameterSpec staticParameters) {
     /*
      * D~ = (p, a, b, G~, n, h) where G~ = [s]G + H
@@ -689,12 +753,23 @@ public class PACEProtocol {
     return new ECParameterSpec(new EllipticCurve(new ECFieldFp(p), a, b), ephemeralGenerator, order, cofactor);
   }
 
-  public static DHParameterSpec mapNonceGMWithDH(byte[] nonceS, BigInteger sharedSecretH, DHParameterSpec params) {
+  /**
+   * Maps the nonce for the DH case using Generic Mapping
+   * to get new parameters
+   * (notably a new generator).
+   *
+   * @param nonceS the nonce received from the PICC
+   * @param sharedSecretH the shared secret point
+   * @param staticParameters the static parameters
+   *
+   * @return the new parameters
+   */
+  public static DHParameterSpec mapNonceGMWithDH(byte[] nonceS, BigInteger sharedSecretH, DHParameterSpec staticParameters) {
     // g~ = g^s * h
-    BigInteger p = params.getP();
-    BigInteger generator = params.getG();
+    BigInteger p = staticParameters.getP();
+    BigInteger generator = staticParameters.getG();
     BigInteger mappedGenerator = generator.modPow(Util.os2i(nonceS), p).multiply(sharedSecretH).mod(p);
-    return new DHParameterSpec(p, mappedGenerator, params.getL());
+    return new DHParameterSpec(p, mappedGenerator, staticParameters.getL());
   }
 
   /* Integrated Mapping. */

@@ -92,9 +92,9 @@ public class CVCertificateBuilder {
 
   /**
    * Translates the role to an EJBCA type.
-   * 
+   *
    * @param role a role
-   * 
+   *
    * @return the role as an EJBCA typed object
    */
   private static org.ejbca.cvc.AuthorizationRoleEnum getRole(Role role) {
@@ -113,9 +113,9 @@ public class CVCertificateBuilder {
 
   /**
    * Translates an access right to an EJBCA type.
-   * 
+   *
    * @param accessRight the access right
-   * 
+   *
    * @return the access right as an EJBCA typed object
    */
   private static org.ejbca.cvc.AccessRightEnum getAccessRight(Permission accessRight) {

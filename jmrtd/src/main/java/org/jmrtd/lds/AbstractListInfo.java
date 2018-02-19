@@ -49,6 +49,11 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
 
   private List<R> subRecords;
 
+  /**
+   * Returns the sub-records of this list.
+   *
+   * @return the sub-records
+   */
   protected List<R> getSubRecords() {
     if (this.subRecords == null) {
       this.subRecords = new ArrayList<R>();
@@ -57,6 +62,11 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     return new ArrayList<R>(this.subRecords);
   }
 
+  /**
+   * Adds a sub-record to this list.
+   *
+   * @param subRecord the sub-record to add
+   */
   protected void add(R subRecord) {
     if (this.subRecords == null) {
       this.subRecords = new ArrayList<R>();
@@ -64,6 +74,11 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     this.subRecords.add(subRecord);
   }
 
+  /**
+   * Adds all sub-records in a collection.
+   *
+   * @param subRecords the sub-records to add
+   */
   protected void addAll(List<R> subRecords) {
     if (this.subRecords == null) {
       this.subRecords = new ArrayList<R>();
@@ -71,6 +86,11 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     this.subRecords.addAll(subRecords);
   }
 
+  /**
+   * Removes a sub-record at a given index.
+   *
+   * @param index the index of the sub-record to remove
+   */
   protected void remove(int index) {
     if (this.subRecords == null) {
       this.subRecords = new ArrayList<R>();
@@ -132,8 +152,20 @@ public abstract class AbstractListInfo<R extends Serializable> extends AbstractL
     return 7 * result + 11;
   }
 
+  /**
+   * Writes this value to a stream.
+   *
+   * @param outputStream the stream to write to
+   */
   @Override
   public abstract void writeObject(OutputStream outputStream) throws IOException;
 
+  /**
+   * Reads this value from a stream.
+   *
+   * @param inputStream the stream to read from
+   *
+   * @throws IOException on error reading from the stream
+   */
   public abstract void readObject(InputStream inputStream) throws IOException;
 }

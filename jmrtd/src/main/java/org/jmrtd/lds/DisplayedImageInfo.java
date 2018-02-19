@@ -107,10 +107,22 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     tlvOut.writeValueEnd();
   }
 
+  /**
+   * Returns the displayed image tag.
+   * Either {@link #DISPLAYED_PORTRAIT_TAG} or {@link #DISPLAYED_SIGNATURE_OR_MARK_TAG},
+   * depending on the type of image.
+   *
+   * @return the displayed image tag
+   */
   int getDisplayedImageTag() {
     return displayedImageTag;
   }
 
+  /**
+   * Returns the record length of the encoded image info.
+   *
+   * @return the record length of the encoded image info
+   */
   public long getRecordLength() {
     long length = 0;
     int imageLength = getImageLength();
@@ -172,6 +184,13 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Derives the displayed image info tag from the image type.
+   *
+   * @param type the image type, either {@link #TYPE_PORTRAIT} or {@link #TYPE_SIGNATURE_OR_MARK}
+   *
+   * @return the corresponding image info tag
+   */
   private static int getDisplayedImageTagFromType(int type) {
     switch (type) {
       case TYPE_PORTRAIT:
@@ -183,6 +202,13 @@ public class DisplayedImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Derives the image info type from the given tag.
+   *
+   * @param tag a tag, either {@link #DISPLAYED_PORTRAIT_TAG} or {@link #DISPLAYED_SIGNATURE_OR_MARK_TAG}
+   *
+   * @return the corresponding image info type
+   */
   private static int getTypeFromDisplayedImageTag(int tag) {
     switch (tag) {
       case DISPLAYED_PORTRAIT_TAG:

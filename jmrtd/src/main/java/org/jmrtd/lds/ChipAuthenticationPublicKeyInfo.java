@@ -217,6 +217,13 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
         && publicKey.equals(otherInfo.publicKey);
   }
 
+  /**
+   * Returns an ASN1 name for the protocol object identifier.
+   *
+   * @param oid the protocol object identifier
+   *
+   * @return an ASN1 name if known, or the object identifier itself if not
+   */
   private static String toProtocolOIDString(String oid) {
     if (ID_PK_DH.equals(oid)) {
       return "id-PK-DH";

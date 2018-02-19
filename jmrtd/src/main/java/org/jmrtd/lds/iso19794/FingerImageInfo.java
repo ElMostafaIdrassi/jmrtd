@@ -434,9 +434,9 @@ public class FingerImageInfo extends AbstractImageInfo {
 
   /**
    * Returns a human readable string for the given position code.
-   * 
+   *
    * @param position an ISO finger position code
-   * 
+   *
    * @return a human readable string
    */
   private static String positionToString(int position) {
@@ -510,9 +510,9 @@ public class FingerImageInfo extends AbstractImageInfo {
 
   /**
    * Returns a human readable string for the given impression type code.
-   * 
+   *
    * @param impressionType the impression type code
-   * 
+   *
    * @return a human readable string for the given impression type code
    */
   private static String impressionTypeToString(int impressionType) {

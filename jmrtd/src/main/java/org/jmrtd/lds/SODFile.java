@@ -297,9 +297,9 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   /**
    * Extracts the digest algorithm from the security object.
-   * 
+   *
    * @param ldsSecurityObject the security object
-   * 
+   *
    * @return a mnemonic (Java JCE) string representation of the digest algorithm
    */
   private static String getDigestAlgorithm(LDSSecurityObject ldsSecurityObject) {
@@ -442,15 +442,15 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   /**
    * Encodes a content info for the hash table.
-   * 
+   *
    * @param contentTypeOID the content info OID to use
    * @param digestAlgorithm the digest algorithm
    * @param dataGroupHashes the hash table
    * @param ldsVersion the LDS version
    * @param unicodeVersion the Unicode version
-   * 
+   *
    * @return the content info
-   * 
+   *
    * @throws NoSuchAlgorithmException on error
    * @throws IOException on error writing to memory
    */

@@ -93,7 +93,7 @@ public class ICAOCountry extends Country {
 
   /**
    * Constructs a country.
-   * 
+   *
    * @param alpha2Code the two-digit alpha code
    * @param alpha3Code the three-digit alpha code
    * @param name a name for the country
@@ -105,7 +105,7 @@ public class ICAOCountry extends Country {
 
   /**
    * Constructs a country.
-   * 
+   *
    * @param alpha2Code the 2-letter alpha code
    * @param alpha3Code the 3-letter alpha code
    * @param name a name for the country

@@ -121,6 +121,11 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     return oid;
   }
 
+  /**
+   * Returns the Chip Authentication version (either 1 or 2).
+   *
+   * @return the Chip Authentication version
+   */
   public int getVersion() {
     return version;
   }
@@ -215,6 +220,14 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         && (keyId == null && otherChipAuthenticationInfo.keyId == null || keyId != null && keyId.equals(otherChipAuthenticationInfo.keyId));
   }
 
+  /**
+   * Returns the key agreement algorithm ({@code "DH"} or {@code "ECDH"}
+   * for the given Chip Authentication protocol object identifier.
+   *
+   * @param oid a EAC-CA protocol object identifier
+   *
+   * @return the key agreement algorithm
+   */
   public static String toKeyAgreementAlgorithm(String oid) {
     if (oid == null) {
       throw new NumberFormatException("Unknown OID: null");
@@ -235,6 +248,14 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the encryption algorithm ({@code "DESede"} or {@code "AES"})
+   * for the given EAC-CA protocol object identifier.
+   *
+   * @param oid a EAC-CA protocol object identifier
+   *
+   * @return a JCE mnemonic cipher algorithm string
+   */
   public static String toCipherAlgorithm(String oid) {
     if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
         || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)) {
@@ -251,6 +272,14 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the digest algorithm ({@code "SHA-1"} or {@code "SHA-256"})
+   * for the given EAC-CA protocol object identifier.
+   *
+   * @param oid a EAC-CA protocol object identifier
+   *
+   * @return a JCE mnemonic digest algorithm string
+   */
   public static String toDigestAlgorithm(String oid) {
     if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
         || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)
@@ -267,6 +296,14 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the key length in bits (128, 192, or 256)
+   * for the given EAC-CA protocol object identifier.
+   *
+   * @param oid a EAC-CA protocol object identifier
+   *
+   * @return a key length in bits
+   */
   public static int toKeyLength(String oid) {
     if (ID_CA_DH_3DES_CBC_CBC.equals(oid)
         || ID_CA_ECDH_3DES_CBC_CBC.equals(oid)
@@ -284,6 +321,13 @@ public class ChipAuthenticationInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns an ASN1 name for the given EAC-CA protocol identifier.
+   *
+   * @param oid a EAC-CA protocol identifier
+   *
+   * @return an ASN1 name
+   */
   private static String toProtocolOIDString(String oid) {
     if (ID_CA_DH_3DES_CBC_CBC.equals(oid)) {
       return "id-CA-DH-3DES-CBC-CBC";

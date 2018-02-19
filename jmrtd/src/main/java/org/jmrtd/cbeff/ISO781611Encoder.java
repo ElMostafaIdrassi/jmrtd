@@ -71,10 +71,10 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   /**
    * Writes a BIT group to a stream.
-   * 
+   *
    * @param records the records of the BIT group
    * @param outputStream the stream to write to
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   private void writeBITGroup(List<CBEFFInfo> records, OutputStream outputStream) throws IOException {
@@ -94,11 +94,11 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   /**
    * Writes a single BIT to a stream.
-   * 
+   *
    * @param tlvOutputStream the stream to write to
    * @param index the index of the BIT within the BIT group
    * @param cbeffInfo the BIT
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   private void writeBIT(TLVOutputStream tlvOutputStream, int index, SimpleCBEFFInfo<B> cbeffInfo) throws IOException {
@@ -110,11 +110,11 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   /**
    * Writes a a header for a single BIT to a stream.
-   * 
+   *
    * @param tlvOutputStream the stream to write to
    * @param index the index of the BIT within the BIT group
    * @param cbeffInfo the BIT to write
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   private void writeBHT(TLVOutputStream tlvOutputStream, int index, SimpleCBEFFInfo<B> cbeffInfo) throws IOException {
@@ -134,10 +134,10 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   /**
    * Writes the contents of a single BIT to a stream.
-   * 
+   *
    * @param tlvOutputStream the stream to write to
    * @param bdb the contents to write
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   private void writeBiometricDataBlock(TLVOutputStream tlvOutputStream, B bdb) throws IOException {

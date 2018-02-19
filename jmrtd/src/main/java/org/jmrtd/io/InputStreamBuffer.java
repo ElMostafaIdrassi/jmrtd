@@ -113,14 +113,14 @@ public class InputStreamBuffer {
 
     /** The position within this stream. */
     private int position;
-    
+
     private int markedPosition;
 
     private Object syncObject;
 
     /**
      * Creates a sub-stream.
-     * 
+     *
      * @param syncObject an object for locking
      */
     public SubInputStream(Object syncObject) {
@@ -131,7 +131,7 @@ public class InputStreamBuffer {
 
     /**
      * Returns the underlying fragment buffer.
-     * 
+     *
      * @return the buffer
      */
     public FragmentBuffer getBuffer() {
@@ -287,7 +287,7 @@ public class InputStreamBuffer {
 
     /**
      * The position within this stream.
-     * 
+     *
      * @return the position
      */
     public int getPosition() {

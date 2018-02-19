@@ -51,7 +51,7 @@ public class CVCAuthorizationTemplate {
 
     /**
      * Creates a role for the given value.
-     * 
+     *
      * @param value the value code
      */
     private Role(int value) {
@@ -85,7 +85,7 @@ public class CVCAuthorizationTemplate {
 
     /**
      * Constructs a permission for the given value.
-     * 
+     *
      * @param value a value code
      */
     private Permission(int value) {
@@ -212,9 +212,9 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Translates a permission to an EJBCA typed equivalent permission.
-   * 
+   *
    * @param permission a permission
-   * 
+   *
    * @return the EJBCA typed equivalent of the given permission
    */
   static org.ejbca.cvc.AccessRightEnum fromPermission(Permission permission) {
@@ -238,9 +238,9 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Translates a role to an EJBCA typed equivalent role.
-   * 
+   *
    * @param role a role
-   * 
+   *
    * @return the EJBCA typed equivalent role
    */
   static org.ejbca.cvc.AuthorizationRoleEnum fromRole(Role role) {
@@ -264,9 +264,9 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Translates an EJBCA typed role to a role.
-   * 
+   *
    * @param template the EJBCA typed role
-   * 
+   *
    * @return the equivalent role
    */
   private static Role toRole(org.ejbca.cvc.CVCAuthorizationTemplate template) {
@@ -291,9 +291,9 @@ public class CVCAuthorizationTemplate {
 
   /**
    * Translates an EJBCA typed permission to an equivalent permission.
-   * 
+   *
    * @param template the EJBCA typed permission
-   * 
+   *
    * @return the equivalent permission
    */
   private static Permission toPermission(org.ejbca.cvc.CVCAuthorizationTemplate template) {

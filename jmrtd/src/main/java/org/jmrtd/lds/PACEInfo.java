@@ -218,6 +218,13 @@ public class PACEInfo extends SecurityInfo {
     this.parameterId = parameterId;
   }
 
+  /**
+   * Creates a PACE info from an encoding.
+   *
+   * @param paceInfoBytes the encoded bytes
+   *
+   * @return a PACE info object
+   */
   public static PACEInfo createPACEInfo(byte[] paceInfoBytes) {
     /*
      * FIXME: Should add a constructor to PACEInfo that takes byte[] or InputStream, or
@@ -333,6 +340,13 @@ public class PACEInfo extends SecurityInfo {
     return getDERObject().equals(otherPACEInfo.getDERObject());
   }
 
+  /**
+   * Checks whether the object identifier is valid for describing a PACE protocol.
+   *
+   * @param oid a PACE object identifier
+   *
+   * @return a boolean indicating whether the object identifier describes a known PACE protocol
+   */
   public static boolean checkRequiredIdentifier(String oid) {
     return ALLOWED_REQUIRED_IDENTIFIERS.contains(oid);
   }
@@ -342,6 +356,13 @@ public class PACEInfo extends SecurityInfo {
    * so that we can get rid of static methods below. -- MO
    */
 
+  /**
+   * Returns the mapping type for a given PACE protocol object identifier.
+   *
+   * @param oid a PACE protocol object identifier
+   *
+   * @return the mapping type
+   */
   public static MappingType toMappingType(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
@@ -370,6 +391,14 @@ public class PACEInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the key agreement algorithm ({@code "DH"} or {@code "ECDH"})
+   * for a PACE protocol object identifier.
+   *
+   * @param oid a PACE protocol object identifier
+   *
+   * @return a key agreement algorithm as JCE mnemonic string
+   */
   public static String toKeyAgreementAlgorithm(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_GM_AES_CBC_CMAC_128.equals(oid)
@@ -397,6 +426,13 @@ public class PACEInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the encryption algorithm described in the PACE protocol object identifier.
+   *
+   * @param oid the PACE protocol object identifier
+   *
+   * @return a encryption algorithm as JCE mnemonic string
+   */
   public static String toCipherAlgorithm(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
@@ -425,6 +461,13 @@ public class PACEInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the digest algorithm described in the PACE protocol object identifier.
+   *
+   * @param oid the PACE protocol object identifier
+   *
+   * @return a digest algorithm as JCE mnemonic string
+   */
   public static String toDigestAlgorithm(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
@@ -452,6 +495,13 @@ public class PACEInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Returns the key length (128, 192, or 256) described in the given PACE protocol object identifier.
+   *
+   * @param oid a PACE protocol object identifier
+   *
+   * @return the key length in bits
+   */
   public static int toKeyLength(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)
         || ID_PACE_DH_IM_3DES_CBC_CBC.equals(oid)
@@ -480,10 +530,24 @@ public class PACEInfo extends SecurityInfo {
     throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
   }
 
+  /**
+   * Derives a JCE algorithm parameter specification from a PACE standard domain parameter integer.
+   *
+   * @param stdDomainParam the standard domain parameter
+   *
+   * @return a JCE algorithm parameter specification
+   */
   public static AlgorithmParameterSpec toParameterSpec(BigInteger stdDomainParam) {
     return toParameterSpec(stdDomainParam.intValue());
   }
 
+  /**
+   * Derives a JCE algorithm parameter specification from a PACE standard domain parameter integer.
+   *
+   * @param stdDomainParam the standard domain parameter
+   *
+   * @return a JCE algorithm parameter specification
+   */
   public static AlgorithmParameterSpec toParameterSpec(int stdDomainParam) {
     switch (stdDomainParam) {
       case PARAM_ID_GFP_1024_160:
@@ -519,6 +583,13 @@ public class PACEInfo extends SecurityInfo {
     }
   }
 
+  /**
+   * Derives a human readable algorithm description from a PACE standard domain parameter integer.
+   *
+   * @param stdDomainParam the standard domain parameter
+   *
+   * @return a human readable algorithm description
+   */
   public static String toStandardizedParamIdString(BigInteger stdDomainParam) {
     if (stdDomainParam == null) {
       return "null";
@@ -560,6 +631,13 @@ public class PACEInfo extends SecurityInfo {
     }
   }
 
+  /**
+   * Returns an ASN1 name for the given object identifier.
+   *
+   * @param oid a PACE protocol object identifier
+   *
+   * @return an ASN1 name if known, or the original object identifier if not
+   */
   private String toProtocolOIDString(String oid) {
     if (ID_PACE_DH_GM_3DES_CBC_CBC.equals(oid)) {
       return "id-PACE-DH-GM-3DES-CBC-CBC";

@@ -313,9 +313,9 @@ public class IrisImageInfo extends AbstractImageInfo {
 
   /**
    * Returns a mime-type for the given image format code.
-   * 
+   *
    * @param imageFormat the image format code
-   * 
+   *
    * @return a mime-type
    */
   private static String getMimeTypeFromImageFormat(int imageFormat) {

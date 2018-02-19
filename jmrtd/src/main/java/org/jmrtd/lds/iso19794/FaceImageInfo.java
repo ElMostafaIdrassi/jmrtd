@@ -125,17 +125,17 @@ public class FaceImageInfo extends AbstractImageInfo {
 
     /**
      * Returns the integer code to use in ISO19794-5 encoding for this color.
-     * 
+     *
      * @return the integer code
      */
     public abstract int toInt();
 
     /**
      * Returns an eye color value for the given code.
-     * 
+     *
      * @param i the integer code for a color
-     * 
-     * @return
+     *
+     * @return the color value
      */
     static EyeColor toEyeColor(int i) {
       for (EyeColor c: EyeColor.values()) {
@@ -715,9 +715,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Writes the record data to a stream.
-   * 
+   *
    * @param outputStream the stream to write to
-   * 
+   *
    * @throws IOException on error
    */
   private void writeFacialRecordData(OutputStream outputStream) throws IOException {
@@ -771,7 +771,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Converts a hair color value to a human readable string.
-   * 
+   *
    * @return a human readable string for the current hair color value
    */
   private String hairColorToString() {
@@ -803,7 +803,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Returns a human readable string for the current feature mask.
-   * 
+   *
    * @return a human readable string
    */
   private String featureMaskToString() {
@@ -854,7 +854,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Converts the current expression to a human readable string.
-   * 
+   *
    * @return a human readable string
    */
   private String expressionToString() {
@@ -882,7 +882,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Converts the current pose angle to a human readable string.
-   * 
+   *
    * @return a human readable string
    */
   private String poseAngleToString() {
@@ -910,7 +910,7 @@ public class FaceImageInfo extends AbstractImageInfo {
    * Returns a textual representation of the face image type
    * ({@code "basic"}, {@code "full frontal"}, {@code "token frontal"},
    * or {@code "unknown"}).
-   * 
+   *
    * @return a textual representation of the face image type
    */
   private String faceImageTypeToString() {
@@ -928,7 +928,7 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Returns a textual representation of the source type.
-   * 
+   *
    * @return a textual representation of the source type
    */
   private String sourceTypeToString() {
@@ -954,9 +954,9 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /**
    * Returns a mime-type string for the compression algorithm code.
-   * 
+   *
    * @param compressionAlg the compression algorithm code as it occurs in the header
-   * 
+   *
    * @return a mime-type string,
    *         typically {@value ImageInfo#JPEG_MIME_TYPE} or {@value ImageInfo#JPEG2000_MIME_TYPE}
    */

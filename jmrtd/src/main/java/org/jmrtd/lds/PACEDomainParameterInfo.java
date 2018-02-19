@@ -113,15 +113,26 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   private BigInteger parameterId;
 
   /**
-   * Constructs a PACE Domain parameter info.
+   * Constructs a PACE domain parameter info structure.
    *
-   * @param protocolOID Must be @see SecurityInfo.#ID_PACE_DH_GM, @see SecurityInfo.#ID_PACE_ECDH_GM, @see SecurityInfo.#ID_PACE_DH_IM, @see SecurityInfo.#ID_PACE_ECDH_IM
-   * @param parameters Parameters in the form of algorithm identifier with algorithm 1.2.840.10046.2.1 (DH public number) or 1.2.840.10045.2.1 (EC public key)
+   * @param protocolOID must be {@link SecurityInfo#ID_PACE_DH_GM}, {@link SecurityInfo#ID_PACE_ECDH_GM},
+   *                    {@link SecurityInfo#ID_PACE_DH_IM}, {@link SecurityInfo#ID_PACE_ECDH_IM}
+   * @param domainParameter parameters in the form of algorithm identifier with algorithm
+   *        1.2.840.10046.2.1 (DH public number) or 1.2.840.10045.2.1 (EC public key)
    */
-  public PACEDomainParameterInfo(String protocolOID, AlgorithmIdentifier parameters) {
-    this(protocolOID, parameters, null);
+  public PACEDomainParameterInfo(String protocolOID, AlgorithmIdentifier domainParameter) {
+    this(protocolOID, domainParameter, null);
   }
 
+  /**
+   * Constructs a PACE domain parameter info structure.
+   *
+   * @param protocolOID must be {@link SecurityInfo#ID_PACE_DH_GM}, {@link SecurityInfo#ID_PACE_ECDH_GM},
+   *                    {@link SecurityInfo#ID_PACE_DH_IM}, {@link SecurityInfo#ID_PACE_ECDH_IM}
+   * @param domainParameter parameters in the form of algorithm identifier with algorithm
+   *        1.2.840.10046.2.1 (DH public number) or 1.2.840.10045.2.1 (EC public key)
+   * @param parameterId an identifier to identify this info
+   */
   public PACEDomainParameterInfo(String protocolOID, AlgorithmIdentifier domainParameter, BigInteger parameterId) {
     if (!checkRequiredIdentifier(protocolOID)) {
       throw new IllegalArgumentException("Invalid protocol id: " + protocolOID);
@@ -138,7 +149,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier as a human readable string.
+   * Returns the protocol object identifier as a human readable string.
    *
    * @return a string
    */
@@ -148,9 +159,9 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the parameter id, or -1 if this is the only domain parameter info.
+   * Returns the parameter id, or {@code null} if this is the only domain parameter info.
    *
-   * @return the parameter id or -1
+   * @return the parameter id or {@code null}
    */
   public BigInteger getParameterId() {
     return parameterId;
@@ -238,6 +249,13 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     return getDERObject().equals(otherPACEDomainParameterInfo.getDERObject());
   }
 
+  /**
+   * Checks whether the object identifier is an allowed PACE related object identifier.
+   *
+   * @param oid a string representing an object identifier
+   *
+   * @return a boolean indicating whether the object identifier is allowed
+   */
   public static boolean checkRequiredIdentifier(String oid) {
     return ID_PACE_DH_GM.equals(oid)
         || ID_PACE_ECDH_GM.equals(oid)
@@ -395,6 +413,14 @@ public class PACEDomainParameterInfo extends SecurityInfo {
 
   /* ONLY PRIVATE METHODS BELOW */
 
+  /**
+   * Returns an BC algorithm identifier for the given protocol object identifier.
+   *
+   * @param protocolOID the protocol object identifier
+   * @param parameters the parameters as a BC ASN1 encodable
+   *
+   * @return an algorithm identifier
+   */
   private static AlgorithmIdentifier toAlgorithmIdentifier(String protocolOID, ASN1Encodable parameters) {
     if (ID_PACE_DH_GM.equals(protocolOID)
         || ID_PACE_DH_IM.equals(protocolOID)) {
@@ -407,6 +433,13 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     throw new IllegalArgumentException("Cannot infer algorithm OID from protocol OID: " + protocolOID);
   }
 
+  /**
+   * Returns an ASN1 name for the give object identifier.
+   *
+   * @param oid an object identifier
+   *
+   * @return an ASN1 name
+   */
   private static String toProtocolOIDString(String oid) {
     if (ID_PACE_DH_GM.equals(oid)) {
       return "id-PACE-DH-GM";

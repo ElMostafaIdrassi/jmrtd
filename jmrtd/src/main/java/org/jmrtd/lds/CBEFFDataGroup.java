@@ -59,6 +59,12 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   /** Records in the BIT group. Each record represents a single BIT. */
   private List<R> subRecords;
 
+  /**
+   * Creates a CBEFF data group.
+   *
+   * @param dataGroupTag the data group tag
+   * @param subRecords the sub-records contained in this data group
+   */
   protected CBEFFDataGroup(int dataGroupTag, List<R> subRecords) {
     super(dataGroupTag);
     addAll(subRecords);
@@ -78,6 +84,11 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     this.random = new Random();
   }
 
+  /**
+   * Adds a record to this data group.
+   *
+   * @param record the record to add
+   */
   public void add(R record) {
     if (subRecords == null) {
       subRecords = new ArrayList<R>();
@@ -85,6 +96,11 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     subRecords.add(record);
   }
 
+  /**
+   * Adds all records in a list to this data group.
+   *
+   * @param records the records to add
+   */
   public void addAll(List<R> records) {
     if (subRecords == null) {
       subRecords = new ArrayList<R>();
@@ -92,6 +108,11 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     subRecords.addAll(records);
   }
 
+  /**
+   * Removes the record at the given index.
+   *
+   * @param index the index of the record to remove
+   */
   public void remove(int index) {
     if (subRecords == null) {
       subRecords = new ArrayList<R>();
@@ -99,6 +120,11 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     subRecords.remove(index);
   }
 
+  /**
+   * Returns the records in this data group.
+   *
+   * @return the records in this data group
+   */
   public List<R> getSubRecords() {
     if (subRecords == null) {
       subRecords = new ArrayList<R>();

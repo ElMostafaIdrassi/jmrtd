@@ -716,7 +716,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /**
    * Gets a bit-mask for the biometric sub-types found in this iris info.
-   * 
+   *
    * @return a bit-mask for the biometric sub-types found in this iris info
    */
   private int getBiometricSubtype() {

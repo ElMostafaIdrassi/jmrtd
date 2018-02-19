@@ -369,7 +369,7 @@ public class FragmentBuffer implements Serializable {
   /**
    * Sets the capacity of the buffer.
    * This has no effect for lengths smaller than the current buffer capacity.
-   * 
+   *
    * @param length the proposed new capacity of the buffer
    */
   private void setLength(int length) {
@@ -396,7 +396,7 @@ public class FragmentBuffer implements Serializable {
 
     /**
      * Constructs a fragment.
-     * 
+     *
      * @param offset the offset within the buffer
      * @param length the length of the fragment
      */
@@ -407,10 +407,10 @@ public class FragmentBuffer implements Serializable {
 
     /**
      * Returns a fragment instance.
-     * 
+     *
      * @param offset the offset within the buffer
      * @param length the length of the fragment
-     * 
+     *
      * @return the new fragment
      */
     public static Fragment getInstance(int offset, int length) {
@@ -419,7 +419,7 @@ public class FragmentBuffer implements Serializable {
 
     /**
      * Returns this fragment's offset within the buffer.
-     * 
+     *
      * @return the offset of the fragment
      */
     public int getOffset() {
@@ -428,7 +428,7 @@ public class FragmentBuffer implements Serializable {
 
     /**
      * Returns the length of the fragment.
-     * 
+     *
      * @return the length of the fragment
      */
     public int getLength() {

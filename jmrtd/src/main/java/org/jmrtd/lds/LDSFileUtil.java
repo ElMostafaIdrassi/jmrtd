@@ -517,6 +517,14 @@ public final class LDSFileUtil {
     }
   }
 
+  /**
+   * Returns the short (one  byte) file identifier corresponding
+   * to the given (two byte) file identifier.
+   *
+   * @param fid a file identifier
+   *
+   * @return the corresponding short file identifier
+   */
   public static int lookupSFIByFID(short fid) {
     switch(fid) {
       case PassportService.EF_COM:

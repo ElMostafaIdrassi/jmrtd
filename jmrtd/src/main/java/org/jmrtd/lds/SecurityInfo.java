@@ -190,12 +190,17 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the protocol object identifier of this SecurityInfo.
+   * Returns the protocol object identifier of this SecurityInfo.
    *
    * @return this protocol object identifier
    */
   public abstract String getObjectIdentifier();
 
+  /**
+   * Gets the protocol object identifier as a human readable string.
+   *
+   * @return a human readable string representing the protocol object identifier
+   */
   public abstract String getProtocolOIDString();
 
   /**

@@ -325,7 +325,7 @@ public class COMFile extends AbstractTaggedLDSFile {
 
   /**
    * Initializes this index file.
-   * 
+   *
    * @param versionLDS the version of the LDS
    * @param updateLevelLDS the update level of the LDS
    * @param majorVersionUnicode the major version

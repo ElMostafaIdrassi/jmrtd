@@ -214,10 +214,10 @@ public class MRZInfo extends AbstractLDSInfo {
 
   /**
    * Reads the object value from a stream.
-   * 
+   *
    * @param inputStream the stream to read from
    * @param length the length of the value
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   private void readObject(InputStream inputStream, int length) throws IOException {
@@ -448,7 +448,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the document type.
+   * Returns the document type.
    *
    * @return document type
    */
@@ -456,6 +456,11 @@ public class MRZInfo extends AbstractLDSInfo {
     return documentCode;
   }
 
+  /**
+   * Sets the document code.
+   *
+   * @param documentCode the new document code
+   */
   public void setDocumentCode(String documentCode) {
     this.documentCode = documentCode;
     this.documentType = getDocumentTypeFromDocumentCode(documentCode);
@@ -729,6 +734,12 @@ public class MRZInfo extends AbstractLDSInfo {
 
   /* ONLY PRIVATE METHODS BELOW */
 
+  /**
+   * Sets the name identifiers (primary and secondary identifier) based on
+   * the name in the MRZ.
+   *
+   * @param mrzNameString the name field as it occurs in the MRZ
+   */
   private void readNameIdentifiers(String mrzNameString) {
     int delimIndex = mrzNameString.indexOf("<<");
     if (delimIndex < 0) {
@@ -742,43 +753,114 @@ public class MRZInfo extends AbstractLDSInfo {
     readSecondaryIdentifiers(rest);
   }
 
+  /**
+   * Sets the secondary identifier.
+   *
+   * @param secondaryIdentifier the new secondary identifier
+   */
   private void readSecondaryIdentifiers(String secondaryIdentifier) {
     this.secondaryIdentifier = secondaryIdentifier;
   }
 
-  private void writeString(String string, DataOutputStream dataOut, int width) throws IOException {
-    dataOut.write(mrzFormat(string, width).getBytes("UTF-8"));
+  /**
+   * Writes a MRZ string to a stream, optionally formatting the MRZ string.
+   *
+   * @param string the string to write
+   * @param dataOutputStream the stream to write to
+   * @param width the width of the MRZ field (the string will be augmented with trailing fillers)
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeString(String string, DataOutputStream dataOutputStream, int width) throws IOException {
+    dataOutputStream.write(mrzFormat(string, width).getBytes("UTF-8"));
   }
 
-  private void writeIssuingState(DataOutputStream dataOut) throws IOException {
-    dataOut.write(issuingState.getBytes("UTF-8"));
+  /**
+   * Writes the issuing state to an stream.
+   *
+   * @param dataOutputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeIssuingState(DataOutputStream dataOutputStream) throws IOException {
+    dataOutputStream.write(issuingState.getBytes("UTF-8"));
   }
 
-  private void writeDateOfExpiry(DataOutputStream dataOut) throws IOException {
-    dataOut.write(dateOfExpiry.getBytes("UTF-8"));
+  /**
+   * Writes the date of expiry to a stream.
+   *
+   * @param dateOutputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeDateOfExpiry(DataOutputStream dateOutputStream) throws IOException {
+    dateOutputStream.write(dateOfExpiry.getBytes("UTF-8"));
   }
 
-  private void writeGender(DataOutputStream dataOut) throws IOException {
-    dataOut.write(genderToString().getBytes("UTF-8"));
+  /**
+   * Writes the gender to a stream.
+   *
+   * @param dataOutputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeGender(DataOutputStream dataOutputStream) throws IOException {
+    dataOutputStream.write(genderToString(gender).getBytes("UTF-8"));
   }
 
-  private void writeDateOfBirth(DataOutputStream dataOut) throws IOException {
-    dataOut.write(dateOfBirth.getBytes("UTF-8"));
+  /**
+   * Writes the data of birth to a stream.
+   *
+   * @param dataOutputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeDateOfBirth(DataOutputStream dataOutputStream) throws IOException {
+    dataOutputStream.write(dateOfBirth.getBytes("UTF-8"));
   }
 
-  private void writeNationality(DataOutputStream dataOut) throws IOException {
-    dataOut.write(nationality.getBytes("UTF-8"));
+  /**
+   * Writes the nationality to a stream.
+   *
+   * @param dataOutputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeNationality(DataOutputStream dataOutputStream) throws IOException {
+    dataOutputStream.write(nationality.getBytes("UTF-8"));
   }
 
-  private void writeName(DataOutputStream dataOut, int width) throws IOException {
-    dataOut.write(nameToString(width).getBytes("UTF-8"));
+  /**
+   * Writes the name to a stream.
+   *
+   * @param dataOutputStream the stream to write to
+   * @param width the width of the field
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeName(DataOutputStream dataOutputStream, int width) throws IOException {
+    dataOutputStream.write(nameToString(primaryIdentifier, secondaryIdentifier, width).getBytes("UTF-8"));
   }
 
-  private void writeDocumentType(DataOutputStream dataOut) throws IOException {
-    writeString(documentCode, dataOut, 2);
+  /**
+   * Write the document type to a stream.
+   *
+   * @param dataOutputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
+  private void writeDocumentType(DataOutputStream dataOutputStream) throws IOException {
+    writeString(documentCode, dataOutputStream, 2);
   }
 
-  private String genderToString() {
+  /**
+   * Converts a gender to a string to be used in an MRZ.
+   *
+   * @param gender the gender
+   *
+   * @return a string to be used in an MRZ
+   */
+  private static String genderToString(Gender gender) {
     switch (gender) {
       case MALE:
         return "M";
@@ -789,7 +871,17 @@ public class MRZInfo extends AbstractLDSInfo {
     }
   }
 
-  private String nameToString(int width) {
+  /**
+   * Converts the name (primary and secondary identifier) to a single MRZ formatted name
+   * field of the given length.
+   *
+   * @param primaryIdentifier the primary identifier part of the name
+   * @param secondaryIdentifier the secondary identifier part of the name
+   * @param width the width of the resulting MRZ formatted string
+   *
+   * @return the string containing the MRZ formatted name field
+   */
+  private static String nameToString(String primaryIdentifier, String secondaryIdentifier, int width) {
     String[] primaryComponents = primaryIdentifier.split(" |<");
     String[] secondaryComponents = secondaryIdentifier == null || secondaryIdentifier.trim().isEmpty() ? new String[0] : secondaryIdentifier.split(" |<");
 
@@ -820,14 +912,18 @@ public class MRZInfo extends AbstractLDSInfo {
     return mrzFormat(name.toString(), width);
   }
 
-  private String readString(DataInputStream in, int count) throws IOException {
-    byte[] data = new byte[count];
-    in.readFully(data);
-    return new String(data).trim();
-  }
-
-  private String readStringWithFillers(DataInputStream in, int count) throws IOException {
-    return trimFillerChars(readString(in, count));
+  /**
+   * Reads a string including fillers.
+   *
+   * @param inputStream the stream to read from
+   * @param count the length of the field
+   *
+   * @return the string
+   *
+   * @throws IOException on error reading from the stream
+   */
+  private String readStringWithFillers(DataInputStream inputStream, int count) throws IOException {
+    return trimFillerChars(readString(inputStream, count));
   }
 
   /**
@@ -838,7 +934,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return a string of length 3 containing an abbreviation
    *         of the issuing state or organization
    *
-   * @throws IOException if something goes wrong
+   * @throws IOException error reading from the stream
    */
   private String readCountry(DataInputStream inputStream) throws IOException {
     return readString(inputStream, 3);
@@ -896,6 +992,22 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   private String readDateOfExpiry(DataInputStream inputStream) throws IOException {
     return readString(inputStream, 6);
+  }
+
+  /**
+   * Reads a fixed length string from a stream.
+   *
+   * @param inputStream the stream to read from
+   * @param count the fixed length
+   *
+   * @return the string that was read
+   *
+   * @throws IOException on error reading from the stream
+   */
+  private String readString(DataInputStream inputStream, int count) throws IOException {
+    byte[] data = new byte[count];
+    inputStream.readFully(data);
+    return new String(data).trim();
   }
 
   /**

@@ -495,12 +495,12 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Reads a long from a stream.
-   * 
+   *
    * @param inputStream the stream to read from
    * @param byteCount the number of bytes to read
-   * 
+   *
    * @return the resulting long
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   private static long readUnsignedLong(InputStream inputStream, int byteCount) throws IOException {
@@ -517,11 +517,11 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Writes a long to a stream.
-   * 
+   *
    * @param value the long value to write
    * @param outputStream the stream to write to
    * @param byteCount the number of bytes to use
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   private static void writeLong(long value, OutputStream outputStream, int byteCount) throws IOException {
@@ -582,9 +582,9 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Converts a mime-type to an image data (compression) type.
-   * 
+   *
    * @param mimeType the mime-type to convert
-   * 
+   *
    * @return the image data (compression) type
    */
   static int fromMimeType(String mimeType) {
@@ -606,7 +606,7 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /**
    * Returns the biometric sub-type bit mask for the fingers in this finger info.
-   * 
+   *
    * @return a biometric sub-type bit mask
    */
   private int getBiometricSubtype() {

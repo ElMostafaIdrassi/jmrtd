@@ -162,7 +162,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
    * @return the efCVCA file identifier stored in this file
    */
   public int getFileId() {
-    return getFileId(efCVCA);
+    return getFID(efCVCA);
   }
 
   /**
@@ -172,7 +172,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
    * @return the efCVCA short file identifier stored in this file
    */
   public byte getShortFileId() {
-    return getShortFileId(efCVCA);
+    return getSFI(efCVCA);
   }
 
   @Override
@@ -260,18 +260,33 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     }
   }
 
-  private static ASN1Sequence constructEFCVCA(short fileId, byte shortFileId) {
-    if (shortFileId != -1) {
+  /**
+   * Encodes the BC object representing a reference to a CVCA file.
+   *
+   * @param fid the file identifier
+   * @param sfi the short file identifier
+   *
+   * @return an BC ASN1 sequence
+   */
+  private static ASN1Sequence constructEFCVCA(short fid, byte sfi) {
+    if (sfi != -1) {
       return new DLSequence(new ASN1Encodable[] {
-          new DEROctetString(new byte[] { (byte)((fileId & 0xFF00) >> 8), (byte)(fileId & 0xFF) }),
-          new DEROctetString(new byte[] { (byte)(shortFileId & 0xFF) }) });
+          new DEROctetString(new byte[] { (byte)((fid & 0xFF00) >> 8), (byte)(fid & 0xFF) }),
+          new DEROctetString(new byte[] { (byte)(sfi & 0xFF) }) });
     } else {
       return new DLSequence(new ASN1Encodable[] {
-          new DEROctetString(new byte[] { (byte)((fileId & 0xFF00) >> 8), (byte)(fileId & 0xFF) }) });
+          new DEROctetString(new byte[] { (byte)((fid & 0xFF00) >> 8), (byte)(fid & 0xFF) }) });
     }
   }
 
-  private static short getFileId(ASN1Sequence efCVCA) {
+  /**
+   * Returns the file identifier encoded in an BC ASN1 sequence.
+   *
+   * @param efCVCA the BC ASN1 sequence
+   *
+   * @return the file identifier
+   */
+  private static short getFID(ASN1Sequence efCVCA) {
     if (efCVCA == null) {
       return -1;
     }
@@ -281,7 +296,14 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     return (short)(((bytes[0] & 0xFF) << 8) | (bytes[1] & 0xFF));
   }
 
-  private static byte getShortFileId(ASN1Sequence efCVCA) {
+  /**
+   * Returns the short file identifier encoded in an BC ASN1 sequence.
+   *
+   * @param efCVCA the BC ASN1 sequence
+   *
+   * @return the short file identifier
+   */
+  private static byte getSFI(ASN1Sequence efCVCA) {
     if (efCVCA == null) {
       return -1;
     }
@@ -291,6 +313,13 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     return ((DEROctetString)efCVCA.getObjectAt(1)).getOctets()[0];
   }
 
+  /**
+   * Returns the ASN1 name for the given protocol object identifier.
+   *
+   * @param oid the protocol object identifier
+   *
+   * @return the ASN1 name if known, or the original object identifier if not
+   */
   private String toProtocolOIDString(String oid) {
     if (ID_TA.equals(oid)) {
       return "id-TA";

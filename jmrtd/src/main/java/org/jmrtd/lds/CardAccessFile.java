@@ -80,9 +80,9 @@ public class CardAccessFile implements Serializable {
 
   /**
    * Reads the contents as a card access file from a stream.
-   * 
+   *
    * @param inputStream the stream to read from
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   protected void readContent(InputStream inputStream) throws IOException {
@@ -101,6 +101,13 @@ public class CardAccessFile implements Serializable {
   }
 
   /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
+  /**
+   * Writes the contents of this file to a stream.
+   *
+   * @param outputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
   protected void writeContent(OutputStream outputStream) throws IOException {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     for (SecurityInfo securityInfo: securityInfos) {
