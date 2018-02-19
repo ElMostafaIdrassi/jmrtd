@@ -78,6 +78,13 @@ public class CardAccessFile implements Serializable {
     readContent(inputStream);
   }
 
+  /**
+   * Reads the contents as a card access file from a stream.
+   * 
+   * @param inputStream the stream to read from
+   * 
+   * @throws IOException on error reading from the stream
+   */
   protected void readContent(InputStream inputStream) throws IOException {
     securityInfos = new HashSet<SecurityInfo>();
     ASN1InputStream asn1In = new ASN1InputStream(inputStream);

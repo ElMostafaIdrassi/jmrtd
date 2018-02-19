@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.AbstractImageInfo;
+import org.jmrtd.lds.ImageInfo;
 
 import net.sf.scuba.data.Gender;
 
@@ -122,8 +123,20 @@ public class FaceImageInfo extends AbstractImageInfo {
       }
     };
 
+    /**
+     * Returns the integer code to use in ISO19794-5 encoding for this color.
+     * 
+     * @return the integer code
+     */
     public abstract int toInt();
 
+    /**
+     * Returns an eye color value for the given code.
+     * 
+     * @param i the integer code for a color
+     * 
+     * @return
+     */
     static EyeColor toEyeColor(int i) {
       for (EyeColor c: EyeColor.values()) {
         if (c.toInt() == i) {
@@ -700,24 +713,31 @@ public class FaceImageInfo extends AbstractImageInfo {
         && sourceType == other.sourceType;
   }
 
+  /**
+   * Writes the record data to a stream.
+   * 
+   * @param outputStream the stream to write to
+   * 
+   * @throws IOException on error
+   */
   private void writeFacialRecordData(OutputStream outputStream) throws IOException {
     DataOutputStream dataOut = new DataOutputStream(outputStream);
 
     /* Facial Information (16) */
-    dataOut.writeShort(featurePoints.length);												/* 2 */
-    dataOut.writeByte(gender == null ? Gender.UNSPECIFIED.toInt() : gender.toInt());		/* 1 */
-    dataOut.writeByte(eyeColor == null ? EyeColor.UNSPECIFIED.toInt() : eyeColor.toInt());	/* 1 */
-    dataOut.writeByte(hairColor);															/* 1 */
-    dataOut.writeByte((byte)((featureMask & 0xFF0000L) >> 16));								/* 1 */
-    dataOut.writeByte((byte)((featureMask & 0x00FF00L) >> 8));								/* 1 */
-    dataOut.writeByte((byte)(featureMask & 0x0000FFL));										/* 1 */
-    dataOut.writeShort(expression);															/* 2 */
-    for (int i = 0; i < 3; i++) {															/* 3 */
+    dataOut.writeShort(featurePoints.length);                                              /* 2 */
+    dataOut.writeByte(gender == null ? Gender.UNSPECIFIED.toInt() : gender.toInt());       /* 1 */
+    dataOut.writeByte(eyeColor == null ? EyeColor.UNSPECIFIED.toInt() : eyeColor.toInt()); /* 1 */
+    dataOut.writeByte(hairColor);                                                          /* 1 */
+    dataOut.writeByte((byte)((featureMask & 0xFF0000L) >> 16));                            /* 1 */
+    dataOut.writeByte((byte)((featureMask & 0x00FF00L) >> 8));                             /* 1 */
+    dataOut.writeByte((byte)(featureMask & 0x0000FFL));                                    /* 1 */
+    dataOut.writeShort(expression);                                                        /* 2 */
+    for (int i = 0; i < 3; i++) {                                                          /* 3 */
       int b = poseAngle[i];
-      //	FIXME: used to be:			(0 <= poseAngle[i] && poseAngle[i] <= 180) ? poseAngle[i] / 2 + 1 : 181 + poseAngle[i] / 2;
+      //  FIXME: used to be:      (0 <= poseAngle[i] && poseAngle[i] <= 180) ? poseAngle[i] / 2 + 1 : 181 + poseAngle[i] / 2;
       dataOut.writeByte(b);
     }
-    for (int i = 0; i < 3; i++) {															/* 3 */
+    for (int i = 0; i < 3; i++) {                                                          /* 3 */
       dataOut.writeByte(poseAngleUncertainty[i]);
     }
 
@@ -731,14 +751,14 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /* Image Information (12) */
-    dataOut.writeByte(faceImageType);														/* 1 */
-    dataOut.writeByte(imageDataType);														/* 1 */
-    dataOut.writeShort(getWidth());															/* 2 */
-    dataOut.writeShort(getHeight());														/* 2 */
-    dataOut.writeByte(colorSpace);															/* 1 */
-    dataOut.writeByte(sourceType);															/* 1 */
-    dataOut.writeShort(deviceType);															/* 2 */
-    dataOut.writeShort(quality);															/* 2 */
+    dataOut.writeByte(faceImageType);                           /* 1 */
+    dataOut.writeByte(imageDataType);                           /* 1 */
+    dataOut.writeShort(getWidth());                             /* 2 */
+    dataOut.writeShort(getHeight());                            /* 2 */
+    dataOut.writeByte(colorSpace);                              /* 1 */
+    dataOut.writeByte(sourceType);                              /* 1 */
+    dataOut.writeShort(deviceType);                             /* 2 */
+    dataOut.writeShort(quality);                                /* 2 */
 
     /*
      * Image data type code based on Section 5.8.1
@@ -749,6 +769,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     dataOut.close();
   }
 
+  /**
+   * Converts a hair color value to a human readable string.
+   * 
+   * @return a human readable string for the current hair color value
+   */
   private String hairColorToString() {
     switch (hairColor) {
       case HAIR_COLOR_UNSPECIFIED:
@@ -776,6 +801,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Returns a human readable string for the current feature mask.
+   * 
+   * @return a human readable string
+   */
   private String featureMaskToString() {
     if ((featureMask & FEATURE_FEATURES_ARE_SPECIFIED_FLAG) == 0) {
       return "";
@@ -822,6 +852,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     return out.toString();
   }
 
+  /**
+   * Converts the current expression to a human readable string.
+   * 
+   * @return a human readable string
+   */
   private String expressionToString() {
     switch (expression) {
       case EXPRESSION_UNSPECIFIED:
@@ -845,6 +880,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Converts the current pose angle to a human readable string.
+   * 
+   * @return a human readable string
+   */
   private String poseAngleToString() {
     StringBuilder out = new StringBuilder();
     out.append("(");
@@ -866,6 +906,13 @@ public class FaceImageInfo extends AbstractImageInfo {
     return out.toString();
   }
 
+  /**
+   * Returns a textual representation of the face image type
+   * ({@code "basic"}, {@code "full frontal"}, {@code "token frontal"},
+   * or {@code "unknown"}).
+   * 
+   * @return a textual representation of the face image type
+   */
   private String faceImageTypeToString() {
     switch (faceImageType) {
       case FACE_IMAGE_TYPE_BASIC:
@@ -879,6 +926,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Returns a textual representation of the source type.
+   * 
+   * @return a textual representation of the source type
+   */
   private String sourceTypeToString() {
     switch (sourceType) {
       case SOURCE_TYPE_UNSPECIFIED:
@@ -900,6 +952,14 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Returns a mime-type string for the compression algorithm code.
+   * 
+   * @param compressionAlg the compression algorithm code as it occurs in the header
+   * 
+   * @return a mime-type string,
+   *         typically {@value ImageInfo#JPEG_MIME_TYPE} or {@value ImageInfo#JPEG2000_MIME_TYPE}
+   */
   private static String toMimeType(int compressionAlg) {
     LOGGER.info("DEBUG: Image type: " + compressionAlg);
 

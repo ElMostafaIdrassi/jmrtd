@@ -145,18 +145,40 @@ public class CardSecurityFile implements Serializable {
     readContent(inputStream);
   }
 
+  /**
+   * Returns the digest algorithm.
+   *
+   * @return the digest algorithm
+   */
   public String getDigestAlgorithm() {
     return digestAlgorithm;
   }
 
+  /**
+   * Returns the signature algorithm.
+   *
+   * @return the signature algorithm
+   */
   public String getDigestEncryptionAlgorithm() {
     return digestEncryptionAlgorithm;
   }
 
+  /**
+   * Returns the encrypted digest (signature bytes).
+   *
+   * @return the encrypted digest
+   */
   public byte[] getEncryptedDigest() {
     return encryptedDigest;
   }
 
+  /**
+   * Reads the contents of this file from a stream.
+   *
+   * @param inputStream the stream to read from
+   *
+   * @throws IOException on error reading from the stream
+   */
   protected void readContent(InputStream inputStream) throws IOException {
     SignedData signedData = SignedDataUtil.readSignedData(inputStream);
 
@@ -174,6 +196,13 @@ public class CardSecurityFile implements Serializable {
     this.encryptedDigest = SignedDataUtil.getEncryptedDigest(signedData);
   }
 
+  /**
+   * Writes the contents of this file to a stream.
+   *
+   * @param outputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
   protected void writeContent(OutputStream outputStream) throws IOException {
     try {
       ContentInfo contentInfo = toContentInfo(CONTENT_TYPE_OID, securityInfos);
@@ -189,7 +218,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets the DER encoded file.
+   * Returns a DER encoded of this file.
    *
    * @return the encoded file
    */
@@ -206,7 +235,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets the security infos as an unordered collection.
+   * Returns the security infos as an unordered collection.
    *
    * @return security infos
    */
@@ -215,7 +244,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets the PACE infos embedded in this card access file.
+   * Returns the PACE infos embedded in this card access file.
    * If no infos are present, an empty list is returned.
    *
    * @return a list of PACE infos
@@ -231,7 +260,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets the CA public key infos embedded in this card access file.
+   * Returns the CA public key infos embedded in this card access file.
    * If no infos are present, an empty list is returned.
    *
    * @return a list of CA public key infos
@@ -247,7 +276,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets the CA public key infos embedded in this card access file.
+   * Returns the CA public key infos embedded in this card access file.
    * If no infos are present, an empty list is returned.
    *
    * @return a list of CA public key infos
@@ -263,7 +292,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets the signature algorithm object identifier.
+   * Returns the signature algorithm object identifier.
    *
    * @return signature algorithm OID
    */
@@ -308,6 +337,14 @@ public class CardSecurityFile implements Serializable {
   }
 
   /* FIXME: rewrite (using writeObject instead of getDERObject) to remove interface dependency on BC. */
+  /**
+   * Computes content info from the given list of security infos.
+   *
+   * @param contentTypeOID the object identifier to use
+   * @param securityInfos the list of security infos
+   *
+   * @return the content info
+   */
   private static ContentInfo toContentInfo(String contentTypeOID, Collection<SecurityInfo> securityInfos) {
     try {
       ASN1EncodableVector vector = new ASN1EncodableVector();
@@ -323,6 +360,16 @@ public class CardSecurityFile implements Serializable {
     }
   }
 
+  /**
+   * Attempts to interpret the contents of the given signed data structure as a collection of security infos.
+   * If the data does not contain any security infos, the empty set is returned.
+   *
+   * @param signedData the signed data structure to parse
+   *
+   * @return the set of security infos inside the signed data structure
+   *
+   * @throws IOException on parse error
+   */
   private static Set<SecurityInfo> getSecurityInfos(SignedData signedData) throws IOException {
     ASN1Primitive encapsulatedContent = SignedDataUtil.getContent(signedData);
 

@@ -226,6 +226,13 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
 
   /* ONLY PRIVATE METHODS BELOW */
 
+  /**
+   * Returns a textual representation of the given biometric sub-type code.
+   * 
+   * @param biometricSubtype the biometric sub-type code
+   * 
+   * @return a human readable string such as {@code "Left eye"}, {@code "Right eye"}, or {@code "Undefined"}
+   */
   private static String biometricSubtypeToString(int biometricSubtype) {
     switch (biometricSubtype) {
       case EYE_LEFT:

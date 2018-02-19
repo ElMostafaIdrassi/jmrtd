@@ -79,7 +79,7 @@ public class CAResult implements Serializable {
   }
 
   /**
-   * Returns the ICC's public key that was used as input to chip authentication protocol.
+   * Returns the PICC's public key that was used as input to chip authentication protocol.
    *
    * @return the public key
    */
@@ -87,6 +87,11 @@ public class CAResult implements Serializable {
     return piccPublicKey;
   }
 
+  /**
+   * Returns the resulting secure messaging wrapper.
+   *
+   * @return the secure messaging wrapper
+   */
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }

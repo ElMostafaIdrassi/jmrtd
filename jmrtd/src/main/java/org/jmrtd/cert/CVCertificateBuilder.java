@@ -90,6 +90,13 @@ public class CVCertificateBuilder {
             validFrom, validTo, provider));
   }
 
+  /**
+   * Translates the role to an EJBCA type.
+   * 
+   * @param role a role
+   * 
+   * @return the role as an EJBCA typed object
+   */
   private static org.ejbca.cvc.AuthorizationRoleEnum getRole(Role role) {
     switch (role) {
       case CVCA:
@@ -104,6 +111,13 @@ public class CVCertificateBuilder {
     throw new NumberFormatException("Cannot decode role " + role);
   }
 
+  /**
+   * Translates an access right to an EJBCA type.
+   * 
+   * @param accessRight the access right
+   * 
+   * @return the access right as an EJBCA typed object
+   */
   private static org.ejbca.cvc.AccessRightEnum getAccessRight(Permission accessRight) {
     switch (accessRight) {
       case READ_ACCESS_NONE:

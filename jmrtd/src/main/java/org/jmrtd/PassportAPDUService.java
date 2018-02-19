@@ -795,6 +795,16 @@ class PassportAPDUService extends CardService {
     }
   }
 
+  /**
+   * Returns the response data from a response APDU.
+   *
+   * @param responseAPDU the response APDU
+   * @param isTLVEncodedOffsetNeeded whether to expect a {@code 0x53} tag encoded value
+   *
+   * @return the response data
+   *
+   * @throws CardServiceException on error
+   */
   private byte[] getResponseData(ResponseAPDU responseAPDU, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
     if (responseAPDU == null) {
       return null;
@@ -826,9 +836,14 @@ class PassportAPDUService extends CardService {
     return responseData;
   }
 
-  /*
-   * 0x80 Cryptographic mechanism reference
+  /**
+   * Encoded an object identifier.
+   * 0x80 Cryptographic mechanism reference.
    * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
+   *
+   * @param oid the object identifier
+   *
+   * @return the encoding
    */
   private byte[] toOIDBytes(String oid) {
     byte[] oidBytes = null;
@@ -847,9 +862,17 @@ class PassportAPDUService extends CardService {
     }
   }
 
-  private static void checkStatusWordAfterFileOperation(CommandAPDU capdu, ResponseAPDU rapdu) throws CardServiceException {
-    short sw = (short)rapdu.getSW();
-    String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(capdu.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(rapdu.getBytes());
+  /**
+   * Checks the status word and throws an appropriate {@code CardServiceException} on error.
+   *
+   * @param commandAPDU the command APDU that was sent
+   * @param responseAPDU the response APDU that was received
+   *
+   * @throws CardServiceException if the response APDU's status word indicates some error
+   */
+  private static void checkStatusWordAfterFileOperation(CommandAPDU commandAPDU, ResponseAPDU responseAPDU) throws CardServiceException {
+    short sw = (short)responseAPDU.getSW();
+    String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(commandAPDU.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(responseAPDU.getBytes());
     switch(sw) {
       case ISO7816.SW_NO_ERROR:
         return;

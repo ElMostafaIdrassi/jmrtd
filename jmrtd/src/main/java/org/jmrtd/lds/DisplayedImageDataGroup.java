@@ -169,6 +169,11 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     return new ArrayList<DisplayedImageInfo>(imageInfos);
   }
 
+  /**
+   * Adds an image info to this data group.
+   * 
+   * @param image the image to add
+   */
   private void add(DisplayedImageInfo image) {
     if (imageInfos == null) {
       imageInfos = new ArrayList<DisplayedImageInfo>();
@@ -176,6 +181,10 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
     imageInfos.add(image);
   }
 
+  /**
+   * Checks whether the type of image infos is consistent with the type
+   * and throws an {@code IllegalArgumentException} if not.
+   */
   private void checkTypesConsistentWithTag() {
     for (DisplayedImageInfo imageInfo: imageInfos) {
       if (imageInfo == null) {

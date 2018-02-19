@@ -33,15 +33,12 @@ import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.ISO781611;
-import org.jmrtd.lds.icao.DG2File;
-import org.jmrtd.lds.icao.DG3File;
-import org.jmrtd.lds.icao.DG4File;
 
 import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * Datagroup containing a list of biometric information templates (BITs).
- * The {@link DG2File}, {@link DG3File}, and {@link DG4File} datagroups
+ * The {@code DG2File}, {@code DG3File}, and {@code DG4File} datagroups
  * are based on this type.
  *
  * @author The JMRTD team (info@jmrtd.org)

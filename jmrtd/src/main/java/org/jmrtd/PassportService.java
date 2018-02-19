@@ -222,22 +222,11 @@ public class PassportService extends PassportAPDUService {
    */
   private int maxBlockSize;
 
-  enum State {
-    SESSION_STOPPED_STATE,
-    SESSION_STARTED_STATE,
-    BAC_AUTHENTICATED_STATE,
-    PACE_AUTHENTICATED_STATE,
-    AA_EXECUTED_STATE,
-    CA_EXECUTED_STATE,
-    TA_AUTHENTICATED_STATE
-  }
-
-  /* FIXME: We should keep track of a stack of these states instead. -- MO */
-  private State state;
+  private boolean isOpen;
 
   private SecureMessagingWrapper wrapper;
 
-  private int maxTranceiveSize;
+  private int maxTranceiveLength;
 
   private boolean isICAOAppletSelected;
 
@@ -249,7 +238,7 @@ public class PassportService extends PassportAPDUService {
    * Creates a new passport service for accessing the passport.
    *
    * @param service another service which will deal with sending the APDUs to the card
-   * @param maxTranceiveSize maximum length for APDUs
+   * @param maxTranceiveLength maximum length for APDUs
    * @param maxBlockSize maximum buffer size for plain text APDUs
    * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
    *
@@ -261,14 +250,14 @@ public class PassportService extends PassportAPDUService {
    *                 <li>Mac: "ISO9797Alg3Mac"</li>
    *             </ul>
    */
-  public PassportService(CardService service, int maxTranceiveSize, int maxBlockSize, boolean isSFIEnabled) throws CardServiceException {
+  public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled) throws CardServiceException {
     super(service);
-    this.maxTranceiveSize = maxTranceiveSize;
+    this.maxTranceiveLength = maxTranceiveLength;
     this.maxBlockSize = maxBlockSize;
     this.rootFileSystem = new MRTDFileSystem(this, isSFIEnabled);
     this.icaoFileSystem = new MRTDFileSystem(this, isSFIEnabled);
     this.isICAOAppletSelected = false;
-    this.state = State.SESSION_STOPPED_STATE;
+    this.isOpen = false;
   }
 
   /**
@@ -284,7 +273,7 @@ public class PassportService extends PassportAPDUService {
     }
     synchronized(this) {
       super.open();
-      state = State.SESSION_STARTED_STATE;
+      isOpen = true;
     }
   }
 
@@ -320,7 +309,7 @@ public class PassportService extends PassportAPDUService {
    */
   @Override
   public boolean isOpen() {
-    return (state != State.SESSION_STOPPED_STATE);
+    return isOpen;
   }
 
   /**
@@ -380,7 +369,6 @@ public class PassportService extends PassportAPDUService {
   public synchronized BACResult doBAC(BACKeySpec bacKey) throws CardServiceException {
     BACResult bacResult = (new BACProtocol(this)).doBAC(bacKey);
     wrapper = bacResult.getWrapper();
-    state = State.BAC_AUTHENTICATED_STATE;
     return bacResult;
   }
 
@@ -403,7 +391,6 @@ public class PassportService extends PassportAPDUService {
   public synchronized BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
     BACResult bacResult = (new BACProtocol(this)).doBAC(kEnc, kMac);
     wrapper = bacResult.getWrapper();
-    state = State.BAC_AUTHENTICATED_STATE;
     return bacResult;
   }
 
@@ -422,7 +409,6 @@ public class PassportService extends PassportAPDUService {
   public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws PACEException {
     PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
-    state = State.PACE_AUTHENTICATED_STATE;
     return paceResult;
   }
 
@@ -444,7 +430,6 @@ public class PassportService extends PassportAPDUService {
   public synchronized CAResult doCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
     CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, oid, publicKeyOID, publicKey);
     wrapper = caResult.getWrapper();
-    state = State.CA_EXECUTED_STATE;
     return caResult;
   }
 
@@ -483,7 +468,6 @@ public class PassportService extends PassportAPDUService {
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
     TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
-    state = State.TA_AUTHENTICATED_STATE;
     return taResult;
   }
 
@@ -509,7 +493,6 @@ public class PassportService extends PassportAPDUService {
   public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
     TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
-    state = State.TA_AUTHENTICATED_STATE;
     return taResult;
   }
 
@@ -527,7 +510,6 @@ public class PassportService extends PassportAPDUService {
    */
   public AAResult doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
     AAResult aaResult = (new AAProtocol(this, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
-    state = State.AA_EXECUTED_STATE;
     return aaResult;
   }
 
@@ -540,12 +522,17 @@ public class PassportService extends PassportAPDUService {
       wrapper = null;
       super.close();
     } finally {
-      state = State.SESSION_STOPPED_STATE;
+      isOpen = false;
     }
   }
 
+  /**
+   * Returns the maximum tranceive length of (protected) APDUs.
+   * 
+   * @return the maximum APDU tranceive length
+   */
   public int getMaxTranceiveLength() {
-    return maxTranceiveSize;
+    return maxTranceiveLength;
   }
 
   /**

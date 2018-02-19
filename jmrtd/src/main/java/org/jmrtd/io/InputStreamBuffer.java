@@ -74,14 +74,29 @@ public class InputStreamBuffer {
     }
   }
 
+  /**
+   * Returns the current position in the buffer.
+   *
+   * @return the position in the buffer
+   */
   public synchronized int getPosition() {
     return buffer.getPosition();
   }
 
+  /**
+   * Returns the number of bytes buffered so far.
+   *
+   * @return the number of bytes buffered so far
+   */
   public synchronized int getBytesBuffered() {
     return buffer.getBytesBuffered();
   }
 
+  /**
+   * Returns the size of the buffer.
+   *
+   * @return the size of the buffer
+   */
   public int getLength() {
     return buffer.getLength();
   }
@@ -91,20 +106,34 @@ public class InputStreamBuffer {
     return "InputStreamBuffer [" + buffer + "]";
   }
 
+  /**
+   * The sub-input stream to serve to clients.
+   */
   public class SubInputStream extends InputStream { // FIXME set class visibility to package
 
-    /** The position within this inputstream. */
+    /** The position within this stream. */
     private int position;
+    
     private int markedPosition;
 
     private Object syncObject;
 
+    /**
+     * Creates a sub-stream.
+     * 
+     * @param syncObject an object for locking
+     */
     public SubInputStream(Object syncObject) {
       position = 0;
       markedPosition = -1;
       this.syncObject = syncObject;
     }
 
+    /**
+     * Returns the underlying fragment buffer.
+     * 
+     * @return the buffer
+     */
     public FragmentBuffer getBuffer() {
       return buffer;
     }
@@ -256,6 +285,11 @@ public class InputStreamBuffer {
       return true;
     }
 
+    /**
+     * The position within this stream.
+     * 
+     * @return the position
+     */
     public int getPosition() {
       return position;
     }

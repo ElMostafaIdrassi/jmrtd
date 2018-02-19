@@ -91,10 +91,26 @@ public class ICAOCountry extends Country {
   private ICAOCountry() {
   }
 
+  /**
+   * Constructs a country.
+   * 
+   * @param alpha2Code the two-digit alpha code
+   * @param alpha3Code the three-digit alpha code
+   * @param name a name for the country
+   *        (which will also be used to indicate the nationality of the country)
+   */
   private ICAOCountry(String alpha2Code, String alpha3Code, String name) {
     this(alpha2Code, alpha3Code, name, name);
   }
 
+  /**
+   * Constructs a country.
+   * 
+   * @param alpha2Code the 2-letter alpha code
+   * @param alpha3Code the 3-letter alpha code
+   * @param name a name for the country
+   * @param nationality a name for nationals of the country
+   */
   private ICAOCountry(String alpha2Code, String alpha3Code, String name, String nationality) {
     this.alpha2Code = alpha2Code;
     this.alpha3Code = alpha3Code;
@@ -103,7 +119,7 @@ public class ICAOCountry extends Country {
   }
 
   /**
-   * Gets an ICAO country instance.
+   * Returns an ICAO country instance.
    *
    * @param alpha3Code a three-digit ICAO country code
    *
@@ -130,7 +146,7 @@ public class ICAOCountry extends Country {
   }
 
   /**
-   * Gets the full name of the country.
+   * Returns the full name of the country.
    *
    * @return a country name
    */
@@ -140,7 +156,7 @@ public class ICAOCountry extends Country {
   }
 
   /**
-   * Gets the adjectival form corresponding to the country.
+   * Returns the adjectival form corresponding to the country.
    *
    * @return the nationality
    */
@@ -150,7 +166,7 @@ public class ICAOCountry extends Country {
   }
 
   /**
-   * Gets the two-digit country code.
+   * Returns the two-digit country code.
    *
    * @return a two-digit country code
    */
@@ -160,7 +176,7 @@ public class ICAOCountry extends Country {
   }
 
   /**
-   * Gets the three-digit country code.
+   * Returns the three-digit country code.
    *
    * @return a three-digit country code
    */

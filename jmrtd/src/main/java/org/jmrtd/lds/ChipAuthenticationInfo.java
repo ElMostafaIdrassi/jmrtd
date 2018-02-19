@@ -52,9 +52,6 @@ import org.bouncycastle.asn1.DLSequence;
  *
  * @version $Revision$
  */
-/*
- * FIXME: dependency on BC?
- */
 public class ChipAuthenticationInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 5591988305059068535L;

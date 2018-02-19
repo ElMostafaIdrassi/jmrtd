@@ -432,6 +432,13 @@ public class FingerImageInfo extends AbstractImageInfo {
         .toString();
   }
 
+  /**
+   * Returns a human readable string for the given position code.
+   * 
+   * @param position an ISO finger position code
+   * 
+   * @return a human readable string
+   */
   private static String positionToString(int position) {
     switch (position) {
       case POSITION_UNKNOWN_FINGER:
@@ -501,6 +508,13 @@ public class FingerImageInfo extends AbstractImageInfo {
     }
   }
 
+  /**
+   * Returns a human readable string for the given impression type code.
+   * 
+   * @param impressionType the impression type code
+   * 
+   * @return a human readable string for the given impression type code
+   */
   private static String impressionTypeToString(int impressionType) {
     switch (impressionType) {
       case IMPRESSION_TYPE_LIVE_SCAN_PLAIN:
@@ -539,7 +553,7 @@ public class FingerImageInfo extends AbstractImageInfo {
    * <tr> <td>Left little</td>  <td>22</td>         <td>10</td> </tr>
    * </table>
    *
-   * @param position an ISO finger position
+   * @param position an ISO finger position code
    *
    * @return an ICAO biometric subtype
    */

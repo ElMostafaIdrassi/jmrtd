@@ -49,6 +49,11 @@ public class CVCAuthorizationTemplate {
 
     private byte value;
 
+    /**
+     * Creates a role for the given value.
+     * 
+     * @param value the value code
+     */
     private Role(int value) {
       this.value = (byte)value;
     }
@@ -78,6 +83,11 @@ public class CVCAuthorizationTemplate {
 
     private byte value;
 
+    /**
+     * Constructs a permission for the given value.
+     * 
+     * @param value a value code
+     */
     private Permission(int value) {
       this.value = (byte)value;
     }
@@ -200,6 +210,13 @@ public class CVCAuthorizationTemplate {
     return 2 * role.value + 3 * accessRight.value + 61;
   }
 
+  /**
+   * Translates a permission to an EJBCA typed equivalent permission.
+   * 
+   * @param permission a permission
+   * 
+   * @return the EJBCA typed equivalent of the given permission
+   */
   static org.ejbca.cvc.AccessRightEnum fromPermission(Permission permission) {
     try{
       switch (permission) {
@@ -219,6 +236,13 @@ public class CVCAuthorizationTemplate {
     }
   }
 
+  /**
+   * Translates a role to an EJBCA typed equivalent role.
+   * 
+   * @param role a role
+   * 
+   * @return the EJBCA typed equivalent role
+   */
   static org.ejbca.cvc.AuthorizationRoleEnum fromRole(Role role) {
     try {
       switch (role) {
@@ -238,6 +262,13 @@ public class CVCAuthorizationTemplate {
     }
   }
 
+  /**
+   * Translates an EJBCA typed role to a role.
+   * 
+   * @param template the EJBCA typed role
+   * 
+   * @return the equivalent role
+   */
   private static Role toRole(org.ejbca.cvc.CVCAuthorizationTemplate template) {
     try {
       AuthorizationRoleEnum role = template.getAuthorizationField().getRole();
@@ -258,6 +289,13 @@ public class CVCAuthorizationTemplate {
     }
   }
 
+  /**
+   * Translates an EJBCA typed permission to an equivalent permission.
+   * 
+   * @param template the EJBCA typed permission
+   * 
+   * @return the equivalent permission
+   */
   private static Permission toPermission(org.ejbca.cvc.CVCAuthorizationTemplate template) {
     try {
       AccessRightEnum accessRight = template.getAuthorizationField().getAccessRight();

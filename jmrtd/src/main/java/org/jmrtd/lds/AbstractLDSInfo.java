@@ -41,6 +41,11 @@ public abstract class AbstractLDSInfo implements LDSElement {
 
   private static final long serialVersionUID = -2340098256249194537L;
 
+  /**
+   * Returns an encoding of this LDS info.
+   *
+   * @return the LDS info encoded as byte array
+   */
   public byte[] getEncoded() {
     try {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -53,5 +58,12 @@ public abstract class AbstractLDSInfo implements LDSElement {
     }
   }
 
+  /**
+   * Writes this LDS info to a stream.
+   *
+   * @param outputStream the stream to write to
+   *
+   * @throws IOException on error writing to the stream
+   */
   public abstract void writeObject(OutputStream outputStream) throws IOException;
 }

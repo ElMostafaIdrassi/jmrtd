@@ -212,6 +212,14 @@ public class MRZInfo extends AbstractLDSInfo {
     }
   }
 
+  /**
+   * Reads the object value from a stream.
+   * 
+   * @param inputStream the stream to read from
+   * @param length the length of the value
+   * 
+   * @throws IOException on error reading from the stream
+   */
   private void readObject(InputStream inputStream, int length) throws IOException {
     DataInputStream dataIn = new DataInputStream(inputStream);
 

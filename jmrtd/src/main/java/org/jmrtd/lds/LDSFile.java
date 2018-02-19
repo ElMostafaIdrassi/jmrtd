@@ -87,14 +87,14 @@ public interface LDSFile extends LDSElement {
   /** ICAO tag for document security index (SOd). */
   public static final int EF_SOD_TAG = 0x77;
 
+  /*
+   * FIXME: Note that this is not necessarily the total length of the file:
+   * For TLV files this gives the length of the value. -- MO
+   */
   /**
    * Returns the length of this file.
    *
    * @return the length of this file
-   */
-  /*
-   * FIXME: Note that this is not necessarily the total length of the file:
-   * For TLV files this gives the length of the value. -- MO
    */
   int getLength();
 }

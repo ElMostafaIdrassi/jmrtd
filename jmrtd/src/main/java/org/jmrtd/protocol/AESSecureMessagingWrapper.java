@@ -105,6 +105,11 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     mac = Util.getMac("AESCMAC", ksMac);
   }
 
+  /**
+   * Returns the type of secure messaging wrapper (in this case {@code "AES"}).
+   *
+   * @return the type of secure messaging wrapper
+   */
   public String getType() {
     return "AES";
   }

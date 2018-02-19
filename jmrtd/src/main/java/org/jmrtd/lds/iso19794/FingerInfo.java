@@ -493,8 +493,18 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
 
   /* ONLY PRIVATE BELOW */
 
-  private static long readUnsignedLong(InputStream in, int byteCount) throws IOException {
-    DataInputStream dataIn = in instanceof DataInputStream ? (DataInputStream)in : new DataInputStream(in);
+  /**
+   * Reads a long from a stream.
+   * 
+   * @param inputStream the stream to read from
+   * @param byteCount the number of bytes to read
+   * 
+   * @return the resulting long
+   * 
+   * @throws IOException on error reading from the stream
+   */
+  private static long readUnsignedLong(InputStream inputStream, int byteCount) throws IOException {
+    DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
     byte[] buf = new byte[byteCount];
     dataIn.readFully(buf);
     long result = 0L;
@@ -505,13 +515,22 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     return result;
   }
 
-  private static void writeLong(long value, OutputStream out, int byteCount) throws IOException {
+  /**
+   * Writes a long to a stream.
+   * 
+   * @param value the long value to write
+   * @param outputStream the stream to write to
+   * @param byteCount the number of bytes to use
+   * 
+   * @throws IOException on error writing to the stream
+   */
+  private static void writeLong(long value, OutputStream outputStream, int byteCount) throws IOException {
     if (byteCount <= 0) {
       return;
     }
 
     for (int i = 0; i < (byteCount - 8); i++) {
-      out.write(0);
+      outputStream.write(0);
     }
     if (byteCount > 8) {
       byteCount = 8;
@@ -519,11 +538,12 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     for (int i = (byteCount - 1); i >= 0; i--) {
       long mask = 0xFFL << (i * 8);
       byte b = (byte)((value & mask) >> (i * 8));
-      out.write(b);
+      outputStream.write(b);
     }
   }
 
   /**
+   * Converts an image data type code to a mime-type.
    * Compression algorithm codes based on Table 3 in Section 7.1.13 of 19794-4.
    *
    * 0 Uncompressed, no bit packing
@@ -560,6 +580,13 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     }
   }
 
+  /**
+   * Converts a mime-type to an image data (compression) type.
+   * 
+   * @param mimeType the mime-type to convert
+   * 
+   * @return the image data (compression) type
+   */
   static int fromMimeType(String mimeType) {
     if ("image/x-wsq".equals(mimeType)) {
       return FingerInfo.COMPRESSION_WSQ;
@@ -577,6 +604,11 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
     throw new IllegalArgumentException("Did not recognize mimeType");
   }
 
+  /**
+   * Returns the biometric sub-type bit mask for the fingers in this finger info.
+   * 
+   * @return a biometric sub-type bit mask
+   */
   private int getBiometricSubtype() {
     int result = CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
     boolean isFirst = true;

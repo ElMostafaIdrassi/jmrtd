@@ -26,6 +26,15 @@ import java.io.Serializable;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
+/**
+ * The result of a the nonce mapping step.
+ * This is the abstract super type, specific implementations
+ * will contain more relevant details.
+ *
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ */
 public abstract class PACEMappingResult implements Serializable {
 
   private static final long serialVersionUID = 2773111318950631118L;
@@ -33,11 +42,18 @@ public abstract class PACEMappingResult implements Serializable {
   // FIXME: Should be serializable instead of transient.
   private transient AlgorithmParameterSpec staticParameters;
 
-  // FIXME: Should be serializable insyead of transient.
+  // FIXME: Should be serializable instead of transient.
   private transient AlgorithmParameterSpec ephemeralParameters;
 
   private byte[] piccNonce;
 
+  /**
+   * Constructs a mapping result.
+   *
+   * @param staticParameters the static agreement parameters
+   * @param piccNonce the nonce that was sent by the PICC
+   * @param ephemeralParameters the resulting ephemeral parameters
+   */
   public PACEMappingResult(AlgorithmParameterSpec staticParameters, byte[] piccNonce, AlgorithmParameterSpec ephemeralParameters) {
     this.staticParameters = staticParameters;
     this.ephemeralParameters = ephemeralParameters;
@@ -49,14 +65,29 @@ public abstract class PACEMappingResult implements Serializable {
     }
   }
 
+  /**
+   * Returns the static agreement parameters.
+   *
+   * @return the original parameters
+   */
   public AlgorithmParameterSpec getStaticParameters() {
     return staticParameters;
   }
 
+  /**
+   * Returns the ephemeral (derived) agreement parameters.
+   *
+   * @return the resulting parameters
+   */
   public AlgorithmParameterSpec getEphemeralParameters() {
     return ephemeralParameters;
   }
 
+  /**
+   * Returns the nonce that was sent by the PICC.
+   *
+   * @return the nonce
+   */
   public byte[] getPICCNonce() {
     return piccNonce;
   }

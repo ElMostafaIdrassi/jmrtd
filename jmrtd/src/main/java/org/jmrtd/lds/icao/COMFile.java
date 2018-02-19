@@ -323,6 +323,16 @@ public class COMFile extends AbstractTaggedLDSFile {
         17 * tagList.hashCode();
   }
 
+  /**
+   * Initializes this index file.
+   * 
+   * @param versionLDS the version of the LDS
+   * @param updateLevelLDS the update level of the LDS
+   * @param majorVersionUnicode the major version
+   * @param minorVersionUnicode the minor version
+   * @param releaseLevelUnicode the release level version
+   * @param tagList the data group tag presence list
+   */
   private void initialize(String versionLDS, String updateLevelLDS,
       String majorVersionUnicode, String minorVersionUnicode,
       String releaseLevelUnicode, int[] tagList) {

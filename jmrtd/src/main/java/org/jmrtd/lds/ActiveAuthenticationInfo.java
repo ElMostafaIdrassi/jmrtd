@@ -126,6 +126,11 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     return oid;
   }
 
+  /**
+   * Returns the version of the Active Authentication protocol (should be 1).
+   * 
+   * @return the version
+   */
   public int getVersion() {
     return version;
   }
@@ -133,7 +138,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   /**
    * Gets the protocol object identifier as a human readable string.
    *
-   * @return a string
+   * @return a string representing the protocol object identifier
    */
   @Override
   public String getProtocolOIDString() {
@@ -276,6 +281,13 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     }
   }
 
+  /**
+   * Returns a human readable rendering of the given object identifier string.
+   * 
+   * @param oid the object identifier (dotted notation)
+   * 
+   * @return a human readable string representing the given object identifier
+   */
   private String toProtocolOIDString(String oid) {
     if (ID_AA.equals(oid)) {
       return "id-AA";
@@ -284,6 +296,13 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
     return oid;
   }
 
+  /**
+   * Returns a human readable rendering of the given object identifier string.
+   * 
+   * @param oid the object identifier (dotted notation)
+   * 
+   * @return a human readable string representing the given object identifier
+   */
   public static String toSignatureAlgorithmOIDString(String oid) {
     if (ECDSA_PLAIN_SHA1_OID.equals(oid)) {
       return "ecdsa-plain-SHA224";

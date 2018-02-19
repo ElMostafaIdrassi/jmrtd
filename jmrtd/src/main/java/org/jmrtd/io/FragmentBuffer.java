@@ -39,6 +39,8 @@ public class FragmentBuffer implements Serializable {
 
   private static final long serialVersionUID = -3510872461790499721L;
 
+  private static final int DEFAULT_SIZE = 2000;
+
   /** Buffer with the actual bytes. */
   private byte[] buffer; // FIXME can we make this buffer grow dynamically?
 
@@ -46,10 +48,10 @@ public class FragmentBuffer implements Serializable {
   private Collection<Fragment> fragments;
 
   /**
-   * Creates a fragment buffer.
+   * Creates a fragment buffer with default size.
    */
   public FragmentBuffer() {
-    this(2000);
+    this(DEFAULT_SIZE);
   }
 
   /**
@@ -62,12 +64,23 @@ public class FragmentBuffer implements Serializable {
     this.fragments = new HashSet<Fragment>();
   }
 
+  /**
+   * Updates this buffer based on the given buffer.
+   *
+   * @param other some other fragment buffer
+   */
   public synchronized void updateFrom(FragmentBuffer other) {
     for (Fragment otherFragment: other.fragments) {
       addFragment(otherFragment.offset, other.buffer, otherFragment.offset, otherFragment.length);
     }
   }
 
+  /**
+   * Adds a fragment containing the given byte.
+   *
+   * @param offset the offset
+   * @param b the byte to insert
+   */
   public synchronized void addFragment(int offset, byte b) {
     /* FIXME: can this be done more efficiently for common case resulting from InputStreamBuffer read, scan all fragments and extend neighboring one */
     addFragment(offset, new byte[] { b });
@@ -142,6 +155,12 @@ public class FragmentBuffer implements Serializable {
     fragments.add(Fragment.getInstance(thisOffset, thisLength));
   }
 
+  /**
+   * Returns the position within the buffer.
+   * This is the upper limit of the farthest fragment read so far.
+   *
+   * @return the position within the buffer
+   */
   public synchronized int getPosition() {
     int result = 0;
     for (int i = 0; i < buffer.length; i++) {
@@ -152,6 +171,11 @@ public class FragmentBuffer implements Serializable {
     return result;
   }
 
+  /**
+   * Returns the number of bytes currently buffered.
+   *
+   * @return the number of bytes currently buffered
+   */
   public synchronized int getBytesBuffered() {
     int result = 0;
     for (int i = 0; i < buffer.length; i++) {
@@ -162,10 +186,27 @@ public class FragmentBuffer implements Serializable {
     return result;
   }
 
+  /**
+   * Checks whether the byte at the given offset is covered
+   * by a fragment.
+   *
+   * @param offset the offset
+   *
+   * @return a boolean indicating whether the byte at the given offset is covered
+   */
   public synchronized boolean isCoveredByFragment(int offset) {
     return isCoveredByFragment(offset, 1);
   }
 
+  /**
+   * Checks whether the segment specified by the given offset and length
+   * is completely covered by fragments.
+   *
+   * @param offset the given offset
+   * @param length the given length
+   *
+   * @return a boolean indicating whether the specified segment is fully covered
+   */
   public synchronized boolean isCoveredByFragment(int offset, int length) {
     for (Fragment fragment: fragments) {
       int left = fragment.getOffset();
@@ -203,14 +244,29 @@ public class FragmentBuffer implements Serializable {
     return result;
   }
 
+  /**
+   * Returns the fragments of this buffer.
+   *
+   * @return the fragments
+   */
   public Collection<Fragment> getFragments() {
     return fragments;
   }
 
+  /**
+   * Returns the current buffer.
+   *
+   * @return the buffer
+   */
   public byte[] getBuffer() {
     return buffer;
   }
 
+  /**
+   * Returns the buffer (the size of the underlying byte array).
+   *
+   * @return the size of the buffer
+   */
   public  int getLength() {
     synchronized(this) {
       return buffer.length;
@@ -310,6 +366,12 @@ public class FragmentBuffer implements Serializable {
     return 3 * Arrays.hashCode(buffer) + 2 * fragments.hashCode() + 7;
   }
 
+  /**
+   * Sets the capacity of the buffer.
+   * This has no effect for lengths smaller than the current buffer capacity.
+   * 
+   * @param length the proposed new capacity of the buffer
+   */
   private void setLength(int length) {
     synchronized(this) {
       if (length <= buffer.length) {
@@ -332,19 +394,43 @@ public class FragmentBuffer implements Serializable {
     private int offset;
     private int length;
 
+    /**
+     * Constructs a fragment.
+     * 
+     * @param offset the offset within the buffer
+     * @param length the length of the fragment
+     */
     private Fragment(int offset, int length) {
       this.offset = offset;
       this.length = length;
     }
 
+    /**
+     * Returns a fragment instance.
+     * 
+     * @param offset the offset within the buffer
+     * @param length the length of the fragment
+     * 
+     * @return the new fragment
+     */
     public static Fragment getInstance(int offset, int length) {
       return new Fragment(offset, length);
     }
 
+    /**
+     * Returns this fragment's offset within the buffer.
+     * 
+     * @return the offset of the fragment
+     */
     public int getOffset() {
       return offset;
     }
 
+    /**
+     * Returns the length of the fragment.
+     * 
+     * @return the length of the fragment
+     */
     public int getLength() {
       return length;
     }

@@ -89,6 +89,17 @@ public class DG15File extends DataGroup {
     }
   }
 
+  /**
+   * Constructs a public key from the given key bytes.
+   * Public keys of type {@code "RSA"} and {@code "EC"}
+   * in X509 encoding are supported.
+   * 
+   * @param keyBytes an X509 encoded public key
+   * 
+   * @return a public object
+   * 
+   * @throws GeneralSecurityException when the bytes cannot be interpreted as a public key
+   */
   private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {
     X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
 
