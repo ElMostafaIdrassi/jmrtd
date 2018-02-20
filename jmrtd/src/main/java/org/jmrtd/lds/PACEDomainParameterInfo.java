@@ -337,7 +337,9 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       if (x962params.isNamedCurve()) {
         ASN1ObjectIdentifier x96ParamsOID = (ASN1ObjectIdentifier)x962params.getParameters();
         X9ECParameters x9ECParams = X962NamedCurves.getByOID(x96ParamsOID);
-        ECNamedCurveParameterSpec bcECNamedCurveParams = new ECNamedCurveParameterSpec(X962NamedCurves.getName(x96ParamsOID), x9ECParams.getCurve(), x9ECParams.getG(), x9ECParams.getN(), x9ECParams.getH(), x9ECParams.getSeed());
+        ECNamedCurveParameterSpec bcECNamedCurveParams =
+          new ECNamedCurveParameterSpec(X962NamedCurves.getName(x96ParamsOID), x9ECParams.getCurve(), x9ECParams.getG(),
+            x9ECParams.getN(), x9ECParams.getH(), x9ECParams.getSeed());
         return Util.toECNamedCurveSpec(bcECNamedCurveParams);
       }
     } catch (Exception e) {

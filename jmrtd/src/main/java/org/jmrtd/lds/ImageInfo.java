@@ -44,7 +44,7 @@ public interface ImageInfo extends LDSElement {
 
   /** Type of image. */
   static final int TYPE_UNKNOWN = -1;
-  
+
   /** Type of image. */
   static final int TYPE_PORTRAIT = 0;
 

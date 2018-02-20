@@ -1027,11 +1027,11 @@ public class PACEProtocol {
 
   /**
    * Computes a key seed given a card access number (CAN).
-   * 
+   *
    * @param cardAccessNumber the card access number
-   * 
+   *
    * @return a key seed for deriving secure messaging keys
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static byte[] computeKeySeedForPACE(String cardAccessNumber) throws GeneralSecurityException {
@@ -1054,7 +1054,7 @@ public class PACEProtocol {
   public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey) throws InvalidKeyException {
     return encodePublicKeyDataObject(oid, publicKey, true);
   }
-  
+
   /**
    * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
    *
@@ -1190,10 +1190,10 @@ public class PACEProtocol {
 
   /**
    * Decodes a public key received from the PICC.
-   * 
+   *
    * @param encodedPublicKey the encoded public key that was received
    * @param params the parameters used for interpreting the public key
-   * 
+   *
    * @return the decoded public key object
    */
   public static PublicKey decodePublicKeyFromSmartCard(byte[] encodedPublicKey, AlgorithmParameterSpec params) {
@@ -1236,13 +1236,13 @@ public class PACEProtocol {
 
   /**
    * Generates an authentication token.
-   * 
+   *
    * @param oid the object identifier as indicated in MSE Set AT
    * @param mac the MAC which has already been initialized with the MAC key derived from key agreement
    * @param publicKey the received public key
-   * 
+   *
    * @return the authentication token
-   * 
+   *
    * @throws GeneralSecurityException on error while performing the MAC operation
    */
   private static byte[] generateAuthenticationToken(String oid, Mac mac, PublicKey publicKey) throws GeneralSecurityException {
@@ -1259,9 +1259,9 @@ public class PACEProtocol {
    * Fixes the document number so that it is in MRZ format.
    * This replaces white spaces with fillers and
    * makes sure the length is at least 9.
-   * 
+   *
    * @param documentNumber the document number
-   * 
+   *
    * @return a fixed document number
    */
   private static String fixDocumentNumber(String documentNumber) {
@@ -1290,7 +1290,7 @@ public class PACEProtocol {
   private static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
     return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
   }
-  
+
   /**
    * Checks consistency of input parameters.
    *
@@ -1337,13 +1337,13 @@ public class PACEProtocol {
 
   /**
    * Infers a MAC algorithm given a encryption algorithm.
-   * 
+   *
    * @param cipherAlg the encryption algorithm.
    * If 3-DES is used for encryption, then the MAC algorithm is ISO9797 algorithm 3.
    * If AES is used for encryption, the the MAC algorithm is AES-CMAC.
-   * 
+   *
    * @return the MAC algorithm
-   * 
+   *
    * @throws InvalidAlgorithmParameterException for unknown encryption algorithm
    */
   private static String inferMACAlgorithmFromCipherAlgorithm(String cipherAlg) throws InvalidAlgorithmParameterException {

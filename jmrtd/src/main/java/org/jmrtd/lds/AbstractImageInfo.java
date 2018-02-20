@@ -53,8 +53,8 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   // FIXME: It's not clear how serialization should work if not fully read. (Clients should only serialize if imageBytes != null.)
   private transient SplittableInputStream splittableInputStream;
-  int imagePositionInInputStream;
-  int imageLength;
+  private int imagePositionInInputStream;
+  private int imageLength;
 
   private int width;
   private int height;
@@ -70,7 +70,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Constructs an abstract image info with a type.
-   * 
+   *
    * @param type the type of image
    */
   protected AbstractImageInfo(int type) {
@@ -79,7 +79,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Constructs an abstract image info with a type and a mime-type.
-   * 
+   *
    * @param type the type
    * @param mimeType the mime-type string
    */
@@ -89,7 +89,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Constructs an abstract image info with full parameters.
-   * 
+   *
    * @param type the type of image
    * @param width the width
    * @param height the height
@@ -298,9 +298,9 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Writes this image to a stream.
-   * 
+   *
    * @param outputStream the stream to write to
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   protected void writeImage(OutputStream outputStream) throws IOException {
@@ -309,7 +309,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Sets the mime-type.
-   * 
+   *
    * @param mimeType the new mime-type
    */
   protected final void setMimeType(String mimeType) {
@@ -318,7 +318,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Sets the type.
-   * 
+   *
    * @param type the new type
    */
   protected final void setType(int type) {
@@ -327,7 +327,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Sets the width of this image.
-   * 
+   *
    * @param width the new width
    */
   protected final void setWidth(int width) {
@@ -336,7 +336,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Sets the height of this image.
-   * 
+   *
    * @param height the new height
    */
   protected final void setHeight(int height) {
@@ -345,7 +345,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Sets the encoded image bytes of this image.
-   * 
+   *
    * @param imageBytes the image bytes
    */
   protected final void setImageBytes(byte[] imageBytes) {
@@ -362,18 +362,18 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Reads this object from a stream.
-   * 
+   *
    * @param inputStream the stream to read from
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   protected abstract void readObject(InputStream inputStream) throws IOException;
 
   /**
    * Writes this object to a stream.
-   * 
+   *
    * @param outputStream the stream to write to
-   * 
+   *
    * @throws IOException on error writing to the stream
    */
   protected abstract void writeObject(OutputStream outputStream) throws IOException;
@@ -382,9 +382,9 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Reads the image bytes from the stream.
-   * 
+   *
    * @return the image bytes
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   private byte[] getImageBytes() throws IOException {
@@ -399,9 +399,9 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /**
    * Returns a human readable string from the image type.
-   * 
+   *
    * @param type the image type
-   * 
+   *
    * @return a human readable string
    */
   private static String typeToString(int type) {

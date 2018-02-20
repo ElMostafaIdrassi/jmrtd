@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.AbstractImageInfo;
-import org.jmrtd.lds.ImageInfo;
 
 import net.sf.scuba.data.Gender;
 
@@ -408,11 +407,11 @@ public class FaceImageInfo extends AbstractImageInfo {
     expression = dataIn.readShort(); /* +2 = 14 */
     poseAngle = new int[3];
     int by = dataIn.readUnsignedByte(); /* +1 = 15 */
-    poseAngle[YAW] = by; // FIXME: used to be: 2 * ((by <= 91) ? (by - 1) : (by - 181));
+    poseAngle[YAW] = by;
     int bp = dataIn.readUnsignedByte(); /* +1 = 16 */
-    poseAngle[PITCH] = bp; // FIXME: used to be: 2 * ((bp <= 91) ? (bp - 1) : (bp - 181));
+    poseAngle[PITCH] = bp;
     int br = dataIn.readUnsignedByte(); /* +1 = 17 */
-    poseAngle[ROLL] = br; // FIXME: used to be: 2 * ((br <= 91) ? (br - 1) : (br - 181));
+    poseAngle[ROLL] = br;
     poseAngleUncertainty = new int[3];
     poseAngleUncertainty[YAW] = dataIn.readUnsignedByte(); /* +1 = 18 */
     poseAngleUncertainty[PITCH] = dataIn.readUnsignedByte(); /* +1 = 19 */
@@ -635,7 +634,6 @@ public class FaceImageInfo extends AbstractImageInfo {
    *
    * @see java.lang.Object#toString()
    */
-  /* TODO: rename this method, distinguish between a pretty print version to be used in JMRTD GUI and a proper toString() */
   @Override
   public String toString() {
     StringBuilder out = new StringBuilder();
@@ -734,7 +732,6 @@ public class FaceImageInfo extends AbstractImageInfo {
     dataOut.writeShort(expression);                                                        /* 2 */
     for (int i = 0; i < 3; i++) {                                                          /* 3 */
       int b = poseAngle[i];
-      //  FIXME: used to be:      (0 <= poseAngle[i] && poseAngle[i] <= 180) ? poseAngle[i] / 2 + 1 : 181 + poseAngle[i] / 2;
       dataOut.writeByte(b);
     }
     for (int i = 0; i < 3; i++) {                                                          /* 3 */
@@ -958,7 +955,7 @@ public class FaceImageInfo extends AbstractImageInfo {
    * @param compressionAlg the compression algorithm code as it occurs in the header
    *
    * @return a mime-type string,
-   *         typically {@value ImageInfo#JPEG_MIME_TYPE} or {@value ImageInfo#JPEG2000_MIME_TYPE}
+   *         typically {@code JPEG_MIME_TYPE} or {@code JPEG2000_MIME_TYPE}
    */
   private static String toMimeType(int compressionAlg) {
     LOGGER.info("DEBUG: Image type: " + compressionAlg);

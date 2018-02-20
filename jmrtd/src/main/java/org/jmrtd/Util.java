@@ -269,13 +269,13 @@ public final class Util {
   /**
    * Computes the key seed from a card access number (CAN) to derive
    * secure messaging keys from.
-   * 
+   *
    * @param cardAccessNumber the card access number
    * @param digestAlg the digest algorithm to use
    * @param doTruncate whether to truncate to 16 bytes or not
-   * 
+   *
    * @return the resulting key seed
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static byte[] computeKeySeed(String cardAccessNumber, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
@@ -463,10 +463,10 @@ public final class Util {
   /* FIXME: improve documentation. Is used in PACE, EAC-CA, EAC-TA. -- MO */
   /**
    * Align the given key data.
-   * 
+   *
    * @param keyData the key data
    * @param size the new size
-   * 
+   *
    * @return a byte array with key data
    */
   public static byte[] alignKeyDataToSize(byte[] keyData, int size) {
@@ -743,9 +743,9 @@ public final class Util {
 
   /**
    * Translates (named) curve specification to JCA compliant explicit parameter specification.
-   * 
+   *
    * @param parameterSpec a BC named curve parameter specification
-   * 
+   *
    * @return a JCA compliant explicit parameter specification
    */
   public static ECParameterSpec toExplicitECParameterSpec(ECNamedCurveParameterSpec parameterSpec) {
@@ -790,9 +790,9 @@ public final class Util {
 
   /**
    * Converts the given EC parameter specification to a BC named curve specification if known.
-   * 
+   *
    * @param ecParamSpec the JCA EC parameter specification, possibly explicit
-   * 
+   *
    * @return a BC named curve specification if recognized, or {@code null} if not
    */
   private static org.bouncycastle.jce.spec.ECNamedCurveSpec toNamedCurveSpec(ECParameterSpec ecParamSpec) {
@@ -853,9 +853,9 @@ public final class Util {
    */
   /**
    * Convert the given JCA compliant public key to a BC subject public key info structure.
-   * 
+   *
    * @param publicKey a public key
-   * 
+   *
    * @return a BC subject public key info structure
    */
   public static SubjectPublicKeyInfo toSubjectPublicKeyInfo(PublicKey publicKey) {
@@ -934,9 +934,9 @@ public final class Util {
 
   /**
    * Extracts a public key from a BC subject public key info structure.
-   * 
+   *
    * @param subjectPublicKeyInfo the BC subject public key info structure
-   * 
+   *
    * @return a public key or {@code null}
    */
   public static PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) {
@@ -988,9 +988,9 @@ public final class Util {
 
   /**
    * Decodes an EC point from a BSI encoded octet string.
-   * 
+   *
    * @param encodedECPoint the encoded EC point
-   * 
+   *
    * @return the EC point
    */
   public static ECPoint os2ECPoint(byte[] encodedECPoint) {
@@ -1092,11 +1092,11 @@ public final class Util {
     return fromBouncyCastleECPoint(bcProd);
   }
 
-  /** 
+  /**
    * Converts a string to bytes using UTF-8.
-   * 
+   *
    * @param str a string
-   * 
+   *
    * @return the bytes
    */
   public static byte[] getBytes(String str) {
@@ -1114,9 +1114,9 @@ public final class Util {
    * Extracts the prime from the given DH or ECDH parameter specification
    * which (hopefully) specifies a curve over a prime field.
    * (This will throw an {@code IllegalArgumentException} for non-prime fields.)
-   * 
+   *
    * @param params a parameter specification
-   * 
+   *
    * @return the prime
    */
   public static BigInteger getPrime(AlgorithmParameterSpec params) {
@@ -1141,9 +1141,9 @@ public final class Util {
   /**
    * Attempts to infer a relevant key agreement algorithm
    * (either {@code "DH"} or {@code "ECDH"}) given a public key.
-   * 
+   *
    * @param publicKey the public key
-   * 
+   *
    * @return either {@code "DH"} or {@code "ECDH"}
    */
   public static String inferKeyAgreementAlgorithm(PublicKey publicKey) {
@@ -1177,10 +1177,10 @@ public final class Util {
 
   /**
    * Converts a JCA EC point to a BC EC point.
-   * 
+   *
    * @param point the JCA EC point
    * @param params the parameters to interpret the point
-   * 
+   *
    * @return the corresponding BC EC point
    */
   public static org.bouncycastle.math.ec.ECPoint toBouncyCastleECPoint(ECPoint point, ECParameterSpec params) {
@@ -1190,9 +1190,9 @@ public final class Util {
 
   /**
    * Convert a BC EC point to a JCA EC point.
-   * 
+   *
    * @param point the BC EC point
-   * 
+   *
    * @return the corresponding JCA EC point
    */
   public static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
@@ -1205,10 +1205,10 @@ public final class Util {
 
   /**
    * Determines whether an EC point is valid with respect to the given EC parameters.
-   * 
+   *
    * @param ecPoint an EC point
    * @param params the EC parameter specification
-   * 
+   *
    * @return a boolean indicating whether the EC point is valid with respect tot the given EC parameters
    */
   public static boolean isValid(ECPoint ecPoint, ECParameterSpec params) {
@@ -1218,10 +1218,10 @@ public final class Util {
 
   /**
    * Normalizes an EC point given the EC parameters.
-   * 
+   *
    * @param ecPoint the EC point
    * @param params the EC parameter specification
-   * 
+   *
    * @return the normalized EC point
    */
   public static ECPoint normalize(ECPoint ecPoint, ECParameterSpec params) {
@@ -1232,9 +1232,9 @@ public final class Util {
 
   /**
    * Converts the EC parameter specification (including a curve) to a BC typed EC curve.
-   * 
+   *
    * @param params the EC parameter specification
-   * 
+   *
    * @return the corresponding EC curve
    */
   private static ECCurve toBouncyCastleECCurve(ECParameterSpec params) {
@@ -1253,9 +1253,9 @@ public final class Util {
 
   /**
    * Converts the EC public key to a BC public key parameter specification.
-   * 
+   *
    * @param publicKey the EC public key
-   * 
+   *
    * @return a BC typed public key parameter specification
    */
   public static ECPublicKeyParameters toBouncyECPublicKeyParameters(ECPublicKey publicKey) {
@@ -1266,9 +1266,9 @@ public final class Util {
 
   /**
    * Converts the EC private key to a BC private key parameter specification.
-   * 
+   *
    * @param privateKey the EC private key
-   * 
+   *
    * @return a BC typed private key parameter specification
    */
   public static ECPrivateKeyParameters toBouncyECPrivateKeyParameters(ECPrivateKey privateKey) {
@@ -1280,9 +1280,9 @@ public final class Util {
   /**
    * Converts a JCA compliant EC parameter (domain) specification to a BC
    * EC domain specification.
-   * 
+   *
    * @param params the EC parameter specification
-   * 
+   *
    * @return the corresponding BC typed EC domain parameter specification.
    */
   public static ECDomainParameters toBouncyECDomainParameters(ECParameterSpec params) {
@@ -1301,11 +1301,11 @@ public final class Util {
    * possibly using the BC provider explicitly if the
    * configured JCA providers cannot provide a cipher for the
    * algorithm.
-   * 
+   *
    * @param algorithm the encryption algorithm
-   * 
+   *
    * @return a cipher
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static Cipher getCipher(String algorithm) throws GeneralSecurityException {
@@ -1322,13 +1322,13 @@ public final class Util {
    * possibly using the BC provider explicitly if the
    * configured JCA providers cannot provide a cipher for the
    * algorithm and key.
-   * 
+   *
    * @param algorithm the encryption algorithm
    * @param mode the mode of operation (encrypt or decrypt)
    * @param key the key
-   * 
+   *
    * @return a cipher
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static Cipher getCipher(String algorithm, int mode, Key key) throws GeneralSecurityException {
@@ -1348,11 +1348,11 @@ public final class Util {
    * Returns a key agreement object for the given algorithm, possibly using
    * the BC provider explicitly if the configured JCA providers cannot provide
    * a key agreement for the algorithm.
-   * 
+   *
    * @param algorithm the key agreement algorithm
-   * 
+   *
    * @return a key agreement object
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static KeyAgreement getKeyAgreement(String algorithm) throws GeneralSecurityException {
@@ -1368,11 +1368,11 @@ public final class Util {
    * Returns a key pair generator for the given algorithm, possibly using
    * the BC provider explicitly when the configured JCA providers cannot
    * provide a generator for the algorithm.
-   * 
+   *
    * @param algorithm the algorithm
-   * 
+   *
    * @return a key pair generator
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static KeyPairGenerator getKeyPairGenerator(String algorithm) throws GeneralSecurityException {
@@ -1388,11 +1388,11 @@ public final class Util {
    * Returns a MAC for the given algorithm, possibly using the
    * BC provider explicitly if the configured JCA providers cannot
    * provide a MAC for the algorithm.
-   * 
+   *
    * @param algorithm the MAC algorithm
-   * 
+   *
    * @return a MAC object
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static Mac getMac(String algorithm) throws GeneralSecurityException {
@@ -1408,12 +1408,12 @@ public final class Util {
    * Returns a MAC for the given algorithm and key, possibly using
    * the BC provider explicitly when the configured JCA providers
    * cannot provide a MAC for the algorithm and key.
-   * 
+   *
    * @param algorithm the MAC algorithm
    * @param key the key
-   * 
+   *
    * @return a MAC object
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static Mac getMac(String algorithm, Key key) throws GeneralSecurityException {
@@ -1433,11 +1433,11 @@ public final class Util {
    * Returns a message digest for the given algorithm, possibly
    * using the BC provider explicitly if the configured JCA providers
    * cannot provide a message digest for the algorithm.
-   * 
+   *
    * @param algorithm the message digest algorithm
-   * 
+   *
    * @return a message digest object
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static MessageDigest getMessageDigest(String algorithm) throws GeneralSecurityException {
@@ -1454,12 +1454,12 @@ public final class Util {
    * possibly using the BC provider explicitly when the configured JCA
    * providers cannot provide a public key for the algorithm and key
    * specification.
-   * 
+   *
    * @param algorithm the public key algorithm
    * @param keySpec the key specification
-   * 
+   *
    * @return a public key object
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static PublicKey getPublicKey(String algorithm, KeySpec keySpec) throws GeneralSecurityException {
@@ -1476,11 +1476,11 @@ public final class Util {
   /**
    * Returns a signature for the given signature algorithm, possibly using the BC
    * provider if the configured JCA providers cannot provide a signature.
-   * 
+   *
    * @param algorithm the signature algorithm
-   * 
+   *
    * @return a signature object
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static Signature getSignature(String algorithm) throws GeneralSecurityException {
@@ -1496,11 +1496,11 @@ public final class Util {
    * Returns a certificate factory object for the given certificate algorithm,
    * possibly using the BC provider explicitly if the configured JCA providers
    * cannot provide a certificate factory for the algorithm.
-   * 
+   *
    * @param algorithm the certificate algorithm
-   * 
+   *
    * @return a certificate factory
-   * 
+   *
    * @throws GeneralSecurityException on error
    */
   public static CertificateFactory getCertificateFactory(String algorithm) throws GeneralSecurityException {

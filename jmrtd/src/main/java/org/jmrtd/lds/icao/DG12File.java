@@ -290,10 +290,10 @@ public class DG12File extends DataGroup {
 
   /**
    * Reads a field from a stream.
-   * 
+   *
    * @param expectedFieldTag the tag to expect
    * @param tlvInputStream the stream to read from
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   private void readField(int expectedFieldTag, TLVInputStream tlvInputStream) throws IOException {
@@ -491,12 +491,12 @@ public class DG12File extends DataGroup {
   public int hashCode() {
     return 13 * toString().hashCode() + 112;
   }
-  
+
   /* Field parsing below. */
 
   /**
    * Parses the personalization system serial number.
-   * 
+   *
    * @param value the value of the personalization system serial number
    */
   private void parsePersonalizationSystemSerialNumber(byte[] value) {
@@ -512,7 +512,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the date and time of personalization.
-   * 
+   *
    * @param value the value of the date and time of personalization data object
    */
   private void parseDateAndTimeOfPersonalization(byte[] value) {
@@ -527,7 +527,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the image of front field.
-   * 
+   *
    * @param value the value of the image of front data object
    */
   private void parseImageOfFront(byte[] value) {
@@ -536,7 +536,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the image of rear field.
-   * 
+   *
    * @param value the value of the image of read data object
    */
   private void parseImageOfRear(byte[] value) {
@@ -545,7 +545,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the tax or exit requirements.
-   * 
+   *
    * @param value the value of the tax or exit requirements data object
    */
   private void parseTaxOrExitRequirements(byte[] value) {
@@ -561,7 +561,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the endorsements and observations field.
-   * 
+   *
    * @param value the value of the endorsements and observations data object
    */
   private void parseEndorsementsAndObservations(byte[] value) {
@@ -577,7 +577,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the name of other person field.
-   * 
+   *
    * @param value the value of the name of other person data object
    */
   private synchronized void parseNameOfOtherPerson(byte[] value) {
@@ -596,7 +596,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the data of issue field.
-   * 
+   *
    * @param value the value of the date of issue data object
    */
   private void parseDateOfIssue(byte[] value) {
@@ -630,7 +630,7 @@ public class DG12File extends DataGroup {
 
   /**
    * Parses the issuing authority field.
-   * 
+   *
    * @param value the value of the issuing authority data object
    */
   private void parseIssuingAuthority(byte[] value) {

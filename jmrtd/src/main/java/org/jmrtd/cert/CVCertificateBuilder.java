@@ -107,8 +107,9 @@ public class CVCertificateBuilder {
         return org.ejbca.cvc.AuthorizationRoleEnum.DV_F;
       case IS:
         return org.ejbca.cvc.AuthorizationRoleEnum.IS;
+      default:
+        throw new NumberFormatException("Cannot decode role " + role);
     }
-    throw new NumberFormatException("Cannot decode role " + role);
   }
 
   /**
@@ -128,7 +129,8 @@ public class CVCertificateBuilder {
         return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG4;
       case READ_ACCESS_DG3_AND_DG4:
         return org.ejbca.cvc.AccessRightEnum.READ_ACCESS_DG3_AND_DG4;
+      default:
+        throw new NumberFormatException("Cannot decode access right " + accessRight);
     }
-    throw new NumberFormatException("Cannot decode access right " + accessRight);
   }
 }

@@ -482,14 +482,18 @@ public class FingerInfo extends AbstractListInfo<FingerImageInfo> implements Bio
    *
    * @param fingerImageInfo the finger image info to add
    */
-  public void addFingerImageInfo(FingerImageInfo fingerImageInfo) { add(fingerImageInfo); }
+  public void addFingerImageInfo(FingerImageInfo fingerImageInfo) {
+    add(fingerImageInfo);
+  }
 
   /**
    * Removes a finger image info from this finger info.
    *
    * @param index the index of the finger image info to remove
    */
-  public void removeFingerImageInfo(int index) { remove(index); }
+  public void removeFingerImageInfo(int index) {
+    remove(index);
+  }
 
   /* ONLY PRIVATE BELOW */
 

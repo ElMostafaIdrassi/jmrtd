@@ -569,7 +569,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the custody information field.
-   * 
+   *
    * @param value the value of the custody information data object
    */
   private void parseCustodyInformation(byte[] value) {
@@ -585,7 +585,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the other valid travel document numbers field.
-   * 
+   *
    * @param value the value of the other valid travel document numbers data object
    */
   private void parseOtherValidTDNumbers(byte[] value) {
@@ -605,7 +605,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the proof of citizen field.
-   * 
+   *
    * @param value the value of the proof of citizen data object
    */
   private void parseProofOfCitizenShip(byte[] value) {
@@ -614,7 +614,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the personal summary field.
-   * 
+   *
    * @param value the value of the personal summary data object
    */
   private void parsePersonalSummary(byte[] value) {
@@ -630,7 +630,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the title field.
-   * 
+   *
    * @param value the value of the title data object
    */
   private void parseTitle(byte[] value) {
@@ -646,7 +646,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the profession field.
-   * 
+   *
    * @param value the value of the profession data object
    */
   private void parseProfession(byte[] value) {
@@ -662,7 +662,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the telephone field.
-   * 
+   *
    * @param value the value of the telephone data object
    */
   private void parseTelephone(byte[] value) {
@@ -678,7 +678,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the permanent address field.
-   * 
+   *
    * @param value the value in the permanent address data object
    */
   private void parsePermanentAddress(byte[] value) {
@@ -698,7 +698,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the place of birth field.
-   * 
+   *
    * @param value the value in the place of birth data object
    */
   private void parsePlaceOfBirth(byte[] value) {
@@ -715,10 +715,10 @@ public class DG11File extends DataGroup {
       placeOfBirth.add(line);
     }
   }
-  
+
   /**
    * Parses the date of birth.
-   * 
+   *
    * @param value the value of the date of birth data object
    */
   private void parseFullDateOfBirth(byte[] value) {
@@ -739,7 +739,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the other name field.
-   * 
+   *
    * @param value the value of the other name data object
    */
   private synchronized void parseOtherName(byte[] value) {
@@ -757,7 +757,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the personal number field.
-   * 
+   *
    * @param value the value of the personal number data object
    */
   private void parsePersonalNumber(byte[] value) {
@@ -772,7 +772,7 @@ public class DG11File extends DataGroup {
 
   /**
    * Parses the name of holder field.
-   * 
+   *
    * @param value the value of the name of holder data object
    */
   private void parseNameOfHolder(byte[] value) {
@@ -787,10 +787,10 @@ public class DG11File extends DataGroup {
 
   /**
    * Reads a field from a stream.
-   * 
+   *
    * @param expectedFieldTag the tag to expect
    * @param tlvInputStream the stream to read from
-   * 
+   *
    * @throws IOException on error reading from the stream
    */
   private void readField(int expectedFieldTag, TLVInputStream tlvInputStream) throws IOException {
