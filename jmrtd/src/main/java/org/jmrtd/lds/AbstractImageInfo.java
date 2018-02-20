@@ -61,20 +61,43 @@ public abstract class AbstractImageInfo implements ImageInfo {
 
   /* PACKAGE ONLY VISIBLE CONSTRUCTORS BELOW */
 
+  /**
+   * Constructs a default abstract image info.
+   */
   AbstractImageInfo() {
+    this(TYPE_UNKNOWN, 0, 0, null);
   }
 
+  /**
+   * Constructs an abstract image info with a type.
+   * 
+   * @param type the type of image
+   */
   protected AbstractImageInfo(int type) {
-    this.type = type;
+    this (type, 0, 0, null);
   }
 
+  /**
+   * Constructs an abstract image info with a type and a mime-type.
+   * 
+   * @param type the type
+   * @param mimeType the mime-type string
+   */
   protected AbstractImageInfo(int type, String mimeType) {
-    this(type);
-    this.mimeType = mimeType;
+    this(type, 0, 0, mimeType);
   }
 
+  /**
+   * Constructs an abstract image info with full parameters.
+   * 
+   * @param type the type of image
+   * @param width the width
+   * @param height the height
+   * @param mimeType the mime-type string
+   */
   private AbstractImageInfo(int type, int width, int height, String mimeType) {
-    this(type, mimeType);
+    this.type = type;
+    this.mimeType = mimeType;
     this.width = width;
     this.height = height;
   }
@@ -273,26 +296,58 @@ public abstract class AbstractImageInfo implements ImageInfo {
     //    }
   }
 
+  /**
+   * Writes this image to a stream.
+   * 
+   * @param outputStream the stream to write to
+   * 
+   * @throws IOException on error writing to the stream
+   */
   protected void writeImage(OutputStream outputStream) throws IOException {
     outputStream.write(getImageBytes());
   }
 
+  /**
+   * Sets the mime-type.
+   * 
+   * @param mimeType the new mime-type
+   */
   protected final void setMimeType(String mimeType) {
     this.mimeType = mimeType;
   }
 
+  /**
+   * Sets the type.
+   * 
+   * @param type the new type
+   */
   protected final void setType(int type) {
     this.type = type;
   }
 
+  /**
+   * Sets the width of this image.
+   * 
+   * @param width the new width
+   */
   protected final void setWidth(int width) {
     this.width = width;
   }
 
+  /**
+   * Sets the height of this image.
+   * 
+   * @param height the new height
+   */
   protected final void setHeight(int height) {
     this.height = height;
   }
 
+  /**
+   * Sets the encoded image bytes of this image.
+   * 
+   * @param imageBytes the image bytes
+   */
   protected final void setImageBytes(byte[] imageBytes) {
     if (imageBytes == null) {
       throw new IllegalArgumentException("Cannot set null image bytes");
@@ -305,12 +360,33 @@ public abstract class AbstractImageInfo implements ImageInfo {
     }
   }
 
-  protected abstract void readObject(InputStream in) throws IOException;
+  /**
+   * Reads this object from a stream.
+   * 
+   * @param inputStream the stream to read from
+   * 
+   * @throws IOException on error reading from the stream
+   */
+  protected abstract void readObject(InputStream inputStream) throws IOException;
 
-  protected abstract void writeObject(OutputStream out) throws IOException;
+  /**
+   * Writes this object to a stream.
+   * 
+   * @param outputStream the stream to write to
+   * 
+   * @throws IOException on error writing to the stream
+   */
+  protected abstract void writeObject(OutputStream outputStream) throws IOException;
 
   /* ONLY PRIVATE METHODS BELOW */
 
+  /**
+   * Reads the image bytes from the stream.
+   * 
+   * @return the image bytes
+   * 
+   * @throws IOException on error reading from the stream
+   */
   private byte[] getImageBytes() throws IOException {
     InputStream inputStream = null;
     int length = getImageLength();
@@ -321,6 +397,13 @@ public abstract class AbstractImageInfo implements ImageInfo {
     return imageBytes;
   }
 
+  /**
+   * Returns a human readable string from the image type.
+   * 
+   * @param type the image type
+   * 
+   * @return a human readable string
+   */
   private static String typeToString(int type) {
     switch (type) {
       case TYPE_PORTRAIT:
@@ -331,6 +414,8 @@ public abstract class AbstractImageInfo implements ImageInfo {
         return "Finger";
       case TYPE_IRIS:
         return "Iris";
+      case TYPE_UNKNOWN:
+        return "Unknown";
       default:
         throw new NumberFormatException("Unknown type: " + Integer.toHexString(type));
     }

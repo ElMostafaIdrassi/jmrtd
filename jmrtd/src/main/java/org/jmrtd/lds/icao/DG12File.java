@@ -288,38 +288,46 @@ public class DG12File extends DataGroup {
     return tagPresenceList;
   }
 
-  private void readField(int expectedFieldTag, TLVInputStream tlvIn) throws IOException {
-    int tag = tlvIn.readTag();
+  /**
+   * Reads a field from a stream.
+   * 
+   * @param expectedFieldTag the tag to expect
+   * @param tlvInputStream the stream to read from
+   * 
+   * @throws IOException on error reading from the stream
+   */
+  private void readField(int expectedFieldTag, TLVInputStream tlvInputStream) throws IOException {
+    int tag = tlvInputStream.readTag();
     if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
-      /* int contentSpecificLength = */ tlvIn.readLength();
-      int countTag = tlvIn.readTag();
+      /* int contentSpecificLength = */ tlvInputStream.readLength();
+      int countTag = tlvInputStream.readTag();
       if (countTag != COUNT_TAG) {
         throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
       }
-      int countLength = tlvIn.readLength();
+      int countLength = tlvInputStream.readLength();
       if (countLength != 1) {
         throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
       }
-      byte[] countValue = tlvIn.readValue();
+      byte[] countValue = tlvInputStream.readValue();
       if (countValue == null || countValue.length != 1) {
         throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
       }
       int count = countValue[0] & 0xFF;
       for (int i = 0; i < count; i++) {
-        tag = tlvIn.readTag();
+        tag = tlvInputStream.readTag();
         if (tag != NAME_OF_OTHER_PERSON_TAG) {
           throw new IllegalArgumentException("Expected " + Integer.toHexString(NAME_OF_OTHER_PERSON_TAG) + ", found " + Integer.toHexString(tag));
         }
-        /* int otherPersonFieldLength = */ tlvIn.readLength();
-        byte[] value = tlvIn.readValue();
+        /* int otherPersonFieldLength = */ tlvInputStream.readLength();
+        byte[] value = tlvInputStream.readValue();
         parseNameOfOtherPerson(value);
       }
     } else {
       if (tag != expectedFieldTag) {
         throw new IllegalArgumentException("Expected " + Integer.toHexString(expectedFieldTag) + ", but found " + Integer.toHexString(tag));
       }
-      /* int length = */ tlvIn.readLength();
-      byte[] value = tlvIn.readValue();
+      /* int length = */ tlvInputStream.readLength();
+      byte[] value = tlvInputStream.readValue();
       switch (tag) {
         case ISSUING_AUTHORITY_TAG:
           parseIssuingAuthority(value);
@@ -351,115 +359,6 @@ public class DG12File extends DataGroup {
         default:
           throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
       }
-    }
-  }
-
-  /* Field parsing below. */
-
-  private void parsePersonalizationSystemSerialNumber(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      personalizationSystemSerialNumber = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      personalizationSystemSerialNumber = new String(value).trim();
-    }
-  }
-
-  private void parseDateAndTimeOfPersonalization(byte[] value) {
-    try {
-      // the following commented line causes invalid parsing of date and time of personalisation field
-      //String field = Hex.bytesToHexString(value);
-      String field = new String(value, "UTF-8");
-      dateAndTimeOfPersonalization = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: never happens, UTF-8 is supported. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-    }
-  }
-
-  private void parseImageOfFront(byte[] value) {
-    imageOfFront =  value;
-  }
-
-  private void parseImageOfRear(byte[] value) {
-    imageOfRear =  value;
-  }
-
-  private void parseTaxOrExitRequirements(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      taxOrExitRequirements = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      taxOrExitRequirements = new String(value).trim();
-    }
-  }
-
-  private void parseEndorsementsAndObservations(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      endorsementsAndObservations = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      endorsementsAndObservations = new String(value).trim();
-    }
-  }
-
-  private synchronized void parseNameOfOtherPerson(byte[] value) {
-    if (namesOfOtherPersons == null) {
-      namesOfOtherPersons = new ArrayList<String>();
-    }
-    try {
-      String field = new String(value, "UTF-8");
-      namesOfOtherPersons.add(field.trim());
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      namesOfOtherPersons.add(new String(value).trim());
-    }
-  }
-
-  private void parseDateOfIssue(byte[] value) {
-    if (value == null) {
-      throw new IllegalArgumentException("Wrong date format");
-    }
-
-    /* Try to interpret value as a ccyymmdd formatted date string as per Doc 9303. */
-    if (value.length == 8) {
-      try {
-        String dateString = new String(value, "UTF-8");
-        dateOfIssue = dateString.trim();
-        return;
-      } catch (UnsupportedEncodingException usee) {
-        /* NOTE: never happens, UTF-8 is supported. */
-        LOGGER.log(Level.WARNING, "Exception", usee);
-      }
-    }
-    LOGGER.warning("DG12 date of issue is not in expected ccyymmdd ASCII format");
-
-    /* Some live French MRTDs encode the date as ccyymmdd but in BCD, not in ASCII. */
-    if (value.length == 4) {
-      String dateString = Hex.bytesToHexString(value);
-      dateOfIssue = dateString.trim();
-      return;
-    }
-
-    /* Giving up... we can't parse this date. */
-    throw new IllegalArgumentException("Wrong date format");
-  }
-
-  private void parseIssuingAuthority(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      issuingAuthority = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: Default charset, wtf, UTF-8 not supported? */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      issuingAuthority = (new String(value)).trim();
     }
   }
 
@@ -591,5 +490,157 @@ public class DG12File extends DataGroup {
   @Override
   public int hashCode() {
     return 13 * toString().hashCode() + 112;
+  }
+  
+  /* Field parsing below. */
+
+  /**
+   * Parses the personalization system serial number.
+   * 
+   * @param value the value of the personalization system serial number
+   */
+  private void parsePersonalizationSystemSerialNumber(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      personalizationSystemSerialNumber = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      personalizationSystemSerialNumber = new String(value).trim();
+    }
+  }
+
+  /**
+   * Parses the date and time of personalization.
+   * 
+   * @param value the value of the date and time of personalization data object
+   */
+  private void parseDateAndTimeOfPersonalization(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      dateAndTimeOfPersonalization = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: never happens, UTF-8 is supported. */
+      LOGGER.log(Level.WARNING, "Exception", usee);
+    }
+  }
+
+  /**
+   * Parses the image of front field.
+   * 
+   * @param value the value of the image of front data object
+   */
+  private void parseImageOfFront(byte[] value) {
+    imageOfFront =  value;
+  }
+
+  /**
+   * Parses the image of rear field.
+   * 
+   * @param value the value of the image of read data object
+   */
+  private void parseImageOfRear(byte[] value) {
+    imageOfRear =  value;
+  }
+
+  /**
+   * Parses the tax or exit requirements.
+   * 
+   * @param value the value of the tax or exit requirements data object
+   */
+  private void parseTaxOrExitRequirements(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      taxOrExitRequirements = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      taxOrExitRequirements = new String(value).trim();
+    }
+  }
+
+  /**
+   * Parses the endorsements and observations field.
+   * 
+   * @param value the value of the endorsements and observations data object
+   */
+  private void parseEndorsementsAndObservations(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      endorsementsAndObservations = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      endorsementsAndObservations = new String(value).trim();
+    }
+  }
+
+  /**
+   * Parses the name of other person field.
+   * 
+   * @param value the value of the name of other person data object
+   */
+  private synchronized void parseNameOfOtherPerson(byte[] value) {
+    if (namesOfOtherPersons == null) {
+      namesOfOtherPersons = new ArrayList<String>();
+    }
+    try {
+      String field = new String(value, "UTF-8");
+      namesOfOtherPersons.add(field.trim());
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      namesOfOtherPersons.add(new String(value).trim());
+    }
+  }
+
+  /**
+   * Parses the data of issue field.
+   * 
+   * @param value the value of the date of issue data object
+   */
+  private void parseDateOfIssue(byte[] value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Wrong date format");
+    }
+
+    /* Try to interpret value as a ccyymmdd formatted date string as per Doc 9303. */
+    if (value.length == 8) {
+      try {
+        String dateString = new String(value, "UTF-8");
+        dateOfIssue = dateString.trim();
+        return;
+      } catch (UnsupportedEncodingException usee) {
+        /* NOTE: never happens, UTF-8 is supported. */
+        LOGGER.log(Level.WARNING, "Exception", usee);
+      }
+    }
+    LOGGER.warning("DG12 date of issue is not in expected ccyymmdd ASCII format");
+
+    /* Some live French MRTDs encode the date as ccyymmdd but in BCD, not in ASCII. */
+    if (value.length == 4) {
+      String dateString = Hex.bytesToHexString(value);
+      dateOfIssue = dateString.trim();
+      return;
+    }
+
+    /* Giving up... we can't parse this date. */
+    throw new IllegalArgumentException("Wrong date format");
+  }
+
+  /**
+   * Parses the issuing authority field.
+   * 
+   * @param value the value of the issuing authority data object
+   */
+  private void parseIssuingAuthority(byte[] value) {
+    try {
+      String field = new String(value, "UTF-8");
+      issuingAuthority = field.trim();
+    } catch (UnsupportedEncodingException usee) {
+      /* NOTE: Default charset, wtf, UTF-8 not supported? */
+      LOGGER.log(Level.WARNING, "Exception", usee);
+      issuingAuthority = (new String(value)).trim();
+    }
   }
 }

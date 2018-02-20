@@ -112,6 +112,10 @@ public final class Util {
 
   private static final Provider BC_PROVIDER = new BouncyCastleProvider();
 
+  /**
+   * Private constructor to prevent clients from creating an instance of this
+   * static class.
+   */
   private Util() {
   }
 
@@ -262,6 +266,18 @@ public final class Util {
     return computeKeySeed(text, digestAlg, doTruncate);
   }
 
+  /**
+   * Computes the key seed from a card access number (CAN) to derive
+   * secure messaging keys from.
+   * 
+   * @param cardAccessNumber the card access number
+   * @param digestAlg the digest algorithm to use
+   * @param doTruncate whether to truncate to 16 bytes or not
+   * 
+   * @return the resulting key seed
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static byte[] computeKeySeed(String cardAccessNumber, String digestAlg, boolean doTruncate) throws GeneralSecurityException {
     MessageDigest shaDigest = MessageDigest.getInstance(digestAlg);
 
@@ -444,6 +460,15 @@ public final class Util {
     }
   }
 
+  /* FIXME: improve documentation. Is used in PACE, EAC-CA, EAC-TA. -- MO */
+  /**
+   * Align the given key data.
+   * 
+   * @param keyData the key data
+   * @param size the new size
+   * 
+   * @return a byte array with key data
+   */
   public static byte[] alignKeyDataToSize(byte[] keyData, int size) {
     byte[] result = new byte[size];
     if (keyData.length < size) {
@@ -716,16 +741,23 @@ public final class Util {
     return namedECParams.getName();
   }
 
+  /**
+   * Translates (named) curve specification to JCA compliant explicit parameter specification.
+   * 
+   * @param parameterSpec a BC named curve parameter specification
+   * 
+   * @return a JCA compliant explicit parameter specification
+   */
   public static ECParameterSpec toExplicitECParameterSpec(ECNamedCurveParameterSpec parameterSpec) {
     return toExplicitECParameterSpec(toECNamedCurveSpec(parameterSpec));
   }
 
   /**
-   * Translates (named) curve spec to JCA compliant explicit param spec.
+   * Translates (named) curve specification to JCA compliant explicit param specification.
    *
-   * @param params an EC parameter spec, possibly named
+   * @param params an EC parameter specification, possibly named
    *
-   * @return another spec not name based
+   * @return another specification not name based
    */
   public static ECParameterSpec toExplicitECParameterSpec(ECParameterSpec params) {
     try {
@@ -756,6 +788,13 @@ public final class Util {
     }
   }
 
+  /**
+   * Converts the given EC parameter specification to a BC named curve specification if known.
+   * 
+   * @param ecParamSpec the JCA EC parameter specification, possibly explicit
+   * 
+   * @return a BC named curve specification if recognized, or {@code null} if not
+   */
   private static org.bouncycastle.jce.spec.ECNamedCurveSpec toNamedCurveSpec(ECParameterSpec ecParamSpec) {
     if (ecParamSpec == null) {
       return null;
@@ -811,6 +850,13 @@ public final class Util {
    * all the key information to include the domain parameters explicitly. This is
    * not what Bouncy Castle does by default. But we first have to check if this is
    * the case.
+   */
+  /**
+   * Convert the given JCA compliant public key to a BC subject public key info structure.
+   * 
+   * @param publicKey a public key
+   * 
+   * @return a BC subject public key info structure
    */
   public static SubjectPublicKeyInfo toSubjectPublicKeyInfo(PublicKey publicKey) {
     try {
@@ -886,6 +932,13 @@ public final class Util {
     }
   }
 
+  /**
+   * Extracts a public key from a BC subject public key info structure.
+   * 
+   * @param subjectPublicKeyInfo the BC subject public key info structure
+   * 
+   * @return a public key or {@code null}
+   */
   public static PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) {
     try {
       byte[] encodedPublicKeyInfoBytes = subjectPublicKeyInfo.getEncoded(ASN1Encoding.DER);
@@ -933,6 +986,13 @@ public final class Util {
     }
   }
 
+  /**
+   * Decodes an EC point from a BSI encoded octet string.
+   * 
+   * @param encodedECPoint the encoded EC point
+   * 
+   * @return the EC point
+   */
   public static ECPoint os2ECPoint(byte[] encodedECPoint) {
     DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedECPoint));
     try {
@@ -961,7 +1021,7 @@ public final class Util {
   }
 
   /**
-   * Encode an EC point (for use as public key value).
+   * Encode (BSI encoding) an EC point (for use as public key value).
    * Prefixes a {@code 0x04} (without a length).
    *
    * @param point an EC Point
@@ -1032,6 +1092,13 @@ public final class Util {
     return fromBouncyCastleECPoint(bcProd);
   }
 
+  /** 
+   * Converts a string to bytes using UTF-8.
+   * 
+   * @param str a string
+   * 
+   * @return the bytes
+   */
   public static byte[] getBytes(String str) {
     byte[] bytes = str.getBytes();
     try {
@@ -1043,6 +1110,15 @@ public final class Util {
     return bytes;
   }
 
+  /**
+   * Extracts the prime from the given DH or ECDH parameter specification
+   * which (hopefully) specifies a curve over a prime field.
+   * (This will throw an {@code IllegalArgumentException} for non-prime fields.)
+   * 
+   * @param params a parameter specification
+   * 
+   * @return the prime
+   */
   public static BigInteger getPrime(AlgorithmParameterSpec params) {
     if (params == null) {
       throw new IllegalArgumentException("Parameters null");
@@ -1062,6 +1138,14 @@ public final class Util {
     }
   }
 
+  /**
+   * Attempts to infer a relevant key agreement algorithm
+   * (either {@code "DH"} or {@code "ECDH"}) given a public key.
+   * 
+   * @param publicKey the public key
+   * 
+   * @return either {@code "DH"} or {@code "ECDH"}
+   */
   public static String inferKeyAgreementAlgorithm(PublicKey publicKey) {
     if (publicKey instanceof ECPublicKey) {
       return "ECDH";
@@ -1091,11 +1175,26 @@ public final class Util {
     return y.toBigInteger();
   }
 
+  /**
+   * Converts a JCA EC point to a BC EC point.
+   * 
+   * @param point the JCA EC point
+   * @param params the parameters to interpret the point
+   * 
+   * @return the corresponding BC EC point
+   */
   public static org.bouncycastle.math.ec.ECPoint toBouncyCastleECPoint(ECPoint point, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECCurve bcCurve = toBouncyCastleECCurve(params);
     return bcCurve.createPoint(point.getAffineX(), point.getAffineY());
   }
 
+  /**
+   * Convert a BC EC point to a JCA EC point.
+   * 
+   * @param point the BC EC point
+   * 
+   * @return the corresponding JCA EC point
+   */
   public static ECPoint fromBouncyCastleECPoint(org.bouncycastle.math.ec.ECPoint point) {
     point = point.normalize();
     if (!point.isValid()) {
@@ -1104,17 +1203,40 @@ public final class Util {
     return new ECPoint(point.getAffineXCoord().toBigInteger(), point.getAffineYCoord().toBigInteger());
   }
 
+  /**
+   * Determines whether an EC point is valid with respect to the given EC parameters.
+   * 
+   * @param ecPoint an EC point
+   * @param params the EC parameter specification
+   * 
+   * @return a boolean indicating whether the EC point is valid with respect tot the given EC parameters
+   */
   public static boolean isValid(ECPoint ecPoint, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(ecPoint, params);
     return bcPoint.isValid();
   }
 
+  /**
+   * Normalizes an EC point given the EC parameters.
+   * 
+   * @param ecPoint the EC point
+   * @param params the EC parameter specification
+   * 
+   * @return the normalized EC point
+   */
   public static ECPoint normalize(ECPoint ecPoint, ECParameterSpec params) {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(ecPoint, params);
     bcPoint = bcPoint.normalize();
     return fromBouncyCastleECPoint(bcPoint);
   }
 
+  /**
+   * Converts the EC parameter specification (including a curve) to a BC typed EC curve.
+   * 
+   * @param params the EC parameter specification
+   * 
+   * @return the corresponding EC curve
+   */
   private static ECCurve toBouncyCastleECCurve(ECParameterSpec params) {
     EllipticCurve curve = params.getCurve();
     ECField field = curve.getField();
@@ -1129,18 +1251,40 @@ public final class Util {
     return new ECCurve.Fp(p, a, b, order, BigInteger.valueOf(coFactor));
   }
 
+  /**
+   * Converts the EC public key to a BC public key parameter specification.
+   * 
+   * @param publicKey the EC public key
+   * 
+   * @return a BC typed public key parameter specification
+   */
   public static ECPublicKeyParameters toBouncyECPublicKeyParameters(ECPublicKey publicKey) {
     ECParameterSpec ecParams = publicKey.getParams();
     org.bouncycastle.math.ec.ECPoint q = toBouncyCastleECPoint(publicKey.getW(), ecParams);
     return new ECPublicKeyParameters(q, toBouncyECDomainParameters(ecParams));
   }
 
+  /**
+   * Converts the EC private key to a BC private key parameter specification.
+   * 
+   * @param privateKey the EC private key
+   * 
+   * @return a BC typed private key parameter specification
+   */
   public static ECPrivateKeyParameters toBouncyECPrivateKeyParameters(ECPrivateKey privateKey) {
     BigInteger d = privateKey.getS();
     ECDomainParameters ecParams = toBouncyECDomainParameters(privateKey.getParams());
     return new ECPrivateKeyParameters(d, ecParams);
   }
 
+  /**
+   * Converts a JCA compliant EC parameter (domain) specification to a BC
+   * EC domain specification.
+   * 
+   * @param params the EC parameter specification
+   * 
+   * @return the corresponding BC typed EC domain parameter specification.
+   */
   public static ECDomainParameters toBouncyECDomainParameters(ECParameterSpec params) {
     ECCurve curve = toBouncyCastleECCurve(params);
     org.bouncycastle.math.ec.ECPoint g = toBouncyCastleECPoint(params.getGenerator(), params);
@@ -1152,6 +1296,18 @@ public final class Util {
 
   /* Get standard crypto primitives from default provider or (if that fails) from BC. */
 
+  /**
+   * Returns a cipher for the given encryption algorithm,
+   * possibly using the BC provider explicitly if the
+   * configured JCA providers cannot provide a cipher for the
+   * algorithm.
+   * 
+   * @param algorithm the encryption algorithm
+   * 
+   * @return a cipher
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static Cipher getCipher(String algorithm) throws GeneralSecurityException {
     try {
       return Cipher.getInstance(algorithm);
@@ -1161,19 +1317,44 @@ public final class Util {
     }
   }
 
-  public static Cipher getCipher(String algorithm, int mode, Key keySpec) throws GeneralSecurityException {
+  /**
+   * Returns a cipher for the given encryption algorithm and key,
+   * possibly using the BC provider explicitly if the
+   * configured JCA providers cannot provide a cipher for the
+   * algorithm and key.
+   * 
+   * @param algorithm the encryption algorithm
+   * @param mode the mode of operation (encrypt or decrypt)
+   * @param key the key
+   * 
+   * @return a cipher
+   * 
+   * @throws GeneralSecurityException on error
+   */
+  public static Cipher getCipher(String algorithm, int mode, Key key) throws GeneralSecurityException {
     try {
       Cipher cipher =  Cipher.getInstance(algorithm);
-      cipher.init(mode, keySpec);
+      cipher.init(mode, key);
       return cipher;
     } catch (Exception e) {
       LOGGER.log(Level.FINE, "Default provider could not provide this Cipher, falling back to explicit BC", e);
       Cipher cipher =  Cipher.getInstance(algorithm, BC_PROVIDER);
-      cipher.init(mode, keySpec);
+      cipher.init(mode, key);
       return cipher;
     }
   }
 
+  /**
+   * Returns a key agreement object for the given algorithm, possibly using
+   * the BC provider explicitly if the configured JCA providers cannot provide
+   * a key agreement for the algorithm.
+   * 
+   * @param algorithm the key agreement algorithm
+   * 
+   * @return a key agreement object
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static KeyAgreement getKeyAgreement(String algorithm) throws GeneralSecurityException {
     try {
       return KeyAgreement.getInstance(algorithm);
@@ -1183,6 +1364,17 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a key pair generator for the given algorithm, possibly using
+   * the BC provider explicitly when the configured JCA providers cannot
+   * provide a generator for the algorithm.
+   * 
+   * @param algorithm the algorithm
+   * 
+   * @return a key pair generator
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static KeyPairGenerator getKeyPairGenerator(String algorithm) throws GeneralSecurityException {
     try {
       return KeyPairGenerator.getInstance(algorithm);
@@ -1192,6 +1384,17 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a MAC for the given algorithm, possibly using the
+   * BC provider explicitly if the configured JCA providers cannot
+   * provide a MAC for the algorithm.
+   * 
+   * @param algorithm the MAC algorithm
+   * 
+   * @return a MAC object
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static Mac getMac(String algorithm) throws GeneralSecurityException {
     try {
       return Mac.getInstance(algorithm);
@@ -1201,6 +1404,18 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a MAC for the given algorithm and key, possibly using
+   * the BC provider explicitly when the configured JCA providers
+   * cannot provide a MAC for the algorithm and key.
+   * 
+   * @param algorithm the MAC algorithm
+   * @param key the key
+   * 
+   * @return a MAC object
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static Mac getMac(String algorithm, Key key) throws GeneralSecurityException {
     try {
       Mac mac = Mac.getInstance(algorithm);
@@ -1214,6 +1429,17 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a message digest for the given algorithm, possibly
+   * using the BC provider explicitly if the configured JCA providers
+   * cannot provide a message digest for the algorithm.
+   * 
+   * @param algorithm the message digest algorithm
+   * 
+   * @return a message digest object
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static MessageDigest getMessageDigest(String algorithm) throws GeneralSecurityException {
     try {
       return MessageDigest.getInstance(algorithm);
@@ -1223,6 +1449,19 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a public key for the given algorithm and key specification,
+   * possibly using the BC provider explicitly when the configured JCA
+   * providers cannot provide a public key for the algorithm and key
+   * specification.
+   * 
+   * @param algorithm the public key algorithm
+   * @param keySpec the key specification
+   * 
+   * @return a public key object
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static PublicKey getPublicKey(String algorithm, KeySpec keySpec) throws GeneralSecurityException {
     try {
       KeyFactory kf = KeyFactory.getInstance(algorithm);
@@ -1234,6 +1473,16 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a signature for the given signature algorithm, possibly using the BC
+   * provider if the configured JCA providers cannot provide a signature.
+   * 
+   * @param algorithm the signature algorithm
+   * 
+   * @return a signature object
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static Signature getSignature(String algorithm) throws GeneralSecurityException {
     try {
       return Signature.getInstance(algorithm);
@@ -1243,6 +1492,17 @@ public final class Util {
     }
   }
 
+  /**
+   * Returns a certificate factory object for the given certificate algorithm,
+   * possibly using the BC provider explicitly if the configured JCA providers
+   * cannot provide a certificate factory for the algorithm.
+   * 
+   * @param algorithm the certificate algorithm
+   * 
+   * @return a certificate factory
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static CertificateFactory getCertificateFactory(String algorithm) throws GeneralSecurityException {
     try {
       return CertificateFactory.getInstance(algorithm);

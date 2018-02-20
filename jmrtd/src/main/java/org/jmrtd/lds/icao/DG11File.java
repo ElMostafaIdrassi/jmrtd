@@ -303,7 +303,7 @@ public class DG11File extends DataGroup {
   /**
    * Gets the permanent address.
    *
-   * @return the permanentAddress
+   * @return the permanent address
    */
   public List<String> getPermanentAddress() {
     return permanentAddress;
@@ -339,7 +339,7 @@ public class DG11File extends DataGroup {
   /**
    * Gets the personal summary.
    *
-   * @return the personalSummary
+   * @return the personal summary
    */
   public String getPersonalSummary() {
     return personalSummary;
@@ -348,25 +348,25 @@ public class DG11File extends DataGroup {
   /**
    * Gets the proof of citizenship.
    *
-   * @return the proofOfCitizenship
+   * @return the proof of citizenship
    */
   public byte[] getProofOfCitizenship() {
     return proofOfCitizenship;
   }
 
   /**
-   * Gets the other valid TD numbers.
+   * Gets the other valid travel document numbers.
    *
-   * @return the otherValidTDNumbers
+   * @return the other valid travel document numbers
    */
   public List<String> getOtherValidTDNumbers() {
     return otherValidTDNumbers;
   }
 
   /**
-   * Gets custody information.
+   * Returns the custody information.
    *
-   * @return the custodyInformation
+   * @return the custody information
    */
   public String getCustodyInformation() {
     return custodyInformation;
@@ -567,6 +567,11 @@ public class DG11File extends DataGroup {
 
   /* Field parsing and interpretation below. */
 
+  /**
+   * Parses the custody information field.
+   * 
+   * @param value the value of the custody information data object
+   */
   private void parseCustodyInformation(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -578,6 +583,11 @@ public class DG11File extends DataGroup {
     }
   }
 
+  /**
+   * Parses the other valid travel document numbers field.
+   * 
+   * @param value the value of the other valid travel document numbers data object
+   */
   private void parseOtherValidTDNumbers(byte[] value) {
     String field = new String(value).trim();
     try {
@@ -593,10 +603,20 @@ public class DG11File extends DataGroup {
     }
   }
 
+  /**
+   * Parses the proof of citizen field.
+   * 
+   * @param value the value of the proof of citizen data object
+   */
   private void parseProofOfCitizenShip(byte[] value) {
     proofOfCitizenship = value;
   }
 
+  /**
+   * Parses the personal summary field.
+   * 
+   * @param value the value of the personal summary data object
+   */
   private void parsePersonalSummary(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -608,6 +628,11 @@ public class DG11File extends DataGroup {
     }
   }
 
+  /**
+   * Parses the title field.
+   * 
+   * @param value the value of the title data object
+   */
   private void parseTitle(byte[] value) {
     try {
       String field = new String(value, "UTF-8");
@@ -619,6 +644,11 @@ public class DG11File extends DataGroup {
     }
   }
 
+  /**
+   * Parses the profession field.
+   * 
+   * @param value the value of the profession data object
+   */
   private void parseProfession(byte[] value) {
     String field = new String(value);
     try {
@@ -630,6 +660,11 @@ public class DG11File extends DataGroup {
     profession = field.trim();
   }
 
+  /**
+   * Parses the telephone field.
+   * 
+   * @param value the value of the telephone data object
+   */
   private void parseTelephone(byte[] value) {
     String field = new String(value);
     try {
@@ -641,6 +676,11 @@ public class DG11File extends DataGroup {
     telephone = field.replace("<", " ").trim();
   }
 
+  /**
+   * Parses the permanent address field.
+   * 
+   * @param value the value in the permanent address data object
+   */
   private void parsePermanentAddress(byte[] value) {
     String field = new String(value);
     try {
@@ -656,6 +696,11 @@ public class DG11File extends DataGroup {
     }
   }
 
+  /**
+   * Parses the place of birth field.
+   * 
+   * @param value the value in the place of birth data object
+   */
   private void parsePlaceOfBirth(byte[] value) {
     String field = new String(value);
     try {
@@ -670,7 +715,12 @@ public class DG11File extends DataGroup {
       placeOfBirth.add(line);
     }
   }
-
+  
+  /**
+   * Parses the date of birth.
+   * 
+   * @param value the value of the date of birth data object
+   */
   private void parseFullDateOfBirth(byte[] value) {
     String field = null;
     if (value.length == 4) {
@@ -687,6 +737,11 @@ public class DG11File extends DataGroup {
     fullDateOfBirth = field;
   }
 
+  /**
+   * Parses the other name field.
+   * 
+   * @param value the value of the other name data object
+   */
   private synchronized void parseOtherName(byte[] value) {
     if (otherNames == null) {
       otherNames = new ArrayList<String>();
@@ -700,6 +755,11 @@ public class DG11File extends DataGroup {
     }
   }
 
+  /**
+   * Parses the personal number field.
+   * 
+   * @param value the value of the personal number data object
+   */
   private void parsePersonalNumber(byte[] value) {
     String field = new String(value);
     try {
@@ -710,6 +770,11 @@ public class DG11File extends DataGroup {
     personalNumber = field.trim();
   }
 
+  /**
+   * Parses the name of holder field.
+   * 
+   * @param value the value of the name of holder data object
+   */
   private void parseNameOfHolder(byte[] value) {
     String field = new String(value);
     try {
@@ -720,38 +785,46 @@ public class DG11File extends DataGroup {
     nameOfHolder = field.trim();
   }
 
-  private void readField(int fieldTag, TLVInputStream tlvIn) throws IOException {
-    int tag = tlvIn.readTag();
+  /**
+   * Reads a field from a stream.
+   * 
+   * @param expectedFieldTag the tag to expect
+   * @param tlvInputStream the stream to read from
+   * 
+   * @throws IOException on error reading from the stream
+   */
+  private void readField(int expectedFieldTag, TLVInputStream tlvInputStream) throws IOException {
+    int tag = tlvInputStream.readTag();
     if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
-      /* int contentSpecificLength = */ tlvIn.readLength();
-      int countTag = tlvIn.readTag();
+      /* int contentSpecificLength = */ tlvInputStream.readLength();
+      int countTag = tlvInputStream.readTag();
       if (countTag != COUNT_TAG) {
         throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
       }
-      int countLength = tlvIn.readLength();
+      int countLength = tlvInputStream.readLength();
       if (countLength != 1) {
         throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
       }
-      byte[] countValue = tlvIn.readValue();
+      byte[] countValue = tlvInputStream.readValue();
       if (countValue == null || countValue.length != 1) {
         throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
       }
       int count = countValue[0] & 0xFF;
       for (int i = 0; i < count; i++) {
-        tag = tlvIn.readTag();
+        tag = tlvInputStream.readTag();
         if (tag != OTHER_NAME_TAG) {
           throw new IllegalArgumentException("Expected " + Integer.toHexString(OTHER_NAME_TAG) + ", found " + Integer.toHexString(tag));
         }
-        /* int otherNameLength = */ tlvIn.readLength();
-        byte[] value = tlvIn.readValue();
+        /* int otherNameLength = */ tlvInputStream.readLength();
+        byte[] value = tlvInputStream.readValue();
         parseOtherName(value);
       }
     } else {
-      if (tag != fieldTag) {
-        throw new IllegalArgumentException("Expected " + Integer.toHexString(fieldTag) + ", but found " + Integer.toHexString(tag));
+      if (tag != expectedFieldTag) {
+        throw new IllegalArgumentException("Expected " + Integer.toHexString(expectedFieldTag) + ", but found " + Integer.toHexString(tag));
       }
-      tlvIn.readLength();
-      byte[] value = tlvIn.readValue();
+      tlvInputStream.readLength();
+      byte[] value = tlvInputStream.readValue();
       switch (tag) {
         case FULL_NAME_TAG:
           parseNameOfHolder(value);

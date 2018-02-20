@@ -43,6 +43,9 @@ public interface ImageInfo extends LDSElement {
   static String WSQ_MIME_TYPE = "image/x-wsq";
 
   /** Type of image. */
+  static final int TYPE_UNKNOWN = -1;
+  
+  /** Type of image. */
   static final int TYPE_PORTRAIT = 0;
 
   /** Type of image. */

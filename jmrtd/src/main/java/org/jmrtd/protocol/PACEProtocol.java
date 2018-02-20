@@ -1004,6 +1004,7 @@ public class PACEProtocol {
   }
 
   /**
+   * Generates an authentication token.
    * The authentication token SHALL be computed over a public key data object (cf. Section 4.5)
    * containing the object identifier as indicated in MSE:Set AT (cf. Section 3.2.1), and the
    * received ephemeral public key (i.e. excluding the domain parameters, cf. Section 4.5.3)
@@ -1019,48 +1020,20 @@ public class PACEProtocol {
    */
   public static byte[] generateAuthenticationToken(String oid, SecretKey macKey, PublicKey publicKey) throws GeneralSecurityException {
     String cipherAlg = PACEInfo.toCipherAlgorithm(oid);
-    String macAlg = inferMacAlgorithmFromCipherAlgorithm(cipherAlg);
+    String macAlg = inferMACAlgorithmFromCipherAlgorithm(cipherAlg);
     Mac mac = Util.getMac(macAlg, macKey);
     return generateAuthenticationToken(oid, mac, publicKey);
   }
 
-  private static byte[] generateAuthenticationToken(String oid, Mac mac, PublicKey publicKey) throws GeneralSecurityException {
-    byte[] encodedPublicKeyDataObject = encodePublicKeyDataObject(oid, publicKey);
-    byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
-
-    /* Output length needs to be 64 bits, copy first 8 bytes. */
-    byte[] authenticationToken = new byte[8];
-    System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
-    return authenticationToken;
-  }
-
   /**
-   * Computes the static key seed to be used in PACE KDF, based on information from the MRZ.
-   *
-   * @param documentNumber a string containing the document number
-   * @param dateOfBirth a string containing the date of birth (YYMMDD)
-   * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
-   *
-   * @return a byte array of length 16 containing the key seed
-   *
-   * @throws GeneralSecurityException on security error
+   * Computes a key seed given a card access number (CAN).
+   * 
+   * @param cardAccessNumber the card access number
+   * 
+   * @return a key seed for deriving secure messaging keys
+   * 
+   * @throws GeneralSecurityException on error
    */
-  private static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
-    return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
-  }
-
-  private static String fixDocumentNumber(String documentNumber) {
-    /* The document number, excluding trailing '<'. */
-    String minDocumentNumber = documentNumber.replace('<', ' ').trim().replace(' ', '<');
-
-    /* The document number, including trailing '<' until length 9. */
-    String maxDocumentNumber = minDocumentNumber;
-    while (maxDocumentNumber.length() < 9) {
-      maxDocumentNumber += "<";
-    }
-    return maxDocumentNumber;
-  }
-
   public static byte[] computeKeySeedForPACE(String cardAccessNumber) throws GeneralSecurityException {
     return Util.computeKeySeed(cardAccessNumber, "SHA-1", false);
   }
@@ -1081,7 +1054,7 @@ public class PACEProtocol {
   public static byte[] encodePublicKeyDataObject(String oid, PublicKey publicKey) throws InvalidKeyException {
     return encodePublicKeyDataObject(oid, publicKey, true);
   }
-
+  
   /**
    * Based on TR-SAC 1.01 4.5.1 and 4.5.2.
    *
@@ -1215,6 +1188,14 @@ public class PACEProtocol {
     }
   }
 
+  /**
+   * Decodes a public key received from the PICC.
+   * 
+   * @param encodedPublicKey the encoded public key that was received
+   * @param params the parameters used for interpreting the public key
+   * 
+   * @return the decoded public key object
+   */
   public static PublicKey decodePublicKeyFromSmartCard(byte[] encodedPublicKey, AlgorithmParameterSpec params) {
     if (params == null) {
       throw new IllegalArgumentException("Params cannot be null");
@@ -1253,6 +1234,63 @@ public class PACEProtocol {
     }
   }
 
+  /**
+   * Generates an authentication token.
+   * 
+   * @param oid the object identifier as indicated in MSE Set AT
+   * @param mac the MAC which has already been initialized with the MAC key derived from key agreement
+   * @param publicKey the received public key
+   * 
+   * @return the authentication token
+   * 
+   * @throws GeneralSecurityException on error while performing the MAC operation
+   */
+  private static byte[] generateAuthenticationToken(String oid, Mac mac, PublicKey publicKey) throws GeneralSecurityException {
+    byte[] encodedPublicKeyDataObject = encodePublicKeyDataObject(oid, publicKey);
+    byte[] maccedPublicKeyDataObject = mac.doFinal(encodedPublicKeyDataObject);
+
+    /* Output length needs to be 64 bits, copy first 8 bytes. */
+    byte[] authenticationToken = new byte[8];
+    System.arraycopy(maccedPublicKeyDataObject, 0, authenticationToken, 0, authenticationToken.length);
+    return authenticationToken;
+  }
+
+  /**
+   * Fixes the document number so that it is in MRZ format.
+   * This replaces white spaces with fillers and
+   * makes sure the length is at least 9.
+   * 
+   * @param documentNumber the document number
+   * 
+   * @return a fixed document number
+   */
+  private static String fixDocumentNumber(String documentNumber) {
+    /* The document number, excluding trailing '<'. */
+    String minDocumentNumber = documentNumber.replace('<', ' ').trim().replace(' ', '<');
+
+    /* The document number, including trailing '<' until length 9. */
+    String maxDocumentNumber = minDocumentNumber;
+    while (maxDocumentNumber.length() < 9) {
+      maxDocumentNumber += "<";
+    }
+    return maxDocumentNumber;
+  }
+
+  /**
+   * Computes the static key seed to be used in PACE KDF, based on information from the MRZ.
+   *
+   * @param documentNumber a string containing the document number
+   * @param dateOfBirth a string containing the date of birth (YYMMDD)
+   * @param dateOfExpiry a string containing the date of expiry (YYMMDD)
+   *
+   * @return a byte array of length 16 containing the key seed
+   *
+   * @throws GeneralSecurityException on security error
+   */
+  private static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
+    return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
+  }
+  
   /**
    * Checks consistency of input parameters.
    *
@@ -1297,7 +1335,18 @@ public class PACEProtocol {
     }
   }
 
-  private static String inferMacAlgorithmFromCipherAlgorithm(String cipherAlg) throws InvalidAlgorithmParameterException {
+  /**
+   * Infers a MAC algorithm given a encryption algorithm.
+   * 
+   * @param cipherAlg the encryption algorithm.
+   * If 3-DES is used for encryption, then the MAC algorithm is ISO9797 algorithm 3.
+   * If AES is used for encryption, the the MAC algorithm is AES-CMAC.
+   * 
+   * @return the MAC algorithm
+   * 
+   * @throws InvalidAlgorithmParameterException for unknown encryption algorithm
+   */
+  private static String inferMACAlgorithmFromCipherAlgorithm(String cipherAlg) throws InvalidAlgorithmParameterException {
     if (cipherAlg == null) {
       throw new IllegalArgumentException("Cannot infer MAC algorithm from cipher algorithm null");
     }

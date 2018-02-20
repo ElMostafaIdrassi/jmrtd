@@ -160,6 +160,15 @@ import org.jmrtd.Util;
   private SignedDataUtil() {
   }
 
+  /**
+   * Reads a signed data structure from a stream.
+   * 
+   * @param inputStream the stream to read from
+   * 
+   * @return the signed data structure
+   * 
+   * @throws IOException on error reading from the stream
+   */
   public static SignedData readSignedData(InputStream inputStream) throws IOException {
     ASN1InputStream asn1in = new ASN1InputStream(inputStream);
     ASN1Sequence sequence = (ASN1Sequence)asn1in.readObject();
@@ -169,11 +178,11 @@ import org.jmrtd.Util;
     }
 
     String contentTypeOID = ((ASN1ObjectIdentifier)sequence.getObjectAt(0)).getId();
-    if (!SignedDataUtil.RFC_3369_SIGNED_DATA_OID.equals(contentTypeOID)) {
-      throw new IOException("Was expecting signed-data content type OID (" + SignedDataUtil.RFC_3369_SIGNED_DATA_OID + "), found " + contentTypeOID);
+    if (!RFC_3369_SIGNED_DATA_OID.equals(contentTypeOID)) {
+      throw new IOException("Was expecting signed-data content type OID (" + RFC_3369_SIGNED_DATA_OID + "), found " + contentTypeOID);
     }
 
-    ASN1Primitive asn1SequenceWithSignedData = SignedDataUtil.getObjectFromTaggedObject(sequence.getObjectAt(1));
+    ASN1Primitive asn1SequenceWithSignedData = getObjectFromTaggedObject(sequence.getObjectAt(1));
 
     if (!(asn1SequenceWithSignedData instanceof ASN1Sequence)) {
       throw new IOException("Was expecting an ASN.1 sequence as content");
@@ -182,15 +191,30 @@ import org.jmrtd.Util;
     return SignedData.getInstance(asn1SequenceWithSignedData);
   }
 
+  /**
+   * Writes a signed data structure to a stream.
+   * 
+   * @param signedData the signed data to write
+   * @param outputStream the stream to write to
+   * 
+   * @throws IOException on error writing to the stream
+   */
   public static void writeData(SignedData signedData, OutputStream outputStream) throws IOException {
     ASN1EncodableVector v = new ASN1EncodableVector();
-    v.add(new ASN1ObjectIdentifier(SignedDataUtil.RFC_3369_SIGNED_DATA_OID));
+    v.add(new ASN1ObjectIdentifier(RFC_3369_SIGNED_DATA_OID));
     v.add(new DERTaggedObject(0, signedData));
     ASN1Sequence fileContentsObject = new DLSequence(v);
     byte[] fileContentsBytes = fileContentsObject.getEncoded(ASN1Encoding.DER);
     outputStream.write(fileContentsBytes);
   }
 
+  /**
+   * Extracts the content from a signed data structure.
+   * 
+   * @param signedData the signed data
+   * 
+   * @return the contents of the e-content in the signed data structure
+   */
   public static ASN1Primitive getContent(SignedData signedData) {
     ContentInfo encapContentInfo = signedData.getEncapContentInfo();
 
@@ -240,11 +264,18 @@ import org.jmrtd.Util;
     return asn1TaggedObject.getObject();
   }
 
+  /**
+   * Returns the digest algirithm used in the signer info in a signed data structure.
+   * 
+   * @param signedData the signed data structure
+   * 
+   * @return the digest algorithm
+   */
   public static String getSignerInfoDigestAlgorithm(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
       String digestAlgOID = signerInfo.getDigestAlgorithm().getAlgorithm().getId();
-      return SignedDataUtil.lookupMnemonicByOID(digestAlgOID);
+      return lookupMnemonicByOID(digestAlgOID);
     } catch (NoSuchAlgorithmException nsae) {
       LOGGER.log(Level.WARNING, "No such algorithm" + nsae);
       return null;
@@ -278,6 +309,13 @@ import org.jmrtd.Util;
     return null;
   }
 
+  /**
+   * Returns the signature algorithm used in the given signed data structure.
+   * 
+   * @param signedData the signed data structure
+   * 
+   * @return a JCE mnemonic algorithm string
+   */
   public static String getDigestEncryptionAlgorithm(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
@@ -286,7 +324,7 @@ import org.jmrtd.Util;
         LOGGER.warning("Could not determine digest encryption algorithm OID");
         return null;
       }
-      return SignedDataUtil.lookupMnemonicByOID(digestEncryptionAlgorithmOID);
+      return lookupMnemonicByOID(digestEncryptionAlgorithmOID);
     } catch (NoSuchAlgorithmException nsae) {
       LOGGER.log(Level.WARNING, "No such algorithm", nsae);
       return null;
@@ -294,7 +332,7 @@ import org.jmrtd.Util;
   }
 
   /**
-   * Gets the contents of the signed data over which the
+   * Returns the contents of the signed data over which the
    * signature is to be computed.
    *
    * See RFC 3369, Cryptographic Message Syntax, August 2002,
@@ -342,7 +380,7 @@ import org.jmrtd.Util;
   }
 
   /**
-   * Gets the stored signature of the security object.
+   * Returns the stored signature of the security object.
    *
    * @param signedData the signed data
    *
@@ -355,6 +393,13 @@ import org.jmrtd.Util;
     return signerInfo.getEncryptedDigest().getOctets();
   }
 
+  /**
+   * Returns the issuer and serial number stored in the given signed data structure.
+   * 
+   * @param signedData the signed data structure
+   * 
+   * @return the issuer and serial number
+   */
   public static IssuerAndSerialNumber getIssuerAndSerialNumber(SignedData signedData) {
     SignerInfo signerInfo = getSignerInfo(signedData);
     SignerIdentifier signerIdentifier = signerInfo.getSID();
@@ -364,6 +409,15 @@ import org.jmrtd.Util;
     return new IssuerAndSerialNumber(issuer, serialNumber);
   }
 
+  /**
+   * Returns the document signer certificate stored in the given signed data structure.
+   * 
+   * @param signedData a signed data structure
+   * 
+   * @return the document signer certificate
+   * 
+   * @throws CertificateException on error decoding the certificate
+   */
   public static X509Certificate getDocSigningCertificate(SignedData signedData) throws CertificateException {
     byte[] certSpec = null;
     ASN1Set certs = signedData.getCertificates();
@@ -395,16 +449,44 @@ import org.jmrtd.Util;
     }
   }
 
+  /**
+   * Creates a signed data structure, for inclusion in a security object.
+   * 
+   * @param digestAlgorithm the digest algorithm
+   * @param digestEncryptionAlgorithm the signature algorithm
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info
+   * @param encryptedDigest the signature bytes
+   * @param docSigningCertificate the document signer certificate
+   * 
+   * @return the signed data structure
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
       String contentTypeOID, ContentInfo contentInfo, byte[] encryptedDigest,
       X509Certificate docSigningCertificate) throws GeneralSecurityException {
-    ASN1Set digestAlgorithmsSet = SignedDataUtil.createSingletonSet(SignedDataUtil.createDigestAlgorithms(digestAlgorithm));
-    ASN1Set certificates =  createSingletonSet(SignedDataUtil.createCertificate(docSigningCertificate));
+    ASN1Set digestAlgorithmsSet = createSingletonSet(createDigestAlgorithms(digestAlgorithm));
+    ASN1Set certificates =  createSingletonSet(createCertificate(docSigningCertificate));
     ASN1Set crls = null;
     ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Object());
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }
 
+  /**
+   * Creates a signer info structures.
+   * 
+   * @param digestAlgorithm the digest algorithm
+   * @param digestEncryptionAlgorithm the signature algorithm
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info
+   * @param encryptedDigest the signature bytes
+   * @param docSigningCertificate the document signer certificate
+   * 
+   * @return the signer info structure
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static SignerInfo createSignerInfo(String digestAlgorithm,
       String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
       byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
@@ -414,8 +496,8 @@ import org.jmrtd.Util;
     BigInteger serial = docSigningCertificate.getSerialNumber();
     SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
 
-    AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm)));
-    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestEncryptionAlgorithm)));
+    AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
+    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
 
     ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
     ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
@@ -423,6 +505,17 @@ import org.jmrtd.Util;
     return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
   }
 
+  /**
+   * Creates the authenticated attributes to be signed.
+   * 
+   * @param digestAlgorithm the digest algorithm
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info to digest
+   * 
+   * @return authenticated attributes to be signed
+   * 
+   * @throws GeneralSecurityException on error
+   */
   public static ASN1Set createAuthenticatedAttributes(String digestAlgorithm, String contentTypeOID, ContentInfo contentInfo) throws GeneralSecurityException {
     /* Check bug found by Paulo Assumpco. */
     if ("SHA256".equals(digestAlgorithm)) {
@@ -432,22 +525,40 @@ import org.jmrtd.Util;
     byte[] contentBytes = ((DEROctetString)contentInfo.getContent()).getOctets();
     byte[] digestedContentBytes = dig.digest(contentBytes);
     ASN1OctetString digestedContent = new DEROctetString(digestedContentBytes);
-    Attribute contentTypeAttribute = new Attribute(new ASN1ObjectIdentifier(SignedDataUtil.RFC_3369_CONTENT_TYPE_OID), createSingletonSet(new ASN1ObjectIdentifier(contentTypeOID)));
-    Attribute messageDigestAttribute = new Attribute(new ASN1ObjectIdentifier(SignedDataUtil.RFC_3369_MESSAGE_DIGEST_OID), createSingletonSet(digestedContent));
+    Attribute contentTypeAttribute = new Attribute(new ASN1ObjectIdentifier(RFC_3369_CONTENT_TYPE_OID), createSingletonSet(new ASN1ObjectIdentifier(contentTypeOID)));
+    Attribute messageDigestAttribute = new Attribute(new ASN1ObjectIdentifier(RFC_3369_MESSAGE_DIGEST_OID), createSingletonSet(digestedContent));
     ASN1Object[] result = { contentTypeAttribute.toASN1Primitive(), messageDigestAttribute.toASN1Primitive() };
     return new DLSet(result);
   }
 
+  /**
+   * Encodes the given JCE mnemonic digest algorithm as an BC ASN1 sequence.
+   * 
+   * @param digestAlgorithm the JCE mnemonic digest algorithm
+   * 
+   * @return the encoded digest algorithm
+   *
+   * @throws NoSuchAlgorithmException when the digest algorithm is not known
+   */
   public static ASN1Sequence createDigestAlgorithms(String digestAlgorithm) throws NoSuchAlgorithmException {
-    ASN1ObjectIdentifier algorithmIdentifier = new ASN1ObjectIdentifier(SignedDataUtil.lookupOIDByMnemonic(digestAlgorithm));
+    ASN1ObjectIdentifier algorithmIdentifier = new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm));
     ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(algorithmIdentifier);
     return new DLSequence(v);
   }
 
-  public static ASN1Sequence createCertificate(X509Certificate cert) throws CertificateException {
+  /**
+   * Encodes an X509 certificate as a BC ASN1 sequence.
+   * 
+   * @param certificate a certificate
+   * 
+   * @return a BC ASN1 sequence with the encoded certificate
+   * 
+   * @throws CertificateException on error
+   */
+  public static ASN1Sequence createCertificate(X509Certificate certificate) throws CertificateException {
     try {
-      byte[] certSpec = cert.getEncoded();
+      byte[] certSpec = certificate.getEncoded();
       ASN1InputStream asn1In = new ASN1InputStream(certSpec);
       try {
         return (ASN1Sequence)asn1In.readObject();
@@ -463,6 +574,18 @@ import org.jmrtd.Util;
     }
   }
 
+  /**
+   * Signs the (authenticated attributes derived from the given) data.
+   * 
+   * @param digestAlgorithm the digest algorithm
+   * @param digestEncryptionAlgorithm the signature algorithm
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info
+   * @param privateKey the private key to use for signing
+   * @param provider the preferred provider to use
+   * 
+   * @return the signed data
+   */
   public static byte[] signData(String digestAlgorithm, String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey, String provider) {
     byte[] encryptedDigest = null;
     try {
@@ -584,6 +707,15 @@ import org.jmrtd.Util;
     throw new NoSuchAlgorithmException("Unknown OID " + oid);
   }
 
+  /**
+   * Looks up an object identifier for the given JCE mnemonic.
+   * 
+   * @param name a JCE mnemonic string
+   * 
+   * @return an object identifier if known
+   * 
+   * @throws NoSuchAlgorithmException if the mnemonic does not correspond to a known object identifier
+   */
   public static String lookupOIDByMnemonic(String name) throws NoSuchAlgorithmException {
     if ("O".equals(name)) {
       return X509ObjectIdentifiers.organization.getId();
@@ -718,6 +850,13 @@ import org.jmrtd.Util;
     }
   }
 
+  /**
+   * Extracts the attributes as a Java list from the BC ASN1 encoded signed attributes set structure.
+   * 
+   * @param signedAttributesSet the BC ASN1 encoded signed attributes set structure
+   * 
+   * @return the attributes as a Java list
+   */
   private static List<Attribute> getAttributes(ASN1Set signedAttributesSet) {
     List<ASN1Sequence> attributeObjects = Collections.list(signedAttributesSet.getObjects());
     List<Attribute> attributes = new ArrayList<Attribute>(attributeObjects.size());
@@ -728,6 +867,15 @@ import org.jmrtd.Util;
     return attributes;
   }
 
+  /**
+   * Converts the BC RSA-SSA parameter specification to a JCE parameter specification.
+   * 
+   * @param rsaSSAParams the RSA-SSA parameter specification to convert
+   * 
+   * @return a corresponding JCE parameter specification
+   * 
+   * @throws NoSuchAlgorithmException on error
+   */
   private static AlgorithmParameterSpec toAlgorithmParameterSpec(RSASSAPSSparams rsaSSAParams) throws NoSuchAlgorithmException {
     String hashAlgorithmOID = rsaSSAParams.getHashAlgorithm().getAlgorithm().getId();
     AlgorithmIdentifier maskGenAlgorithm = rsaSSAParams.getMaskGenAlgorithm();
@@ -742,6 +890,13 @@ import org.jmrtd.Util;
     return new PSSParameterSpec(hashAlgorithmName, maskGenAlgorithmName, toMaskGenAlgorithmParameterSpec(maskGenAlgorithm), saltLength, trailerField);
   }
 
+  /**
+   * Converts the BC algorithm identifier (used in RSA-SSA) to a JCE algorithm parameter specification.
+   * 
+   * @param maskGenAlgorithm the algorithm identifier to convert
+   * 
+   * @return the corresponding JCE algorithm parameter specification
+   */
   private static AlgorithmParameterSpec toMaskGenAlgorithmParameterSpec(AlgorithmIdentifier maskGenAlgorithm) {
     try {
       ASN1Encodable maskGenParams = maskGenAlgorithm.getParameters();
@@ -758,6 +913,13 @@ import org.jmrtd.Util;
     return new MGF1ParameterSpec("SHA-1");
   }
 
+  /**
+   * Extracts the signer info structure from a signed data structure.
+   * 
+   * @param signedData the signed data structure
+   * 
+   * @return the signer info structure
+   */
   private static SignerInfo getSignerInfo(SignedData signedData)  {
     ASN1Set signerInfos = signedData.getSignerInfos();
     if (signerInfos == null || signerInfos.size() <= 0) {
@@ -771,6 +933,13 @@ import org.jmrtd.Util;
     return SignerInfo.getInstance(signerInfos.getObjectAt(0));
   }
 
+  /**
+   * Creates a singleton ASN1 set containing the given BC ASN1 object.
+   * 
+   * @param e the ASN1 object
+   * 
+   * @return an ASN1 set containing the given object as single element
+   */
   private static ASN1Set createSingletonSet(ASN1Object e) {
     return new DLSet(new ASN1Encodable[] { e });
   }

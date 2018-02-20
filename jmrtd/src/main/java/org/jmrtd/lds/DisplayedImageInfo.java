@@ -55,9 +55,8 @@ public class DisplayedImageInfo extends AbstractImageInfo {
    * @param imageBytes encoded image, for <i>Portrait</i> and <i>Signature or mark</i> use JPEG encoding
    */
   public DisplayedImageInfo(int type, byte[] imageBytes) {
-    super(type);
+    super(type, getMimeTypeFromType(type));
     displayedImageTag = getDisplayedImageTagFromType(type);
-    setMimeType(getMimeTypeFromType(type));
     setImageBytes(imageBytes);
   }
 
