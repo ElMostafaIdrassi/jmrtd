@@ -79,7 +79,7 @@ public class CAProtocol {
   }
 
   /**
-   * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
+   * Perform EAC-CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
    * ver. 1.11. In short, we authenticate the chip with DH or ECDH key agreement
    * protocol and create new secure messaging keys.
    *
@@ -91,9 +91,9 @@ public class CAProtocol {
    * @param publicKeyOID the OID indicating the type of public key
    * @param piccPublicKey PICC's public key (stored in DG14)
    *
-   * @return the chip authentication result
+   * @return the Chip Authentication result
    *
-   * @throws CardServiceException if CA failed or some error occurred
+   * @throws CardServiceException if Chip Authentication failed or some error occurred
    */
   public CAResult doCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey piccPublicKey) throws CardServiceException {
     if (piccPublicKey == null) {
@@ -233,7 +233,7 @@ public class CAProtocol {
   }
 
   /**
-   * Returns the key hash.
+   * Returns the key hash which will be used as input for Terminal Authentication.
    *
    * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
    * @param pcdPublicKey the inspection system's public key
@@ -249,8 +249,9 @@ public class CAProtocol {
       return md.digest(getKeyData(agreementAlg, pcdPublicKey));
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      byte[] t = Util.i2os(pcdECPublicKey.getQ().getX().toBigInteger());
-      return Util.alignKeyDataToSize(t, pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8);
+      byte[] t = Util.i2os(pcdECPublicKey.getQ().getAffineXCoord().toBigInteger());
+      int keySize = (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0);
+      return Util.alignKeyDataToSize(t, keySize);
     }
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
@@ -270,7 +271,7 @@ public class CAProtocol {
       return pcdDHPublicKey.getY().toByteArray();
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      return pcdECPublicKey.getQ().getEncoded();
+      return pcdECPublicKey.getQ().getEncoded(false);
     }
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
