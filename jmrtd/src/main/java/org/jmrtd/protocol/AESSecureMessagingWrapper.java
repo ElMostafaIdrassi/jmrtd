@@ -29,6 +29,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -300,7 +301,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     }
 
     bOut.reset();
-    bOut.write((byte) 0x8E);
+    bOut.write((byte)0x8E);
     bOut.write(ccLength);
     bOut.write(cc, 0, ccLength);
     byte[] do8E = bOut.toByteArray();
@@ -345,17 +346,17 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
           switch (tag) {
             case (byte) 0x87:
               data = readDO87(inputStream, false);
-              break;
+            break;
             case (byte) 0x85:
               data = readDO87(inputStream, true);
-              break;
+            break;
             case (byte) 0x99:
               sw = readDO99(inputStream);
-              break;
+            break;
             case (byte) 0x8E:
               cc = readDO8E(inputStream);
-              finished = true;
-              break;
+            finished = true;
+            break;
             default:
               LOGGER.warning("Unexpected tag " + Integer.toHexString(tag));
               break;
@@ -364,7 +365,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       } finally {
         inputStream.close();
       }
-      if (!checkMac(rapdu, cc)) {
+      if (shouldCheckMAC() && !checkMac(rapdu, cc)) {
         throw new IllegalStateException("Invalid MAC");
       }
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -482,9 +483,29 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @throws GeneralSecurityException on error
    */
-  private boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
-//    LOGGER.info("DEBUG: shouldCheckMAC(" + Hex.bytesToHexString(rapdu) + ", " + Hex.bytesToHexString(cc));
-    return true;
+  private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
+    try {
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+      dataOutputStream.write(getSSCAsBytes(ssc));
+      byte[] paddedData = Util.pad(rapdu, 0, rapdu.length - 2 - 8 - 2, 16);
+      dataOutputStream.write(paddedData, 0, paddedData.length);
+      dataOutputStream.flush();
+      dataOutputStream.close();
+      mac.init(ksMac);
+      byte[] cc2 = mac.doFinal(byteArrayOutputStream.toByteArray());
+
+      if (cc2.length > 8 && cc1.length == 8) {
+        byte[] newCC2 = new byte[8];
+        System.arraycopy(cc2, 0, newCC2, 0, newCC2.length);
+        cc2 = newCC2;
+      }
+
+      return Arrays.equals(cc1, cc2);
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception checking MAC", ioe);
+      return false;
+    }
   }
 
   /**
@@ -521,7 +542,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * Gets the SSC as bytes.
+   * Gets the SSC as bytes, making sure the 128 bit (16 byte) block-size is used.
    *
    * @param ssc the send sequence counter
    *
