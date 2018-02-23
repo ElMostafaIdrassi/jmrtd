@@ -55,7 +55,7 @@ public class AAProtocol {
   }
 
   /**
-   * Performs the <i>Active Authentication</i> protocol.
+   * Performs the Active Authentication protocol.
    *
    * @param publicKey the public key to use (usually read from the card)
    * @param digestAlgorithm the digest algorithm to use, or null

@@ -92,14 +92,15 @@ public class TAProtocol {
    */
 
   /**
-   * Perform TA (Terminal Authentication) part of EAC (version 1). For details see
-   * TR-03110 ver. 1.11. In short, we feed the sequence of terminal certificates
-   * to the card for verification, get a challenge from the card, sign it with
-   * terminal private key, and send back to the card for verification.
+   * Perform the EAC-TA (Terminal Authentication) part of EAC (version 1).
+   * For details see TR-03110 ver. 1.11. In short, we feed the sequence of
+   * terminal certificates to the card for verification, get a challenge
+   * from the card, sign it with terminal private key, and send back to
+   * the card for verification.
    *
-   * @param caReference reference issuer
-   * @param terminalCertificates terminal certificate chain
-   * @param terminalKey terminal private key
+   * @param caReference a reference to the issuer
+   * @param terminalCertificates the terminal certificate chain
+   * @param terminalKey the terminal private key
    * @param taAlg the algorithm
    * @param chipAuthenticationResult the chip authentication result
    * @param documentNumber the document number from which the chip key hash will be derived

@@ -176,7 +176,8 @@ public class CAProtocol {
   }
 
   /**
-   * Does the key agreement step. Genereates a secret based on the PICC's public key and the PCD's private key.
+   * Does the key agreement step.
+   * Generates a secret based on the PICC's public key and the PCD's private key.
    *
    * @param agreementAlg the agreement algorithm
    * @param piccPublicKey the PICC's public key
