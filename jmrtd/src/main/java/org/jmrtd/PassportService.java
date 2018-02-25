@@ -228,6 +228,8 @@ public class PassportService extends PassportAPDUService {
 
   private int maxTranceiveLength;
 
+  private boolean shouldCheckMAC;
+  
   private boolean isICAOAppletSelected;
 
   private MRTDFileSystem rootFileSystem;
@@ -241,6 +243,8 @@ public class PassportService extends PassportAPDUService {
    * @param maxTranceiveLength maximum length for APDUs
    * @param maxBlockSize maximum buffer size for plain text APDUs
    * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
+   * @param shouldCheckMAC whether the secure messaging channels, resulting from BAC, PACE, EAC-CA, should
+   *                       check MACs on response APDUs
    *
    * @throws CardServiceException
    *             when the available JCE providers cannot provide the necessary
@@ -250,12 +254,13 @@ public class PassportService extends PassportAPDUService {
    *                 <li>Mac: "ISO9797Alg3Mac"</li>
    *             </ul>
    */
-  public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled) throws CardServiceException {
+  public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) throws CardServiceException {
     super(service);
     this.maxTranceiveLength = maxTranceiveLength;
     this.maxBlockSize = maxBlockSize;
     this.rootFileSystem = new MRTDFileSystem(this, isSFIEnabled);
     this.icaoFileSystem = new MRTDFileSystem(this, isSFIEnabled);
+    this.shouldCheckMAC = shouldCheckMAC;
     this.isICAOAppletSelected = false;
     this.isOpen = false;
   }
@@ -276,7 +281,7 @@ public class PassportService extends PassportAPDUService {
       isOpen = true;
     }
   }
-
+  
   /**
    * Selects the MRTD card side applet. If PACE has been executed successfully previously, then the card has authenticated
    * us and a secure messaging channel has already been established. If not, then the caller should request BAC execution as a next
@@ -544,6 +549,15 @@ public class PassportService extends PassportAPDUService {
     return wrapper;
   }
 
+  /**
+   * Whether secure channels should check the MAC on response APDUs sent by the ICC.
+   * 
+   * @return a boolean indicating whether the MAC should be checked
+   */
+  public boolean shouldCheckMAC() {
+    return shouldCheckMAC;
+  }
+  
   /**
    * Gets the file as an input stream indicated by a file identifier.
    * The resulting input stream will send APDUs to the card.

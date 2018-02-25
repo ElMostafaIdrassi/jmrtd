@@ -155,7 +155,7 @@ public class PACEProtocol {
    *
    * @param accessKey the MRZ or CAN based access key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
-   * @param params explicit static domain parameters the domain params for DH or ECDH
+   * @param params explicit static domain parameters for DH or ECDH
    *
    * @return a PACE result
    *
@@ -278,9 +278,9 @@ public class PACEProtocol {
     try {
       long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
       if (cipherAlg.startsWith("DESede")) {
-        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), true, 0L);
+        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), service.shouldCheckMAC(), 0L);
       } else if (cipherAlg.startsWith("AES")) {
-        wrapper = new AESSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), true, ssc);
+        wrapper = new AESSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), service.shouldCheckMAC(), ssc);
       } else {
         LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }

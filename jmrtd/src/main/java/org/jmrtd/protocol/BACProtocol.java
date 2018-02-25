@@ -52,7 +52,7 @@ public class BACProtocol {
   private PassportService service;
 
   private Random random;
-
+  
   /**
    * Constructs a BAC protocol instance.
    *
@@ -138,7 +138,7 @@ public class BACProtocol {
     SecretKey ksMac = Util.deriveKey(keySeed, Util.MAC_MODE);
     long ssc = computeSendSequenceCounter(rndICC, rndIFD);
 
-    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, service.getMaxTranceiveLength(), true, ssc);
+    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, service.getMaxTranceiveLength(), service.shouldCheckMAC(), ssc);
   }
 
   /**
