@@ -52,23 +52,13 @@ import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * Card service for reading files (such as data groups) and using the BAC and AA
- * protocols on the passport. Defines secure messaging. Defines active
- * authentication.
+ * Card service for reading files (such as data groups) and using the various
+ * access control protocols (BAC, PACE, EAC-TA), clone-detection verification
+ * protocols (AA, EAC-CA), and the resulting secure messaging as implemented
+ * by the MRTD ICC.
  *
- * Based on Doc 9303.
+ * Based on ICAO Doc 9303 2015.
  * Originally based on ICAO-TR-PKI and ICAO-TR-LDS.
- *
- * Usage:
- *
- * <pre>
- *        open() ==&gt;&lt;br /&gt;
- *        sendSelectApplet() ==&gt;&lt;br /&gt;
- *        doBAC(...) ==&gt;&lt;br /&gt;
- *        doAA() ==&gt;&lt;br /&gt;
- *        getInputStream(...)&lt;sup&gt;*&lt;/sup&gt; ==&gt;&lt;br /&gt;
- *        close()
- * </pre>
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -229,7 +219,7 @@ public class PassportService extends PassportAPDUService {
   private int maxTranceiveLength;
 
   private boolean shouldCheckMAC;
-  
+
   private boolean isICAOAppletSelected;
 
   private MRTDFileSystem rootFileSystem;
@@ -281,7 +271,7 @@ public class PassportService extends PassportAPDUService {
       isOpen = true;
     }
   }
-  
+
   /**
    * Selects the MRTD card side applet. If PACE has been executed successfully previously, then the card has authenticated
    * us and a secure messaging channel has already been established. If not, then the caller should request BAC execution as a next
@@ -551,13 +541,13 @@ public class PassportService extends PassportAPDUService {
 
   /**
    * Whether secure channels should check the MAC on response APDUs sent by the ICC.
-   * 
+   *
    * @return a boolean indicating whether the MAC should be checked
    */
   public boolean shouldCheckMAC() {
     return shouldCheckMAC;
   }
-  
+
   /**
    * Gets the file as an input stream indicated by a file identifier.
    * The resulting input stream will send APDUs to the card.

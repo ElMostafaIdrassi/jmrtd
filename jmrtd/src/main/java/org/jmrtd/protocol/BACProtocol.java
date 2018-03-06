@@ -52,7 +52,7 @@ public class BACProtocol {
   private PassportService service;
 
   private Random random;
-  
+
   /**
    * Constructs a BAC protocol instance.
    *
@@ -64,7 +64,7 @@ public class BACProtocol {
   }
 
   /**
-   * Performs the Basic Access Control< protocol.
+   * Performs the Basic Access Control protocol.
    *
    * @param bacKey the key based on the document number,
    *               the card holder's birth date,

@@ -483,7 +483,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
    *
    * @throws GeneralSecurityException on error
    */
-  private boolean checkMac(byte[] rapdu, byte[] cc1) throws GeneralSecurityException {
+  private boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
     try {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
@@ -495,13 +495,13 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
       mac.init(ksMac);
       byte[] cc2 = mac.doFinal(byteArrayOutputStream.toByteArray());
 
-      if (cc2.length > 8 && cc1.length == 8) {
+      if (cc2.length > 8 && cc.length == 8) {
         byte[] newCC2 = new byte[8];
         System.arraycopy(cc2, 0, newCC2, 0, newCC2.length);
         cc2 = newCC2;
       }
 
-      return Arrays.equals(cc1, cc2);
+      return Arrays.equals(cc, cc2);
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Exception checking MAC", ioe);
       return false;

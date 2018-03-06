@@ -202,6 +202,7 @@ public class CAProtocol {
    * @param oid the Chip Authentication object identifier
    * @param sharedSecret the shared secret
    * @param maxTranceiveLength the maximum APDU tranceive length
+   * @param shouldCheckMAC whether to check MAC
    *
    * @return the secure messaging wrapper
    *
