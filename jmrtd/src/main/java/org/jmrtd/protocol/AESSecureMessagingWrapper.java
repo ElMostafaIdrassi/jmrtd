@@ -249,7 +249,9 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
     byte[] do8587 = new byte[0];
     byte[] do97 = new byte[0];
 
-    if (le > 0) {
+    /* Include the expected length, if present. Always include for Active Authentication. */
+    int ins = commandAPDU.getINS();
+    if ((0 < le && le < getMaxTranceiveLength()) || (byte)ins == ISO7816.INS_INTERNAL_AUTHENTICATE) {
       bOut.reset();
       bOut.write((byte)0x97);
       bOut.write((byte)0x01);

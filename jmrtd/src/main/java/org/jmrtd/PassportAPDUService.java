@@ -37,6 +37,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.tsp.GenTimeAccuracy;
 
 import net.sf.scuba.smartcards.APDUEvent;
 import net.sf.scuba.smartcards.APDUWrapper;
