@@ -261,7 +261,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
     } else if (imageBytes != null) {
       return new ByteArrayInputStream(imageBytes);
     } else {
-      throw new IllegalStateException("DEBUG");
+      throw new IllegalStateException("Both the byte buffer and the stream are null");
     }
   }
 

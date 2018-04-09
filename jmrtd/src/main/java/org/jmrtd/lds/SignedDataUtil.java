@@ -75,7 +75,6 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.jmrtd.Util;
 
 /**
@@ -83,8 +82,6 @@ import org.jmrtd.Util;
  * card security file.
  *
  * This hopefully abstracts some of the BC dependencies away.
- *
- * FIXME: WORK IN PROGRESS
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -170,8 +167,8 @@ import org.jmrtd.Util;
    * @throws IOException on error reading from the stream
    */
   public static SignedData readSignedData(InputStream inputStream) throws IOException {
-    ASN1InputStream asn1in = new ASN1InputStream(inputStream);
-    ASN1Sequence sequence = (ASN1Sequence)asn1in.readObject();
+    ASN1InputStream asn1InputStream = new ASN1InputStream(inputStream);
+    ASN1Sequence sequence = (ASN1Sequence)asn1InputStream.readObject();
 
     if (sequence.size() != 2) {
       throw new IOException("Was expecting a DER sequence of length 2, found a DER sequence of length " + sequence.size());
@@ -414,39 +411,64 @@ import org.jmrtd.Util;
    *
    * @param signedData a signed data structure
    *
-   * @return the document signer certificate
-   *
-   * @throws CertificateException on error decoding the certificate
+   * @return the document signer certificate, or {@code null}
    */
-  public static X509Certificate getDocSigningCertificate(SignedData signedData) throws CertificateException {
-    byte[] certSpec = null;
-    ASN1Set certs = signedData.getCertificates();
-    if (certs == null || certs.size() <= 0) {
+  public static X509Certificate getDocSigningCertificate(SignedData signedData) {
+    List<X509Certificate> certificates = getCertificates(signedData);
+    if (certificates == null || certificates.isEmpty()) {
       return null;
     }
-    if (certs.size() != 1) {
-      LOGGER.warning("Found " + certs.size() + " certificates");
+
+    int certificateCount = certificates.size();
+    if (certificateCount != 1) {
+      LOGGER.warning("Found " + certificateCount + " certificates, interpreting last one as document signer certificate");
     }
 
-    X509CertificateObject certObject = null;
-    for (int i = 0; i < certs.size(); i++) {
-      org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance(certs.getObjectAt(i));
-      certObject = new X509CertificateObject(certAsASN1Object);
-      certSpec = certObject.getEncoded();
+    return certificates.get(certificateCount - 1);
+  }
+
+  /**
+   * Extracts the list of embedded certificates from a signed data object.
+   *
+   * @param signedData the signed data object
+   *
+   * @return the list of certificates
+   */
+  public static List<X509Certificate> getCertificates(SignedData signedData) {
+    ASN1Set encodedCertificates = signedData.getCertificates();
+    int certificateCount = encodedCertificates == null ? 0 : encodedCertificates.size();
+
+    List<X509Certificate> result = new ArrayList<X509Certificate>(certificateCount);
+    if (certificateCount <= 0) {
+      return result;
     }
 
-    /*
-     * NOTE: we could have just returned that X509CertificateObject here,
-     * but by reconstructing it using the client's default provider we hide
-     * the fact that we're using BC.
-     */
-    try {
-      CertificateFactory factory = Util.getCertificateFactory("X.509");
-      return (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certSpec));
-    } catch (Exception e) {
-      LOGGER.log(Level.FINE, "Reconstructing using preferred provider didn't work.", e);
-      return certObject;
+    for (int i = 0; i < certificateCount; i++) {
+      try {
+        org.bouncycastle.asn1.x509.Certificate certAsASN1Object = org.bouncycastle.asn1.x509.Certificate.getInstance(encodedCertificates.getObjectAt(i));
+        result.add(decodeCertificate(certAsASN1Object));
+      } catch (Exception e) {
+        LOGGER.log(Level.WARNING, "Exception in decoding certificate", e);
+      }
     }
+
+    return result;
+  }
+
+  /**
+   * Decodes an ASN1 encoded BC certificate object to a JCA certificate object.
+   *
+   * @param certAsASN1Object the ASN1 object
+   *
+   * @return an X509 certificate
+   *
+   * @throws IOException on error decoding the DER structure, never happens
+   * @throws GeneralSecurityException on error decoding
+   */
+  public static X509Certificate decodeCertificate(org.bouncycastle.asn1.x509.Certificate certAsASN1Object) throws IOException, GeneralSecurityException {
+    byte[] certSpec = certAsASN1Object.getEncoded(ASN1Encoding.DER);
+    CertificateFactory factory = Util.getCertificateFactory("X.509");
+    return (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certSpec));
   }
 
   /**
@@ -469,7 +491,7 @@ import org.jmrtd.Util;
     ASN1Set digestAlgorithmsSet = createSingletonSet(createDigestAlgorithms(digestAlgorithm));
     ASN1Set certificates =  createSingletonSet(createCertificate(docSigningCertificate));
     ASN1Set crls = null;
-    ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Object());
+    ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Primitive());
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }
 

@@ -322,9 +322,6 @@ public class PACEDomainParameterInfo extends SecurityInfo {
    */
   @Deprecated
   public static ECParameterSpec toECParameterSpec(AlgorithmIdentifier domainParameter) {
-    String algorithmOID = domainParameter.getAlgorithm().getId();
-    LOGGER.info("DEBUG: algorithmOID = " + algorithmOID);
-    //    assert PACEDomainParameterInfo.ID_EC_PUBLIC_KEY.equals(algorithmOID) || PACEDomainParameterInfo.ID_DH_PUBLIC_NUMBER.equals(algorithmOID);
     ASN1Encodable parameters = domainParameter.getParameters();
 
     if (!(parameters instanceof ASN1Sequence)) {
@@ -376,7 +373,6 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       /* String fieldIdOID = */ ((ASN1ObjectIdentifier)fieldIdObject.getObjectAt(0)).getId();
       //        assert ID_PRIME_FIELD.equals(fieldIdOID);
       BigInteger p = ((ASN1Integer)fieldIdObject.getObjectAt(1)).getPositiveValue();
-      LOGGER.info("DEBUG: p = " + p);
 
       ASN1Sequence curveObject = (ASN1Sequence)paramSequence.getObjectAt(2);
       //        assert 2 == curveObject.size();
@@ -404,7 +400,6 @@ public class PACEDomainParameterInfo extends SecurityInfo {
       } else {
         ASN1Integer coFactorObject = (ASN1Integer)paramSequence.getObjectAt(5);
         BigInteger coFactor = coFactorObject.getValue();
-        LOGGER.info("DEBUG: coFactor = " + coFactor);
         return new ECParameterSpec(curve, g, n, coFactor.intValue());
       }
     } catch (Exception e) {

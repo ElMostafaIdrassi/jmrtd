@@ -31,7 +31,6 @@ import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
@@ -77,7 +76,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   //  private static final String E_CONTENT_TYPE_OID = "1.2.528.1.1006.1.20.1";
 
   /**
-   * OID to indicate content-type in encapContentInfo.
+   * The object identifier to indicate content-type in encapContentInfo.
    *
    * <pre>
    * id-icao-ldsSecurityObject OBJECT IDENTIFIER ::=
@@ -368,10 +367,8 @@ public class SODFile extends AbstractTaggedLDSFile {
    * using the country signing certificate.
    *
    * @return the document signing certificate
-   *
-   * @throws CertificateException when certificate not be constructed from this SOd
    */
-  public X509Certificate getDocSigningCertificate() throws CertificateException {
+  public X509Certificate getDocSigningCertificate() {
     return SignedDataUtil.getDocSigningCertificate(signedData);
   }
 

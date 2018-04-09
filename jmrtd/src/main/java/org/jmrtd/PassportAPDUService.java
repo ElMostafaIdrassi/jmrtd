@@ -357,7 +357,7 @@ class PassportAPDUService extends CardService {
 
     byte[] responseData = getResponseData(responseAPDU, isTLVEncodedOffsetNeeded);
     if (responseData == null || responseData.length == 0) {
-      LOGGER.warning("DEBUG: rapduBytes = " + Arrays.toString(responseData) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
+      LOGGER.warning("Empty response data: rapduBytes = " + Arrays.toString(responseData) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
     } else {
       checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
     }

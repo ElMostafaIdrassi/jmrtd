@@ -40,8 +40,6 @@ import org.bouncycastle.asn1.DLSet;
 /**
  * Card access file stores a set of SecurityInfos for PACE.
  *
- * FIXME: Strictly speaking this file is not part of the LDS (or even the MRTD application)! Move it out of this package? -- MO
- *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$

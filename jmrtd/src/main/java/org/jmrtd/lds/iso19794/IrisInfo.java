@@ -368,8 +368,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       add(biometricSubtypeInfo);
     }
     if (dataLength != constructedDataLength) {
-      LOGGER.warning("DEBUG: constructedDataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
-      //			throw new IllegalStateException("DEBUG: constructed DataLength and dataLength differ: " + "dataLength = " + dataLength + ", constructedDataLength = " + constructedDataLength);
+      LOGGER.warning("ConstructedDataLength and dataLength differ: "
+          + "dataLength = " + dataLength
+          + ", constructedDataLength = " + constructedDataLength);
     }
   }
 

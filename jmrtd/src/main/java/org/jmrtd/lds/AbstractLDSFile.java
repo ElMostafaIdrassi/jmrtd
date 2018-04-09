@@ -50,7 +50,7 @@ abstract class AbstractLDSFile implements LDSFile {
   }
 
   /**
-   * Gets the contents of this file as byte array,
+   * Returns the contents of this file as byte array,
    * includes the ICAO tag and length.
    *
    * @return a byte array containing the file

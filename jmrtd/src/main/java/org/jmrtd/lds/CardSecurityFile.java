@@ -52,8 +52,6 @@ import org.bouncycastle.asn1.cms.SignedData;
 /**
  * Card security file stores a set of SecurityInfos for PACE with Chip Authentication Mapping (CAM).
  *
- * FIXME: Strictly speaking this file is not part of the LDS (or even the MRTD application)! Move it out of this package? -- MO
- *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -185,12 +183,7 @@ public class CardSecurityFile implements Serializable {
     this.digestAlgorithm = SignedDataUtil.getSignerInfoDigestAlgorithm(signedData);
     this.digestEncryptionAlgorithm = SignedDataUtil.getDigestEncryptionAlgorithm(signedData);
 
-    try {
-      this.certificate = SignedDataUtil.getDocSigningCertificate(signedData);
-    } catch (CertificateException ce) {
-      LOGGER.log(Level.WARNING, "Exceptiong while extracting document signing certificate", ce);
-    }
-
+    this.certificate = SignedDataUtil.getDocSigningCertificate(signedData);
     this.securityInfos = getSecurityInfos(signedData);
 
     this.encryptedDigest = SignedDataUtil.getEncryptedDigest(signedData);

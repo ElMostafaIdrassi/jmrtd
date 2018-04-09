@@ -157,13 +157,13 @@ public class SODFileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-
+  
   public void testFields() {
     testFields(createTestObject("SHA-1", "SHA1WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithECDSA"));
   }
-
+  
   public void testFields(SODFile sodFile) {
     try {
       String ldsVersion = sodFile.getLDSVersion();

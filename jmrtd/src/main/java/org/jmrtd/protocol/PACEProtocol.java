@@ -804,11 +804,11 @@ public class PACEProtocol {
    * The function Map: g -> g~ is defined as g~ = f_g(R_p(s, t)), where R_p() is the pseudo-random function
    * that maps octet strings to elements of GF(p) and f_g() is a function that maps elements of GF(p) to
    * <g>. The random nonce t SHALL be chosen randomly by the inspection system and sent to the MRTD
-   * chip. The pseudo-random function R_p() is descibed in Section 4.3.3. The function f_g() is defined as
+   * chip. The pseudo-random function R_p() is described in Section 4.3.3. The function f_g() is defined as
    * f_g(x) = x^a mod p, and a = (p-1)/q is the cofactor. Implementations MUST check that g~ != 1.
    *
    * NOTE: The public key validation method described in RFC 2631 MUST be used to
-   * prevent smallsubgroup attacks.
+   * prevent small subgroup attacks.
    */
   /**
    * Transforms the nonces using a pseudo random number function and maps the resulting value to a field element.
@@ -1083,17 +1083,22 @@ public class PACEProtocol {
 
         tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag  */
         if (!isContextKnown) {
+          /* p: Prime modulus */
           tlvOutputStream.writeTag(0x81);
-          tlvOutputStream.writeValue(Util.i2os(p)); /* p: Prime modulus */
+          tlvOutputStream.writeValue(Util.i2os(p));
 
+          /* q: Order of the subgroup */
           tlvOutputStream.writeTag(0x82);
-          tlvOutputStream.writeValue(Util.i2os(BigInteger.valueOf(l))); /* q: Order of the subgroup */
+          tlvOutputStream.writeValue(Util.i2os(BigInteger.valueOf(l)));
 
+          /* Generator */
           tlvOutputStream.writeTag(0x83);
-          tlvOutputStream.writeValue(Util.i2os(generator)); /* Generator */
+          tlvOutputStream.writeValue(Util.i2os(generator));
         }
+
+        /* y: Public value */
         tlvOutputStream.writeTag(0x84);
-        tlvOutputStream.writeValue(Util.i2os(y)); /* y: Public value */
+        tlvOutputStream.writeValue(Util.i2os(y));
       } else if (publicKey instanceof ECPublicKey) {
         ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
         ECParameterSpec params = ecPublicKey.getParams();
@@ -1106,33 +1111,43 @@ public class PACEProtocol {
         int coFactor = params.getCofactor();
         ECPoint publicPoint = ecPublicKey.getW();
 
-        tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded()); /* Object Identifier, NOTE: encoding already contains 0x06 tag */
+        /* Object Identifier, NOTE: encoding already contains 0x06 tag */
+        tlvOutputStream.write(new ASN1ObjectIdentifier(oid).getEncoded());
+
         if (!isContextKnown) {
+          /* Prime modulus */
           tlvOutputStream.writeTag(0x81);
-          tlvOutputStream.writeValue(Util.i2os(p)); /* Prime modulus */
+          tlvOutputStream.writeValue(Util.i2os(p));
 
+          /* First coefficient */
           tlvOutputStream.writeTag(0x82);
-          tlvOutputStream.writeValue(Util.i2os(a)); /* First coefficient */
+          tlvOutputStream.writeValue(Util.i2os(a));
 
+          /* Second coefficient */
           tlvOutputStream.writeTag(0x83);
-          tlvOutputStream.writeValue(Util.i2os(b)); /* Second coefficient */
+          tlvOutputStream.writeValue(Util.i2os(b));
           BigInteger affineX = generator.getAffineX();
           BigInteger affineY = generator.getAffineY();
 
+          /* Base point, FIXME: correct encoding? */
           tlvOutputStream.writeTag(0x84);
           tlvOutputStream.write(Util.i2os(affineX));
           tlvOutputStream.write(Util.i2os(affineY));
-          tlvOutputStream.writeValueEnd(); /* Base point, FIXME: correct encoding? */
+          tlvOutputStream.writeValueEnd();
 
+          /* Order of the base point */
           tlvOutputStream.writeTag(0x85);
-          tlvOutputStream.writeValue(Util.i2os(order)); /* Order of the base point */
+          tlvOutputStream.writeValue(Util.i2os(order));
         }
+
+        /* Public point */
         tlvOutputStream.writeTag(0x86);
-        tlvOutputStream.writeValue(Util.ecPoint2OS(publicPoint)); /* Public point */
+        tlvOutputStream.writeValue(Util.ecPoint2OS(publicPoint));
 
         if (!isContextKnown) {
+          /* Cofactor */
           tlvOutputStream.writeTag(0x87);
-          tlvOutputStream.writeValue(Util.i2os(BigInteger.valueOf(coFactor))); /* Cofactor */
+          tlvOutputStream.writeValue(Util.i2os(BigInteger.valueOf(coFactor)));
         }
       } else {
         throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
@@ -1152,9 +1167,6 @@ public class PACEProtocol {
     return byteArrayOutputStream.toByteArray();
   }
 
-  /*
-   * FIXME: how can we be sure coords are uncompressed?
-   */
   /**
    * Write uncompressed coordinates (for EC) or public value (DH).
    *

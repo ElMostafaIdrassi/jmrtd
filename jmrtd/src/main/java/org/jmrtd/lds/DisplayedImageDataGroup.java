@@ -33,8 +33,8 @@ import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
- * File structure for displayed image template files.
- * Abstract super class for DG5 - DG7.
+ * File structure image template files that can be displayed.
+ * Abstract super class for ICAO LDS EF_DG5 - EF_DG7.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *

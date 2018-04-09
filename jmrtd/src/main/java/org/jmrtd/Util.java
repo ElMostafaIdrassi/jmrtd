@@ -286,7 +286,6 @@ public final class Util {
     byte[] hash = shaDigest.digest();
 
     if (doTruncate) {
-      /* FIXME: truncate to 16 byte only for BAC with 3DES. Also for PACE and/or AES? -- MO */
       byte[] keySeed = new byte[16];
       System.arraycopy(hash, 0, keySeed, 0, 16);
       return keySeed;
@@ -344,7 +343,7 @@ public final class Util {
       i--;
     }
     if ((bytes[i] & 0xFF) != 0x80) {
-      throw new BadPaddingException("Expected constant 0x80, found 0x" + Integer.toHexString((bytes[i] & 0x000000FF)) + "\nDEBUG: in = " + Hex.bytesToHexString(bytes) + ", index = " + i);
+      throw new BadPaddingException("Expected constant 0x80, found 0x" + Integer.toHexString((bytes[i] & 0x000000FF)));
     }
     byte[] out = new byte[i];
     System.arraycopy(bytes, 0, out, 0, i);
@@ -899,7 +898,6 @@ public final class Util {
             // In case we would like to compress the point:
             // p = p.getCurve().createPoint(p.getX().toBigInteger(), p.getY().toBigInteger(), true);
 
-            LOGGER.info("DEBUG: =====> q " + q);
             subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded(false));
             return subjectPublicKeyInfo;
           } else {
@@ -1168,9 +1166,7 @@ public final class Util {
     ECFieldElement a = bcCurve.getA();
     ECFieldElement b = bcCurve.getB();
     ECFieldElement x = bcCurve.fromBigInteger(affineX);
-    LOGGER.info("DEBUG: x.bitLength = " + x.bitLength());
     ECFieldElement y = x.multiply(x).add(a).multiply(x).add(b).sqrt();
-    LOGGER.info("DEBUG: y.bitLength = " + y.bitLength());
 
     return y.toBigInteger();
   }

@@ -150,7 +150,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
       add(imageInfo);
     }
     if (dataLength != constructedDataLength) {
-      LOGGER.warning("DEBUG: constructedDataLength and dataLength differ: "
+      LOGGER.warning("ConstructedDataLength and dataLength differ: "
           + "dataLength = " + dataLength
           + ", constructedDataLength = " + constructedDataLength);
     }

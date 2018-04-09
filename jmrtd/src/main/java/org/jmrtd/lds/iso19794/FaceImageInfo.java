@@ -58,76 +58,30 @@ public class FaceImageInfo extends AbstractImageInfo {
 
   /** Eye color code based on Section 5.5.4 of ISO 19794-5. */
   public enum EyeColor {
-    UNSPECIFIED {
+    UNSPECIFIED(EYE_COLOR_UNSPECIFIED),
+    BLACK(EYE_COLOR_BLACK),
+    BLUE(EYE_COLOR_BLUE),
+    BROWN(EYE_COLOR_BROWN),
+    GRAY(EYE_COLOR_GRAY),
+    GREEN(EYE_COLOR_GREEN),
+    MULTI_COLORED(EYE_COLOR_MULTI_COLORED),
+    PINK(EYE_COLOR_PINK),
+    UNKNOWN(EYE_COLOR_UNKNOWN);
 
-      @Override
-      public int toInt() {
-        return EYE_COLOR_UNSPECIFIED;
-      }
-    },
-    BLACK {
+    private int code;
 
-      @Override
-      public int toInt() {
-        return EYE_COLOR_BLACK;
-      }
-    },
-    BLUE {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_BLUE;
-      }
-    },
-    BROWN {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_BROWN;
-      }
-    },
-    GRAY {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_GRAY;
-      }
-    },
-    GREEN {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_GREEN;
-      }
-    },
-    MULTI_COLORED {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_MULTI_COLORED;
-      }
-    },
-    PINK {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_PINK;
-      }
-    },
-    UNKNOWN {
-
-      @Override
-      public int toInt() {
-        return EYE_COLOR_UNKNOWN;
-      }
-    };
+    private EyeColor(int code) {
+      this.code = code;
+    }
 
     /**
      * Returns the integer code to use in ISO19794-5 encoding for this color.
      *
      * @return the integer code
      */
-    public abstract int toInt();
+    public int toInt() {
+      return code;
+    }
 
     /**
      * Returns an eye color value for the given code.
@@ -146,6 +100,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
   }
 
+  /* These correspond to values in Table 4 in 5.5.4 in ISO/IEC 19794-5:2005(E). */
   public static final int EYE_COLOR_UNSPECIFIED = 0x00;
   public static final int EYE_COLOR_BLACK = 0x01;
   public static final int EYE_COLOR_BLUE = 0x02;
@@ -154,21 +109,53 @@ public class FaceImageInfo extends AbstractImageInfo {
   public static final int EYE_COLOR_GREEN = 0x05;
   public static final int EYE_COLOR_MULTI_COLORED = 0x06;
   public static final int EYE_COLOR_PINK = 0x07;
-  public static final int EYE_COLOR_UNKNOWN = 0x08;
+  public static final int EYE_COLOR_UNKNOWN = 0xFF;
 
   /** Hair color code based on Section 5.5.5 of ISO 19794-5. */
   public enum HairColor {
-    UNSPECIFIED,
-    BALD,
-    BLACK,
-    BLONDE,
-    BROWN,
-    GRAY,
-    WHITE,
-    RED,
-    GREEN,
-    BLUE,
-    UNKNOWN
+    UNSPECIFIED(HAIR_COLOR_UNSPECIFIED),
+    BALD(HAIR_COLOR_BALD),
+    BLACK(HAIR_COLOR_BLACK),
+    BLONDE(HAIR_COLOR_BLONDE),
+    BROWN(HAIR_COLOR_BROWN),
+    GRAY(HAIR_COLOR_GRAY),
+    WHITE(HAIR_COLOR_WHITE),
+    RED(HAIR_COLOR_RED),
+    GREEN(HAIR_COLOR_GREEN),
+    BLUE(HAIR_COLOR_BLUE),
+    UNKNOWN(HAIR_COLOR_UNKNOWN);
+
+    private int code;
+
+    private HairColor(int code) {
+      this.code = code;
+    }
+
+    /**
+     * Returns the code for this hair color.
+     *
+     * @return the code
+     */
+    public int toInt() {
+      return code;
+    }
+
+    /**
+     * Returns a hair color value for the given code.
+     *
+     * @param i the integer code for a color
+     *
+     * @return the color value
+     */
+    static HairColor toHairColor(int i) {
+      for (HairColor c: HairColor.values()) {
+        if (c.toInt() == i) {
+          return c;
+        }
+      }
+
+      return UNKNOWN;
+    }
   }
 
   public static final int HAIR_COLOR_UNSPECIFIED = 0x00;
@@ -958,15 +945,13 @@ public class FaceImageInfo extends AbstractImageInfo {
    *         typically {@code JPEG_MIME_TYPE} or {@code JPEG2000_MIME_TYPE}
    */
   private static String toMimeType(int compressionAlg) {
-    LOGGER.info("DEBUG: Image type: " + compressionAlg);
-
     switch (compressionAlg) {
       case IMAGE_DATA_TYPE_JPEG:
         return JPEG_MIME_TYPE;
       case IMAGE_DATA_TYPE_JPEG2000:
         return JPEG2000_MIME_TYPE;
       default:
-        LOGGER.info("DEBUG: Unknown image type: " + compressionAlg);
+        LOGGER.warning("Unknown image type: " + compressionAlg);
         return null;
     }
   }
