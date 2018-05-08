@@ -614,7 +614,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
       return false;
     }
 
-    IrisInfo other = (IrisInfo) obj;
+    IrisInfo other = (IrisInfo)obj;
     if (sbh == null) {
       if (other.sbh != null) {
         return false;

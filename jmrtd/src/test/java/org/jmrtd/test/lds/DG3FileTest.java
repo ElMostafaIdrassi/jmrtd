@@ -63,7 +63,7 @@ public class DG3FileTest extends TestCase {
 
   public void testFile() {
     try {
-      DG3File dg3 = getTestObject();
+      DG3File dg3 = getTestObjectFromResource();
       List<FingerInfo> recordInfos = dg3.getFingerInfos();
       int recordCount = recordInfos.size();
       int recordNumber = 1;
@@ -163,7 +163,7 @@ public class DG3FileTest extends TestCase {
   }
 
   public void testElements() {
-    testElements(getTestObject());
+    testElements(getTestObjectFromResource());
   }
 
   public void testElements(DG3File dg3File) {
@@ -192,7 +192,7 @@ public class DG3FileTest extends TestCase {
 
   public void testImageBytes() {
     try {
-      DG3File dg3 = getTestObject();
+      DG3File dg3 = getTestObjectFromResource();
       FingerImageInfo i1 = dg3.getFingerInfos().get(0).getFingerImageInfos().get(0);
       int l1 = i1.getImageLength();
       byte[] b1 = new byte[l1];
@@ -372,7 +372,7 @@ public class DG3FileTest extends TestCase {
 
   public void testEncodeDecode() {
     try {
-      DG3File dg3 = getTestObject();
+      DG3File dg3 = getTestObjectFromResource();
       byte[] dg3Bytes = dg3.getEncoded();
       assertNotNull(dg3Bytes);
 
@@ -448,7 +448,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
-  private DG3File createTestObject() {
+  public static DG3File createTestObject() {
     try {
       FingerInfo fingerInfo1 = FingerInfoTest.createSingleRightIndexFingerTestObject();
       //			FingerInfo fingerInfo2 = FingerInfoTest.createTestObject();
@@ -463,7 +463,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
-  private DG3File getTestObject() {
+  public static DG3File getTestObjectFromResource() {
     try {
       InputStream in = ResourceUtil.getInputStream(TEST_FILE);
       DG3File dg3 = new DG3File(in);

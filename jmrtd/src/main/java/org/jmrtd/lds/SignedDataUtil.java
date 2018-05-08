@@ -467,7 +467,7 @@ import org.jmrtd.Util;
    */
   public static X509Certificate decodeCertificate(org.bouncycastle.asn1.x509.Certificate certAsASN1Object) throws IOException, GeneralSecurityException {
     byte[] certSpec = certAsASN1Object.getEncoded(ASN1Encoding.DER);
-    /* 
+    /*
      * NOTE: We explicitly prefer Bouncy Castle here. The default Sun provider claims to support all X509 encoded
      * certificates but cannot handle named EC curves
      * for EC public keys.

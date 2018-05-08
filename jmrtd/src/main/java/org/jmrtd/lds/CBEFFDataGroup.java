@@ -121,6 +121,32 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   }
 
   /**
+   * Returns a textual representation of this data group.
+   * 
+   * @return a textual representation of this data group
+   */
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append("CBEFFDataGroup [");
+    if (subRecords == null) {
+      result.append("null");
+    } else {
+      boolean isFirst = true;
+      for (R subRecord: subRecords) {
+        if (!isFirst) {
+          result.append(", ");
+        } else {
+          isFirst = false;
+        }
+        result.append(subRecord == null ? "null" : subRecord.toString());
+      }
+    }
+    result.append(']');
+    return result.toString();
+  }
+
+  /**
    * Returns the records in this data group.
    *
    * @return the records in this data group
