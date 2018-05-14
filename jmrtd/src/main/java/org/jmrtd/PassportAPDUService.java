@@ -796,6 +796,16 @@ class PassportAPDUService extends CardService {
   }
 
   /**
+   * Determines if the connection to the card is fatally lost.
+   * 
+   * @param e an optional exception object that was thrown to indicate something was wrong
+   */
+  @Override
+  public boolean isConnectionLost(Exception e) {
+    return service.isConnectionLost(e);
+  }
+
+  /**
    * Returns the response data from a response APDU.
    *
    * @param responseAPDU the response APDU
