@@ -22,30 +22,25 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
-import java.security.spec.KeySpec;
+import net.sf.scuba.smartcards.APDUWrapper;
+import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * Super interface for BACKeySpec and PACEKeySpec.
- *
+ * The low-level capability of sending APDUs for the (EAC) Terminal Authentication protocol.
+ * 
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
-public interface AccessKeySpec extends Serializable, KeySpec {
+public interface APDULevelEACTACapable {
 
-  /**
-   * Returns the type of access key.
-   * Typical values are {@code "BAC"}, and {@code "PACE"}.
-   *
-   * @return the type of access key
-   */
-  String getAlgorithm();
+  void sendMSESetDST(APDUWrapper wrapper, byte[] data) throws CardServiceException;
   
-  /**
-   * Gets the bytes used for deriving the key seed.
-   * 
-   * @return a byte array with the input for key derivation
-   */
-  byte[] getKey();
+  void sendPSOExtendedLengthMode(APDUWrapper wrapper, byte[] certBodyData, byte[] certSignatureData) throws CardServiceException;
+  
+  void sendMSESetATExtAuth(APDUWrapper wrapper, byte[] data) throws CardServiceException;
+  
+  byte[] sendGetChallenge(APDUWrapper wrapper) throws CardServiceException;
+  
+  void sendMutualAuthenticate(APDUWrapper wrapper, byte[] signature) throws CardServiceException;
 }

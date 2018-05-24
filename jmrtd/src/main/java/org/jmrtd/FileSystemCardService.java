@@ -22,30 +22,27 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
-import java.security.spec.KeySpec;
+import net.sf.scuba.smartcards.CardFileInputStream;
+import net.sf.scuba.smartcards.CardService;
+import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * Super interface for BACKeySpec and PACEKeySpec.
- *
+ * A card service that acts as a (file identifier indexed) file system.
+ * 
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
-public interface AccessKeySpec extends Serializable, KeySpec {
+public abstract class FileSystemCardService extends CardService {
 
   /**
-   * Returns the type of access key.
-   * Typical values are {@code "BAC"}, and {@code "PACE"}.
-   *
-   * @return the type of access key
-   */
-  String getAlgorithm();
-  
-  /**
-   * Gets the bytes used for deriving the key seed.
+   * Returns an input stream to access the file indicated by the file identifier.
    * 
-   * @return a byte array with the input for key derivation
+   * @param fid the file identifier
+   * 
+   * @return a stream to read from
+   * 
+   * @throws CardServiceException on error creating the stream
    */
-  byte[] getKey();
+  public abstract CardFileInputStream getInputStream(short fid) throws CardServiceException;
 }

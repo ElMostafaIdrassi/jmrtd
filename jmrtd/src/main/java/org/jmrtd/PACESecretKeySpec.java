@@ -65,7 +65,7 @@ public class PACESecretKeySpec extends SecretKeySpec implements AccessKeySpec {
     super(key, algorithm);
     this.keyReference = paceKeyReference;
   }
-
+  
   /**
    * Returns reference specifying the type of key from BSI TR-03110 (Appendix B).
 
@@ -97,6 +97,10 @@ public class PACESecretKeySpec extends SecretKeySpec implements AccessKeySpec {
 
     PACESecretKeySpec other = (PACESecretKeySpec)obj;
     return keyReference == other.keyReference;
+  }
+
+  public byte[] getKey() {
+    return super.getEncoded();
   }
 }
 

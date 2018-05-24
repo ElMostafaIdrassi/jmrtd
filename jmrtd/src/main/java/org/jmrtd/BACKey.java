@@ -22,6 +22,7 @@
 
 package org.jmrtd;
 
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -39,7 +40,9 @@ public class BACKey implements BACKeySpec {
   private static final String SDF = "yyMMdd";
 
   private String documentNumber;
+
   private String dateOfBirth;
+
   private String dateOfExpiry;
 
   /**
@@ -169,6 +172,14 @@ public class BACKey implements BACKeySpec {
    */
   public String getAlgorithm() {
     return "BAC";
+  }
+
+  public byte[] getKey() {
+    try {
+      return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", true);
+    } catch (GeneralSecurityException gse) {
+      throw new IllegalArgumentException("Unexpected exception", gse);
+    }
   }
 
   /**

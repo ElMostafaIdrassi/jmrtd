@@ -34,22 +34,28 @@ import javax.crypto.SecretKey;
 
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
+import org.jmrtd.protocol.AAAPDUSender;
 import org.jmrtd.protocol.AAProtocol;
 import org.jmrtd.protocol.AAResult;
+import org.jmrtd.protocol.BACAPDUSender;
 import org.jmrtd.protocol.BACProtocol;
 import org.jmrtd.protocol.BACResult;
-import org.jmrtd.protocol.CAProtocol;
-import org.jmrtd.protocol.CAResult;
+import org.jmrtd.protocol.EACCAAPDUSender;
+import org.jmrtd.protocol.EACCAProtocol;
+import org.jmrtd.protocol.EACCAResult;
+import org.jmrtd.protocol.EACTAProtocol;
+import org.jmrtd.protocol.EACTAResult;
+import org.jmrtd.protocol.PACEAPDUSender;
 import org.jmrtd.protocol.PACEProtocol;
 import org.jmrtd.protocol.PACEResult;
+import org.jmrtd.protocol.ReadBinaryAPDUSender;
 import org.jmrtd.protocol.SecureMessagingWrapper;
-import org.jmrtd.protocol.TAProtocol;
-import org.jmrtd.protocol.TAResult;
 
-import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardFileInputStream;
 import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
+import net.sf.scuba.smartcards.CommandAPDU;
+import net.sf.scuba.smartcards.ResponseAPDU;
 
 /**
  * Card service for reading files (such as data groups) and using the various
@@ -64,8 +70,26 @@ import net.sf.scuba.smartcards.CardServiceException;
  *
  * @version $Revision:352 $
  */
-public class PassportService extends PassportAPDUService {
+public class PassportService extends AbstractMRTDCardService { // PassportAPDUService implements APDULevelReadBinaryCapable {
 
+  /** Shared secret type for non-PACE key. */
+  public static final byte NO_PACE_KEY_REFERENCE = 0x00;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte MRZ_PACE_KEY_REFERENCE = 0x01;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte CAN_PACE_KEY_REFERENCE = 0x02;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte PIN_PACE_KEY_REFERENCE = 0x03;
+
+  /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
+  public static final byte PUK_PACE_KEY_REFERENCE = 0x04;
+  
+  /** The applet we select when we start a session. */
+  public static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
+  
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** Card Access. */
@@ -220,11 +244,20 @@ public class PassportService extends PassportAPDUService {
 
   private boolean shouldCheckMAC;
 
-  private boolean isICAOAppletSelected;
+  private boolean isAppletSelected;
 
-  private MRTDFileSystem rootFileSystem;
+  private DefaultFileSystem rootFileSystem;
 
-  private MRTDFileSystem icaoFileSystem;
+  private DefaultFileSystem appletFileSystem;
+
+  private BACAPDUSender bacSender;
+  private PACEAPDUSender paceSender;
+  private AAAPDUSender aaSender;
+  private EACCAAPDUSender eacCASender;
+  private EACTAAPDUSender eacTASender;
+  private ReadBinaryAPDUSender readBinarySender;
+
+  private CardService service;
 
   /**
    * Creates a new passport service for accessing the passport.
@@ -245,14 +278,23 @@ public class PassportService extends PassportAPDUService {
    *             </ul>
    */
   public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) throws CardServiceException {
-    super(service);
+    this.service = service;
+    
+    this.bacSender = new BACAPDUSender(service);
+    this.paceSender = new PACEAPDUSender(service);
+    this.aaSender = new AAAPDUSender(service);
+    this.eacCASender = new EACCAAPDUSender(service);
+    this.eacTASender = new EACTAAPDUSender(service);
+    this.readBinarySender = new ReadBinaryAPDUSender(service);
+    
     this.maxTranceiveLength = maxTranceiveLength;
     this.maxBlockSize = maxBlockSize;
-    this.rootFileSystem = new MRTDFileSystem(this, isSFIEnabled);
-    this.icaoFileSystem = new MRTDFileSystem(this, isSFIEnabled);
     this.shouldCheckMAC = shouldCheckMAC;
-    this.isICAOAppletSelected = false;
+    this.isAppletSelected = false;
     this.isOpen = false;
+    
+    this.rootFileSystem = new DefaultFileSystem(readBinarySender, isSFIEnabled);
+    this.appletFileSystem = new DefaultFileSystem(readBinarySender, isSFIEnabled);
   }
 
   /**
@@ -267,13 +309,13 @@ public class PassportService extends PassportAPDUService {
       return;
     }
     synchronized(this) {
-      super.open();
+      service.open();
       isOpen = true;
     }
   }
 
   /**
-   * Selects the MRTD card side applet. If PACE has been executed successfully previously, then the card has authenticated
+   * Selects the card side applet. If PACE has been executed successfully previously, then the ICC has authenticated
    * us and a secure messaging channel has already been established. If not, then the caller should request BAC execution as a next
    * step.
    *
@@ -282,19 +324,19 @@ public class PassportService extends PassportAPDUService {
    * @throws CardServiceException on error
    */
   public void sendSelectApplet(boolean hasPACESucceeded) throws CardServiceException {
-    if (isICAOAppletSelected) {
+    if (isAppletSelected) {
       LOGGER.info("Re-selecting ICAO applet");
     }
 
     if (hasPACESucceeded) {
       /* Use SM as set up by doPACE() */
-      sendSelectApplet(wrapper, APPLET_AID);
+      readBinarySender.sendSelectApplet(wrapper, APPLET_AID);
     } else {
       /* Use plain messaging to select the applet, caller will have to do doBAC. */
-      sendSelectApplet(null, APPLET_AID);
+      readBinarySender.sendSelectApplet(null, APPLET_AID);
     }
 
-    isICAOAppletSelected = true;
+    isAppletSelected = true;
   }
 
   /**
@@ -308,49 +350,6 @@ public class PassportService extends PassportAPDUService {
   }
 
   /**
-   * Selects a file within the MRTD application.
-   *
-   * @param fid a file identifier
-   */
-  @Override
-  public synchronized void sendSelectFile(short fid) throws CardServiceException {
-    sendSelectFile(wrapper, fid);
-  }
-
-  /**
-   * Sends a {@code READ BINARY} command using a short file identifier to the passport,
-   * using the wrapper when a secure channel has been set up.
-   *
-   * @param offset offset into the file
-   * @param le the expected length of the file to read
-   * @param isTLVEncodedOffsetNeeded whether to encode the offset in a TLV object (typically for offset larger than 32767)
-   *
-   * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
-   *
-   * @throws CardServiceException on tranceive error
-   */
-  public synchronized byte[] sendReadBinary(int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
-    return sendReadBinary(wrapper, NO_SFI, offset, le, false, isTLVEncodedOffsetNeeded);
-  }
-
-  /**
-   * Sends a {@code READ BINARY} command using a short file identifier to the passport,
-   * using the wrapper when a secure channel has been set up.
-   *
-   * @param sfi the short file identifier byte as int value (between 0 and 255)
-   * @param offset offset into the file
-   * @param le the expected length of the file to read
-   * @param isTLVEncodedOffsetNeeded whether to encode the offset in a TLV object (typically for offset larger than 32767)
-   *
-   * @return a byte array of length {@code le} with (the specified part of) the contents of the currently selected file
-   *
-   * @throws CardServiceException on tranceive error
-   */
-  public synchronized byte[] sendReadBinary(int sfi, int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
-    return sendReadBinary(wrapper, sfi, offset, le, true, isTLVEncodedOffsetNeeded);
-  }
-
-  /**
    * Performs the <i>Basic Access Control</i> protocol.
    *
    * @param bacKey the key based on the document number,
@@ -361,9 +360,13 @@ public class PassportService extends PassportAPDUService {
    *
    * @throws CardServiceException if authentication failed
    */
-  public synchronized BACResult doBAC(BACKeySpec bacKey) throws CardServiceException {
-    BACResult bacResult = (new BACProtocol(this)).doBAC(bacKey);
+  public synchronized BACResult doBAC(AccessKeySpec bacKey) throws CardServiceException {
+    if (!(bacKey instanceof BACKeySpec)) {
+      throw new IllegalArgumentException("Unsupported key type");
+    }
+    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLength, shouldCheckMAC)).doBAC((BACKeySpec)bacKey);
     wrapper = bacResult.getWrapper();
+    appletFileSystem.setWrapper(wrapper);
     return bacResult;
   }
 
@@ -384,8 +387,9 @@ public class PassportService extends PassportAPDUService {
    * @throws GeneralSecurityException on security primitives related problems
    */
   public synchronized BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
-    BACResult bacResult = (new BACProtocol(this)).doBAC(kEnc, kMac);
+    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLength, shouldCheckMAC)).doBAC(kEnc, kMac);
     wrapper = bacResult.getWrapper();
+    appletFileSystem.setWrapper(wrapper);
     return bacResult;
   }
 
@@ -402,8 +406,9 @@ public class PassportService extends PassportAPDUService {
    * @throws PACEException on error
    */
   public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws PACEException {
-    PACEResult paceResult = (new PACEProtocol(this, wrapper)).doPACE(keySpec, oid, params);
+    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
+    appletFileSystem.setWrapper(wrapper);
     return paceResult;
   }
 
@@ -422,9 +427,10 @@ public class PassportService extends PassportAPDUService {
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
-  public synchronized CAResult doCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
-    CAResult caResult = (new CAProtocol(this, wrapper)).doCA(keyId, oid, publicKeyOID, publicKey);
+  public synchronized EACCAResult doEACCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
+    EACCAResult caResult = (new EACCAProtocol(eacCASender, wrapper, maxTranceiveLength, shouldCheckMAC)).doCA(keyId, oid, publicKeyOID, publicKey);
     wrapper = caResult.getWrapper();
+    appletFileSystem.setWrapper(wrapper);
     return caResult;
   }
 
@@ -460,9 +466,9 @@ public class PassportService extends PassportAPDUService {
    *
    * @throws CardServiceException on error
    */
-  public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
-    TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
+  public synchronized EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
+      PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
+    EACTAResult taResult = (new EACTAProtocol(eacTASender, wrapper)).doEACTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
     return taResult;
   }
 
@@ -485,9 +491,9 @@ public class PassportService extends PassportAPDUService {
    *
    * @throws CardServiceException on error
    */
-  public synchronized TAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
-      PrivateKey terminalKey, String taAlg, CAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
-    TAResult taResult = (new TAProtocol(this, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
+  public synchronized EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
+      PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
+    EACTAResult taResult = (new EACTAProtocol(eacTASender, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
     return taResult;
   }
 
@@ -504,8 +510,7 @@ public class PassportService extends PassportAPDUService {
    * @throws CardServiceException on error
    */
   public AAResult doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
-    AAResult aaResult = (new AAProtocol(this, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
-    return aaResult;
+    return (new AAProtocol(aaSender, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
   }
 
   /**
@@ -514,8 +519,8 @@ public class PassportService extends PassportAPDUService {
   @Override
   public void close() {
     try {
+      service.close();
       wrapper = null;
-      super.close();
     } finally {
       isOpen = false;
     }
@@ -535,8 +540,23 @@ public class PassportService extends PassportAPDUService {
    *
    * @return the wrapper
    */
-  public APDUWrapper getWrapper() {
+  public SecureMessagingWrapper getWrapper() {
     return wrapper;
+  }
+  
+  @Override
+  public ResponseAPDU transmit(CommandAPDU commandAPDU) throws CardServiceException {
+    return service.transmit(commandAPDU);
+  }
+
+  @Override
+  public byte[] getATR() throws CardServiceException {
+    return service.getATR();
+  }
+
+  @Override
+  public boolean isConnectionLost(Exception e) {
+    return service.isConnectionLost(e);
   }
 
   /**
@@ -559,15 +579,15 @@ public class PassportService extends PassportAPDUService {
    * @throws CardServiceException if the file cannot be read
    */
   public synchronized CardFileInputStream getInputStream(short fid) throws CardServiceException {
-    if (!isICAOAppletSelected) {
+    if (!isAppletSelected) {
       synchronized(rootFileSystem) {
         rootFileSystem.selectFile(fid);
         return new CardFileInputStream(maxBlockSize, rootFileSystem);
       }
     } else {
-      synchronized(icaoFileSystem) {
-        icaoFileSystem.selectFile(fid);
-        return new CardFileInputStream(maxBlockSize, icaoFileSystem);
+      synchronized(appletFileSystem) {
+        appletFileSystem.selectFile(fid);
+        return new CardFileInputStream(maxBlockSize, appletFileSystem);
       }
     }
   }

@@ -92,7 +92,8 @@ import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.icao.MRZInfo;
 
-import net.sf.scuba.util.Hex;
+import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVUtil;
 
 /**
  * Some static helper functions. Mostly dealing with low-level crypto.
@@ -239,7 +240,7 @@ public final class Util {
       return new PACESecretKeySpec(keyBytes, cipherAlg, paceKeyReference);
     }
   }
-
+  
   /**
    * Computes the static key seed, based on information from the MRZ.
    *
@@ -263,7 +264,7 @@ public final class Util {
         .append(MRZInfo.checkDigit(dateOfExpiry))
         .toString();
 
-    return computeKeySeed(text, digestAlg, doTruncate);
+    return Util.computeKeySeed(text, digestAlg, doTruncate);
   }
 
   /**
@@ -1505,6 +1506,32 @@ public final class Util {
     } catch (Exception e) {
       LOGGER.log(Level.FINE, "Default provider could not provide this Certificate Factory, falling back ot explicit BC", e);
       return CertificateFactory.getInstance(algorithm, BC_PROVIDER);
+    }
+  }
+  
+  /**
+   * Encodes an object identifier.
+   * 0x80 Cryptographic mechanism reference.
+   * Object Identifier of the protocol to select (value only, tag 0x06 is omitted).
+   *
+   * @param oid the object identifier
+   *
+   * @return the encoding
+   */
+  public static byte[] toOIDBytes(String oid) {
+    byte[] oidBytes = null;
+    try {
+      TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
+      try {
+        oidTLVIn.readTag(); /* Should be 0x06 */
+        oidTLVIn.readLength();
+        oidBytes = oidTLVIn.readValue();
+      } finally {
+        oidTLVIn.close();
+      }
+      return TLVUtil.wrapDO(0x80, oidBytes); /* FIXME: define constant for 0x80. */
+    } catch (IOException ioe) {
+      throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
     }
   }
 }

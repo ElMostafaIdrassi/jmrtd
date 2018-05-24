@@ -22,30 +22,28 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
-import java.security.spec.KeySpec;
+import net.sf.scuba.smartcards.APDUWrapper;
+import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * Super interface for BACKeySpec and PACEKeySpec.
- *
+ * The low-level capability of sending APDUs for the Active Authentication protocol.
+ * 
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
  */
-public interface AccessKeySpec extends Serializable, KeySpec {
+public interface APDULevelAACapable {
 
   /**
-   * Returns the type of access key.
-   * Typical values are {@code "BAC"}, and {@code "PACE"}.
+   * Sends an {@code INTERNAL AUTHENTICATE} command to the ICC.
+   * This method will remove the status word from the response.
    *
-   * @return the type of access key
+   * @param wrapper the secure messaging wrapper to use
+   * @param rndIFD the challenge to send
+   *
+   * @return the response from the ICC
+   *
+   * @throws CardServiceException on tranceive error
    */
-  String getAlgorithm();
-  
-  /**
-   * Gets the bytes used for deriving the key seed.
-   * 
-   * @return a byte array with the input for key derivation
-   */
-  byte[] getKey();
+  byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException;
 }

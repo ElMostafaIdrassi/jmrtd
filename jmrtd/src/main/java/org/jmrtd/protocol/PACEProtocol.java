@@ -63,6 +63,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.jmrtd.APDULevelPACECapable;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.PACEException;
@@ -133,9 +134,14 @@ public class PACEProtocol {
     { 0x54, (byte)0xBD, 0x72, 0x55, (byte)0xF0, (byte)0xAA, (byte)0xF8, 0x31, (byte)0xBE, (byte)0xC3, 0x42, 0x3F, (byte)0xCF, 0x39, (byte)0xD6, (byte)0x9B,
         0x6C, (byte)0xBF, 0x06, 0x66, 0x77, (byte)0xD0, (byte)0xFA, (byte)0xAE, 0x5A, (byte)0xAD, (byte)0xD9, (byte)0x9D, (byte)0xF8, (byte)0xE5, 0x35, 0x17 };
 
-  private PassportService service;
+  private APDULevelPACECapable service;
+  
   private SecureMessagingWrapper wrapper;
 
+  private int maxTranceiveLength;
+  
+  private boolean shouldCheckMAC;
+  
   private Random random;
 
   /**
@@ -144,9 +150,11 @@ public class PACEProtocol {
    * @param service the service for sending APDUs
    * @param wrapper the already established secure messaging channel (or {@code null})
    */
-  public PACEProtocol(PassportService service, SecureMessagingWrapper wrapper) {
+  public PACEProtocol(APDULevelPACECapable service, SecureMessagingWrapper wrapper, int maxTranceiveLength, boolean shouldCheckMAC) {
     this.service = service;
     this.wrapper = wrapper;
+    this.maxTranceiveLength = maxTranceiveLength;
+    this.shouldCheckMAC = shouldCheckMAC;
     this.random = new SecureRandom();
   }
 
@@ -278,9 +286,9 @@ public class PACEProtocol {
     try {
       long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
       if (cipherAlg.startsWith("DESede")) {
-        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), service.shouldCheckMAC(), 0L);
+        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, maxTranceiveLength, shouldCheckMAC, 0L);
       } else if (cipherAlg.startsWith("AES")) {
-        wrapper = new AESSecureMessagingWrapper(encKey, macKey, service.getMaxTranceiveLength(), service.shouldCheckMAC(), ssc);
+        wrapper = new AESSecureMessagingWrapper(encKey, macKey, maxTranceiveLength, shouldCheckMAC, ssc);
       } else {
         LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }
@@ -718,7 +726,9 @@ public class PACEProtocol {
       return ((PACEKeySpec)accessKey).getKey();
     }
 
-    throw new IllegalArgumentException("Unsupported access key, was expecting BAC or CAN key specification, found " + accessKey.getClass().getSimpleName());
+    LOGGER.warning("JMRTD doesn't recognize this type of access key, best effort key derivation!");
+    return accessKey.getKey();
+//    throw new IllegalArgumentException("Unsupported access key, was expecting BAC or CAN key specification, found " + accessKey.getClass().getSimpleName());
   }
 
   /* Generic Mapping. */

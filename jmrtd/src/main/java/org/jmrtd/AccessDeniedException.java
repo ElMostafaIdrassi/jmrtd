@@ -22,30 +22,41 @@
 
 package org.jmrtd;
 
-import java.io.Serializable;
-import java.security.spec.KeySpec;
+import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * Super interface for BACKeySpec and PACEKeySpec.
+ * Exception for signaling failed BAC.
  *
- * @author The JMRTD team (info@jmrtd.org)
+ * @author The JMRTD team
  *
  * @version $Revision$
+ *
+ * @since 0.7.0
  */
-public interface AccessKeySpec extends Serializable, KeySpec {
+public class AccessDeniedException extends CardServiceException {
+
+  private static final long serialVersionUID = -7094953658210693249L;
+
+  private final AccessKeySpec bacKey;
 
   /**
-   * Returns the type of access key.
-   * Typical values are {@code "BAC"}, and {@code "PACE"}.
+   * Creates an exception.
    *
-   * @return the type of access key
+   * @param msg the message
+   * @param bacKey the BAC entry that was tried
+   * @param sw status word or <code>-1</code>
    */
-  String getAlgorithm();
-  
+  public AccessDeniedException(String msg, AccessKeySpec bacKey, int sw) {
+    super(msg, sw);
+    this.bacKey = bacKey;
+  }
+
   /**
-   * Gets the bytes used for deriving the key seed.
-   * 
-   * @return a byte array with the input for key derivation
+   * Returns the BAC key that was tried before BAC failed.
+   *
+   * @return a BAC key
    */
-  byte[] getKey();
+  public AccessKeySpec getAccessKey() {
+    return bacKey;
+  }
 }

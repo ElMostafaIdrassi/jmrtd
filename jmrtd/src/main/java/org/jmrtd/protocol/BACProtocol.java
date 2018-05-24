@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
+import org.jmrtd.APDULevelBACCapable;
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.CardServiceException;
@@ -49,17 +49,23 @@ public class BACProtocol {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private PassportService service;
+  private APDULevelBACCapable service;
 
   private Random random;
+
+  private int maxTranceiveLength;
+
+  private boolean shouldCheckMAC;
 
   /**
    * Constructs a BAC protocol instance.
    *
    * @param service the service to send APDUs
    */
-  public BACProtocol(PassportService service) {
+  public BACProtocol(APDULevelBACCapable service, int maxTranceiveLength, boolean shouldCheckMAC) {
     this.service = service;
+    this.maxTranceiveLength = maxTranceiveLength;
+    this.shouldCheckMAC = shouldCheckMAC;
     this.random = new SecureRandom();
   }
 
@@ -137,7 +143,7 @@ public class BACProtocol {
     SecretKey ksMac = Util.deriveKey(keySeed, Util.MAC_MODE);
     long ssc = computeSendSequenceCounter(rndICC, rndIFD);
 
-    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, service.getMaxTranceiveLength(), service.shouldCheckMAC(), ssc);
+    return new DESedeSecureMessagingWrapper(ksEnc, ksMac, maxTranceiveLength, shouldCheckMAC, ssc);
   }
 
   /**

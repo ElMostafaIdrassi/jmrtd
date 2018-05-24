@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +57,8 @@ import org.jmrtd.lds.icao.DG7File;
 public final class LDSFileUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+
+  public static final Map<Short, Byte> FID_TO_SFI = createICAOFIDToSFIMap();
 
   /**
    * Objects of this class should not be constructed.
@@ -526,48 +530,12 @@ public final class LDSFileUtil {
    * @return the corresponding short file identifier
    */
   public static int lookupSFIByFID(short fid) {
-    switch(fid) {
-      case PassportService.EF_COM:
-        return PassportService.SFI_COM;
-      case PassportService.EF_DG1:
-        return PassportService.SFI_DG1;
-      case PassportService.EF_DG2:
-        return PassportService.SFI_DG2;
-      case PassportService.EF_DG3:
-        return PassportService.SFI_DG3;
-      case PassportService.EF_DG4:
-        return PassportService.SFI_DG4;
-      case PassportService.EF_DG5:
-        return PassportService.SFI_DG5;
-      case PassportService.EF_DG6:
-        return PassportService.SFI_DG6;
-      case PassportService.EF_DG7:
-        return PassportService.SFI_DG7;
-      case PassportService.EF_DG8:
-        return PassportService.SFI_DG8;
-      case PassportService.EF_DG9:
-        return PassportService.SFI_DG9;
-      case PassportService.EF_DG10:
-        return PassportService.SFI_DG10;
-      case PassportService.EF_DG11:
-        return PassportService.SFI_DG11;
-      case PassportService.EF_DG12:
-        return PassportService.SFI_DG12;
-      case PassportService.EF_DG13:
-        return PassportService.SFI_DG13;
-      case PassportService.EF_DG14:
-        return PassportService.SFI_DG14;
-      case PassportService.EF_DG15:
-        return PassportService.SFI_DG15;
-      case PassportService.EF_DG16:
-        return PassportService.SFI_DG16;
-      case PassportService.EF_SOD:
-        return PassportService.SFI_SOD;
-      case PassportService.EF_CVCA:
-        return PassportService.SFI_CVCA;
-      default:
-        throw new NumberFormatException("Unknown FID " + Integer.toHexString(fid));
+    Byte sfiByte = FID_TO_SFI.get(fid);
+    if (sfiByte == null) {
+      throw new NumberFormatException("Unknown FID " + Integer.toHexString(fid));
     }
+    
+    return sfiByte & 0xFF;
   }
 
   /**
@@ -681,5 +649,34 @@ public final class LDSFileUtil {
       }
     }
     return dgNumberList;
+  }
+
+  /**
+   * Creates a map for looking up short file identifiers based on file identifiers.
+   * 
+   * @return the lookup map
+   */
+  private static Map<Short, Byte> createICAOFIDToSFIMap() {
+    Map<Short, Byte> fidToSFI = new HashMap<Short, Byte>(20);
+    fidToSFI.put(PassportService.EF_COM, PassportService.SFI_COM);
+    fidToSFI.put(PassportService.EF_DG1, PassportService.SFI_DG1);
+    fidToSFI.put(PassportService.EF_DG2, PassportService.SFI_DG2);
+    fidToSFI.put(PassportService.EF_DG3, PassportService.SFI_DG3);
+    fidToSFI.put(PassportService.EF_DG4, PassportService.SFI_DG4);
+    fidToSFI.put(PassportService.EF_DG5, PassportService.SFI_DG5);
+    fidToSFI.put(PassportService.EF_DG6, PassportService.SFI_DG6);
+    fidToSFI.put(PassportService.EF_DG7, PassportService.SFI_DG7);
+    fidToSFI.put(PassportService.EF_DG8, PassportService.SFI_DG8);
+    fidToSFI.put(PassportService.EF_DG9,  PassportService.SFI_DG9);
+    fidToSFI.put(PassportService.EF_DG10, PassportService.SFI_DG10);
+    fidToSFI.put(PassportService.EF_DG11, PassportService.SFI_DG11);
+    fidToSFI.put(PassportService.EF_DG12, PassportService.SFI_DG12);
+    fidToSFI.put(PassportService.EF_DG13, PassportService.SFI_DG13);
+    fidToSFI.put(PassportService.EF_DG14, PassportService.SFI_DG14);
+    fidToSFI.put(PassportService.EF_DG15, PassportService.SFI_DG15);
+    fidToSFI.put(PassportService.EF_DG16, PassportService.SFI_DG16);
+    fidToSFI.put(PassportService.EF_SOD, PassportService.SFI_SOD);
+    fidToSFI.put(PassportService.EF_CVCA, PassportService.SFI_CVCA); 
+    return Collections.unmodifiableMap(fidToSFI);
   }
 }

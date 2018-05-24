@@ -24,7 +24,7 @@ package org.jmrtd.protocol;
 
 import java.security.PublicKey;
 
-import org.jmrtd.PassportService;
+import org.jmrtd.APDULevelAACapable;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
@@ -39,7 +39,7 @@ import net.sf.scuba.smartcards.CardServiceException;
  */
 public class AAProtocol {
 
-  private PassportService service;
+  private APDULevelAACapable service;
 
   private SecureMessagingWrapper wrapper;
 
@@ -49,7 +49,7 @@ public class AAProtocol {
    * @param service the service for APDU communication
    * @param wrapper the secure messaging wrapper
    */
-  public AAProtocol(PassportService service, SecureMessagingWrapper wrapper) {
+  public AAProtocol(APDULevelAACapable service, SecureMessagingWrapper wrapper) {
     this.service = service;
     this.wrapper = wrapper;
   }
