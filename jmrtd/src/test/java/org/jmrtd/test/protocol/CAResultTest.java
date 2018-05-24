@@ -36,8 +36,8 @@ import javax.crypto.SecretKey;
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.protocol.AESSecureMessagingWrapper;
-import org.jmrtd.protocol.CAProtocol;
-import org.jmrtd.protocol.CAResult;
+import org.jmrtd.protocol.EACCAProtocol;
+import org.jmrtd.protocol.EACCAResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import junit.framework.TestCase;
@@ -70,7 +70,7 @@ public class CAResultTest extends TestCase {
       
       SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       
-      CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
+      EACCAResult caResult = new EACCAResult(keyId, piccPublicKey, EACCAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
       
       assertEquals(piccPublicKey, caResult.getPublicKey());
       
@@ -101,8 +101,8 @@ public class CAResultTest extends TestCase {
       SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 256, true, 0L);
       
-      CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
-      CAResult anotherCAResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);
+      EACCAResult caResult = new EACCAResult(keyId, piccPublicKey, EACCAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
+      EACCAResult anotherCAResult = new EACCAResult(keyId, piccPublicKey, EACCAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);
 
       assertEquals(caResult.hashCode(), anotherCAResult.hashCode());
       assertEquals(caResult, anotherCAResult);

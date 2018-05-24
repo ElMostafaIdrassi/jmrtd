@@ -40,10 +40,10 @@ import org.jmrtd.Util;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
 import org.jmrtd.protocol.AESSecureMessagingWrapper;
-import org.jmrtd.protocol.CAProtocol;
-import org.jmrtd.protocol.CAResult;
+import org.jmrtd.protocol.EACCAProtocol;
+import org.jmrtd.protocol.EACCAResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
-import org.jmrtd.protocol.TAResult;
+import org.jmrtd.protocol.EACTAResult;
 
 import junit.framework.TestCase;
 
@@ -75,14 +75,14 @@ public class TAResultTest extends TestCase {
 
       SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(getRandomAESKey(), getRandomAESKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
-      CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
+      EACCAResult caResult = new EACCAResult(keyId, piccPublicKey, EACCAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
 
       CVCPrincipal cvcPrincipal = new CVCPrincipal("CAReference00001");
       List<CardVerifiableCertificate> terminalCertificates = Collections.emptyList();
       PrivateKey terminalKey = null;
       String documentNumber = "123456789";
       byte[] cardChallenge = null;
-      TAResult taResult = new TAResult(caResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
+      EACTAResult taResult = new EACTAResult(caResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
 
       assertEquals(caResult, taResult.getChipAuthenticationResult());
       assertEquals(cvcPrincipal, taResult.getCAReference());
@@ -113,16 +113,16 @@ public class TAResultTest extends TestCase {
       SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
 
-      CAResult caResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
-      CAResult anotherCAResult = new CAResult(keyId, piccPublicKey, CAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);
+      EACCAResult caResult = new EACCAResult(keyId, piccPublicKey, EACCAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, wrapper);
+      EACCAResult anotherCAResult = new EACCAResult(keyId, piccPublicKey, EACCAProtocol.getKeyHash("ECDH", pcdPublicKey), pcdPublicKey, pcdPrivateKey, anotherWrapper);
 
       CVCPrincipal cvcPrincipal = new CVCPrincipal("CAReference00001");
       List<CardVerifiableCertificate> terminalCertificates = Collections.emptyList();
       PrivateKey terminalKey = null;
       String documentNumber = "123456789";
       byte[] cardChallenge = null;
-      TAResult taResult = new TAResult(caResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
-      TAResult anotherTAResult = new TAResult(anotherCAResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
+      EACTAResult taResult = new EACTAResult(caResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
+      EACTAResult anotherTAResult = new EACTAResult(anotherCAResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
       
       assertEquals(taResult.hashCode(), anotherTAResult.hashCode());
       assertEquals(taResult, anotherTAResult);
