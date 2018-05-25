@@ -29,7 +29,7 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * The low-level capability of sending APDUs for the (EAC) Chip Authentication protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -47,7 +47,7 @@ public interface APDULevelEACCACapable {
    * @throws CardServiceException on tranceive error
    */
   byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException;
-  
+
   /**
    * The MSE KAT APDU, see EAC 1.11 spec, Section B.1.
    *
@@ -58,7 +58,7 @@ public interface APDULevelEACCACapable {
    * @throws CardServiceException on error
    */
   void sendMSEKAT(APDUWrapper wrapper, byte[] keyData, byte[] idData) throws CardServiceException;
-  
+
   /**
    * The  MSE Set AT for Chip Authentication.
    *
@@ -69,7 +69,7 @@ public interface APDULevelEACCACapable {
    * @throws CardServiceException on error
    */
   void sendMSESetATIntAuth(APDUWrapper wrapper, String oid, BigInteger keyId) throws CardServiceException;
-  
+
   /**
    * Sends a General Authenticate command.
    *
@@ -81,5 +81,5 @@ public interface APDULevelEACCACapable {
    *
    * @throws CardServiceException on error
    */
-  byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException;  
+  byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException;
 }

@@ -28,7 +28,7 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * A card service that acts as a (file identifier indexed) file system.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -37,11 +37,11 @@ public abstract class FileSystemCardService extends CardService {
 
   /**
    * Returns an input stream to access the file indicated by the file identifier.
-   * 
+   *
    * @param fid the file identifier
-   * 
+   *
    * @return a stream to read from
-   * 
+   *
    * @throws CardServiceException on error creating the stream
    */
   public abstract CardFileInputStream getInputStream(short fid) throws CardServiceException;

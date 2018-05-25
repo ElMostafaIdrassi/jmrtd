@@ -40,7 +40,7 @@ public class PACEKeySpec implements AccessKeySpec {
   private static final long serialVersionUID = -7113246293247012560L;
 
   private byte[] key;
-  
+
   private byte keyReference;
 
   /**

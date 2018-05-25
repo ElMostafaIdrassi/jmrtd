@@ -43,6 +43,7 @@ import org.jmrtd.protocol.BACResult;
 import org.jmrtd.protocol.EACCAAPDUSender;
 import org.jmrtd.protocol.EACCAProtocol;
 import org.jmrtd.protocol.EACCAResult;
+import org.jmrtd.protocol.EACTAAPDUSender;
 import org.jmrtd.protocol.EACTAProtocol;
 import org.jmrtd.protocol.EACTAResult;
 import org.jmrtd.protocol.PACEAPDUSender;
@@ -70,7 +71,7 @@ import net.sf.scuba.smartcards.ResponseAPDU;
  *
  * @version $Revision:352 $
  */
-public class PassportService extends AbstractMRTDCardService { // PassportAPDUService implements APDULevelReadBinaryCapable {
+public class PassportService extends AbstractMRTDCardService {
 
   /** Shared secret type for non-PACE key. */
   public static final byte NO_PACE_KEY_REFERENCE = 0x00;
@@ -86,10 +87,7 @@ public class PassportService extends AbstractMRTDCardService { // PassportAPDUSe
 
   /** Shared secret type for PACE according to BSI TR-03110 v2.03 B.11.1. */
   public static final byte PUK_PACE_KEY_REFERENCE = 0x04;
-  
-  /** The applet we select when we start a session. */
-  public static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** Card Access. */
@@ -230,6 +228,9 @@ public class PassportService extends AbstractMRTDCardService { // PassportAPDUSe
 
   /** The extended maximal tranceive length of APDUs. */
   public static final int EXTENDED_MAX_TRANCEIVE_LENGTH = 65536;
+  
+  /** The applet we select when we start a session. */
+  protected static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
 
   /**
    * The file read block size, some passports cannot handle large values.
@@ -279,21 +280,21 @@ public class PassportService extends AbstractMRTDCardService { // PassportAPDUSe
    */
   public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) throws CardServiceException {
     this.service = service;
-    
+
     this.bacSender = new BACAPDUSender(service);
     this.paceSender = new PACEAPDUSender(service);
     this.aaSender = new AAAPDUSender(service);
     this.eacCASender = new EACCAAPDUSender(service);
     this.eacTASender = new EACTAAPDUSender(service);
     this.readBinarySender = new ReadBinaryAPDUSender(service);
-    
+
     this.maxTranceiveLength = maxTranceiveLength;
     this.maxBlockSize = maxBlockSize;
     this.shouldCheckMAC = shouldCheckMAC;
     this.isAppletSelected = false;
     this.isOpen = false;
-    
-    this.rootFileSystem = new DefaultFileSystem(readBinarySender, isSFIEnabled);
+
+    this.rootFileSystem = new DefaultFileSystem(readBinarySender, false); // Some passports (UK?) don't support SFI for EF.CardAccess. -- MO
     this.appletFileSystem = new DefaultFileSystem(readBinarySender, isSFIEnabled);
   }
 
@@ -543,7 +544,7 @@ public class PassportService extends AbstractMRTDCardService { // PassportAPDUSe
   public SecureMessagingWrapper getWrapper() {
     return wrapper;
   }
-  
+
   @Override
   public ResponseAPDU transmit(CommandAPDU commandAPDU) throws CardServiceException {
     return service.transmit(commandAPDU);
@@ -554,7 +555,6 @@ public class PassportService extends AbstractMRTDCardService { // PassportAPDUSe
     return service.getATR();
   }
 
-  @Override
   public boolean isConnectionLost(Exception e) {
     return service.isConnectionLost(e);
   }

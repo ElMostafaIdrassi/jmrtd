@@ -24,24 +24,21 @@ package org.jmrtd;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardServiceException;
-import net.sf.scuba.smartcards.CommandAPDU;
-import net.sf.scuba.smartcards.ISO7816;
-import net.sf.scuba.smartcards.ResponseAPDU;
 
 /**
  * The low-level capability for reading files using {@code SELECT} and {@code READ BINARY}
  * (both SFI and non-SFI) commands.
- * 
+ *
  * The actual file system on an ICAO compliant chip supports this.
- * 
+ *
  * @author The JMRTD team (info@jmrtd,org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.7.0
  */
 public interface APDULevelReadBinaryCapable {
-  
+
   /**
    * Sends a {@code SELECT APPLET} command to the card.
    *
@@ -51,12 +48,13 @@ public interface APDULevelReadBinaryCapable {
    * @throws CardServiceException on tranceive error
    */
   void sendSelectApplet(APDUWrapper wrapper, byte[] aid) throws CardServiceException;
-  
+
   /**
    * Selects a file by file identifier.
-   * 
+   *
+   * @param wrapper the APDU wrapper to use
    * @param fid the file identifier
-   * 
+   *
    * @throws CardServiceException on error
    */
   void sendSelectFile(APDUWrapper wrapper, short fid) throws CardServiceException;

@@ -27,7 +27,7 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 /**
  * The low-level capability of sending APDUs for the Active Authentication protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$

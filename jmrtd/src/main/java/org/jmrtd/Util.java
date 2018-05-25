@@ -240,7 +240,7 @@ public final class Util {
       return new PACESecretKeySpec(keyBytes, cipherAlg, paceKeyReference);
     }
   }
-  
+
   /**
    * Computes the static key seed, based on information from the MRZ.
    *
@@ -1508,7 +1508,7 @@ public final class Util {
       return CertificateFactory.getInstance(algorithm, BC_PROVIDER);
     }
   }
-  
+
   /**
    * Encodes an object identifier.
    * 0x80 Cryptographic mechanism reference.

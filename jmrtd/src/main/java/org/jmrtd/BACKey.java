@@ -174,6 +174,11 @@ public class BACKey implements BACKeySpec {
     return "BAC";
   }
 
+  /**
+   * Returns the encoded key (key seed) for use in key derivation.
+   *
+   * @return the encoded key
+   */
   public byte[] getKey() {
     try {
       return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", true);

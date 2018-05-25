@@ -58,7 +58,7 @@ public final class LDSFileUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public static final Map<Short, Byte> FID_TO_SFI = createICAOFIDToSFIMap();
+  public static final Map<Short, Byte> FID_TO_SFI = createFIDToSFIMap();
 
   /**
    * Objects of this class should not be constructed.
@@ -534,7 +534,7 @@ public final class LDSFileUtil {
     if (sfiByte == null) {
       throw new NumberFormatException("Unknown FID " + Integer.toHexString(fid));
     }
-    
+
     return sfiByte & 0xFF;
   }
 
@@ -653,10 +653,10 @@ public final class LDSFileUtil {
 
   /**
    * Creates a map for looking up short file identifiers based on file identifiers.
-   * 
+   *
    * @return the lookup map
    */
-  private static Map<Short, Byte> createICAOFIDToSFIMap() {
+  private static Map<Short, Byte> createFIDToSFIMap() {
     Map<Short, Byte> fidToSFI = new HashMap<Short, Byte>(20);
     fidToSFI.put(PassportService.EF_COM, PassportService.SFI_COM);
     fidToSFI.put(PassportService.EF_DG1, PassportService.SFI_DG1);
@@ -676,7 +676,7 @@ public final class LDSFileUtil {
     fidToSFI.put(PassportService.EF_DG15, PassportService.SFI_DG15);
     fidToSFI.put(PassportService.EF_DG16, PassportService.SFI_DG16);
     fidToSFI.put(PassportService.EF_SOD, PassportService.SFI_SOD);
-    fidToSFI.put(PassportService.EF_CVCA, PassportService.SFI_CVCA); 
+    fidToSFI.put(PassportService.EF_CVCA, PassportService.SFI_CVCA);
     return Collections.unmodifiableMap(fidToSFI);
   }
 }

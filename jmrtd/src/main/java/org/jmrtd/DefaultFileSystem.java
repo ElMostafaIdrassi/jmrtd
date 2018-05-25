@@ -50,14 +50,14 @@ import net.sf.scuba.tlv.TLVInputStream;
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.7.0
  */
 public class DefaultFileSystem implements FileSystemStructured {
 
   /** Invalid short identifier. */
   public static final int NO_SFI = -1;
-  
+
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   /** Number of bytes to read at start of file to determine file length. */
@@ -77,9 +77,9 @@ public class DefaultFileSystem implements FileSystemStructured {
   private APDULevelReadBinaryCapable service;
 
   private Map<Short, DefaultFileInfo> fileInfos;
-  
+
   private Map<Short, Byte> fidToSFI;
-  
+
   private APDUWrapper wrapper;
 
   /**
@@ -91,7 +91,7 @@ public class DefaultFileSystem implements FileSystemStructured {
   public DefaultFileSystem(APDULevelReadBinaryCapable service, boolean isSFIEnabled) {
     this(service, isSFIEnabled, LDSFileUtil.FID_TO_SFI);
   }
-  
+
   /**
    * Creates a file system.
    *
@@ -111,13 +111,13 @@ public class DefaultFileSystem implements FileSystemStructured {
   /**
    * Sets the current wrapper to the given APDU wrapper.
    * Subsequent APDUs will be wrapped before sending to the ICC.
-   * 
+   *
    * @param wrapper an APDU wrapper
    */
   public void setWrapper(APDUWrapper wrapper) {
     this.wrapper = wrapper;
   }
-  
+
   /**
    * Gets the selected path.
    *
@@ -306,11 +306,13 @@ public class DefaultFileSystem implements FileSystemStructured {
    * Selects a file within the MRTD application.
    *
    * @param fid a file identifier
+   *
+   * @throws CardServiceException on error
    */
   public synchronized void sendSelectFile(short fid) throws CardServiceException {
     service.sendSelectFile(wrapper, fid);
   }
-  
+
   /**
    * Sends a {@code READ BINARY} command using a short file identifier to the passport,
    * using the wrapper when a secure channel has been set up.
@@ -343,7 +345,7 @@ public class DefaultFileSystem implements FileSystemStructured {
   public synchronized byte[] sendReadBinary(int sfi, int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
     return service.sendReadBinary(wrapper, sfi, offset, le, true, isTLVEncodedOffsetNeeded);
   }
-  
+
   /**
    * A file info for the ICAO MRTD file system.
    *

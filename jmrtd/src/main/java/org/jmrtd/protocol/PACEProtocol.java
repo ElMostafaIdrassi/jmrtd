@@ -135,13 +135,13 @@ public class PACEProtocol {
         0x6C, (byte)0xBF, 0x06, 0x66, 0x77, (byte)0xD0, (byte)0xFA, (byte)0xAE, 0x5A, (byte)0xAD, (byte)0xD9, (byte)0x9D, (byte)0xF8, (byte)0xE5, 0x35, 0x17 };
 
   private APDULevelPACECapable service;
-  
+
   private SecureMessagingWrapper wrapper;
 
   private int maxTranceiveLength;
-  
+
   private boolean shouldCheckMAC;
-  
+
   private Random random;
 
   /**
@@ -149,6 +149,10 @@ public class PACEProtocol {
    *
    * @param service the service for sending APDUs
    * @param wrapper the already established secure messaging channel (or {@code null})
+   * @param maxTranceiveLength the maximal tranceive length (on responses to {@code READ BINARY})
+   *        to use in the resulting secure messaging channel
+   * @param shouldCheckMAC whether the resulting secure messaging channel should apply strict MAC
+   *        checking on response APDUs
    */
   public PACEProtocol(APDULevelPACECapable service, SecureMessagingWrapper wrapper, int maxTranceiveLength, boolean shouldCheckMAC) {
     this.service = service;
@@ -728,7 +732,6 @@ public class PACEProtocol {
 
     LOGGER.warning("JMRTD doesn't recognize this type of access key, best effort key derivation!");
     return accessKey.getKey();
-//    throw new IllegalArgumentException("Unsupported access key, was expecting BAC or CAN key specification, found " + accessKey.getClass().getSimpleName());
   }
 
   /* Generic Mapping. */

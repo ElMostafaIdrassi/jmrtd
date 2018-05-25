@@ -122,7 +122,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
 
   /**
    * Returns a textual representation of this data group.
-   * 
+   *
    * @return a textual representation of this data group
    */
   @Override

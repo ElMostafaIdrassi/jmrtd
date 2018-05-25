@@ -42,6 +42,15 @@ import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
+/**
+ * Base class for MRTD card services.
+ *
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ *
+ * @since 0.7.0
+ */
 public abstract class AbstractMRTDCardService extends FileSystemCardService {
 
   /**
@@ -56,7 +65,7 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @throws CardServiceException if authentication failed
    */
   public abstract BACResult doBAC(AccessKeySpec bacKey) throws CardServiceException;
-  
+
   /**
    * Performs the <i>Basic Access Control</i> protocol.
    * It does BAC using kEnc and kMac keys, usually calculated
@@ -74,7 +83,7 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @throws GeneralSecurityException on security primitives related problems
    */
   public abstract BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException;
-  
+
   /**
    * Performs the PACE 2.0 / SAC protocol.
    * A secure messaging channel is set up as a result.
@@ -114,7 +123,7 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @throws CardServiceException on error
    */
   public abstract AAResult doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException;
-  
+
   /**
    * Perform CA (Chip Authentication) part of EAC (version 1). For details see TR-03110
    * ver. 1.11. In short, we authenticate the chip with (EC)DH key agreement
@@ -131,7 +140,7 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @throws CardServiceException if CA failed or some error occurred
    */
   public abstract EACCAResult doEACCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException;
-  
+
   /**
    * Performs <i>Terminal Authentication</i> (TA) part of EAC (version 1). For details see
    * TR-03110 ver. 1.11.
@@ -175,6 +184,11 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    */
   public abstract EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException;
-  
+
+  /**
+   * Return the secure messaging wrapper currently in use.
+   *
+   * @return the secure messaging wrapper
+   */
   public abstract SecureMessagingWrapper getWrapper();
 }

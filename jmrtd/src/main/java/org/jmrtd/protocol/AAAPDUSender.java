@@ -33,21 +33,26 @@ import net.sf.scuba.smartcards.ResponseAPDU;
 
 /**
  * A low-level APDU sender to support the Active Authentication protocol.
- * 
+ *
  * @author The JMRTD team
  *
  * @version $Revision$
- * 
+ *
  * @since 0.7.0
  */
 public class AAAPDUSender implements APDULevelAACapable {
 
   private SecureMessagingAPDUSender secureMessagingSender;
-  
+
+  /**
+   * Creates an APDU sender for tranceiving Active Authentication protocol APDUs.
+   *
+   * @param service the card service for tranceiving APDUs
+   */
   public AAAPDUSender(CardService service) {
     this.secureMessagingSender = new SecureMessagingAPDUSender(service);
   }
-  
+
   /**
    * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
    * This is part of AA and possibly EAC-CA.

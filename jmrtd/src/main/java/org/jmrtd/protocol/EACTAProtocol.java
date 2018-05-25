@@ -61,7 +61,7 @@ public class EACTAProtocol {
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private APDULevelEACTACapable service;
-  
+
   private SecureMessagingWrapper wrapper;
 
   /**

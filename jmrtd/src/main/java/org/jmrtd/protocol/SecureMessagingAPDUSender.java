@@ -36,21 +36,35 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.util.Hex;
 
+/**
+ * An APDU sender for tranceiving wrapped APDUs.
+ *
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ *
+ * @since 0.7.0
+ */
 public class SecureMessagingAPDUSender {
 
   private CardService service;
-  
+
   /** The apduListeners. */
   private Collection<APDUListener> apduListeners;
 
   private int apduCount;
-  
+
+  /**
+   * Creates an APDU sender for tranceiving wrapped APDUs.
+   *
+   * @param service the card service for tranceiving the APDUs
+   */
   public SecureMessagingAPDUSender(CardService service) {
     this.service = service;
     this.apduListeners = new HashSet<APDUListener>();
     this.apduCount = 0;
   }
-  
+
   /**
    * Transmits an APDU.
    *
@@ -91,7 +105,7 @@ public class SecureMessagingAPDUSender {
 
     return responseAPDU;
   }
-  
+
   /**
    * Adds a listener.
    *

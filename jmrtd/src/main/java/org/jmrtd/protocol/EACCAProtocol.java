@@ -76,6 +76,10 @@ public class EACCAProtocol {
    *
    * @param service the card service
    * @param wrapper the existing secure messaging wrapper
+   * @param maxTranceiveLength the maximal tranceive length (on responses to {@code READ BINARY})
+   *        to use in the resulting secure messaging channel
+   * @param shouldCheckMAC whether the resulting secure messaging channel should apply strict MAC
+   *        checking on response APDUs
    */
   public EACCAProtocol(APDULevelEACCACapable service, SecureMessagingWrapper wrapper, int maxTranceiveLength, boolean shouldCheckMAC) {
     this.service = service;

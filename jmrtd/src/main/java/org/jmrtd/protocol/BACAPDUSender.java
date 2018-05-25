@@ -18,24 +18,38 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 
+/**
+ * A low-level APDU sender to support the BAC protocol.
+ *
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ *
+ * @since 0.7.0
+ */
 public class BACAPDUSender implements APDULevelBACCapable {
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
-  
+
   /** Initialization vector used by the cipher below. */
   private static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
-  
+
   private CardService service;
-    
+
   /** DESede encryption/decryption cipher. */
   private Cipher cipher;
 
   /** ISO9797Alg3Mac. */
   private Mac mac;
 
+  /**
+   * Creates an APDU sender for tranceiving BAC protocol APDUs.
+   *
+   * @param service the card service for tranceiving APDUs
+   */
   public BACAPDUSender(CardService service) {
     this.service = service;
-    
+
     try {
       this.mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
       this.cipher = Util.getCipher("DESede/CBC/NoPadding");
@@ -43,7 +57,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
       throw new IllegalStateException("Unexpected security exception during initialization", gse);
     }
   }
-  
+
   /**
    * Sends a {@code GET CHALLENGE} command to the passport.
    *

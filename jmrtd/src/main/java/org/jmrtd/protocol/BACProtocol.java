@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 import org.jmrtd.APDULevelBACCapable;
+import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.Util;
 
@@ -61,6 +62,10 @@ public class BACProtocol {
    * Constructs a BAC protocol instance.
    *
    * @param service the service to send APDUs
+   * @param maxTranceiveLength the maximal tranceive length (on responses to {@code READ BINARY})
+   *        to use in the resulting secure messaging channel
+   * @param shouldCheckMAC whether the resulting secure messaging channel should apply strict MAC
+   *        checking on response APDUs
    */
   public BACProtocol(APDULevelBACCapable service, int maxTranceiveLength, boolean shouldCheckMAC) {
     this.service = service;
@@ -80,9 +85,9 @@ public class BACProtocol {
    *
    * @throws CardServiceException if authentication failed
    */
-  public BACResult doBAC(BACKeySpec bacKey) throws CardServiceException {
+  public BACResult doBAC(AccessKeySpec bacKey) throws CardServiceException {
     try {
-      byte[] keySeed = computeKeySeedForBAC(bacKey);
+      byte[] keySeed = bacKey.getKey();
       SecretKey kEnc = Util.deriveKey(keySeed, Util.ENC_MODE);
       SecretKey kMac = Util.deriveKey(keySeed, Util.MAC_MODE);
 

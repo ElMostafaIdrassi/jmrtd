@@ -70,6 +70,11 @@ public class FaceImageInfo extends AbstractImageInfo {
 
     private int code;
 
+    /**
+     * Creates an eye color.
+     *
+     * @param code the ISO19794-5 integer code for the color
+     */
     private EyeColor(int code) {
       this.code = code;
     }
@@ -127,6 +132,11 @@ public class FaceImageInfo extends AbstractImageInfo {
 
     private int code;
 
+    /**
+     * Creates a hair color.
+     *
+     * @param code the integer code for a color
+     */
     private HairColor(int code) {
       this.code = code;
     }

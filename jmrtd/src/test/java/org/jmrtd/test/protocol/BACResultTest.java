@@ -27,8 +27,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKey;
-import org.jmrtd.BACKeySpec;
 import org.jmrtd.PassportService;
 import org.jmrtd.protocol.BACResult;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
@@ -50,7 +50,7 @@ public class BACResultTest extends TestCase {
   public void testBACResult() {
     try {
       BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(getRandomDESedeKey(), getRandomDESedeKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L));
-      BACKeySpec bacKey = bacResult.getBACKey();
+      AccessKeySpec bacKey = bacResult.getBACKey();
       assertNotNull(bacKey);
       assertEquals(new BACKey("123456789", "700101", "171108"), bacKey);
 

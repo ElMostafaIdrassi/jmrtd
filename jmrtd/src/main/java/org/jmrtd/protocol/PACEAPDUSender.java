@@ -40,11 +40,11 @@ import net.sf.scuba.tlv.TLVUtil;
 
 /**
  * A low-level APDU sender to support the PACE protocol.
- * 
+ *
  * @author The JMRTD team
  *
  * @version $Revision$
- * 
+ *
  * @since 0.7.0
  */
 public class PACEAPDUSender implements APDULevelPACECapable {
@@ -66,16 +66,20 @@ public class PACEAPDUSender implements APDULevelPACECapable {
 
   /** The general Authenticate command is used to perform the PACE protocol. See Section 3.2.2 of SAC-TR 1.01. */
   private static final byte INS_PACE_GENERAL_AUTHENTICATE = (byte)0x86;
-  
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
-  
-  private SecureMessagingAPDUSender secureMessagingSender;
-  
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
+
+  private SecureMessagingAPDUSender secureMessagingSender;
+
+  /**
+   * Creates an APDU sender to support the PACE protocol.
+   *
+   * @param service the card service to tranceive APDUs
+   */
   public PACEAPDUSender(CardService service) {
     this.secureMessagingSender = new SecureMessagingAPDUSender(service);
   }
-    
+
   /**
    * The MSE AT APDU for PACE, see ICAO TR-SAC-1.01, Section 3.2.1, BSI TR 03110 v2.03 B11.1.
    * Note that (for now) caller is responsible for prefixing the byte[] params with specified tags.
@@ -146,7 +150,7 @@ public class PACEAPDUSender implements APDULevelPACECapable {
       throw new CardServiceException("Sending MSE AT failed", sw);
     }
   }
-  
+
   /**
    * Sends a General Authenticate command.
    *

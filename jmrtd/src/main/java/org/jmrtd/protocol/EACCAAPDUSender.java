@@ -41,26 +41,31 @@ import net.sf.scuba.tlv.TLVUtil;
 
 /**
  * A low-level APDU sender to support the EAC-CA protocol.
- * 
+ *
  * @author The JMRTD team
  *
  * @version $Revision$
- * 
+ *
  * @since 0.7.0
  */
 public class EACCAAPDUSender implements APDULevelEACCACapable {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
-  
+
   /** The general Authenticate command is used to perform the PACE protocol. See Section 3.2.2 of SAC-TR 1.01. */
   private static final byte INS_BSI_GENERAL_AUTHENTICATE = (byte)0x86;
-  
+
   private SecureMessagingAPDUSender secureMessagingSender;
-  
+
+  /**
+   * Creates an APDU sender for the EAC-CA protocol.
+   *
+   * @param service the card service for tranceiving APDUs
+   */
   public EACCAAPDUSender(CardService service) {
     this.secureMessagingSender = new SecureMessagingAPDUSender(service);
   }
-  
+
   /**
    * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
    * This is part of AA and possibly EAC-CA.

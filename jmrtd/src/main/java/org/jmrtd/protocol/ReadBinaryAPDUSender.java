@@ -14,14 +14,28 @@ import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.util.Hex;
 
+/**
+ * An APDU sender to support reading binaries. both selection and short file identifier based.
+ *
+ * @author The JMRTD team (info@jmrtd.org)
+ *
+ * @version $Revision$
+ *
+ * @since 0.7.0
+ */
 public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
-  
+
   private SecureMessagingAPDUSender secureMessagingSender;
 
   private CardService service;
 
+  /**
+   * Creates an APDU sender.
+   *
+   * @param service the card service for tranceiving APDUs
+   */
   public ReadBinaryAPDUSender(CardService service) {
     this.service = service;
     this.secureMessagingSender = new SecureMessagingAPDUSender(service);
@@ -44,7 +58,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
 
     checkStatusWordAfterFileOperation(capdu, rapdu);
   }
-  
+
   /**
    * Sends a {@code SELECT FILE} command to the passport. Secure
    * messaging will be applied to the command and response apdu.
@@ -65,7 +79,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
 
     checkStatusWordAfterFileOperation(capdu, rapdu);
   }
-  
+
   /**
    * Sends a {@code READ BINARY} command to the passport.
    * Secure messaging will be applied to the command and response APDU.
@@ -129,7 +143,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
          */
         throw cse;
       }
-      
+
       LOGGER.log(Level.FINE, "Exception during READ BINARY", cse);
       sw = (short)cse.getSW();
     }
@@ -144,7 +158,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
   }
 
   /* PRIVATE BELOW */
-  
+
   /**
    * Returns the response data from a response APDU.
    *

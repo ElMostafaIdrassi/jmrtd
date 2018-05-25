@@ -24,7 +24,7 @@ package org.jmrtd.protocol;
 
 import java.io.Serializable;
 
-import org.jmrtd.BACKeySpec;
+import org.jmrtd.AccessKeySpec;
 
 /**
  * Result of a Basic Access Control protocol run.
@@ -37,7 +37,7 @@ public class BACResult implements Serializable {
 
   private static final long serialVersionUID = -7114911372181772099L;
 
-  private BACKeySpec bacKey;
+  private AccessKeySpec bacKey;
   private SecureMessagingWrapper wrapper;
 
   /**
@@ -55,7 +55,7 @@ public class BACResult implements Serializable {
    * @param bacKey the initial access key
    * @param wrapper the secure messaging wrapper that resulted from the BAC protocol run
    */
-  public BACResult(BACKeySpec bacKey, SecureMessagingWrapper wrapper) {
+  public BACResult(AccessKeySpec bacKey, SecureMessagingWrapper wrapper) {
     this.bacKey = bacKey;
     this.wrapper = wrapper;
   }
@@ -65,7 +65,7 @@ public class BACResult implements Serializable {
    *
    * @return the initial access key or {@code null}
    */
-  public BACKeySpec getBACKey() {
+  public AccessKeySpec getBACKey() {
     return bacKey;
   }
 
