@@ -25,8 +25,10 @@ package org.jmrtd.test;
 import java.text.SimpleDateFormat;
 
 import org.jmrtd.BACKey;
+import org.jmrtd.lds.icao.ICAOCountry;
 
 import junit.framework.TestCase;
+import net.sf.scuba.data.Country;
 
 public class BACKeyTest extends TestCase {
 

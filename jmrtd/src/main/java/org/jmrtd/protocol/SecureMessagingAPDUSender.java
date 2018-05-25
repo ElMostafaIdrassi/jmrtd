@@ -23,7 +23,7 @@
 package org.jmrtd.protocol;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.logging.Logger;
 
 import org.jmrtd.WrappedAPDUEvent;
 
@@ -47,10 +47,9 @@ import net.sf.scuba.util.Hex;
  */
 public class SecureMessagingAPDUSender {
 
-  private CardService service;
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
 
-  /** The apduListeners. */
-  private Collection<APDUListener> apduListeners;
+  private CardService service;
 
   private int apduCount;
 
@@ -61,7 +60,6 @@ public class SecureMessagingAPDUSender {
    */
   public SecureMessagingAPDUSender(CardService service) {
     this.service = service;
-    this.apduListeners = new HashSet<APDUListener>();
     this.apduCount = 0;
   }
 
@@ -112,9 +110,7 @@ public class SecureMessagingAPDUSender {
    * @param l the listener to add
    */
   public void addAPDUListener(APDUListener l) {
-    if (apduListeners != null && l != null) {
-      apduListeners.add(l);
-    }
+    service.addAPDUListener(l);
   }
 
   /**
@@ -124,9 +120,7 @@ public class SecureMessagingAPDUSender {
    * @param l the listener to remove
    */
   public void removeAPDUListener(APDUListener l) {
-    if (apduListeners != null) {
-      apduListeners.remove(l);
-    }
+    service.removeAPDUListener(l);
   }
 
   /**
@@ -135,6 +129,7 @@ public class SecureMessagingAPDUSender {
    * @param event the APDU event
    */
   protected void notifyExchangedAPDU(APDUEvent event) {
+    Collection<APDUListener> apduListeners = service.getAPDUListeners();
     if (apduListeners == null || apduListeners.isEmpty()) {
       return;
     }

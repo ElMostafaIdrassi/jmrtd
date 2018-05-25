@@ -52,6 +52,7 @@ import org.jmrtd.protocol.PACEResult;
 import org.jmrtd.protocol.ReadBinaryAPDUSender;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
+import net.sf.scuba.smartcards.APDUListener;
 import net.sf.scuba.smartcards.CardFileInputStream;
 import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
@@ -228,7 +229,7 @@ public class PassportService extends AbstractMRTDCardService {
 
   /** The extended maximal tranceive length of APDUs. */
   public static final int EXTENDED_MAX_TRANCEIVE_LENGTH = 65536;
-  
+
   /** The applet we select when we start a session. */
   protected static final byte[] APPLET_AID = { (byte)0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01 };
 
@@ -590,5 +591,15 @@ public class PassportService extends AbstractMRTDCardService {
         return new CardFileInputStream(maxBlockSize, appletFileSystem);
       }
     }
+  }
+
+  @Override
+  public void addAPDUListener(APDUListener l) {
+    service.addAPDUListener(l);
+  }
+
+  @Override
+  public void removeAPDUListener(APDUListener l) {
+    service.removeAPDUListener(l);
   }
 }
