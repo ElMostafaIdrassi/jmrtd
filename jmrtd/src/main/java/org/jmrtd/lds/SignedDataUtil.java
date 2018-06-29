@@ -87,7 +87,7 @@ import org.jmrtd.Util;
  *
  * @version $Revision$
  */
-/* package-visible */ final class SignedDataUtil {
+public final class SignedDataUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
