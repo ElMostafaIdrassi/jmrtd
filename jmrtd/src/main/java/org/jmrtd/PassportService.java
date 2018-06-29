@@ -270,16 +270,8 @@ public class PassportService extends AbstractMRTDCardService {
    * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
    * @param shouldCheckMAC whether the secure messaging channels, resulting from BAC, PACE, EAC-CA, should
    *                       check MACs on response APDUs
-   *
-   * @throws CardServiceException
-   *             when the available JCE providers cannot provide the necessary
-   *             cryptographic primitives:
-   *             <ul>
-   *                 <li>Cipher: "DESede/CBC/Nopadding"</li>
-   *                 <li>Mac: "ISO9797Alg3Mac"</li>
-   *             </ul>
    */
-  public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) throws CardServiceException {
+  public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) {
     this.service = service;
 
     this.bacSender = new BACAPDUSender(service);
@@ -551,11 +543,26 @@ public class PassportService extends AbstractMRTDCardService {
     return service.transmit(commandAPDU);
   }
 
+  /**
+   * Returns the answer to reset.
+   *
+   * @return the answer to reset
+   *
+   * @throws CardServiceException on error
+   */
   @Override
   public byte[] getATR() throws CardServiceException {
     return service.getATR();
   }
 
+  /**
+   * Determines whether an exception indicates a tag is lost event.
+   *
+   * @param e an exception
+   *
+   * @return whether the exception indicates a tag is lost event
+   */
+  @Override
   public boolean isConnectionLost(Exception e) {
     return service.isConnectionLost(e);
   }

@@ -381,8 +381,6 @@ public final class SignedDataUtil {
    *
    * @param signedData the signed data
    *
-   * @see #getDocSigningCertificate()
-   *
    * @return the signature
    */
   public static byte[] getEncryptedDigest(SignedData signedData) {
