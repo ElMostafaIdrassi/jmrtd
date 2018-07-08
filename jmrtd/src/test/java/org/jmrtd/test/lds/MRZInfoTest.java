@@ -47,29 +47,29 @@ public class MRZInfoTest extends TestCase {
 
   private static final String MRZ_SUSANNA_SAMPLE_3LINE_ID1 =
       "IRGBRZU12345673<<<<<<<<<<<<<<<"
-    + "6608198F0808088COU<<<<<<<<<<<6"
-    + "SAMPLE<<SUSANNA<<<<<<<<<<<<<<<";
+          + "6608198F0808088COU<<<<<<<<<<<6"
+          + "SAMPLE<<SUSANNA<<<<<<<<<<<<<<<";
 
   /*
    * FIXME: line length = 28, not 30?
    */
   private static final String MRZ_MICHAEL_VAN_PASSEL_3LINE_ID1 =
       "I<BEL0000000000<<<<<<<<<<<<<"
-    + "5001013F0806017BEL<<<<<<<<<<"
-    + "VAN<PASSEL<<MICHAEL<<<<<<<<<";
+          + "5001013F0806017BEL<<<<<<<<<<"
+          + "VAN<PASSEL<<MICHAEL<<<<<<<<<";
 
   /*
    * FIXME: 3?
    */
   private static final String MRZ_PETER_STEVENSON_3LINE_ID1 =
       "CIUT0D231458907A123X5328434D23"
-    + "3407127M9507122UTO<<<<<<<<<<<6"
-    + "STEVENSON<<PETER<<<<<<<<<<<<<<";
+          + "3407127M9507122UTO<<<<<<<<<<<6"
+          + "STEVENSON<<PETER<<<<<<<<<<<<<<";
 
   private static final String MRZ_CARVALHO_FERNANDA_SILVA_3LINE_ID1 =
       "IDUTO00000000032<<<<<<<<<<<<<<"
-    + "7507123F1510212UTO<<<<<<<<<<<2"
-    + "SILVA<<CARVALHO<FERNANDA<<<<<<";
+          + "7507123F1510212UTO<<<<<<<<<<<2"
+          + "SILVA<<CARVALHO<FERNANDA<<<<<<";
 
   /*
    * NOTE: optional data 2, right
@@ -77,60 +77,60 @@ public class MRZInfoTest extends TestCase {
    */
   private static final String MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1 = 
       "IDBRA123456789712345R00F456912"
-    + "7006012F0212311UTO<<<HDFDTR091"
-    + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
+          + "7006012F0212311UTO<<<HDFDTR091"
+          + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
 
   private static final String MRZ_ANNA_KOWALSKA_3LINE_ID1 =
       "I<POLABA3000004<<<<<<<<<<<<<<<"
-    + "7203305F1208227POL<<<<<<<<<<<2"
-    + "KOWALSKA<<ANNA<<<<<<<<<<<<<<<<";
+          + "7203305F1208227POL<<<<<<<<<<<2"
+          + "KOWALSKA<<ANNA<<<<<<<<<<<<<<<<";
 
   /* ID 3 samples. */
 
   private static final String MRZ_ANNA_ERIKSSON_2LINE_ID3 =
       "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
-    + "L898902C<3UTO6908061F9406236ZE184226B<<<<<14";
-  
+          + "L898902C<3UTO6908061F9406236ZE184226B<<<<<14";
+
   private static final String MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT =
       "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<"
-    + "XX00000000NLD7110195F1108280123456782<<<<<02";
+          + "XX00000000NLD7110195F1108280123456782<<<<<02";
 
 
   private static final String MRZ_LOES_MEULENDIJK_2LINE_ID3_FILLER_CHECKDIGIT =
       "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<"
-    + "XX00000000NLD7110195F1108280123456782<<<<<<2";
+          + "XX00000000NLD7110195F1108280123456782<<<<<<2";
 
   private static final String MRZ_GERARD_ROBBERT_MARTINUS_SEBASTIAAN_VAN_NIEUWENHUIZEN_2LINE_ID3 =
       "P<NLDVAN<NIEUWENHUIZEN<<GERARD<ROBBERT<MARTI"
-    + "XN01BC0150NLD7112247M1108268123456782<<<<<02";
+          + "XN01BC0150NLD7112247M1108268123456782<<<<<02";
 
   private static final String MRZ_ERIKA_MUSTERMAN_2LINE_ID3 =
       "P<D<<MUSTERMANN<<ERIKA<<<<<<<<<<<<<<<<<<<<<<"
-    + "C11T002JM4D<<9608122F1310317<<<<<<<<<<<<<<<6";
+          + "C11T002JM4D<<9608122F1310317<<<<<<<<<<<<<<<6";
 
   private static final String MRZ_CHRISTIAN_MUSTERMAN_2LINE_ID3 =
       "P<D<<MUSTERMAN<<CHRISTIAN<<<<<<<<<<<<<<<<<<<"
-    + "0000000000D<<8601067M1111156<<<<<<<<<<<<<<<2";
+          + "0000000000D<<8601067M1111156<<<<<<<<<<<<<<<2";
 
   private static final String MRZ_VZOR_SPECIMEN_2LINE_ID3 =
       "P<CZESPECIMEN<<VZOR<<<<<<<<<<<<<<<<<<<<<<<<<"
-    + "99009054<4CZE6906229F16072996956220612<<<<74";
+          + "99009054<4CZE6906229F16072996956220612<<<<74";
 
   private static final String MRZ_HAPPY_TRAVELER_2LINE_ID3 =
       "P<USATRAVELER<<HAPPY<<<<<<<<<<<<<<<<<<<<<<<<"
-    + "1500000035USA5609165M0811150<<<<<<<<<<<<<<08";
+          + "1500000035USA5609165M0811150<<<<<<<<<<<<<<08";
 
   private static final String MRZ_FRANK_AMOSS_2LINE_ID3 =
       "P<USAAMOSS<<FRANK<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-    + "0000780043USA5001013M1511169100000000<381564";
+          + "0000780043USA5001013M1511169100000000<381564";
 
   private static final String MRZ_LORENA_FERNANDEZ_2LINE_ID3 =
       "P<ARGFERNANDEZ<<LORENA<<<<<<<<<<<<<<<<<<<<<<"
-    + "00000000A0ARG7903122F081210212300004<<<<<<86";
+          + "00000000A0ARG7903122F081210212300004<<<<<<86";
 
   private static final String MRZ_KWOK_SUM_CHNCHUNG_2LINE_ID3 =
       "P<CHNCHUNG<<KWOK<SUM<<<<<<<<<<<<<<<<<<<<<<<<"
-    + "K123455994CHN8008080F1702057HK8888888<<<<<36";
+          + "K123455994CHN8008080F1702057HK8888888<<<<<36";
 
   private static final String[] MRZ_SAMPLES = { MRZ_ANNA_ERIKSSON_2LINE_ID3,
       MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT,
@@ -237,6 +237,25 @@ public class MRZInfoTest extends TestCase {
       testDecodeEncode(MRZ_SUSANNA_SAMPLE_3LINE_ID1, "IR", "COU", "SAMPLE", new String[] { "SUSANNA" }, "ZU1234567", "660819", Gender.FEMALE, "080808", "GBR");
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
+  public void testBelgianMRZ() {
+    try {
+      String specimenSampleMRZ = "IDBEL590330101085020100200<<<<" + 
+          "8502016F0901015BEL<<<<<<<<<<<8" + 
+          "VAN<DER<VELDEN<<GREET<HILDE<<<";
+
+      assertNotNull(specimenSampleMRZ);
+      assertEquals(30 * 3, specimenSampleMRZ.replace("\n", "").length());
+      
+      MRZInfo mrzInfo = new MRZInfo(specimenSampleMRZ);
+      
+      String reencoded = mrzInfo.toString();
+      
+      assertEquals(specimenSampleMRZ.replaceAll("\n", ""), reencoded.replaceAll("\n", ""));
+    } catch (Exception e) {
       fail(e.getMessage());
     }
   }
@@ -382,7 +401,7 @@ public class MRZInfoTest extends TestCase {
   public void testArnjlotMalaysia() {
     String anonymizedSample =
         "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
-      + "A984726053MYS8709125M2204134880811055050<<52";
+            + "A984726053MYS8709125M2204134880811055050<<52";
 
     MRZInfo mrzInfo = new MRZInfo(anonymizedSample);
     assertEquals("ABC DEFG HIJKLMNOP QRS TUV XYZABCDEFGHI", mrzInfo.getPrimaryIdentifier());
@@ -392,7 +411,7 @@ public class MRZInfoTest extends TestCase {
   public void testArnjlotLongPrimaryIdenfitier() {
     String sampleWithLongPrimaryIdentifier =
         "P<MYSMEGAN<ELLA<RUTH<BIN<ISMAELAR<EZZAHUDDIN"
-      + "A001122338MYS0911267M2010153<<<<<<<<<<<<<<<8";
+            + "A001122338MYS0911267M2010153<<<<<<<<<<<<<<<8";
 
     try {
       MRZInfo mrzInfo = new MRZInfo(sampleWithLongPrimaryIdentifier);

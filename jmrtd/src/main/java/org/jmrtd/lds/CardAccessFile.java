@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -116,12 +117,12 @@ public class CardAccessFile implements Serializable {
   }
 
   /**
-   * Gets the security infos as an unordered collection.
+   * Returns the security infos as an unordered collection.
    *
    * @return security infos
    */
   public Collection<SecurityInfo> getSecurityInfos() {
-    return securityInfos;
+    return Collections.unmodifiableCollection(securityInfos);
   }
 
   /**

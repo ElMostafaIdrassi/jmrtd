@@ -166,20 +166,23 @@ public class DG12File extends DataGroup {
     int expectedTagCount = tagListLength / 2;
 
     ByteArrayInputStream tagListBytesInputStream = new ByteArrayInputStream(tlvInputStream.readValue());
+    try {
+      /* Find out which tags are present. */
+      List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
+      while (tagListBytesRead < tagListLength) {
+        /* We're using another TLV inputstream everytime to read each tag. */
+        TLVInputStream anotherTLVInputStream = new TLVInputStream(tagListBytesInputStream);
+        int tag = anotherTLVInputStream.readTag();
+        tagListBytesRead += TLVUtil.getTagLength(tag);
+        tagList.add(tag);
+      }
 
-    /* Find out which tags are present. */
-    List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
-    while (tagListBytesRead < tagListLength) {
-      /* We're using another TLV inputstream everytime to read each tag. */
-      TLVInputStream anotherTLVInputStream = new TLVInputStream(tagListBytesInputStream);
-      int tag = anotherTLVInputStream.readTag();
-      tagListBytesRead += TLVUtil.getTagLength(tag);
-      tagList.add(tag);
-    }
-
-    /* Now read the fields in order. */
-    for (int t: tagList) {
-      readField(t, tlvInputStream);
+      /* Now read the fields in order. */
+      for (int t: tagList) {
+        readField(t, tlvInputStream);
+      }
+    } finally {
+      tagListBytesInputStream.close();
     }
   }
 

@@ -33,7 +33,9 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -167,7 +169,7 @@ public class CardSecurityFile implements Serializable {
    * @return the encrypted digest
    */
   public byte[] getEncryptedDigest() {
-    return encryptedDigest;
+    return encryptedDigest == null ? null : Arrays.copyOf(encryptedDigest, encryptedDigest.length);
   }
 
   /**
@@ -233,7 +235,7 @@ public class CardSecurityFile implements Serializable {
    * @return security infos
    */
   public Collection<SecurityInfo> getSecurityInfos() {
-    return securityInfos;
+    return Collections.unmodifiableCollection(securityInfos);
   }
 
   /**
@@ -241,7 +243,10 @@ public class CardSecurityFile implements Serializable {
    * If no infos are present, an empty list is returned.
    *
    * @return a list of PACE infos
+   *
+   * @deprecated Use filter utility functions in {@code SignedDataUtil} instead.
    */
+  @Deprecated
   public Collection<PACEInfo> getPACEInfos() {
     List<PACEInfo> paceInfos = new ArrayList<PACEInfo>(securityInfos.size());
     for (SecurityInfo securityInfo: securityInfos) {
@@ -257,7 +262,10 @@ public class CardSecurityFile implements Serializable {
    * If no infos are present, an empty list is returned.
    *
    * @return a list of CA public key infos
+   *
+   * @deprecated Use filter utility functions in {@code SignedDataUtil} instead.
    */
+  @Deprecated
   public Collection<ChipAuthenticationInfo> getChipAuthenticationInfos() {
     List<ChipAuthenticationInfo> chipAuthenticationInfos = new ArrayList<ChipAuthenticationInfo>(securityInfos.size());
     for (SecurityInfo securityInfo: securityInfos) {
@@ -273,7 +281,10 @@ public class CardSecurityFile implements Serializable {
    * If no infos are present, an empty list is returned.
    *
    * @return a list of CA public key infos
+   *
+   * @deprecated Use filter utility functions in {@code SignedDataUtil} instead.
    */
+  @Deprecated
   public Collection<ChipAuthenticationPublicKeyInfo> getChipAuthenticationPublicKeyInfos() {
     List<ChipAuthenticationPublicKeyInfo> chipAuthenticationPublicKeyInfos = new ArrayList<ChipAuthenticationPublicKeyInfo>(securityInfos.size());
     for (SecurityInfo securityInfo: securityInfos) {

@@ -94,8 +94,8 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     /* Iris biometric subtype header */
-    this.biometricSubtype = dataIn.readUnsignedByte();			/* 1 */
-    int count = dataIn.readUnsignedShort();						/* + 2 = 3 */
+    this.biometricSubtype = dataIn.readUnsignedByte();      /* 1 */
+    int count = dataIn.readUnsignedShort();                 /* + 2 = 3 */
 
     long constructedDataLength = 0L;
 

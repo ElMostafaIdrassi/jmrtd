@@ -33,6 +33,8 @@ public interface BACKeySpec extends AccessKeySpec {
 
   /**
    * Returns the document number. This does not include a check digit.
+   * The result may include filler characters to make sure the resulting
+   * length is at least 9.
    *
    * @return the document number
    */

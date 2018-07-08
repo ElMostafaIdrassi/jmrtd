@@ -54,9 +54,9 @@ public class BACKey implements BACKeySpec {
   /**
    * Creates a BAC key.
    *
-   * @param documentNumber the document number string, cannot be <code>null</code>
-   * @param dateOfBirth the date of birth, cannot be <code>null</code>
-   * @param dateOfExpiry the date of expiry, cannot be <code>null</code>
+   * @param documentNumber the document number string, withou check digit, cannot be {@code null}, and may be shorter than 9
+   * @param dateOfBirth the date of birth, in <i>yymmdd</i> format, cannot be {@code null}
+   * @param dateOfExpiry the date of expiry, in <i>yymmdd</i> format, cannot be {@code null}
    */
   public BACKey(String documentNumber, Date dateOfBirth, Date dateOfExpiry) {
     this(documentNumber, toString(dateOfBirth), toString(dateOfExpiry));
@@ -66,8 +66,8 @@ public class BACKey implements BACKeySpec {
    * Creates a BAC key.
    *
    * @param documentNumber the document number string, cannot be <code>null</code>
-   * @param dateOfBirth the date of birth string in <i>yymmdd</i> format, cannot be <code>null</code>
-   * @param dateOfExpiry the date of expiry string in <i>yymmdd</i> format, cannot be <code>null</code>
+   * @param dateOfBirth the date of birth string in <i>yymmdd</i> format, cannot be {@code null}
+   * @param dateOfExpiry the date of expiry string in <i>yymmdd</i> format, cannot be {@code null}
    */
   public BACKey(String documentNumber, String dateOfBirth, String dateOfExpiry) {
     if (documentNumber == null) {
@@ -90,7 +90,7 @@ public class BACKey implements BACKeySpec {
   }
 
   /**
-   * Gets the document number string.
+   * Returns the document number string.
    *
    * @return the document number string
    */
@@ -99,7 +99,7 @@ public class BACKey implements BACKeySpec {
   }
 
   /**
-   * Gets the date of birth string.
+   * Returns the date of birth string.
    *
    * @return a date in <i>yymmdd</i> format
    */
@@ -108,7 +108,7 @@ public class BACKey implements BACKeySpec {
   }
 
   /**
-   * Gets the date of expiry string.
+   * Returns the date of expiry string.
    *
    * @return a date in <i>yymmdd</i> format
    */
@@ -117,7 +117,7 @@ public class BACKey implements BACKeySpec {
   }
 
   /**
-   * Gets a textual representation of this BAC key.
+   * Returns a textual representation of this BAC key.
    *
    * @return a textual representation of this BAC key
    */

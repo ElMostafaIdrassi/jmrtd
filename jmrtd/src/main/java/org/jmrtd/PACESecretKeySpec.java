@@ -68,7 +68,7 @@ public class PACESecretKeySpec extends SecretKeySpec implements AccessKeySpec {
 
   /**
    * Returns reference specifying the type of key from BSI TR-03110 (Appendix B).
-
+   *
    * @return a key reference
    */
   public byte getKeyReference() {

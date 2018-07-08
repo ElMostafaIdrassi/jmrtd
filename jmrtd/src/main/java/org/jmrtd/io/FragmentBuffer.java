@@ -42,7 +42,7 @@ public class FragmentBuffer implements Serializable {
   private static final int DEFAULT_SIZE = 2000;
 
   /** Buffer with the actual bytes. */
-  private byte[] buffer; // FIXME can we make this buffer grow dynamically?
+  private byte[] buffer;
 
   /** Administration of which parts of buffer are filled. */
   private Collection<Fragment> fragments;
@@ -82,7 +82,10 @@ public class FragmentBuffer implements Serializable {
    * @param b the byte to insert
    */
   public synchronized void addFragment(int offset, byte b) {
-    /* FIXME: can this be done more efficiently for common case resulting from InputStreamBuffer read, scan all fragments and extend neighboring one */
+    /*
+     * NOTE: This can be done more efficiently for common case resulting from InputStreamBuffer read,
+     * scan all fragments and extend neighboring one.
+     */
     addFragment(offset, new byte[] { b });
   }
 

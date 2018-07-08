@@ -23,7 +23,6 @@
 package org.jmrtd.protocol;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import org.jmrtd.WrappedAPDUEvent;
 
@@ -46,8 +45,6 @@ import net.sf.scuba.util.Hex;
  * @since 0.7.0
  */
 public class SecureMessagingAPDUSender {
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
 
   private CardService service;
 

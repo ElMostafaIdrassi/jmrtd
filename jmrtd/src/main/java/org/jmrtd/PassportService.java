@@ -462,8 +462,7 @@ public class PassportService extends AbstractMRTDCardService {
    */
   public synchronized EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
-    EACTAResult taResult = (new EACTAProtocol(eacTASender, wrapper)).doEACTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
-    return taResult;
+    return (new EACTAProtocol(eacTASender, wrapper)).doEACTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
   }
 
   /**
@@ -487,8 +486,7 @@ public class PassportService extends AbstractMRTDCardService {
    */
   public synchronized EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
-    EACTAResult taResult = (new EACTAProtocol(eacTASender, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
-    return taResult;
+    return (new EACTAProtocol(eacTASender, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
   }
 
   /**
