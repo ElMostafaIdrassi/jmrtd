@@ -17,12 +17,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id$
+ * $Id: EACTAAPDUSender.java 1779 2018-05-24 22:30:31Z martijno $
  */
 
-package org.jmrtd;
+package org.jmrtd.protocol;
 
-import org.jmrtd.protocol.SecureMessagingAPDUSender;
+import org.jmrtd.APDULevelEACTACapable;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardService;
@@ -33,21 +33,26 @@ import net.sf.scuba.smartcards.ResponseAPDU;
 
 /**
  * A low-level APDU sender to support the (EAC) Terminal Authentication protocol.
- * 
+ *
  * @author The JMRTD team
  *
- * @version $Revision$
- * 
+ * @version $Revision: 1779 $
+ *
  * @since 0.7.0
  */
 public class EACTAAPDUSender implements APDULevelEACTACapable {
 
   private SecureMessagingAPDUSender secureMessagingSender;
-  
+
+  /**
+   * Creates an APDU sender.
+   *
+   * @param service the card service for tranceiving APDUs
+   */
   public EACTAAPDUSender(CardService service) {
     this.secureMessagingSender = new SecureMessagingAPDUSender(service);
   }
-  
+
   /**
    * The MSE DST APDU, see EAC 1.11 spec, Section B.2.
    *
