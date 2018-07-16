@@ -28,10 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
-import org.jmrtd.lds.icao.ICAOCountry;
 
 import junit.framework.TestCase;
-import net.sf.scuba.data.Country;
 
 /**
  * Tests some of the utility functions.
