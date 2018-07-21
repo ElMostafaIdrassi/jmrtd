@@ -576,11 +576,14 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the personal number (if a personal number is encoded in optional data 1).
+   * Returns the personal number (if a personal number is encoded in optional data 1).
    *
    * @return personal number
    */
   public String getPersonalNumber() {
+    if (optionalData1 == null) {
+      return null;
+    }
     if (optionalData1.length() > 14) {
       return trimFillerChars(optionalData1.substring(0, 14));
     } else {
@@ -1023,7 +1026,7 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   private static String mrzFormat(String str, int width) {
     if (str == null) {
-      throw new IllegalArgumentException("Attempting to MRZ format null");
+      return "";
     }
     if (str.length() > width) {
       throw new IllegalArgumentException("Argument too wide (" + str.length() + " > " + width + ")");

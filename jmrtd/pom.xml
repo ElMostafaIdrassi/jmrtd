@@ -5,7 +5,7 @@
 
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.7.1</version>
+  <version>0.7.2-SNAPSHOT</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -126,7 +126,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>2.10.4</version>
             <configuration>
-              <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${pom.name}</additionalJOption>
+              <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
               <links>
                 <link>https://bouncycastle.org/docs/docs1.5on</link>
                 <link>https://docs.oracle.com/javase/8/docs/api</link>
