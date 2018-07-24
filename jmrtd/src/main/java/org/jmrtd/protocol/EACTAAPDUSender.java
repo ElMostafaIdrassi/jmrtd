@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: EACTAAPDUSender.java 1779 2018-05-24 22:30:31Z martijno $
+ * $Id$
  */
 
 package org.jmrtd.protocol;
@@ -36,7 +36,7 @@ import net.sf.scuba.smartcards.ResponseAPDU;
  *
  * @author The JMRTD team
  *
- * @version $Revision: 1779 $
+ * @version $Revision$
  *
  * @since 0.7.0
  */
