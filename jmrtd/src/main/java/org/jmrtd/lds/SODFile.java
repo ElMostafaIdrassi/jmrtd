@@ -205,6 +205,11 @@ public class SODFile extends AbstractTaggedLDSFile {
       byte[] encryptedDigest,
       X509Certificate docSigningCertificate) throws GeneralSecurityException {
     super(EF_SOD_TAG);
+
+    if (dataGroupHashes == null) {
+      throw new IllegalArgumentException("Cannot construct security object from null datagroup hashes");
+    }
+
     try {
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,
           digestEncryptionAlgorithm,
@@ -389,7 +394,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the serial number of the document signing certificate.
+   * Returns the serial number as it appears in the SignerInfo in the SignedData.
    *
    * @return a certificate serial number
    */

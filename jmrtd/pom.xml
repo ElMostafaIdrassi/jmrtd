@@ -5,7 +5,7 @@
 
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.7.2</version>
+  <version>0.7.3-SNAPSHOT</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -32,6 +32,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jdk.version>1.6</jdk.version>
+    <java.version>${jdk.version}</java.version>
   </properties>
 
   <dependencies>
@@ -85,6 +87,15 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <source>${jdk.version}</source>
+          <target>${jdk.version}</target>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>

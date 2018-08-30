@@ -77,6 +77,8 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.jmrtd.Util;
 
+import net.sf.scuba.util.Hex;
+
 /**
  * Utility class for helping with CMS SignedData in security object document and
  * card security file.
@@ -398,10 +400,43 @@ public final class SignedDataUtil {
   public static IssuerAndSerialNumber getIssuerAndSerialNumber(SignedData signedData) {
     SignerInfo signerInfo = getSignerInfo(signedData);
     SignerIdentifier signerIdentifier = signerInfo.getSID();
-    IssuerAndSerialNumber issuerAndSerialNumber = IssuerAndSerialNumber.getInstance(signerIdentifier.getId());
+    ASN1Encodable signerIdentifierId = signerIdentifier.getId();
+    if (!(signerIdentifierId instanceof ASN1Sequence || signerIdentifierId instanceof IssuerAndSerialNumber)) {
+      /* NOTE: DE MasterList appears to use DER octet string here. */
+      return null;
+    }
+
+    IssuerAndSerialNumber issuerAndSerialNumber = IssuerAndSerialNumber.getInstance(signerIdentifierId);
     X500Name issuer = issuerAndSerialNumber.getName();
     BigInteger serialNumber = issuerAndSerialNumber.getSerialNumber().getValue();
     return new IssuerAndSerialNumber(issuer, serialNumber);
+  }
+
+  /**
+   * Reads any objects in the given ASN1 octet string (as an ASN1 input stream).
+   *
+   * @param octetString the octet string
+   *
+   * @return a list of objects read
+   */
+  public static List<ASN1Primitive> getObjectsFromOctetString(ASN1OctetString octetString) {
+    List<ASN1Primitive> result = new ArrayList<ASN1Primitive>();
+    byte[] octets = octetString.getOctets();
+    ASN1InputStream derInputStream = new ASN1InputStream(new ByteArrayInputStream(octets));
+    try {
+      while (true) {
+        ASN1Primitive derObject = derInputStream.readObject();
+        if (derObject == null) {
+          break;
+        }
+        result.add(derObject);
+      }
+      derInputStream.close();
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception", ioe);
+    }
+
+    return result;
   }
 
   /**
@@ -515,6 +550,11 @@ public final class SignedDataUtil {
   public static SignerInfo createSignerInfo(String digestAlgorithm,
       String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
       byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
+
+    if (encryptedDigest == null) {
+      throw new IllegalArgumentException("Encrypted digest cannot be null");
+    }
+
     /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
     X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
     X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
@@ -527,6 +567,7 @@ public final class SignedDataUtil {
     ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
     ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
     ASN1Set unAuthenticatedAttributes = null; // should be empty set?
+
     return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
   }
 
@@ -582,6 +623,10 @@ public final class SignedDataUtil {
    * @throws CertificateException on error
    */
   public static ASN1Sequence createCertificate(X509Certificate certificate) throws CertificateException {
+    if (certificate == null) {
+      throw new IllegalArgumentException("Cannot encode null certificate");
+    }
+
     try {
       byte[] certSpec = certificate.getEncoded();
       ASN1InputStream asn1In = new ASN1InputStream(certSpec);
