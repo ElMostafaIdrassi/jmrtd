@@ -49,7 +49,7 @@ import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVUtil;
 
 /**
- * The EAC Chip Authentication protocol.
+ * The EAC Chip Authentication protocol (version 1).
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -173,7 +173,7 @@ public class EACCAProtocol {
     if (cipherAlg.startsWith("DESede")) {
       byte[] idData = null;
       if (keyId != null) {
-        byte[] keyIdBytes = keyId.toByteArray(); // FIXME: Shouldn't this be  Util.i2os(keyId); ? -- MO 20170926
+        byte[] keyIdBytes = Util.i2os(keyId);
         idData = TLVUtil.wrapDO(0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
       }
       service.sendMSEKAT(wrapper, TLVUtil.wrapDO(0x91, keyData), idData); /* FIXME: Constant for 0x91. */
@@ -270,7 +270,7 @@ public class EACCAProtocol {
   }
 
   /**
-   * Gets the public key data to be sent.
+   * Returns the public key data to be sent.
    *
    * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
    * @param pcdPublicKey the inspection system's public key
@@ -290,7 +290,7 @@ public class EACCAProtocol {
   }
 
   /**
-   * Infers the Chip Authentication OID form a Chip Authentication public key OID.
+   * Infers the Chip Authentication OID from a Chip Authentication public key OID.
    * This is a best effort.
    *
    * @param publicKeyOID the Chip Authentication public key OID

@@ -28,7 +28,7 @@ import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardServiceException;
 
 /**
- * The low-level capability of sending APDUs for the (EAC) Chip Authentication protocol.
+ * The low-level capability of sending APDUs for the (EAC) Chip Authentication protocol (version 1).
  *
  * @author The JMRTD team (info@jmrtd.org)
  *

@@ -40,7 +40,7 @@ import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVUtil;
 
 /**
- * A low-level APDU sender to support the EAC-CA protocol.
+ * A low-level APDU sender to support the EAC-CA protocol (version 1).
  *
  * @author The JMRTD team
  *
@@ -162,11 +162,23 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
   public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException {
     /* Tranceive APDU. */
     byte[] commandData = TLVUtil.wrapDO(0x7C, data); // FIXME: constant for 0x7C
-    CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 256);
+
+    /*
+     * NOTE: Support of Protocol Response Data is CONDITIONAL:
+     * It MUST be provided for version 2but MUST NOT be provided for version 1.
+     * So, we are expecting 0x7C (= tag), 0x00 (= length) here.
+     */
+    CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 4);
     ResponseAPDU rapdu = secureMessagingSender.transmit(wrapper, capdu);
 
     /* Handle error status word. */
     short sw = (short)rapdu.getSW();
+
+    if (sw == ISO7816.SW_WRONG_LENGTH) {
+      capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 256);
+      rapdu = secureMessagingSender.transmit(wrapper, capdu);
+    }
+
     if (sw != ISO7816.SW_NO_ERROR) {
       throw new CardServiceException("Sending general authenticate failed", sw);
     }
