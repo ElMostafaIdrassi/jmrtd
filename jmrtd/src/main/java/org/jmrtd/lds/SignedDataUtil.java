@@ -438,27 +438,6 @@ public final class SignedDataUtil {
   }
 
   /**
-   * Returns the document signer certificate stored in the given signed data structure.
-   *
-   * @param signedData a signed data structure
-   *
-   * @return the document signer certificate, or {@code null}
-   */
-  public static X509Certificate getDocSigningCertificate(SignedData signedData) {
-    List<X509Certificate> certificates = getCertificates(signedData);
-    if (certificates == null || certificates.isEmpty()) {
-      return null;
-    }
-
-    int certificateCount = certificates.size();
-    if (certificateCount != 1) {
-      LOGGER.warning("Found " + certificateCount + " certificates, interpreting last one as document signer certificate");
-    }
-
-    return certificates.get(certificateCount - 1);
-  }
-
-  /**
    * Extracts the list of embedded certificates from a signed data object.
    *
    * @param signedData the signed data object

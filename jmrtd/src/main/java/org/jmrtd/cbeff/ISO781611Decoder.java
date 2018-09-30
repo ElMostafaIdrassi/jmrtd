@@ -280,7 +280,7 @@ public class ISO781611Decoder implements ISO781611 {
    * Reads a biometric data block from an input stream.
    *
    * @param inputStream the stream to read from
-   * @param sbh the niometric header that was already read
+   * @param sbh the biometric header that was already read
    * @param index the index of the biometric data block within the BIT group
    *
    * @return the biometric data block

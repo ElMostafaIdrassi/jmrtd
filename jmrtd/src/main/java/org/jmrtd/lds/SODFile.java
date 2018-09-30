@@ -34,6 +34,7 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -366,7 +367,23 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the embedded document signing certificate (if present).
+   * Returns any embedded (document signing) certificates.
+   *
+   * If the document signing certificate is embedded, a list of size 1 is returned.
+   * If a document signing certificate is not embedded, the empty list is returned.
+   *
+   * Doc 9303 part 10 does not allow multiple certificates here, PKCS7 does allow
+   * this.
+   *
+   * @return the document signing certificate
+   */
+  public List<X509Certificate> getDocSigningCertificates() {
+    return SignedDataUtil.getCertificates(signedData);
+  }
+
+  /**
+   * Returns the embedded document signing certificate (if present) or
+   * {@code null} if not present.
    * Use this certificate to verify that <i>eSignature</i> is a valid
    * signature for <i>eContent</i>. This certificate itself is signed
    * using the country signing certificate.
@@ -374,7 +391,12 @@ public class SODFile extends AbstractTaggedLDSFile {
    * @return the document signing certificate
    */
   public X509Certificate getDocSigningCertificate() {
-    return SignedDataUtil.getDocSigningCertificate(signedData);
+    List<X509Certificate> certificates = getDocSigningCertificates();
+    if (certificates == null || certificates.isEmpty()) {
+      return null;
+    }
+
+    return certificates.get(certificates.size() - 1);
   }
 
   /**
@@ -411,8 +433,14 @@ public class SODFile extends AbstractTaggedLDSFile {
   @Override
   public String toString() {
     try {
-      X509Certificate cert = getDocSigningCertificate();
-      return "SODFile " + cert.getIssuerX500Principal();
+      StringBuilder result = new StringBuilder();
+      result.append("SODFile ");
+      List<X509Certificate> certificates = getDocSigningCertificates();
+      for (X509Certificate certificate: certificates) {
+        result.append(certificate.getIssuerX500Principal().getName());
+        result.append(", ");
+      }
+      return result.toString();
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       return "SODFile";

@@ -185,7 +185,8 @@ public class CardSecurityFile implements Serializable {
     this.digestAlgorithm = SignedDataUtil.getSignerInfoDigestAlgorithm(signedData);
     this.digestEncryptionAlgorithm = SignedDataUtil.getDigestEncryptionAlgorithm(signedData);
 
-    this.certificate = SignedDataUtil.getDocSigningCertificate(signedData);
+    List<X509Certificate> certificates = SignedDataUtil.getCertificates(signedData);
+    this.certificate = certificates == null || certificates.isEmpty() ? null : certificates.get(certificates.size() - 1);
     this.securityInfos = getSecurityInfos(signedData);
 
     this.encryptedDigest = SignedDataUtil.getEncryptedDigest(signedData);
