@@ -372,8 +372,8 @@ public class SODFile extends AbstractTaggedLDSFile {
    * If the document signing certificate is embedded, a list of size 1 is returned.
    * If a document signing certificate is not embedded, the empty list is returned.
    *
-   * Doc 9303 part 10 does not allow multiple certificates here, PKCS7 does allow
-   * this.
+   * Doc 9303 part 10 (in our interpretation) does not allow multiple certificates
+   * here, PKCS7 does allow this.
    *
    * @return the document signing certificate
    */
