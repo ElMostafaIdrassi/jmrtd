@@ -157,13 +157,13 @@ public class SODFileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testFields() {
     testFields(createTestObject("SHA-1", "SHA1WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithECDSA"));
   }
-  
+
   public void testFields(SODFile sodFile) {
     try {
       String ldsVersion = sodFile.getLDSVersion();
@@ -219,6 +219,22 @@ public class SODFileTest extends TestCase {
       testFields(sodFile);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
+  public void testReconstructionViaOtherConstructor() {
+    try {
+      SODFile sodFile = createTestObject("SHA-1", "SHA256WithRSA");
+      SODFile reconstructedSODFile = new SODFile(sodFile.getDigestAlgorithm(), sodFile.getDigestEncryptionAlgorithm(), sodFile.getDataGroupHashes(), sodFile.getEncryptedDigest(), sodFile.getDocSigningCertificate());
+      assertEquals(sodFile, reconstructedSODFile);
+      assertEquals(sodFile.getDigestAlgorithm(), reconstructedSODFile.getDigestAlgorithm());
+      assertEquals(sodFile.getDigestEncryptionAlgorithm(), reconstructedSODFile.getDigestEncryptionAlgorithm());
+      assertTrue(Arrays.equals(sodFile.getEContent(), reconstructedSODFile.getEContent()));
+      assertEquals(new SODFile(new ByteArrayInputStream(sodFile.getEncoded())), reconstructedSODFile);
+      assertEquals(new SODFile(new ByteArrayInputStream(reconstructedSODFile.getEncoded())), sodFile);
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception" , e);
       fail(e.getMessage());
     }
   }

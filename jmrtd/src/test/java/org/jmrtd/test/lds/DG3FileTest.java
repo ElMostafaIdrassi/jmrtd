@@ -67,11 +67,11 @@ public class DG3FileTest extends TestCase {
       List<FingerInfo> recordInfos = dg3.getFingerInfos();
       int recordCount = recordInfos.size();
       int recordNumber = 1;
-      LOGGER.info("DEBUG: Number of finger records = " + recordCount);
+//      LOGGER.info("DEBUG: Number of finger records = " + recordCount);
       for (FingerInfo record: recordInfos) {
         List<FingerImageInfo> imageInfos = record.getFingerImageInfos();
         int imageInfoCount = imageInfos.size();
-        LOGGER.info("DEBUG: Number of images in record " + recordNumber + " is " + imageInfoCount);
+//        LOGGER.info("DEBUG: Number of images in record " + recordNumber + " is " + imageInfoCount);
         int imageInfoNumber = 1;
         for (FingerImageInfo imageInfo: imageInfos) {
           int length = imageInfo.getImageLength();
@@ -292,14 +292,14 @@ public class DG3FileTest extends TestCase {
       DataInputStream img1In = new DataInputStream(dg3.getFingerInfos().get(0).getFingerImageInfos().get(0).getImageInputStream());
       byte[] img1Bytes = new byte[img1Length];
       img1In.readFully(img1Bytes);
-      LOGGER.info("DEBUG: img1\n" + Hex.bytesToHexString(img1Bytes, 0, 32));
+//      LOGGER.info("DEBUG: img1\n" + Hex.bytesToHexString(img1Bytes, 0, 32));
 
       int img2Length = dg3.getFingerInfos().get(1).getFingerImageInfos().get(0).getImageLength();
       DataInputStream img2In = new DataInputStream(dg3.getFingerInfos().get(1).getFingerImageInfos().get(0).getImageInputStream());
       byte[] img2Bytes = new byte[img2Length];
       img2In.readFully(img2Bytes);
 
-      LOGGER.info("DEBUG: img2\n" + Hex.bytesToHexString(img2Bytes, 0, 32));
+//      LOGGER.info("DEBUG: img2\n" + Hex.bytesToHexString(img2Bytes, 0, 32));
 
       byte[] encodedFromByteArrayStream = dg3.getEncoded();
 
@@ -435,7 +435,7 @@ public class DG3FileTest extends TestCase {
     DG3File dg3 = createTestObject();
     byte[] header = new byte[256];
     System.arraycopy(dg3.getEncoded(), 0, header, 0, header.length);
-    LOGGER.info(Hex.bytesToPrettyString(header));
+//    LOGGER.info(Hex.bytesToPrettyString(header));
   }
 
   public void testFromBin() {

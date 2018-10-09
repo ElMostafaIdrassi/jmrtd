@@ -102,10 +102,15 @@ public class FingerImageInfoTest extends TestCase {
       String mimeType = original.getMimeType();
       int compressionAlg = 0;
 
-      if ("image/x-wsq".equals(mimeType)) { compressionAlg = FingerInfo.COMPRESSION_WSQ; }
-      else if ("image/jpeg".equals(mimeType)) { compressionAlg = FingerInfo.COMPRESSION_JPEG; }
-      else if ("image/jpeg2000".equals(mimeType)) { compressionAlg = FingerInfo.COMPRESSION_JPEG2000; }
-      else { fail("This test doesn't support this image data type " + mimeType); }
+      if ("image/x-wsq".equals(mimeType)) {
+        compressionAlg = FingerInfo.COMPRESSION_WSQ;
+      } else if ("image/jpeg".equals(mimeType)) {
+        compressionAlg = FingerInfo.COMPRESSION_JPEG;
+      } else if ("image/jpeg2000".equals(mimeType)) {
+        compressionAlg = FingerInfo.COMPRESSION_JPEG2000;
+      } else {
+        fail("This test doesn't support this image data type " + mimeType);
+      }
       byte[] encoded = original.getEncoded();
       assertNotNull(encoded);
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
@@ -123,8 +128,8 @@ public class FingerImageInfoTest extends TestCase {
   public void testWidthHeight() {
     try {
       FingerImageInfo imageInfo = createRightIndexFingerTestObject();
-      LOGGER.info("DEBUG: imageInfo.getWidth() = " + imageInfo.getWidth());
-      LOGGER.info("DEBUG: imageInfo.getHeight() = " + imageInfo.getHeight());
+      //      LOGGER.info("DEBUG: imageInfo.getWidth() = " + imageInfo.getWidth());
+      //      LOGGER.info("DEBUG: imageInfo.getHeight() = " + imageInfo.getHeight());
       String mimeType = imageInfo.getMimeType();
       assertNotNull(mimeType);
       assertTrue("image/x-wsq".equals(mimeType) || "image/jpeg2000".equals(mimeType) || "image/jpeg".equals(mimeType));
@@ -182,9 +187,13 @@ public class FingerImageInfoTest extends TestCase {
       int impressionType = FingerImageInfo.IMPRESSION_TYPE_LIVE_SCAN_PLAIN;
       int compressionType = -1;
 
-      if (JPEG_MIME_TYPE.equals(mimeType)) { compressionType = FingerInfo.COMPRESSION_JPEG; }
-      else if (WSQ_MIME_TYPE.equals(mimeType)) {compressionType = FingerInfo.COMPRESSION_WSQ; }
-      else if (JPEG2000_MIME_TYPE.equals(mimeType) || JPEG2000_ALT_MIME_TYPE.equals(mimeType)) {compressionType = FingerInfo.COMPRESSION_JPEG2000; }
+      if (JPEG_MIME_TYPE.equals(mimeType)) {
+        compressionType = FingerInfo.COMPRESSION_JPEG;
+      } else if (WSQ_MIME_TYPE.equals(mimeType)) {
+        compressionType = FingerInfo.COMPRESSION_WSQ;
+      } else if (JPEG2000_MIME_TYPE.equals(mimeType) || JPEG2000_ALT_MIME_TYPE.equals(mimeType)) {
+        compressionType = FingerInfo.COMPRESSION_JPEG2000;
+      }
 
       FingerImageInfo imageInfo = new FingerImageInfo(position, viewCount, viewNumber, quality, impressionType,
           width, height, new ByteArrayInputStream(imageBytes), imageBytes.length, compressionType);

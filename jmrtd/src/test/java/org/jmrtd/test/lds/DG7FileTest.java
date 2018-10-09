@@ -135,7 +135,7 @@ public class DG7FileTest extends TestCase {
       DG7File dg7 = createTestObject();
       byte[] header = new byte[256];
       System.arraycopy(dg7.getEncoded(), 0, header, 0, header.length);
-      LOGGER.info(Hex.bytesToPrettyString(header));
+//      LOGGER.info(Hex.bytesToPrettyString(header));
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
