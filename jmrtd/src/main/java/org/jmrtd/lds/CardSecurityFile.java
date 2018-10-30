@@ -332,7 +332,7 @@ public class CardSecurityFile implements Serializable {
   }
 
   /**
-   * Gets a hash code of this object.
+   * Returns a hash code of this object.
    *
    * @return the hash code
    */

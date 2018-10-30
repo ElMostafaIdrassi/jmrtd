@@ -90,7 +90,7 @@ public class EACTAResult implements Serializable {
   }
 
   /**
-   * Gets CA certificate's reference used during EAC.
+   * Returns CA certificate's reference used during EAC-TA.
    *
    * @return CA certificate's reference
    */
@@ -99,8 +99,8 @@ public class EACTAResult implements Serializable {
   }
 
   /**
-   * Gets the chain of CVCertificates used to authenticate the terminal to
-   * the card.
+   * Returns the chain of card verifiable certificates that is to be used
+   * for authenticating the PCD to the ICC.
    *
    * @return the chain of CVCertificates used to authenticate the terminal to
    *         the card
@@ -110,16 +110,16 @@ public class EACTAResult implements Serializable {
   }
 
   /**
-   * Gets the terminal private key used during EAC.
+   * Returns the PCD's private key used during EAC.
    *
-   * @return the terminal private key
+   * @return the PCD's private key
    */
   public PrivateKey getTerminalKey() {
     return terminalKey;
   }
 
   /**
-   * Gets the id of the card used during EAC.
+   * Returns the identifier of the card used during EAC.
    *
    * @return the id of the card
    */
@@ -128,7 +128,7 @@ public class EACTAResult implements Serializable {
   }
 
   /**
-   * Gets the card's challenge generated during EAC.
+   * Returns the card's challenge generated during EAC.
    *
    * @return the card's challenge
    */

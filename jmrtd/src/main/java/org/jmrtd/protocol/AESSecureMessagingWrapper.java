@@ -116,7 +116,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * Gets the current value of the send sequence counter.
+   * Returns the current value of the send sequence counter.
    *
    * @return the current value of the send sequence counter.
    */
@@ -544,7 +544,7 @@ public class AESSecureMessagingWrapper extends SecureMessagingWrapper implements
   }
 
   /**
-   * Gets the SSC as bytes, making sure the 128 bit (16 byte) block-size is used.
+   * Returns the SSC as bytes, making sure the 128 bit (16 byte) block-size is used.
    *
    * @param ssc the send sequence counter
    *

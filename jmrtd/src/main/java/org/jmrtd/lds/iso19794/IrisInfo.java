@@ -431,9 +431,9 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the capture device id.
+   * Returns the capture device identifier.
    *
-   * @return the captureDeviceId
+   * @return the capture device identifier
    */
   public int getCaptureDeviceId() {
     return captureDeviceId;
@@ -458,16 +458,19 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the scan type.
+   * Returns the scan type.
+   * One of {@link #SCAN_TYPE_UNDEF}, {@link #SCAN_TYPE_PROGRESSIVE},
+   * {@link #SCAN_TYPE_INTERLACE_FRAME}, {@link #SCAN_TYPE_INTERLACE_FIELD},
+   * or {@link #SCAN_TYPE_CORRECTED}.
    *
-   * @return the scanType, one of {@link #SCAN_TYPE_UNDEF}, {@link #SCAN_TYPE_PROGRESSIVE}, {@link #SCAN_TYPE_INTERLACE_FRAME}, {@link #SCAN_TYPE_INTERLACE_FIELD}, or {@link #SCAN_TYPE_CORRECTED}
+   * @return the scanType
    */
   public int getScanType() {
     return scanType;
   }
 
   /**
-   * Gets the iris occlusion.
+   * Returns the iris occlusion.
    *
    * @return the irisOcclusion
    */
@@ -476,7 +479,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the iris occlusing filling.
+   * Returns the iris occlusing filling.
    *
    * @return the occlusionFilling
    */
@@ -485,7 +488,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the boundary extraction.
+   * Returns the boundary extraction.
    *
    * @return the boundaryExtraction
    */
@@ -494,7 +497,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the iris diameter.
+   * Returns the iris diameter.
    *
    * @return the irisDiameter
    */
@@ -503,7 +506,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the image format.
+   * Returns the image format.
    *
    * @return the imageFormat
    */
@@ -512,7 +515,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the raw image width.
+   * Returns the raw image width.
    *
    * @return the rawImageWidth
    */
@@ -521,7 +524,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the raw image height.
+   * Returns the raw image height.
    *
    * @return the rawImageHeight
    */
@@ -530,7 +533,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the intensity depth.
+   * Returns the intensity depth.
    *
    * @return the intensityDepth
    */
@@ -539,7 +542,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the image transformation.
+   * Returns the image transformation.
    *
    * @return the imageTransformation
    */
@@ -548,7 +551,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the device unique id.
+   * Returns the device unique id.
    *
    * @return the deviceUniqueId
    */
@@ -557,7 +560,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the standard biometric header of this iris info.
+   * Returns the standard biometric header of this iris info.
    *
    * @return the standard biometric header
    */
@@ -687,7 +690,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   }
 
   /**
-   * Gets the iris biometric subtype infos embedded in this iris info.
+   * Returns the iris biometric subtype infos embedded in this iris info.
    *
    * @return iris biometric subtype infos
    */
@@ -716,7 +719,7 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
   /* ONLY PRIVATE METHODS BELOW */
 
   /**
-   * Gets a bit-mask for the biometric sub-types found in this iris info.
+   * Returns a bit-mask for the biometric sub-types found in this iris info.
    *
    * @return a bit-mask for the biometric sub-types found in this iris info
    */

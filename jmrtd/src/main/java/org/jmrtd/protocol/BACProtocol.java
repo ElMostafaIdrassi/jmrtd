@@ -93,9 +93,6 @@ public class BACProtocol {
 
       SecureMessagingWrapper wrapper = doBACStep(kEnc, kMac);
       return new BACResult(bacKey, wrapper);
-    } catch (CardServiceException cse) {
-      LOGGER.log(Level.WARNING, "BAC failed", cse);
-      throw cse;
     } catch (GeneralSecurityException gse) {
       throw new CardServiceException("Error during BAC", gse);
     }

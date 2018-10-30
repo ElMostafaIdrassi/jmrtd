@@ -119,7 +119,7 @@ public class DefaultFileSystem implements FileSystemStructured {
   }
 
   /**
-   * Gets the selected path.
+   * Returns the selected path.
    *
    * @return the path components
    *
@@ -233,7 +233,7 @@ public class DefaultFileSystem implements FileSystemStructured {
   }
 
   /**
-   * Gets the file info object for the currently selected file. If this
+   * Returns the file info object for the currently selected file. If this
    * executes normally the result is non-null. If the file has not been
    * read before this will send a READ_BINARY to determine length.
    *

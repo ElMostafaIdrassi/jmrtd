@@ -176,7 +176,7 @@ public class EACCAResult implements Serializable {
   }
 
   /**
-   * Gets the hash of the ephemeral public key of the terminal.
+   * Returns the hash of the ephemeral public key of the terminal.
    *
    * @return the hash of the ephemeral public key of the terminal
    */
@@ -185,7 +185,7 @@ public class EACCAResult implements Serializable {
   }
 
   /**
-   * The ephemeral public key of the terminal that was used in the key exchange.
+   * Returns the ephemeral public key of the terminal that was used in the key exchange.
    *
    * @return the public key
    */

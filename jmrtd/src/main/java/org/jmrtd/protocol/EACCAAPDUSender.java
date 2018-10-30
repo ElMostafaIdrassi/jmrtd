@@ -68,7 +68,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
 
   /**
    * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
-   * This is part of AA and possibly EAC-CA.
+   * This is part of EAC-CA (but AA uses a similar command).
    *
    * @param wrapper secure messaging wrapper
    * @param rndIFD the challenge to send
@@ -160,12 +160,11 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
    * @throws CardServiceException on error
    */
   public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException {
-    /* Tranceive APDU. */
     byte[] commandData = TLVUtil.wrapDO(0x7C, data); // FIXME: constant for 0x7C
 
     /*
      * NOTE: Support of Protocol Response Data is CONDITIONAL:
-     * It MUST be provided for version 2but MUST NOT be provided for version 1.
+     * It MUST be provided for version 2 but MUST NOT be provided for version 1.
      * So, we are expecting 0x7C (= tag), 0x00 (= length) here.
      */
     CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 4);

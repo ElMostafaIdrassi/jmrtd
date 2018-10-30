@@ -1127,17 +1127,30 @@ public class MRZInfo extends AbstractLDSInfo {
 
   /**
    * Updates the check digit fields for document number,
-   * date of birth, date of expiry, and personal number.
+   * date of birth, date of expiry, and composite.
    */
   private void checkDigit() {
     this.documentNumberCheckDigit = checkDigit(documentNumber);
     this.dateOfBirthCheckDigit = checkDigit(dateOfBirth);
     this.dateOfExpiryCheckDigit = checkDigit(dateOfExpiry);
+
     if (optionalData1.length() < 15) {
       String personalNumber = mrzFormat(optionalData1, 14);
       char personalNumberCheckDigit = checkDigit(mrzFormat(optionalData1, 14), true); /* FIXME: Uses '<' over '0'. Where specified? */
       optionalData1 = personalNumber + personalNumberCheckDigit;
     }
+
+    this.compositeCheckDigit = checkDigit(getComposite(documentType));
+  }
+
+  /**
+   * Returns the composite part over which the composite check digit is computed.
+   *
+   * @param documentType the type of document, either {@code DOC_TYPE_ID1} or {@code DOC_TYPE_ID3}
+   *
+   * @return a string with the composite part
+   */
+  private String getComposite(int documentType) {
     StringBuilder composite = new StringBuilder();
     if (documentType == DOC_TYPE_ID1) {
       /*
@@ -1152,15 +1165,33 @@ public class MRZInfo extends AbstractLDSInfo {
        * 9-15, i.e., dateOfExpiry, dateOfExpiryCheckDigit
        * 19-29, i.e., optionalData2(11)
        */
-      composite.append(documentNumber);
-      composite.append(documentNumberCheckDigit);
-      composite.append(mrzFormat(optionalData1, 15));
+      int documentNumberLength = documentNumber.length();
+      if (documentNumberLength <= 9) {
+        composite.append(mrzFormat(documentNumber, 9));
+        composite.append(documentNumberCheckDigit);
+        composite.append(mrzFormat(optionalData1, 15));
+      } else {
+        /* Document number, first 9 characters. */
+        composite.append(documentNumber.substring(0, 9));
+        composite.append("<"); /* Filler instead of check digit. */
+
+        /* Remainder of document number. */
+        String documentNumberRemainder = documentNumber.substring(9);
+        composite.append(documentNumberRemainder);
+        composite.append(documentNumberCheckDigit);
+
+        /* Remainder of optional data 1 (removing any prefix). */
+        String optionalData1Remainder = mrzFormat(optionalData1, 15).substring(documentNumberRemainder.length() + 1);
+        composite.append(mrzFormat(optionalData1Remainder, optionalData1Remainder.length()));
+      }
       composite.append(dateOfBirth);
       composite.append(dateOfBirthCheckDigit);
       composite.append(dateOfExpiry);
       composite.append(dateOfExpiryCheckDigit);
       composite.append(mrzFormat(optionalData2, 11));
     } else {
+      /* Must be ID3. */
+      /* Composite check digit lower line: 1-10, 14-20, 22-43. */
       composite.append(documentNumber);
       composite.append(documentNumberCheckDigit);
       composite.append(dateOfBirth);
@@ -1169,7 +1200,8 @@ public class MRZInfo extends AbstractLDSInfo {
       composite.append(dateOfExpiryCheckDigit);
       composite.append(mrzFormat(optionalData1, 15));
     }
-    this.compositeCheckDigit = checkDigit(composite.toString()); /* FIXME: Uses '0' over '<'. Where specified? */
+
+    return composite.toString();
   }
 
   /**

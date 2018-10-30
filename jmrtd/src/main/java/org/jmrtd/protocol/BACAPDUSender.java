@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.jmrtd.APDULevelBACCapable;
+import org.jmrtd.AccessDeniedException;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.APDUWrapper;
@@ -167,17 +168,20 @@ public class BACAPDUSender implements APDULevelBACCapable {
       }
 
       if (rapduBytes.length != 42) {
-        throw new CardServiceException("Mutual authentication failed: expected length: 40 + 2, actual length: " + rapduBytes.length, sw);
+        throw new AccessDeniedException("Mutual authentication failed: expected length: 40 + 2, actual length: " + rapduBytes.length, sw);
       }
 
       /* Decrypt the response. */
       cipher.init(Cipher.DECRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);
       byte[] result = cipher.doFinal(rapduBytes, 0, rapduBytes.length - 8 - 2);
       if (result.length != 32) {
-        throw new IllegalStateException("Cryptogram wrong length " + result.length);
+        /* The PICC allowed access, but probably the resulting secure channel will be wrong. */
+        throw new CardServiceException("Cryptogram wrong length, was expecting 32, found " + result.length, sw);
       }
+
       return result;
     } catch (GeneralSecurityException gse) {
+      /* Lower level security exception, probably the resulting secure channel will be wrong. */
       throw new CardServiceException("Security exception during mutual auth", gse);
     }
   }

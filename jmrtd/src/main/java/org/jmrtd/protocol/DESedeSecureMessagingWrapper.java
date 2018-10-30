@@ -232,7 +232,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * Gets the current value of the send sequence counter.
+   * Returns the current value of the send sequence counter.
    *
    * @return the current value of the send sequence counter.
    */
@@ -289,7 +289,7 @@ public class DESedeSecureMessagingWrapper extends SecureMessagingWrapper impleme
   }
 
   /**
-   * Does the actual encoding of a command APDU.
+   * Performs the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
    *
    * @param commandAPDU the command APDU

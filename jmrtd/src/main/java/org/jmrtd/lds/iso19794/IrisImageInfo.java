@@ -139,7 +139,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the image format.
+   * Returns the image format.
    *
    * @return the image format
    */
@@ -148,7 +148,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the image number.
+   * Returns the image number.
    *
    * @return the image number
    */
@@ -157,7 +157,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the quality.
+   * Returns the quality.
    *
    * @return the image quality
    */
@@ -166,7 +166,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the rotation angle.
+   * Returns the rotation angle.
    *
    * @return the rotationAngle
    */
@@ -175,7 +175,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the rotation angle uncertainty.
+   * Returns the rotation angle uncertainty.
    *
    * @return the rotationAngleUncertainty
    */
@@ -184,7 +184,7 @@ public class IrisImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the record length.
+   * Returns the record length.
    *
    * @return the record length
    */

@@ -145,10 +145,6 @@ public class DG2FileTest extends TestCase {
       FaceImageInfo faceImage1 = faceImageCount1 == 0 ? null : images1.get(0);
       int width1 = faceImageCount1 == 0 ? -1 : faceImage1.getWidth(), height1 = faceImageCount1 == 0 ? -1 : faceImage1.getHeight();
 
-      LOGGER.info("width = " + width);
-
-      LOGGER.info("width1 = " + width1);
-
       assertEquals(width, width1);
       assertEquals(height, height1);
     } catch (Exception e) {
@@ -172,7 +168,7 @@ public class DG2FileTest extends TestCase {
 
     FaceInfoTest faceInfoTest = new FaceInfoTest("DG2FileTest");
     List<FaceInfo> faceInfos = dg2File.getFaceInfos();
-    LOGGER.info("DEBUG: faceInfos: " + faceInfos.size());
+//    LOGGER.info("DEBUG: faceInfos: " + faceInfos.size());
     for (FaceInfo faceInfo: faceInfos) {
       faceInfoTest.testMandatorySBHFields(faceInfo);
       faceInfoTest.testOptionalSBHFields(faceInfo);

@@ -151,7 +151,7 @@ public class FaceImageInfoTest extends TestCase {
       byte[] imageBytes = new byte[imageLength];
       imageInputStream.readFully(imageBytes);
       imageInputStream.close();
-      LOGGER.info("DEBUG: imageBytes.length = " + imageBytes.length);
+//      LOGGER.info("DEBUG: imageBytes.length = " + imageBytes.length);
     } catch (IOException e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());

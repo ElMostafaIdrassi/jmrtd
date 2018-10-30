@@ -138,16 +138,16 @@ public class DG4FileTest extends TestCase {
       List<IrisInfo> recordInfos = dg4.getIrisInfos();
       int recordCount = recordInfos.size();
       int recordNumber = 1;
-      LOGGER.info("DEBUG: Number of iris records = " + recordCount);
+//      LOGGER.info("DEBUG: Number of iris records = " + recordCount);
       for (IrisInfo record: recordInfos) {
         List<IrisBiometricSubtypeInfo> subtypeInfos = record.getIrisBiometricSubtypeInfos();
         int subtypeInfoCount = subtypeInfos.size();
-        LOGGER.info("DEBUG: Number of subtypes in iris record " + recordNumber + " is " + subtypeInfoCount);
+//        LOGGER.info("DEBUG: Number of subtypes in iris record " + recordNumber + " is " + subtypeInfoCount);
         int imageInfoNumber = 1;
         for (IrisBiometricSubtypeInfo subtypeInfo: subtypeInfos) {
           List<IrisImageInfo> imageInfos = subtypeInfo.getIrisImageInfos();
           int imageInfoCount = imageInfos.size();
-          LOGGER.info("DEBUG: Number of image infos in iris subtype record " + imageInfoNumber + " is " + imageInfoCount);
+//          LOGGER.info("DEBUG: Number of image infos in iris subtype record " + imageInfoNumber + " is " + imageInfoCount);
           for (IrisImageInfo imageInfo: imageInfos) {
             int length = imageInfo.getImageLength();
             byte[] bytes = new byte[length];
@@ -159,7 +159,7 @@ public class DG4FileTest extends TestCase {
         recordNumber ++;
       }
     } catch (AccessControlException ace) {
-      LOGGER.info("DEBUG: *************** could not get access to DG4 *********");
+      LOGGER.log(Level.WARNING, "Exception", ace);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());

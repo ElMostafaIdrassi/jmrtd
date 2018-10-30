@@ -171,9 +171,9 @@ public class PACEProtocol {
    *
    * @return a PACE result
    *
-   * @throws PACEException on error
+   * @throws CardServiceException if authentication failed or on some lower-level error
    */
-  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params) throws PACEException {
+  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params) throws CardServiceException {
     try {
       return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
     } catch (GeneralSecurityException gse) {
@@ -191,9 +191,9 @@ public class PACEProtocol {
    *
    * @return a PACE result
    *
-   * @throws PACEException if authentication failed
+   * @throws CardServiceException if authentication failed or on lower level errors
    */
-  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws PACEException {
+  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws CardServiceException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
@@ -618,9 +618,9 @@ public class PACEProtocol {
    *
    * @return possible encrypted chip authentication data (PACE-CAM case)
    *
-   * @throws PACEException on error
+   * @throws CardServiceException on error
    */
-  public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws PACEException {
+  public byte[] doPACEStep4(String oid, MappingType mappingType, KeyPair pcdKeyPair, PublicKey piccPublicKey, SecretKey macKey) throws CardServiceException {
     try {
       byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] step4Data = TLVUtil.wrapDO(0x85, pcdToken);
@@ -662,8 +662,6 @@ public class PACEProtocol {
       return null;
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side exception in authentication token generation step", gse);
-    } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in authentication token generation step", cse, cse.getSW());
     }
   }
 
@@ -1290,15 +1288,16 @@ public class PACEProtocol {
    * @return a fixed document number
    */
   private static String fixDocumentNumber(String documentNumber) {
+
     /* The document number, excluding trailing '<'. */
     String minDocumentNumber = documentNumber.replace('<', ' ').trim().replace(' ', '<');
 
     /* The document number, including trailing '<' until length 9. */
-    String maxDocumentNumber = minDocumentNumber;
-    while (maxDocumentNumber.length() < 9) {
-      maxDocumentNumber += "<";
+    StringBuilder result = new StringBuilder(minDocumentNumber);
+    while (result.length() < 9) {
+      result.append('<');
     }
-    return maxDocumentNumber;
+    return result.toString();
   }
 
   /**

@@ -133,7 +133,7 @@ public class EACCAProtocol {
       }
 
       /* Generate the inspection system's ephemeral key pair. */
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER); // FIXME: Shouldn't we use "EC" instead of "ECDH"?
+      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(params);
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
@@ -186,7 +186,7 @@ public class EACCAProtocol {
   }
 
   /**
-   * Does the key agreement step.
+   * Performs the key agreement step.
    * Generates a secret based on the PICC's public key and the PCD's private key.
    *
    * @param agreementAlg the agreement algorithm
@@ -236,7 +236,7 @@ public class EACCAProtocol {
   }
 
   /**
-   * Gets the secure messaging wrapper currently in use.
+   * Returns the secure messaging wrapper currently in use.
    *
    * @return a secure messaging wrapper
    */

@@ -55,6 +55,7 @@ public class EACTAAPDUSender implements APDULevelEACTACapable {
 
   /**
    * The MSE DST APDU, see EAC 1.11 spec, Section B.2.
+   * This means that a case 3 APDU is sent, to which no response is expected.
    *
    * @param wrapper secure messaging wrapper
    * @param data public key reference data object (tag 0x83)

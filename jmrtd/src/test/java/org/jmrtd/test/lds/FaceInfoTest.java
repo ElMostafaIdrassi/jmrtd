@@ -67,7 +67,6 @@ public class FaceInfoTest extends TestCase {
 
   public void testElements(FaceInfo FaceInfo) {
     List<FaceImageInfo> imageInfos = FaceInfo.getFaceImageInfos();
-    LOGGER.info("DEBUG: imageInfos: " + imageInfos.size());
     for (FaceImageInfo imageInfo: imageInfos) {
       FaceImageInfoTest imageInfoTest = new FaceImageInfoTest("FaceInfoTest_testElements");
       imageInfoTest.testEncodeDecode(imageInfo);

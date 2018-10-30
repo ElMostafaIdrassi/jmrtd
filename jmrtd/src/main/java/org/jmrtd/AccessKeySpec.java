@@ -43,7 +43,7 @@ public interface AccessKeySpec extends Serializable, KeySpec {
   String getAlgorithm();
 
   /**
-   * Gets the bytes used for deriving the key seed.
+   * Returns the bytes used for deriving the key seed.
    *
    * @return a byte array with the input for key derivation
    */

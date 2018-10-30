@@ -245,9 +245,9 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the stored data group hashes.
+   * Returns the stored data group hashes indexed by data group number.
    *
-   * @return data group hashes indexed by data group numbers (1 to 16)
+   * @return data group hashes indexed by data group number (1 to 16)
    */
   public Map<Integer, byte[]> getDataGroupHashes() {
     DataGroupHash[] hashObjects = getLDSSecurityObject(signedData).getDatagroupHash();
@@ -261,7 +261,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the signature (the encrypted digest) over the hashes.
+   * Returns the signature (the encrypted digest) over the hashes.
    *
    * @return the encrypted digest
    */
@@ -270,7 +270,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the parameters of the digest encryption (signature) algorithm.
+   * Returns the parameters of the digest encryption (signature) algorithm.
    * For instance for {@code "RSASSA/PSS"} this includes the hash algorithm
    * and the salt length.
    *
@@ -281,9 +281,10 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the e-content inside the signed data structure.
+   * Returns the encoded contents of the signed data over which the
+   * signature is to be computed.
    *
-   * @return the e-content
+   * @return the encoded contents
    *
    * @throws SignatureException if the contents do not check out
    */
@@ -292,7 +293,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the name of the algorithm used in the data group hashes.
+   * Returns the name of the algorithm used in the data group hashes.
    *
    * @return an algorithm string such as "SHA-1" or "SHA-256"
    */
@@ -317,7 +318,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the name of the digest algorithm used in the signature.
+   * Returns the name of the digest algorithm used in the signature.
    *
    * @return an algorithm string such as "SHA-1" or "SHA-256"
    */
@@ -326,7 +327,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the name of the digest encryption algorithm used in the signature.
+   * Returns the name of the digest encryption algorithm used in the signature.
    *
    * @return an algorithm string such as "SHA256withRSA"
    */
@@ -335,7 +336,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the version of the LDS if stored in the Security Object (SOd).
+   * Returns the version of the LDS if stored in the Security Object (SOd).
    *
    * @return the version of the LDS in "aabb" format or null if LDS &lt; V1.8
    *
@@ -351,7 +352,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the version of unicode if stored in the Security Object (SOd).
+   * Returns the version of unicode if stored in the Security Object (SOd).
    *
    * @return the unicode version in "aabbcc" format or null if LDS &lt; V1.8
    *
@@ -400,7 +401,8 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the issuer of the document signing certificate.
+   * Returns the issuer name of the document signing certificate
+   * as it appears in the signer-info in the signed-data structure.
    *
    * @return a certificate issuer
    */
@@ -416,7 +418,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Returns the serial number as it appears in the SignerInfo in the SignedData.
+   * Returns the serial number as it appears in the signer-info in the signed-data structure.
    *
    * @return a certificate serial number
    */
@@ -426,7 +428,7 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */

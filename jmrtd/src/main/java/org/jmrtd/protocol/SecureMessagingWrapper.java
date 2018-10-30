@@ -55,21 +55,21 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
   }
 
   /**
-   * Gets the send sequence counter.
+   * Returns the send sequence counter.
    *
    * @return the send sequence counter
    */
   public abstract long getSendSequenceCounter();
 
   /**
-   * Gets the shared key for encrypting APDU payloads.
+   * Returns the shared key for encrypting APDU payloads.
    *
    * @return the encryption key
    */
   public abstract SecretKey getEncryptionKey();
 
   /**
-   * Get the shared key for computing message authentication codes over APDU payloads.
+   * Returns the shared key for computing message authentication codes over APDU payloads.
    *
    * @return the MAC key
    */

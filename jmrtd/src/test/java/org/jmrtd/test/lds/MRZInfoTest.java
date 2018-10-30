@@ -249,11 +249,11 @@ public class MRZInfoTest extends TestCase {
 
       assertNotNull(specimenSampleMRZ);
       assertEquals(30 * 3, specimenSampleMRZ.replace("\n", "").length());
-      
+
       MRZInfo mrzInfo = new MRZInfo(specimenSampleMRZ);
-      
+
       String reencoded = mrzInfo.toString();
-      
+
       assertEquals(specimenSampleMRZ.replaceAll("\n", ""), reencoded.replaceAll("\n", ""));
     } catch (Exception e) {
       fail(e.getMessage());

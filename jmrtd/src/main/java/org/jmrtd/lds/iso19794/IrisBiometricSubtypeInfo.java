@@ -130,7 +130,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
   }
 
   /**
-   * Gets the record length.
+   * Returns the record length.
    *
    * @return the record length
    */
@@ -189,7 +189,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
   }
 
   /**
-   * Gets the image format used in the images encoded in this record.
+   * Returns the image format used in the images encoded in this record.
    *
    * @return the image format
    */
@@ -198,7 +198,7 @@ public class IrisBiometricSubtypeInfo extends AbstractListInfo<IrisImageInfo> {
   }
 
   /**
-   * Gets the iris image infos embedded in this iris biometric subtype info.
+   * Returns the iris image infos embedded in this iris biometric subtype info.
    *
    * @return the embedded iris image infos
    */

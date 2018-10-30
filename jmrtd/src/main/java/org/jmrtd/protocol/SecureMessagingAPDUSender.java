@@ -102,6 +102,15 @@ public class SecureMessagingAPDUSender {
   }
 
   /**
+   * Returns a boolean indicating whether extended length APDUs are supported.
+   *
+   * @return a boolean indicating whether extended length APDUs are supported
+   */
+  public boolean isExtendedAPDULengthSupported() {
+    return service.isExtendedAPDULengthSupported();
+  }
+
+  /**
    * Adds a listener.
    *
    * @param l the listener to add

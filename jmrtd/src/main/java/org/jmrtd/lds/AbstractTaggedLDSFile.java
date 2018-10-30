@@ -131,7 +131,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   protected abstract void writeContent(OutputStream outputStream) throws IOException;
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */
@@ -141,16 +141,28 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   }
 
   /**
-   * The data group tag.
+   * Returns the tag that identifies this LDS file.
    *
-   * @return the tag of the data group
+   * @return the tag of this LDS file
    */
   public int getTag() {
     return tag;
   }
 
   /**
-   * Gets the value part of this DG.
+   * The length of the value of the data group.
+   *
+   * @return the length of the value of the data group
+   */
+  public int getLength() {
+    if (length <= 0) {
+      length = getContent().length;
+    }
+    return length;
+  }
+
+  /**
+   * Returns the value part of this LDS file.
    *
    * @return the value as byte array
    */
@@ -169,17 +181,5 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
         LOGGER.log(Level.FINE, "Error closing stream", ioe);
       }
     }
-  }
-
-  /**
-   * The length of the value of the data group.
-   *
-   * @return the length of the value of the data group
-   */
-  public int getLength() {
-    if (length <= 0) {
-      length = getContent().length;
-    }
-    return length;
   }
 }

@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.APDULevelPACECapable;
+import org.jmrtd.AccessDeniedException;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.APDUWrapper;
@@ -171,7 +172,8 @@ public class PACEAPDUSender implements APDULevelPACECapable {
     /* Handle error status word. */
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
-      throw new CardServiceException("Sending general authenticate failed", sw);
+      /* If PACE fails at this stage, blame it on the PACE credentials. */
+      throw new AccessDeniedException("Sending general authenticate failed", sw);
     }
     byte[] responseData = rapdu.getData();
     responseData = TLVUtil.unwrapDO(0x7C, responseData);

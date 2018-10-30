@@ -334,7 +334,7 @@ public class PassportService extends AbstractMRTDCardService {
   }
 
   /**
-   * Gets whether this service is open.
+   * Returns a boolean that indicates whether this service is open.
    *
    * @return a boolean that indicates whether this service is open
    */
@@ -397,9 +397,9 @@ public class PassportService extends AbstractMRTDCardService {
    *
    * @return the result
    *
-   * @throws PACEException on error
+   * @throws CardServiceException on error
    */
-  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws PACEException {
+  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException {
     PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params);
     wrapper = paceResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
@@ -528,7 +528,8 @@ public class PassportService extends AbstractMRTDCardService {
   }
 
   /**
-   * Gets the wrapper. Returns {@code null} until access control has been performed.
+   * Returns the secure messaging wrapper currently in use.
+   * Returns {@code null} until access control has been performed.
    *
    * @return the wrapper
    */
@@ -575,10 +576,10 @@ public class PassportService extends AbstractMRTDCardService {
   }
 
   /**
-   * Gets the file as an input stream indicated by a file identifier.
-   * The resulting input stream will send APDUs to the card.
+   * Returns the file indicated by the file identifier as an input stream.
+   * The resulting input stream will send APDUs to the card as it is being read.
    *
-   * @param fid ICAO file identifier
+   * @param fid the file identifier
    *
    * @return the file as an input stream
    *

@@ -64,7 +64,7 @@ public class InputStreamBuffer {
   }
 
   /**
-   * Gets a copy of the input stream positioned at <code>0</code>.
+   * Returns a copy of the input stream positioned at {@code 0}.
    *
    * @return a copy of the input stream
    */

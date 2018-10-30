@@ -337,7 +337,7 @@ public class EACTAProtocol {
   }
 
   /**
-   * Gets the public key data to be sent.
+   * Returns the encoded public key data to be sent.
    *
    * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
    * @param pcdPublicKey the inspection system's public key
@@ -349,6 +349,7 @@ public class EACTAProtocol {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
       return pcdDHPublicKey.getY().toByteArray();
     } else if ("ECDH".equals(agreementAlg)) {
+      /* NOTE: Why are we not relying on JCE here, but on Bouncy instead? */
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
       return pcdECPublicKey.getQ().getEncoded(false);
     }

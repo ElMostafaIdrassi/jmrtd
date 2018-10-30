@@ -147,7 +147,6 @@ public class PACEInfoTest extends TestCase {
 
   public void testECDHPrime() {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
-    LOGGER.info("DEBUG: paramSpec: " + paramSpec.getClass().getCanonicalName());
     assertTrue(paramSpec instanceof ECParameterSpec);
   }
 }

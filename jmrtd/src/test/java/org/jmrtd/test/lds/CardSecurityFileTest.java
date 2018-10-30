@@ -85,9 +85,9 @@ public class CardSecurityFileTest extends TestCase {
 
     assertTrue(securityInfos.size() > 0);
 
-    for (SecurityInfo securityInfo: securityInfos) {
-      LOGGER.info("DEBUG: securityInfo = " + securityInfo);
-    }
+//    for (SecurityInfo securityInfo: securityInfos) {
+//      LOGGER.info("DEBUG: securityInfo = " + securityInfo);
+//    }
   }
 
   public InputStream createSampleInputStream() {

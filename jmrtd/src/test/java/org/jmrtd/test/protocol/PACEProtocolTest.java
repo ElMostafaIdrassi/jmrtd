@@ -109,10 +109,10 @@ public class PACEProtocolTest extends TestCase {
       PublicKey publicKey = keyFactory.generatePublic(new ECPublicKeySpec(publicKeyPoint, (ECParameterSpec)params));
 
       byte[] encodedPublicKeyForSmartCard = PACEProtocol.encodePublicKeyForSmartCard(publicKey);
-      LOGGER.info("DEBUG: encoded public key for smart card = \n" + Hex.bytesToPrettyString(encodedPublicKeyForSmartCard));
+//      LOGGER.info("DEBUG: encoded public key for smart card = \n" + Hex.bytesToPrettyString(encodedPublicKeyForSmartCard));
 
       byte[] encodedPublicKeyForMac = PACEProtocol.encodePublicKeyDataObject(oid, publicKey);
-      LOGGER.info("DEBUG: encoded public key for MAC = \n" + Hex.bytesToPrettyString(encodedPublicKeyForMac));
+//      LOGGER.info("DEBUG: encoded public key for MAC = \n" + Hex.bytesToPrettyString(encodedPublicKeyForMac));
 
     } catch(Exception e) {
       fail(e.getMessage());
@@ -163,10 +163,10 @@ public class PACEProtocolTest extends TestCase {
 
       /* FIXME: SHA-1 hardcoded here? */
       byte[] keySeed = Util.computeKeySeed(serialNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
-      LOGGER.info("DEBUG: keySeed = " + Hex.bytesToHexString(keySeed));
+//      LOGGER.info("DEBUG: keySeed = " + Hex.bytesToHexString(keySeed));
       assertTrue(Arrays.equals(expectedKeySeed, keySeed));
       SecretKey secretKey = Util.deriveKey(keySeed, cipherAlg, keyLength, Util.PACE_MODE);
-      LOGGER.info("DEBUG: secretKey = " + Hex.bytesToHexString(secretKey.getEncoded()));
+//      LOGGER.info("DEBUG: secretKey = " + Hex.bytesToHexString(secretKey.getEncoded()));
       assertTrue(Arrays.equals(expectedEncodedSecretKey, secretKey.getEncoded()));
 
       /*
@@ -275,7 +275,7 @@ public class PACEProtocolTest extends TestCase {
 
       /* Given in example. */
       byte[] expectedSharedSecret = Hex.hexStringToBytes("28768D20 701247DA E81804C9 E780EDE5 82A9996D B4A31502 0B273319 7DB84925");
-      LOGGER.info("DEBUG: expectedSharedSecret.length = " + expectedSharedSecret.length);
+//      LOGGER.info("DEBUG: expectedSharedSecret.length = " + expectedSharedSecret.length);
 
       keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
       pcdPrivateKey = keyFactory.generatePrivate(new ECPrivateKeySpec(pcdPrivateKeyFieldElement, ephemeralECParams));
@@ -306,7 +306,7 @@ public class PACEProtocolTest extends TestCase {
       SecretKey encKey = null;
       SecretKey macKey = null;
       try {
-        LOGGER.info("DEBUG: digestAlg = " + digestAlg);
+//        LOGGER.info("DEBUG: digestAlg = " + digestAlg);
 
         encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
         byte[] encKeyBytes = encKey.getEncoded();
@@ -338,9 +338,8 @@ public class PACEProtocolTest extends TestCase {
 
       byte[] encodedPCDPublicKeyDataObject = PACEProtocol.encodePublicKeyDataObject(oid, pcdPublicKey);
 
-      LOGGER.info("DEBUG: expectedInputDataForPICCToken = " + Hex.bytesToHexString(expectedInputDataForPICCToken));
-      LOGGER.info("DEBUG: encodedPCDPublicKeyDataObject = " + Hex.bytesToHexString(encodedPCDPublicKeyDataObject));
-
+//      LOGGER.info("DEBUG: expectedInputDataForPICCToken = " + Hex.bytesToHexString(expectedInputDataForPICCToken));
+//      LOGGER.info("DEBUG: encodedPCDPublicKeyDataObject = " + Hex.bytesToHexString(encodedPCDPublicKeyDataObject));
 
       assertTrue(Arrays.equals(expectedInputDataForPICCToken, encodedPCDPublicKeyDataObject));
 
@@ -649,7 +648,7 @@ public class PACEProtocolTest extends TestCase {
       mappingAgreement.init(pcdMappingPrivateKey);
       ECPoint mappingSharedSecret = mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey));
 
-      LOGGER.info("DEBUG: mappingSharedSecret = " + mappingSharedSecret);
+//      LOGGER.info("DEBUG: mappingSharedSecret = " + mappingSharedSecret);
 
       ECParameterSpec ephemeralParams = PACEProtocol.mapNonceGMWithECDH(nonceS, mappingSharedSecret, ecParams);
 
@@ -662,18 +661,6 @@ public class PACEProtocolTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
-    }
-  }
-
-  public void testBlockSize() {
-    try {
-      Security.addProvider(new BouncyCastleProvider());
-      String cipherAlg = "DESede";
-      Cipher cipher = Cipher.getInstance(cipherAlg + "/CBC/NoPadding");
-      LOGGER.info("DEBUG: blocksize in bits = " + 8 * cipher.getBlockSize());
-    } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.WARNING, "Exception", gse);
-      fail(gse.getMessage());
     }
   }
 

@@ -121,7 +121,7 @@ public final class Util {
   }
 
   /**
-   * Gets the BC provider, if present.
+   * Returns the BC provider, if present.
    *
    * @return the BC provider, the SC provider, or <code>null</code>
    */
@@ -726,7 +726,7 @@ public final class Util {
   }
 
   /**
-   * Gets the curve name if known (or {@code null}).
+   * Returns the curve name if known (or {@code null}).
    *
    * @param params an specification of the curve
    *

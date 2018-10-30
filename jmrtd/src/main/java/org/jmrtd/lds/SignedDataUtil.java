@@ -280,7 +280,8 @@ public final class SignedDataUtil {
   }
 
   /**
-   * Gets the parameters of the digest encryption (signature) algorithm.
+   * Returns the parameters of the digest encryption (signature) algorithm
+   * used in the given signed data object.
    * For instance for {@code "RSASSA/PSS"} this includes the hash algorithm
    * and the salt length.
    *

@@ -222,7 +222,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
   /**
    * Returns the key agreement algorithm ({@code "DH"} or {@code "ECDH"}
-   * for the given Chip Authentication protocol object identifier.
+   * for the given Chip Authentication info object identifier.
    *
    * @param oid a EAC-CA protocol object identifier
    *
@@ -250,7 +250,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
 
   /**
    * Returns the encryption algorithm ({@code "DESede"} or {@code "AES"})
-   * for the given EAC-CA protocol object identifier.
+   * for the given EAC-CA info object identifier.
    *
    * @param oid a EAC-CA protocol object identifier
    *

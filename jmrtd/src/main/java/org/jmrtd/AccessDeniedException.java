@@ -43,8 +43,18 @@ public class AccessDeniedException extends CardServiceException {
    * Creates an exception.
    *
    * @param msg the message
-   * @param bacKey the BAC entry that was tried
    * @param sw status word or <code>-1</code>
+   */
+  public AccessDeniedException(String msg, int sw) {
+    this(msg, null, sw);
+  }
+
+  /**
+   * Creates an exception.
+   *
+   * @param msg the message
+   * @param bacKey the BAC entry that was tried, or {@code null}
+   * @param sw status word or {@code -1}
    */
   public AccessDeniedException(String msg, AccessKeySpec bacKey, int sw) {
     super(msg, sw);

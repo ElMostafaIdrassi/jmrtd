@@ -218,6 +218,31 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   }
 
   /**
+   * Returns the key agreement algorithm ({@code "DH"} or {@code "ECDH"}
+   * for the given Chip Authentication Public Key info object identifier.
+   * This may throw an unchecked exception if the given object identifier not
+   * a known Chip Authentication Public Key info object identifier.
+   *
+   * @param oid a EAC-CA public key info object identifier
+   *
+   * @return the key agreement algorithm
+   */
+  public static String toKeyAgreementAlgorithm(String oid) {
+    if (oid == null) {
+      throw new NumberFormatException("Unknown OID: null");
+    }
+
+    if (ID_PK_DH.equals(oid)) {
+      return "DH";
+    }
+    if (ID_PK_ECDH.equals(oid)) {
+      return "ECDH";
+    }
+
+    throw new NumberFormatException("Unknown OID: \"" + oid + "\"");
+  }
+
+  /**
    * Returns an ASN1 name for the protocol object identifier.
    *
    * @param oid the protocol object identifier
