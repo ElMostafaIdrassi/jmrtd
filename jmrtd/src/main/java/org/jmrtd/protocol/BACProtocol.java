@@ -25,8 +25,6 @@ package org.jmrtd.protocol;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -47,8 +45,6 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @since 0.5.6
  */
 public class BACProtocol {
-
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private APDULevelBACCapable service;
 

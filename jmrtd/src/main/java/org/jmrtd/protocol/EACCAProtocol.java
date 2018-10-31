@@ -34,6 +34,8 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;
@@ -62,6 +64,8 @@ public class EACCAProtocol {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
+
+  private static final int COMMAND_CHAINING_CHUNK_SIZE = 224;
 
   private APDULevelEACCACapable service;
 
@@ -179,7 +183,18 @@ public class EACCAProtocol {
       service.sendMSEKAT(wrapper, TLVUtil.wrapDO(0x91, keyData), idData); /* FIXME: Constant for 0x91. */
     } else if (cipherAlg.startsWith("AES")) {
       service.sendMSESetATIntAuth(wrapper, oid, keyId);
-      service.sendGeneralAuthenticate(wrapper, TLVUtil.wrapDO(0x80, keyData), true); /* FIXME: Constant for 0x80. */
+      byte[] data = TLVUtil.wrapDO(0x80, keyData); /* FIXME: Constant for 0x80. */
+      try {
+        service.sendGeneralAuthenticate(wrapper, data, true);
+      } catch (CardServiceException cse) {
+        LOGGER.log(Level.WARNING, "Failed to send GENERAL AUTHENTICATE, falling back to command chaining", cse);
+        List<byte[]> segments = Util.partition(COMMAND_CHAINING_CHUNK_SIZE, data);
+
+        int index = 0;
+        for (byte[] segment: segments) {
+          service.sendGeneralAuthenticate(wrapper, segment, ++index >= segments.size());
+        }
+      }
     } else {
       throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
     }

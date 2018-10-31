@@ -1534,4 +1534,42 @@ public final class Util {
       throw new IllegalArgumentException("Illegal OID: \"" + oid, ioe);
     }
   }
+
+  /**
+   * Partitions a byte array into a number of segments of the given size,
+   * and a final segment if there is a remainder.
+   *
+   * @param segmentSize the number of bytes per segment
+   * @param data the data to be partitioned
+   *
+   * @return a list with the segments
+   */
+  public static List<byte[]> partition(int segmentSize, byte[] data) {
+    ArrayList<byte[]> segments = new ArrayList<byte[]>();
+    if (data == null || segmentSize <= 0) {
+      throw new IllegalArgumentException("Cannot partition");
+    }
+
+    /* Check if all data fits in one segment. */
+    segmentSize = Math.min(data.length, segmentSize);
+
+    int segmentCount = data.length / segmentSize; // Excluding the remainder.
+    int lastSegmentSize = data.length % segmentSize;
+
+    int offset = 0;
+    for (int i = 0; i < segmentCount; i++) {
+      byte[] segment = new byte[segmentSize];
+      System.arraycopy(data, offset, segment, 0, segmentSize);
+      segments.add(segment);
+      offset += segmentSize;
+    }
+
+    if (lastSegmentSize != 0) {
+      byte[] segment = new byte[lastSegmentSize];
+      System.arraycopy(data, offset, segment, 0, lastSegmentSize);
+      segments.add(segment);
+    }
+
+    return segments;
+  }
 }

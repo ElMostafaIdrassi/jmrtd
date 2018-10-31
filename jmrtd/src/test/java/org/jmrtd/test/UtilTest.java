@@ -22,7 +22,9 @@
 
 package org.jmrtd.test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +57,7 @@ public class UtilTest extends TestCase {
     testPadding(65, 128);
     testPadding(127, 128);
   }
-  
+
   public void testPadding(int arraySize, int blockSize) {
     try {
       Random random = new Random();
@@ -66,30 +68,60 @@ public class UtilTest extends TestCase {
       assertNotNull(paddedBytes);
       assertTrue(paddedBytes.length >= bytes.length);
       assertTrue(isPrefixOf(bytes, paddedBytes));
-      
+
       byte[] unpaddedPaddedBytes = Util.unpad(paddedBytes);
       assertTrue(Arrays.equals(bytes, unpaddedPaddedBytes));
-      
+
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
     }
+  }
+
+  public void testPartition() {
+    for (int dataSize = 23; dataSize < 987; dataSize++) {
+      for (int segmentSize = 13; segmentSize < 63; segmentSize ++) {
+        testPartition(dataSize, segmentSize);
+      }
+    }
+  }
+  
+  public void testPartition(int dataSize, int segmentSize) {
+    Random random = new Random();  
+    byte[] data = new byte[dataSize];
+    random.nextBytes(data);
+    List<byte[]> segments = Util.partition(segmentSize, data);
+    
+    /* This should be approximately true. */
+    assertTrue(segmentSize * (segments.size() - 1) <= dataSize);
+    assertTrue(segmentSize * segments.size() >= dataSize);
+
+    List<Boolean> isLasts = new ArrayList<Boolean>(segments.size());
+    int index = 0;
+    for (byte[] segment: segments) {
+      boolean isLast = ++index >= segments.size();
+      isLasts.add(isLast);
+    }
+    for (int i = 0; i < segments.size() - 1; i++) {
+      assertFalse(isLasts.get(i));
+    }
+    assertTrue(isLasts.get(segments.size() - 1));
   }
 
   private static boolean isPrefixOf(byte[] bytes, byte[] paddedBytes) {
     if (bytes == null || paddedBytes == null) {
       throw new IllegalArgumentException();
     }
-    
+
     if (bytes.length > paddedBytes.length) {
       return false;
     }
-    
+
     for (int i = 0; i < bytes.length; i++) {
       if (paddedBytes[i] != bytes[i]) {
         return false;
       }
     }
-    
+
     return true;
   }
 }

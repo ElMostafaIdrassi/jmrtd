@@ -182,7 +182,11 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
       throw new CardServiceException("Sending general authenticate failed", sw);
     }
     byte[] responseData = rapdu.getData();
-    responseData = TLVUtil.unwrapDO(0x7C, responseData);
+    try {
+      responseData = TLVUtil.unwrapDO(0x7C, responseData);
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Could not unwrap response to GENERAL AUTHENTICATE", e);
+    }
     return responseData;
   }
 }

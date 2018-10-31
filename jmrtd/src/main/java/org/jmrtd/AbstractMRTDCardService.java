@@ -94,7 +94,7 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    *
    * @return the result
    *
-   * @throws PACEException on error
+   * @throws CardServiceException if authentication failed or on error
    */
   public abstract PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException;
 
