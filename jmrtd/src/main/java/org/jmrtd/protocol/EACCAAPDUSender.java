@@ -38,9 +38,11 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVUtil;
+import net.sf.scuba.util.Hex;
 
 /**
  * A low-level APDU sender to support the EAC-CA protocol (version 1).
+ * This provides functionality for the "DESede" case and for the "AES" case.
  *
  * @author The JMRTD team
  *
@@ -67,27 +69,8 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
   }
 
   /**
-   * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
-   * This is part of EAC-CA (but AA uses a similar command).
-   *
-   * @param wrapper secure messaging wrapper
-   * @param rndIFD the challenge to send
-   *
-   * @return the response from the passport (status word removed)
-   *
-   * @throws CardServiceException on tranceive error
-   */
-  public synchronized byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException {
-    if (rndIFD == null || rndIFD.length != 8) {
-      throw new IllegalArgumentException("rndIFD wrong length");
-    }
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 256);
-    ResponseAPDU rapdu = secureMessagingSender.transmit(wrapper, capdu);
-    return rapdu.getData();
-  }
-
-  /**
    * The MSE KAT APDU, see EAC 1.11 spec, Section B.1.
+   * This command is sent in the "DESede" case.
    *
    * @param wrapper secure messaging wrapper
    * @param keyData key data object (tag 0x91)
@@ -102,9 +85,11 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
       System.arraycopy(idData, 0, data, keyData.length, idData.length);
     }
 
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA6, data);
-    ResponseAPDU rapdu = secureMessagingSender.transmit(wrapper, capdu);
-    short sw = (short)rapdu.getSW();
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA6, data);
+    byte[] commandAPDUBytes = commandAPDU.getBytes();
+    LOGGER.info("DEBUG: MSEKAT Command APDU (" + commandAPDUBytes.length + "): " + Hex.bytesToHexString(commandAPDUBytes));
+    ResponseAPDU responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
+    short sw = (short)responseAPDU.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
       throw new CardServiceException("Sending MSE KAT failed", sw);
     }
@@ -113,6 +98,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
   /* For Chip Authentication. We prefix 0x80 for OID and 0x84 for keyId. */
   /**
    * The  MSE Set AT for Chip Authentication.
+   * This command is the first command that is sent in the "AES" case.
    *
    * @param wrapper secure messaging wrapper
    * @param oid the OID
@@ -150,6 +136,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
 
   /**
    * Sends a General Authenticate command.
+   * This command is the second command that is sent in the "AES" case.
    *
    * @param wrapper secure messaging wrapper
    * @param data data to be sent, without the {@code 0x7C} prefix (this method will add it)

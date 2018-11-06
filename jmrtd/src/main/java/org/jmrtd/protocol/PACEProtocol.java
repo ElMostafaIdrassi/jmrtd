@@ -56,6 +56,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPublicKeySpec;
@@ -971,7 +972,7 @@ public class PACEProtocol {
     BigInteger h2 = x2.modPow(BigInteger.valueOf(3), p).add(a.multiply(x2)).add(b).mod(p);
 
     /* 5. (Why are we calculating this?) */
-//    BigInteger h3 = x3.modPow(BigInteger.valueOf(3), p).add(a.multiply(x3)).add(b).mod(p);
+    //    BigInteger h3 = x3.modPow(BigInteger.valueOf(3), p).add(a.multiply(x3)).add(b).mod(p);
 
     /* 6. */
     BigInteger u = t.modPow(BigInteger.valueOf(3), p).multiply(h2).mod(p);
@@ -1005,13 +1006,29 @@ public class PACEProtocol {
    * @throws GeneralSecurityException on security error, or when keys are not EC
    */
   public static PublicKey updateParameterSpec(PublicKey publicKey, PrivateKey privateKey) throws GeneralSecurityException {
-    if (!(publicKey instanceof ECPublicKey) || !(privateKey instanceof ECPrivateKey)) {
-      throw new NoSuchAlgorithmException("Unsupported key type");
-    }
+    String publicKeyAlgorithm = publicKey.getAlgorithm();
+    String privateKeyAlgorithm = privateKey.getAlgorithm();
 
-    KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
-    KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
-    return keyFactory.generatePublic(keySpec);
+    if ("EC".equals(publicKeyAlgorithm) || "ECDH".equals(publicKeyAlgorithm)) {
+      if (!("EC".equals(privateKeyAlgorithm) || "ECDH".equals(privateKeyAlgorithm))) {
+        throw new NoSuchAlgorithmException("Unsupported key type public: " + publicKeyAlgorithm + ", private: " + privateKeyAlgorithm);
+      }
+      KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
+      KeySpec keySpec = new ECPublicKeySpec(((ECPublicKey)publicKey).getW(), ((ECPrivateKey)privateKey).getParams());
+      return keyFactory.generatePublic(keySpec);
+    } else if ("DH".equals(publicKeyAlgorithm)) {
+      if (!("DH".equals(privateKeyAlgorithm))) {
+        throw new NoSuchAlgorithmException("Unsupported key type public: " + publicKeyAlgorithm + ", private: " + privateKeyAlgorithm);
+      }
+      KeyFactory keyFactory = KeyFactory.getInstance("DH");
+      DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+      DHPrivateKey dhPrivateKey = (DHPrivateKey)privateKey;
+      DHParameterSpec privateKeyParams = dhPrivateKey.getParams();
+      KeySpec keySpec = new DHPublicKeySpec(dhPublicKey.getY(), privateKeyParams.getP(), privateKeyParams.getG());
+      return keyFactory.generatePublic(keySpec);
+    } else {
+      throw new NoSuchAlgorithmException("Unsupported key type public: " + publicKeyAlgorithm + ", private: " + privateKeyAlgorithm);
+    }
   }
 
   /**
@@ -1230,27 +1247,12 @@ public class PACEProtocol {
         ECParameterSpec ecParams = (ECParameterSpec)params;
         return Util.getPublicKey("EC", new ECPublicKeySpec(w, ecParams));
       } else if (params instanceof DHParameterSpec) {
-        DataInputStream dataIn = new DataInputStream(new ByteArrayInputStream(encodedPublicKey));
-        try {
-          int b = dataIn.read();
-          if (b != 0x04) {
-            throw new IllegalArgumentException("Expected encoded public key to start with 0x04");
-          }
-          int length = encodedPublicKey.length - 1;
-          byte[] publicValue = new byte[length];
-          dataIn.readFully(publicValue);
-          BigInteger y = Util.os2i(publicValue);
-          DHParameterSpec dhParams = (DHParameterSpec)params;
-          return Util.getPublicKey("DH",new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
-        } finally {
-          dataIn.close();
-        }
+        BigInteger y = Util.os2i(encodedPublicKey);
+        DHParameterSpec dhParams = (DHParameterSpec)params;
+        return Util.getPublicKey("DH", new DHPublicKeySpec(y, dhParams.getP(), dhParams.getG()));
       }
 
       throw new IllegalArgumentException("Expected ECParameterSpec or DHParameterSpec, found " + params.getClass().getCanonicalName());
-    } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Exception", ioe);
-      throw new IllegalArgumentException(ioe);
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.WARNING, "Exception", gse);
       throw new IllegalArgumentException(gse);

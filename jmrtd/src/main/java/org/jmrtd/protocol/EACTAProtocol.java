@@ -347,7 +347,7 @@ public class EACTAProtocol {
   private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
     if ("DH".equals(agreementAlg)) {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
-      return pcdDHPublicKey.getY().toByteArray();
+      return Util.i2os(pcdDHPublicKey.getY());
     } else if ("ECDH".equals(agreementAlg)) {
       /* NOTE: Why are we not relying on JCE here, but on Bouncy instead? */
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;

@@ -1032,7 +1032,7 @@ public final class Util {
     BigInteger x = point.getAffineX();
     BigInteger y = point.getAffineY();
     try {
-      bOut.write(0x04);
+      bOut.write(0x04); // FIXME: Constant for 0x04.
       bOut.write(i2os(x));
       bOut.write(i2os(y));
       bOut.close();
@@ -1571,5 +1571,27 @@ public final class Util {
     }
 
     return segments;
+  }
+
+  /**
+   * Strips any leading zeroes from a byte-array and
+   * returns the resulting byte-array.
+   *
+   * @param bytes the input byte-array (which is not modified in the process)
+   *
+   * @return a copy of the input byte-array, without the leading zeroes
+   */
+  public static byte[] stripLeadingZeroes(byte[] bytes) {
+    if (bytes == null || bytes.length == 0) {
+      return bytes;
+    }
+
+    while (bytes.length > 0 && bytes[0] == 0x00) {
+      byte[] result = new byte[bytes.length - 1];
+      System.arraycopy(bytes, 1, result, 0, result.length);
+      bytes = result;
+    }
+
+    return bytes;
   }
 }

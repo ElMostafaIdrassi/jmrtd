@@ -252,7 +252,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets the tags of fields actually present in this file.
+   * Returns the tags of fields actually present in this file.
    *
    * @return a list of tags
    */
@@ -368,7 +368,7 @@ public class DG12File extends DataGroup {
   /* Accessors below. */
 
   /**
-   * Gets the issuing authority.
+   * Returns the issuing authority.
    *
    * @return the issuingAuthority
    */
@@ -377,7 +377,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets the date of issuance.
+   * Returns the date of issuance.
    *
    * @return the dateOfIssue
    */
@@ -386,7 +386,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets name of other person.
+   * Returns name of other person.
    *
    * @return the nameOfOtherPerson
    */
@@ -395,7 +395,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets endorsements and observations.
+   * Returns endorsements and observations.
    *
    * @return the endorsementsAndObservations
    */
@@ -404,7 +404,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets tax or exit requirements.
+   * Returns tax or exit requirements.
    *
    * @return the taxOrExitRequirements
    */
@@ -413,7 +413,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets image of front.
+   * Returns image of front.
    *
    * @return the imageOfFront
    */
@@ -422,7 +422,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets image of rear.
+   * Returns image of rear.
    *
    * @return the imageOfRear
    */
@@ -431,7 +431,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets date and time of personalization.
+   * Returns the date and time of personalization.
    *
    * @return the dateAndTimeOfPersonalization
    */
@@ -440,7 +440,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets the personalization system serial number.
+   * Returns the personalization system serial number.
    *
    * @return the personalizationSystemSerialNumber
    */
@@ -454,7 +454,7 @@ public class DG12File extends DataGroup {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */

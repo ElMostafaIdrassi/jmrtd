@@ -55,7 +55,7 @@ public class AAAPDUSender implements APDULevelAACapable {
 
   /**
    * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
-   * This is part of AA (but EAC-CA uses a similar command).
+   * This is part of AA.
    *
    * @param wrapper secure messaging wrapper
    * @param rndIFD the challenge to send

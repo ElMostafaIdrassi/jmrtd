@@ -34,6 +34,7 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +50,7 @@ import org.jmrtd.lds.SecurityInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVUtil;
+import net.sf.scuba.util.Hex;
 
 /**
  * The EAC Chip Authentication protocol (version 1).
@@ -171,7 +173,6 @@ public class EACCAProtocol {
   public static void sendPublicKey(APDULevelEACCACapable service, SecureMessagingWrapper wrapper, String oid, BigInteger keyId, PublicKey pcdPublicKey) throws CardServiceException {
     String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
     String cipherAlg = ChipAuthenticationInfo.toCipherAlgorithm(oid);
-
     byte[] keyData = getKeyData(agreementAlg, pcdPublicKey);
 
     if (cipherAlg.startsWith("DESede")) {
@@ -295,7 +296,7 @@ public class EACCAProtocol {
   private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
     if ("DH".equals(agreementAlg)) {
       DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
-      return pcdDHPublicKey.getY().toByteArray();
+      return Util.i2os(pcdDHPublicKey.getY());
     } else if ("ECDH".equals(agreementAlg)) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
       return pcdECPublicKey.getQ().getEncoded(false);

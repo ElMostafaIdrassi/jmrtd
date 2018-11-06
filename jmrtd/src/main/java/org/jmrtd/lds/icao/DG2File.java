@@ -116,7 +116,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */
@@ -126,7 +126,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
   }
 
   /**
-   * Gets the face infos embedded in this file.
+   * Returns the face infos embedded in this file.
    *
    * @return face infos
    */

@@ -204,7 +204,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets list of tags of fields actually present.
+   * Returns the list of tags of fields actually present.
    *
    * @return list of tags
    */
@@ -256,7 +256,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the full name of the holder (primary and secondary identifiers).
+   * Returns the full name of the holder (primary and secondary identifiers).
    *
    * @return the name of holder
    */
@@ -265,7 +265,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the other names.
+   * Returns the other names.
    *
    * @return the other names, or empty list when not present
    */
@@ -274,7 +274,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the personal number.
+   * Returns the personal number.
    *
    * @return the personal number
    */
@@ -283,7 +283,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the full date of birth.
+   * Returns the full date of birth.
    *
    * @return the full date of birth
    */
@@ -292,7 +292,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the place of birth.
+   * Returns the place of birth.
    *
    * @return the place of birth
    */
@@ -301,7 +301,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the permanent address.
+   * Returns the permanent address.
    *
    * @return the permanent address
    */
@@ -310,7 +310,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the telephone number.
+   * Returns the telephone number.
    *
    * @return the telephone
    */
@@ -319,7 +319,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the profession.
+   * Returns the holder's profession.
    *
    * @return the profession
    */
@@ -328,7 +328,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the title.
+   * Returns the holder's title.
    *
    * @return the title
    */
@@ -337,7 +337,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the personal summary.
+   * Returns the personal summary.
    *
    * @return the personal summary
    */
@@ -346,7 +346,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the proof of citizenship.
+   * Returns the proof of citizenship.
    *
    * @return the proof of citizenship
    */
@@ -355,7 +355,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets the other valid travel document numbers.
+   * Returns the other valid travel document numbers.
    *
    * @return the other valid travel document numbers
    */
@@ -373,7 +373,7 @@ public class DG11File extends DataGroup {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */

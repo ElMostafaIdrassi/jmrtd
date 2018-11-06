@@ -45,6 +45,7 @@ public interface BiometricDataBlockDecoder<B extends BiometricDataBlock> {
    * @param sbh the standard biometric header that preceded this BDB
    * @param index the index of this BDB
    * @param length the length of this BDB
+   *
    * @return a biometric data block
    *
    * @throws IOException if reading failed

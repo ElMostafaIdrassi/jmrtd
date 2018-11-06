@@ -37,18 +37,6 @@ import net.sf.scuba.smartcards.CardServiceException;
 public interface APDULevelEACCACapable {
 
   /**
-   * Sends an {@code INTERNAL AUTHENTICATE} command to the passport.
-   *
-   * @param wrapper secure messaging wrapper
-   * @param rndIFD the challenge to send
-   *
-   * @return the response from the passport (status word removed)
-   *
-   * @throws CardServiceException on tranceive error
-   */
-  byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException;
-
-  /**
    * The MSE KAT APDU, see EAC 1.11 spec, Section B.1.
    *
    * @param wrapper secure messaging wrapper

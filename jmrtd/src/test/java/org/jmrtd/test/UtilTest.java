@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import org.jmrtd.Util;
 
 import junit.framework.TestCase;
+import net.sf.scuba.util.Hex;
 
 /**
  * Tests some of the utility functions.
@@ -84,13 +85,13 @@ public class UtilTest extends TestCase {
       }
     }
   }
-  
+
   public void testPartition(int dataSize, int segmentSize) {
     Random random = new Random();  
     byte[] data = new byte[dataSize];
     random.nextBytes(data);
     List<byte[]> segments = Util.partition(segmentSize, data);
-    
+
     /* This should be approximately true. */
     assertTrue(segmentSize * (segments.size() - 1) <= dataSize);
     assertTrue(segmentSize * segments.size() >= dataSize);
@@ -105,6 +106,13 @@ public class UtilTest extends TestCase {
       assertFalse(isLasts.get(i));
     }
     assertTrue(isLasts.get(segments.size() - 1));
+  }
+
+  public void testStripLeadingZeroes() {
+    byte[] example = { 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04 };
+    byte[] stripped = Util.stripLeadingZeroes(example);
+    assertTrue(stripped[0] != 0x00);
+    assertTrue(Arrays.equals(new byte[] { 0x01, 0x02, 0x03, 0x04 }, stripped));
   }
 
   private static boolean isPrefixOf(byte[] bytes, byte[] paddedBytes) {
