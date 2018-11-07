@@ -482,8 +482,8 @@ public final class Util {
    * Converts an integer to an octet string.
    * Based on BSI TR 03111 Section 3.1.2.
    *
-   * @param val positive integer
-   * @param length length
+   * @param val a non-negative integer
+   * @param length the desired length of the octet string
    *
    * @return octet string
    */
@@ -499,15 +499,13 @@ public final class Util {
   }
 
   /**
-   * Converts an integer to an octet string.
+   * Converts a non-negative integer to an octet string.
    *
-   * @param val positive integer
-   * @return octet string
+   * @param val non-negative integer
+   *
+   * @return the octet string
    */
   public static byte[] i2os(BigInteger val) {
-    /* FIXME: Quick hack. What if val < 0? -- MO */
-    /* Do something with: int sizeInBytes = val.bitLength() / Byte.SIZE; */
-
     int sizeInNibbles = val.toString(16).length();
     if (sizeInNibbles % 2 != 0) {
       sizeInNibbles++;
@@ -522,7 +520,7 @@ public final class Util {
    *
    * @param bytes octet string
    *
-   * @return positive integer
+   * @return a non-negative integer
    */
   public static BigInteger os2i(byte[] bytes) {
     if (bytes == null) {
@@ -535,11 +533,11 @@ public final class Util {
    * Converts an octet string to an integer.
    * Based on BSI TR 03111 Section 3.1.2.
    *
-   * @param bytes octet string
-   * @param offset offset of octet string
-   * @param length length of octet string
+   * @param bytes a byte array containing the octet string
+   * @param offset the offset of the octet string within the given byte array
+   * @param length the length of the octet string
    *
-   * @return positive integer
+   * @return a non-negative integer
    */
   public static BigInteger os2i(byte[] bytes, int offset, int length) {
     if (bytes == null) {
@@ -557,18 +555,17 @@ public final class Util {
   }
 
   /**
-   * Convert an octet string to field element via OS2FE as specified in BSI TR-03111.
+   * Converts an octet string to a field element via OS2FE as specified in BSI TR-03111.
    *
    * @param bytes octet string
-   * @param p modulus
+   * @param p the modulus
    *
-   * @return positive integer
+   * @return a non-negative integer modulo p
    */
   public static BigInteger os2fe(byte[] bytes, BigInteger p) {
     return Util.os2i(bytes).mod(p);
   }
 
-  /* Best effort. Needs testing and improvement. -- MO */
   /**
    * Infers a digest algorithm mnemonic from a signature algorithm mnemonic.
    *
@@ -607,7 +604,6 @@ public final class Util {
     return digestAlgorithm;
   }
 
-  /* Best effort. Needs testing and improvement. -- MO */
   /**
    * Infers a digest algorithm mnemonic from a signature algorithm mnemonic for
    * use in key derivation.
@@ -645,7 +641,7 @@ public final class Util {
    *
    * @param params parameters for Diffie-Hellman as a Bouncy Castle specific object.
    *
-   * @return a JCE Diffie-Hellman parameter spec
+   * @return a JCE Diffie-Hellman parameter specification
    */
   public static DHParameterSpec toExplicitDHParameterSpec(DHParameters params) {
     BigInteger p = params.getP();
@@ -660,7 +656,7 @@ public final class Util {
   }
 
   /**
-   * Return detailed information about the given public key (like RSA or) with some extra
+   * Returns detailed information about the given public key (like RSA or) with some extra
    * information (like 1024 bits).
    *
    * @param publicKey a public key
@@ -726,11 +722,11 @@ public final class Util {
   }
 
   /**
-   * Returns the curve name if known (or {@code null}).
+   * Returns the curve name, if known, or {@code null}.
    *
    * @param params an specification of the curve
    *
-   * @return the name
+   * @return the curve name
    */
   public static String getCurveName(ECParameterSpec params) {
     org.bouncycastle.jce.spec.ECNamedCurveSpec namedECParams = toNamedCurveSpec(params);
@@ -816,7 +812,6 @@ public final class Util {
       }
     }
     if (namedSpecs.isEmpty()) {
-      // throw new IllegalArgumentException("No named curve found");
       return null;
     } else if (namedSpecs.size() == 1) {
       return namedSpecs.get(0);
@@ -895,10 +890,6 @@ public final class Util {
             org.bouncycastle.jce.interfaces.ECPublicKey ecPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)publicKey;
             AlgorithmIdentifier id = new AlgorithmIdentifier(subjectPublicKeyInfo.getAlgorithm().getAlgorithm(), params.toASN1Primitive());
             org.bouncycastle.math.ec.ECPoint q = ecPublicKey.getQ();
-            /* FIXME: investigate the compressed versus uncompressed point issue. What is allowed in TR03110? -- MO */
-            // In case we would like to compress the point:
-            // p = p.getCurve().createPoint(p.getX().toBigInteger(), p.getY().toBigInteger(), true);
-
             subjectPublicKeyInfo = new SubjectPublicKeyInfo(id, q.getEncoded(false));
             return subjectPublicKeyInfo;
           } else {
@@ -1020,7 +1011,7 @@ public final class Util {
   }
 
   /**
-   * Encode (BSI encoding) an EC point (for use as public key value).
+   * Encodes (using BSI encoding) an EC point (for use as public key value).
    * Prefixes a {@code 0x04} (without a length).
    *
    * @param point an EC Point
@@ -1043,7 +1034,7 @@ public final class Util {
   }
 
   /**
-   * Infer an EAC object identifier for an EC or DH public key.
+   * Infers an EAC object identifier for an EC or DH public key.
    *
    * @param publicKey a public key
    *
@@ -1061,7 +1052,7 @@ public final class Util {
   }
 
   /**
-   * EC point addition.
+   * Adds two EC points.
    *
    * @param x an EC point
    * @param y another EC point
@@ -1077,10 +1068,10 @@ public final class Util {
   }
 
   /**
-   * EC point scalar multiplication.
+   * Multiplies a scalar and an EC point.
    *
    * @param s the scalar
-   * @param point an EC point
+   * @param point the EC point
    * @param params the domain parameters
    *
    * @return the resulting EC point
@@ -1106,6 +1097,7 @@ public final class Util {
       /* NOTE: unlikely. */
       LOGGER.log(Level.WARNING, "Exception", use);
     }
+
     return bytes;
   }
 
@@ -1160,6 +1152,7 @@ public final class Util {
    *
    * @param affineX the x coord of a point on the curve
    * @param params EC parameters for curve over Fp
+   *
    * @return the corresponding y coord
    */
   public static BigInteger computeAffineY(BigInteger affineX, ECParameterSpec params) {
@@ -1582,7 +1575,7 @@ public final class Util {
    * @return a copy of the input byte-array, without the leading zeroes
    */
   public static byte[] stripLeadingZeroes(byte[] bytes) {
-    if (bytes == null || bytes.length == 0) {
+    if (bytes == null || bytes.length <= 1) {
       return bytes;
     }
 

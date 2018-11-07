@@ -22,6 +22,7 @@
 
 package org.jmrtd.test;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -113,6 +114,15 @@ public class UtilTest extends TestCase {
     byte[] stripped = Util.stripLeadingZeroes(example);
     assertTrue(stripped[0] != 0x00);
     assertTrue(Arrays.equals(new byte[] { 0x01, 0x02, 0x03, 0x04 }, stripped));
+  }
+  
+  public void testBigIntegerI2OSStripLeadingZeroes() {
+    for (long i = 0; i < 66666; i++) {
+      BigInteger bigInteger = BigInteger.valueOf(i);
+      byte[] bigIBytes = bigInteger.toByteArray();
+      byte[] os = Util.i2os(bigInteger);
+      assertTrue(i  + ": " +  Hex.bytesToHexString(bigIBytes) + ", " + Hex.bytesToHexString(os), Arrays.equals(os, Util.stripLeadingZeroes(bigIBytes)));
+    }
   }
 
   private static boolean isPrefixOf(byte[] bytes, byte[] paddedBytes) {
