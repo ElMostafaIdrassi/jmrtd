@@ -87,7 +87,6 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
 
     CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_MSE, 0x41, 0xA6, data);
     byte[] commandAPDUBytes = commandAPDU.getBytes();
-    LOGGER.info("DEBUG: MSEKAT Command APDU (" + commandAPDUBytes.length + "): " + Hex.bytesToHexString(commandAPDUBytes));
     ResponseAPDU responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
     short sw = (short)responseAPDU.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
