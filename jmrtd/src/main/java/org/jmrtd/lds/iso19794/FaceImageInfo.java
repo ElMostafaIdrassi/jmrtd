@@ -634,25 +634,30 @@ public class FaceImageInfo extends AbstractImageInfo {
   @Override
   public String toString() {
     StringBuilder out = new StringBuilder();
-
-    out.append("Image size: ").append(getWidth()).append(" x ").append(getHeight()).append("\n");
-    out.append("Gender: ").append(gender == null ? Gender.UNSPECIFIED : gender).append("\n");
-    out.append("Eye color: ").append(eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor).append("\n");
-    out.append("Hair color: ").append(hairColorToString()).append("\n");
-    out.append("Feature mask: ").append(featureMaskToString()).append("\n");
-    out.append("Expression: ").append(expressionToString()).append("\n");
-    out.append("Pose angle: ").append(poseAngleToString()).append("\n");
-    out.append("Face image type: ").append(faceImageTypeToString()).append("\n");
-    out.append("Source type: ").append(sourceTypeToString()).append("\n");
-    out.append("Feature points: ").append("\n");
-    if (featurePoints == null || featurePoints.length == 0) {
-      out.append("   (none)\n");
-    } else {
+    out.append("FaceImageInfo [");
+    out.append("Image size: ").append(getWidth()).append(" x ").append(getHeight()).append(", ");
+    out.append("Gender: ").append(gender == null ? Gender.UNSPECIFIED : gender).append(", ");
+    out.append("Eye color: ").append(eyeColor == null ? EyeColor.UNSPECIFIED : eyeColor).append(", ");
+    out.append("Hair color: ").append(hairColorToString()).append(", ");
+    out.append("Feature mask: ").append(featureMaskToString()).append(", ");
+    out.append("Expression: ").append(expressionToString()).append(", ");
+    out.append("Pose angle: ").append(poseAngleToString()).append(", ");
+    out.append("Face image type: ").append(faceImageTypeToString()).append(", ");
+    out.append("Source type: ").append(sourceTypeToString()).append(", ");
+    out.append("FeaturePoints [");
+    if (featurePoints != null && featurePoints.length > 0) {
+      boolean isFirstFeaturePoint = true;
       for (FeaturePoint featurePoint: featurePoints) {
-        out.append("   ").append(featurePoint.toString()).append("\n");
+        if (isFirstFeaturePoint) {
+          isFirstFeaturePoint = false;
+        } else {
+          out.append(", ");
+        }
+        out.append(featurePoint.toString());
       }
     }
-
+    out.append("]"); /* FeaturePoints. */
+    out.append("]"); /* FaceImageInfo. */
     return out.toString();
   }
 

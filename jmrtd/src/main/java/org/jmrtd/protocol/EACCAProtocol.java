@@ -34,7 +34,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +49,6 @@ import org.jmrtd.lds.SecurityInfo;
 
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.tlv.TLVUtil;
-import net.sf.scuba.util.Hex;
 
 /**
  * The EAC Chip Authentication protocol (version 1).

@@ -23,6 +23,7 @@
 package org.jmrtd.cbeff;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -64,7 +65,19 @@ public class StandardBiometricHeader implements Serializable {
 
   @Override
   public String toString() {
-    return "StandardBiometricHeader " + toString(elements);
+    StringBuilder result = new StringBuilder();
+    result.append("StandardBiometricHeader [");
+    boolean isFirst = true;
+    for (Map.Entry<Integer, byte[]> entry: elements.entrySet()) {
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        result.append(", ");
+      }
+      result.append(Integer.toHexString(entry.getKey())).append(" -> ").append(Hex.bytesToHexString(entry.getValue()));
+    }
+    result.append("]");
+    return result.toString();
   }
 
   @Override
@@ -87,7 +100,7 @@ public class StandardBiometricHeader implements Serializable {
       return false;
     }
 
-    StandardBiometricHeader other = (StandardBiometricHeader) obj;
+    StandardBiometricHeader other = (StandardBiometricHeader)obj;
     return equals(elements, other.elements);
   }
 
@@ -107,29 +120,23 @@ public class StandardBiometricHeader implements Serializable {
       return false;
     }
 
-    return elements1 == elements2 || elements1.entrySet().equals(elements2.entrySet());
-  }
-
-  /**
-   * Returns a textual representation of the given map.
-   *
-   * @param elements a map with elements
-   *
-   * @return a textual representation of th emap
-   */
-  private static String toString(SortedMap<Integer, byte[]> elements) {
-    StringBuilder result = new StringBuilder();
-    result.append("[");
-    boolean isFirst = true;
-    for (Map.Entry<Integer, byte[]> entry: elements.entrySet()) {
-      if (isFirst) {
-        isFirst = false;
-      } else {
-        result.append(", ");
-      }
-      result.append(Integer.toHexString(entry.getKey())).append(" -> ").append(Hex.bytesToHexString(entry.getValue()));
+    if (elements1 == elements2) {
+      return true;
     }
-    result.append("]");
-    return result.toString();
+
+    if (!elements1.keySet().equals(elements2.keySet())) {
+      return false;
+    }
+
+    for (Map.Entry<Integer, byte[]> entry: elements1.entrySet()) {
+      int key = entry.getKey();
+      byte[] bytes = entry.getValue();
+      byte[] otherBytes = elements2.get(key);
+      if (!Arrays.equals(bytes, otherBytes)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

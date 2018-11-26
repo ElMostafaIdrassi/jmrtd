@@ -191,6 +191,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
           return false;
         }
       }
+
       return true;
     } catch (ClassCastException cce) {
       LOGGER.log(Level.WARNING, "Wrong class", cce);

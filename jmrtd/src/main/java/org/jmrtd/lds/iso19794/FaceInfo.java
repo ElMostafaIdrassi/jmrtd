@@ -177,8 +177,8 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
     DataOutputStream dataOut = outputStream instanceof DataOutputStream ? (DataOutputStream)outputStream : new DataOutputStream(outputStream);
 
-    dataOut.writeInt(FORMAT_IDENTIFIER);													/* 4 */
-    dataOut.writeInt(VERSION_NUMBER);														/* + 4 = 8 */
+    dataOut.writeInt(FORMAT_IDENTIFIER);											    /* 4 */
+    dataOut.writeInt(VERSION_NUMBER);														  /* + 4 = 8 */
 
     /*
      * The (4 byte) Length of Record field shall
@@ -186,9 +186,10 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
      * This is the entire length of the record including
      * the Facial Record Header and Facial Record Data.
      */
-    dataOut.writeInt((int)(recordLength & 0x00000000FFFFFFFFL));							/* + 4 = 12 */
+    dataOut.writeInt((int)(recordLength & 0x00000000FFFFFFFFL));	/* + 4 = 12 */
 
-    dataOut.writeShort(faceImageInfos.size()); /* Number of facial record data blocks. */	/* + 2 = 14 */
+    /* Number of facial record data blocks. */
+    dataOut.writeShort(faceImageInfos.size());                   	/* + 2 = 14 */
 
     for (FaceImageInfo faceImageInfo: faceImageInfos) {
       faceImageInfo.writeObject(dataOut);
@@ -242,5 +243,45 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
    */
   public void removeFaceImageInfo(int index) {
     remove(index);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append("FaceInfo [");
+    List<FaceImageInfo> records = getSubRecords();
+    for (FaceImageInfo record: records) {
+      result.append(record.toString());
+    }
+    result.append("]");
+    return result.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((sbh == null) ? 0 : sbh.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    FaceInfo other = (FaceInfo)obj;
+    if (sbh == null) {
+      return other.sbh == null;
+    }
+
+    return sbh == other.sbh || sbh.equals(other.sbh);
   }
 }

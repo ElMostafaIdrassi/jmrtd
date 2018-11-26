@@ -38,7 +38,6 @@ import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.smartcards.ResponseAPDU;
 import net.sf.scuba.tlv.TLVUtil;
-import net.sf.scuba.util.Hex;
 
 /**
  * A low-level APDU sender to support the EAC-CA protocol (version 1).

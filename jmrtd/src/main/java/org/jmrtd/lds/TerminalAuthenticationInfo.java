@@ -124,6 +124,13 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     return version;
   }
 
+  /**
+   * Returns a DER object with this SecurityInfo data (DER sequence).
+   *
+   * @return a DER object with this SecurityInfo data
+   *
+   * @deprecated this method will be removed from visible interface (because of dependency on BC API)
+   */
   @Override
   @Deprecated
   public ASN1Primitive getDERObject() {

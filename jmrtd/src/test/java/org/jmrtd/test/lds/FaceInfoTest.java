@@ -138,9 +138,17 @@ public class FaceInfoTest extends TestCase {
   }
 
   public void testEncoded() {
-    FaceInfo faceInfo = createTestObject();
-    byte[] encoded = faceInfo.getEncoded();
-    //		LOGGER.info(Hex.bytesToPrettyString(encoded));
+    try {
+      FaceInfo faceInfo = createTestObject();
+      byte[] encoded = faceInfo.getEncoded();
+      FaceInfo faceInfo2 = new FaceInfo(faceInfo.getStandardBiometricHeader(), new ByteArrayInputStream(encoded));
+      LOGGER.info("DEBUG: faceInfo = " + faceInfo);
+      assertEquals(faceInfo, faceInfo2);
+      assertEquals(faceInfo.toString(), faceInfo2.toString());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
   }
 
   public static FaceInfo createTestObject() {

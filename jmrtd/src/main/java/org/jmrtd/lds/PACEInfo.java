@@ -285,6 +285,13 @@ public class PACEInfo extends SecurityInfo {
     return parameterId;
   }
 
+  /**
+   * Returns a DER object with this SecurityInfo data (DER sequence).
+   *
+   * @return a DER object with this SecurityInfo data
+   *
+   * @deprecated this method will be removed from visible interface (because of dependency on BC API)
+   */
   @Deprecated
   @Override
   public ASN1Primitive getDERObject() {
