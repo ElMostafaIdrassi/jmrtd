@@ -104,6 +104,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
 
     // In case the data ended right on the block boundary
     if (le == 0) {
+      LOGGER.info("DEBUG: ===> HIER null");
       return null;
     }
 
@@ -154,6 +155,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
     } else {
       checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
     }
+
     return responseData;
   }
 

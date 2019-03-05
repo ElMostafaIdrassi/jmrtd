@@ -309,7 +309,7 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
         throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
         /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
       }
-      return unwrapResponseAPDU(responseAPDU, ssc);
+      return unwrapResponseAPDU(responseAPDU);
     } catch (GeneralSecurityException gse) {
       throw new IllegalStateException("Unexpected exception", gse);
     } catch (IOException ioe) {
@@ -322,14 +322,13 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
    * Based on Section E.3 of TR-PKI, especially the examples.
    *
    * @param responseAPDU the response APDU
-   * @param ssc the send sequence counter which, it is assumed, has already been incremented by the caller
    *
    * @return a byte array containing the unwrapped APDU buffer
    *
    * @throws GeneralSecurityException on error unwrapping the APDU
    * @throws IOException on error writing the result to memory
    */
-  private ResponseAPDU unwrapResponseAPDU(ResponseAPDU responseAPDU, long ssc) throws GeneralSecurityException, IOException {
+  private ResponseAPDU unwrapResponseAPDU(ResponseAPDU responseAPDU) throws GeneralSecurityException, IOException {
     byte[] rapdu = responseAPDU.getBytes();
     if (rapdu == null || rapdu.length < 2) {
       throw new IllegalArgumentException("Invalid response APDU");
@@ -345,19 +344,19 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
       while (!isFinished) {
         int tag = inputStream.readByte();
         switch (tag) {
-          case (byte) 0x87:
+          case (byte)0x87:
             data = readDO87(inputStream, false);
-          break;
-          case (byte) 0x85:
+            break;
+          case (byte)0x85:
             data = readDO87(inputStream, true);
-          break;
-          case (byte) 0x99:
+            break;
+          case (byte)0x99:
             sw = readDO99(inputStream);
-          break;
-          case (byte) 0x8E:
+            break;
+          case (byte)0x8E:
             cc = readDO8E(inputStream);
-          isFinished = true;
-          break;
+            isFinished = true;
+            break;
           default:
             LOGGER.warning("Unexpected tag " + Integer.toHexString(tag));
             break;
@@ -417,7 +416,6 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
     }
   }
 
-
   /**
    * Returns the length (in bytes) to use for padding.
    *
@@ -450,7 +448,8 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
    * @return a byte array with the encoded expected length
    */
   private byte[] encodeLe(int le) {
-    if (0 <= le && le < 256) {
+    if (0 <= le && le <= 256) {
+      /* NOTE: Both 0x00 and 0x100 are mapped to 0x00. */
       return new byte[] { (byte)le };
     } else {
       return new byte[] { (byte)((le & 0xFF00) >> 8), (byte)(le & 0xFF) };

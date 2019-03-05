@@ -77,17 +77,6 @@ public class AAAPDUSender implements APDULevelAACapable {
 
     CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 256);
 
-    /* Make a copy of the wrapper's state. */
-    APDUWrapper copyOfWrapper = wrapper;
-    try {
-      if (wrapper instanceof SecureMessagingWrapper) {
-        copyOfWrapper = SecureMessagingWrapper.getInstance((SecureMessagingWrapper)wrapper);
-      }
-    } catch (Exception e) {
-      /* Never happens. */
-      LOGGER.log(Level.WARNING, "Exception copying wrapper", e);
-    }
-
     ResponseAPDU rapdu = null;
     short sw = -1;
     try {
@@ -98,18 +87,35 @@ public class AAAPDUSender implements APDULevelAACapable {
       sw = (short)cse.getSW();
     }
 
-
     if (sw == ISO7816.SW_NO_ERROR && rapdu != null) {
       return rapdu.getData();
     } else if ((sw & 0xFF00) == 0x6100) {
+      byte[] normalLengthResponse = rapdu == null ? null : rapdu.getData();
+
       /* Something is wrong with that length. Try different length. */
       capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 65536);
       rapdu = secureMessagingSender.transmit(wrapper, capdu);
-      return rapdu.getData();
-    } else if ((sw & 0xFF00) == 0x6700) {
-      /* Something is wrong with that length. Try different length and original wrapper. */
-      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 65536);
-      rapdu = secureMessagingSender.transmit(copyOfWrapper, capdu);
+      byte[] extendedLengthResponse = rapdu == null ? null : rapdu.getData();
+
+      if (normalLengthResponse == null && extendedLengthResponse == null) {
+        throw new CardServiceException("Internal Authenticate failed", sw);
+      }
+      if (normalLengthResponse != null && extendedLengthResponse == null) {
+        return normalLengthResponse;
+      }
+      if (normalLengthResponse == null && extendedLengthResponse != null) {
+        return extendedLengthResponse;
+      }
+
+      /* Both are non-null. Send the one with the most data. */
+      if (normalLengthResponse.length > extendedLengthResponse.length) {
+        return normalLengthResponse;
+      } else {
+        return extendedLengthResponse;
+      }
+    } else if (rapdu != null && rapdu.getData() != null) {
+      /* If we got some data, return it, independent of what the status is. */
+      LOGGER.warning("Internal Authenticate may not have succeeded, got status word " + Integer.toHexString(sw & 0xFFFF));
       return rapdu.getData();
     }
 
