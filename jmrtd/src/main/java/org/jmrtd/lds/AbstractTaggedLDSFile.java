@@ -75,7 +75,7 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
   }
 
   /**
-   * Reads the contents of this data group, including tag and length from an input stream.
+   * Reads the contents of this LDS file, including tag and length from an input stream.
    *
    * @param inputStream the stream to read from
    *
@@ -89,7 +89,8 @@ public abstract class AbstractTaggedLDSFile extends AbstractLDSFile {
       throw new IllegalArgumentException("Was expecting tag " + Integer.toHexString(tag) + ", found " + Integer.toHexString(inputTag));
     }
     length = tlvIn.readLength();
-    readContent(new SplittableInputStream(inputStream, length));
+    readContent(tlvIn);
+//    readContent(new SplittableInputStream(inputStream, length)); // was using this in <= 0.7.9 -- MO
   }
 
   @Override

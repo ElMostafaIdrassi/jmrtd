@@ -190,6 +190,96 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
   }
 
   /**
+   * Unwraps the APDU buffer of a response APDU.
+   *
+   * @param responseAPDU the response APDU
+   *
+   * @return a new byte array containing the unwrapped buffer
+   */
+  public ResponseAPDU unwrap(ResponseAPDU responseAPDU) {
+    ssc++;
+    try {
+      byte[] data = responseAPDU.getData();
+      if (data == null || data.length <= 0) {
+        // no sense in unwrapping - card indicates some kind of error
+        throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
+        /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
+      }
+      return unwrapResponseAPDU(responseAPDU);
+    } catch (GeneralSecurityException gse) {
+      throw new IllegalStateException("Unexpected exception", gse);
+    } catch (IOException ioe) {
+      throw new IllegalStateException("Unexpected exception", ioe);
+    }
+  }
+
+  /**
+   * Checks the MAC.
+   *
+   * @param rapdu the bytes of the response APDU, including the {@code 0x8E} tag, the length of the MAC, the MAC itself, and the status word
+   * @param cc the MAC sent by the other party
+   *
+   * @return whether the computed MAC is identical
+   *
+   * @throws GeneralSecurityException on security related error
+   */
+  protected boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
+    try {
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+      dataOutputStream.write(getEncodedSendSequenceCounter());
+      byte[] paddedData = Util.pad(rapdu, 0, rapdu.length - 2 - 8 - 2, getPadLength());
+      dataOutputStream.write(paddedData, 0, paddedData.length);
+      dataOutputStream.flush();
+      dataOutputStream.close();
+      mac.init(ksMac);
+      byte[] cc2 = mac.doFinal(byteArrayOutputStream.toByteArray());
+
+      if (cc2.length > 8 && cc.length == 8) {
+        byte[] newCC2 = new byte[8];
+        System.arraycopy(cc2, 0, newCC2, 0, newCC2.length);
+        cc2 = newCC2;
+      }
+
+      return Arrays.equals(cc, cc2);
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception checking MAC", ioe);
+      return false;
+    }
+  }
+
+  /**
+   * Returns the length (in bytes) to use for padding.
+   *
+   * @return the length to use for padding
+   */
+  protected abstract int getPadLength();
+
+  /**
+   * Returns the initialization vector to be used by the encryption cipher.
+   *
+   * @return the initialization vector as a paramaters specification
+   *
+   * @throws GeneralSecurityException on error constructing the parameter specification object
+   */
+  protected abstract IvParameterSpec getIV() throws GeneralSecurityException;
+
+  /**
+   * Returns the send sequence counter encoded as a byte array for inclusion in wrapped APDUs.
+   *
+   * @return the send sequence counter encoded as byte array
+   */
+  protected abstract byte[] getEncodedSendSequenceCounter();
+
+  /* PRIVATE BELOW. */
+
+  /*
+   * The SM Data Objects (see [ISO/IEC 7816-4]) MUST be used in the following order:
+   *   - Command APDU: [DO‘85’ or DO‘87’] [DO‘97’] DO‘8E’.
+   *   - Response APDU: [DO‘85’ or DO‘87’] [DO‘99’] DO‘8E’.
+   */
+
+  /**
    * Performs the actual encoding of a command APDU.
    * Based on Section E.3 of ICAO-TR-PKI, especially the examples.
    *
@@ -281,39 +371,15 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
     byte[] data = byteArrayOutputStream.toByteArray();
 
     /*
-     * If the requested response length is explicitly set to 256 or 65536, use that.
-     * If not, get the configured maximum length.
+     * The requested response is 0x00 or 0x0000, depending on whether extended length is needed.
      */
-    if (le == 256) {
+    if (le <= 256 && data.length <= 255) {
       return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 256);
-    } else if (le == 65536) {
+    } else if (le > 256 || data.length > 255) {
       return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, 65536);
     } else {
+      /* Not sure if this case ever occurs, but this is consistent with previous behavior. */
       return new CommandAPDU(maskedHeader[0], maskedHeader[1], maskedHeader[2], maskedHeader[3], data, getMaxTranceiveLength());
-    }
-  }
-
-  /**
-   * Unwraps the APDU buffer of a response APDU.
-   *
-   * @param responseAPDU the response APDU
-   *
-   * @return a new byte array containing the unwrapped buffer
-   */
-  public ResponseAPDU unwrap(ResponseAPDU responseAPDU) {
-    ssc++;
-    try {
-      byte[] data = responseAPDU.getData();
-      if (data == null || data.length <= 0) {
-        // no sense in unwrapping - card indicates some kind of error
-        throw new IllegalStateException("Card indicates SM error, SW = " + Integer.toHexString(responseAPDU.getSW() & 0xFFFF));
-        /* FIXME: wouldn't it be cleaner to throw a CardServiceException? */
-      }
-      return unwrapResponseAPDU(responseAPDU);
-    } catch (GeneralSecurityException gse) {
-      throw new IllegalStateException("Unexpected exception", gse);
-    } catch (IOException ioe) {
-      throw new IllegalStateException("Unexpected exception", ioe);
     }
   }
 
@@ -374,70 +440,6 @@ public abstract class SecureMessagingWrapper implements Serializable, APDUWrappe
     bOut.write(sw & 0x00FF);
     return new ResponseAPDU(bOut.toByteArray());
   }
-
-  /*
-   * The SM Data Objects (see [ISO/IEC 7816-4]) MUST be used in the following order:
-   *   - Command APDU: [DO‘85’ or DO‘87’] [DO‘97’] DO‘8E’.
-   *   - Response APDU: [DO‘85’ or DO‘87’] [DO‘99’] DO‘8E’.
-   */
-
-  /**
-   * Checks the MAC.
-   *
-   * @param rapdu the bytes of the response APDU, including the {@code 0x8E} tag, the length of the MAC, the MAC itself, and the status word
-   * @param cc the MAC sent by the other party
-   *
-   * @return whether the computed MAC is identical
-   *
-   * @throws GeneralSecurityException on security related error
-   */
-  protected boolean checkMac(byte[] rapdu, byte[] cc) throws GeneralSecurityException {
-    try {
-      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-      dataOutputStream.write(getEncodedSendSequenceCounter());
-      byte[] paddedData = Util.pad(rapdu, 0, rapdu.length - 2 - 8 - 2, getPadLength());
-      dataOutputStream.write(paddedData, 0, paddedData.length);
-      dataOutputStream.flush();
-      dataOutputStream.close();
-      mac.init(ksMac);
-      byte[] cc2 = mac.doFinal(byteArrayOutputStream.toByteArray());
-
-      if (cc2.length > 8 && cc.length == 8) {
-        byte[] newCC2 = new byte[8];
-        System.arraycopy(cc2, 0, newCC2, 0, newCC2.length);
-        cc2 = newCC2;
-      }
-
-      return Arrays.equals(cc, cc2);
-    } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Exception checking MAC", ioe);
-      return false;
-    }
-  }
-
-  /**
-   * Returns the length (in bytes) to use for padding.
-   *
-   * @return the length to use for padding
-   */
-  protected abstract int getPadLength();
-
-  /**
-   * Returns the initialization vector to be used by the encryption cipher.
-   *
-   * @return the initialization vector as a paramaters specification
-   *
-   * @throws GeneralSecurityException on error constructing the parameter specification object
-   */
-  protected abstract IvParameterSpec getIV() throws GeneralSecurityException;
-
-  /**
-   * Returns the send sequence counter encoded as a byte array for inclusion in wrapped APDUs.
-   *
-   * @return the send sequence counter encoded as byte array
-   */
-  protected abstract byte[] getEncodedSendSequenceCounter();
 
   /**
    * Encodes the expected length value to a byte array for inclusion in wrapped APDUs.

@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.jmrtd.lds.icao.MRZInfo;
 
@@ -337,7 +338,7 @@ public class MRZInfoTest extends TestCase {
     testEquals(MRZ_SUSANNA_SAMPLE_3LINE_ID1);
     testEquals(MRZ_PETER_STEVENSON_3LINE_ID1);
   }
-
+  
   public void testEquals(String mrz) {
     try {
       MRZInfo mrzInfo = new MRZInfo(mrz);
