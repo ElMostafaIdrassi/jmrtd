@@ -123,7 +123,7 @@ public class DG14File extends DataGroup {
   }
 
   /**
-   * Gets Terminal Authentication infos.
+   * Returns the  Terminal Authentication infos.
    *
    * @return the Terminal Authentication infos.
    *
@@ -163,7 +163,7 @@ public class DG14File extends DataGroup {
   }
 
   /**
-   * Gets the mapping of key identifiers to public keys.
+   * Returns the mapping of key identifiers to public keys.
    * The key identifier may be -1 if there is only one key.
    *
    * @return the mapping of key identifiers to public keys
@@ -201,7 +201,7 @@ public class DG14File extends DataGroup {
   }
 
   /**
-   * Gets the security infos as an unordered collection.
+   * Returns the security infos as an unordered collection.
    *
    * @return security infos
    */

@@ -127,7 +127,7 @@ public class BACKey implements BACKeySpec {
   }
 
   /**
-   * Gets the hash code of this BAC key.
+   * Computes the hash code of this BAC key.
    * Document number, date of birth, and date of expiry (with year in <i>yy</i> precision) are taken into account.
    *
    * @return a hash code

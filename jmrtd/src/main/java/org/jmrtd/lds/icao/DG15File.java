@@ -120,7 +120,7 @@ public class DG15File extends DataGroup {
   }
 
   /**
-   * Gets the public key stored in this file.
+   * Returns the public key stored in this file.
    *
    * @return the public key
    */

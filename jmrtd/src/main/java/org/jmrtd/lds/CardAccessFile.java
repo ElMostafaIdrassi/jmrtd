@@ -126,7 +126,7 @@ public class CardAccessFile implements Serializable {
   }
 
   /**
-   * Gets the signature algorithm object identifier.
+   * Returns the signature algorithm object identifier.
    *
    * @return signature algorithm OID
    */
@@ -167,7 +167,7 @@ public class CardAccessFile implements Serializable {
   }
 
   /**
-   * Gets a hash code of this object.
+   * Returns a hash code of this object.
    *
    * @return the hash code
    */

@@ -150,7 +150,7 @@ public class CVCAuthorizationTemplate {
   }
 
   /**
-   * Gets the role.
+   * Returns the role.
    *
    * @return the role
    */
@@ -159,7 +159,7 @@ public class CVCAuthorizationTemplate {
   }
 
   /**
-   * Gets the access rights.
+   * Returns the access rights.
    *
    * @return the access rights
    */
@@ -168,7 +168,7 @@ public class CVCAuthorizationTemplate {
   }
 
   /**
-   * Gets a textual representation of this authorization template.
+   * Returns a textual representation of this authorization template.
    *
    * @return a textual representation of this authorization template
    */
@@ -201,7 +201,7 @@ public class CVCAuthorizationTemplate {
   }
 
   /**
-   * Gets a hash code of this object.
+   * Returns a hash code of this object.
    *
    * @return the hash code
    */

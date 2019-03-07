@@ -132,7 +132,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */
@@ -142,7 +142,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
   }
 
   /**
-   * Gets the finger infos embedded in this file.
+   * Returns the finger infos embedded in this file.
    *
    * @return finger infos
    */

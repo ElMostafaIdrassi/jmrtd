@@ -114,7 +114,7 @@ public class CVCAFile extends AbstractLDSFile {
   }
 
   /**
-   * Gets the file identifier of this CVCA file.
+   * Returns the file identifier of this CVCA file.
    *
    * @return the file identifier
    */
@@ -194,7 +194,7 @@ public class CVCAFile extends AbstractLDSFile {
   }
 
   /**
-   * Gets a textual representation of this CVCAFile.
+   * Returns a textual representation of this CVCAFile.
    *
    * @return a textual representation of this CVCAFile
    */
@@ -239,7 +239,7 @@ public class CVCAFile extends AbstractLDSFile {
   }
 
   /**
-   * Gets the length of the content of this CVCA file. This always returns {@value #LENGTH}.
+   * Returns the length of the content of this CVCA file. This always returns {@value #LENGTH}.
    *
    * @return {@value #LENGTH}
    */

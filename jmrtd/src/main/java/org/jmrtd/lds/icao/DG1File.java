@@ -78,7 +78,7 @@ public class DG1File extends DataGroup {
   }
 
   /**
-   * Gets the MRZ information stored in this file.
+   * Returns the MRZ information stored in this file.
    *
    * @return the MRZ information
    */
@@ -87,7 +87,7 @@ public class DG1File extends DataGroup {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */

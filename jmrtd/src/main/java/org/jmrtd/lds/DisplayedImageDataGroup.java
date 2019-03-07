@@ -168,7 +168,7 @@ public abstract class DisplayedImageDataGroup extends DataGroup {
   }
 
   /**
-   * Gets the image infos.
+   * Returns the image infos.
    *
    * @return images
    */

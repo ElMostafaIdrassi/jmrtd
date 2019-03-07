@@ -117,7 +117,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier of this AA security info.
+   * Returns the protocol object identifier of this AA security info.
    *
    * @return an object identifier
    */
@@ -136,7 +136,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier as a human readable string.
+   * Returns the protocol object identifier as a human readable string.
    *
    * @return a string representing the protocol object identifier
    */
@@ -146,7 +146,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the signature algorithm object identifier.
+   * Returns the signature algorithm object identifier.
    *
    * @return signature algorithm OID
    */
@@ -155,7 +155,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets a textual representation of this object.
+   * Returns a textual representation of this object.
    *
    * @return a textual representation of this object
    */
@@ -196,7 +196,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets a hash code of this object.
+   * Returns the hash code of this object.
    *
    * @return the hash code
    */

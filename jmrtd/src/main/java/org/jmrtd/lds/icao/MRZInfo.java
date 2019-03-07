@@ -382,7 +382,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the date of birth of the passport holder.
+   * Returns the date of birth of the passport holder.
    *
    * @return date of birth
    */
@@ -420,7 +420,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the document number.
+   * Returns the document number.
    *
    * @return document number
    */
@@ -439,7 +439,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the document type.
+   * Returns the document type.
    *
    * @return document type
    */
@@ -490,7 +490,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the passport holder's last name.
+   * Returns the passport holder's last name.
    *
    * @return name
    */
@@ -509,7 +509,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the document holder's first names.
+   * Returns the document holder's first names.
    *
    * @return the secondary identifier
    */
@@ -518,7 +518,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the document holder's first names.
+   * Returns the document holder's first names.
    *
    * @return first names
    */
@@ -557,7 +557,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the passport holder's nationality as a 3 digit code.
+   * Returns the passport holder's nationality as a 3 digit code.
    *
    * @return a country
    */
@@ -604,7 +604,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the contents of the first optional data field for ID-1 and ID-3 style MRZs.
+   * Returns the contents of the first optional data field for ID-1 and ID-3 style MRZs.
    *
    * @return optional data 1
    */
@@ -613,7 +613,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the contents of the second optional data field for ID-1 style MRZs.
+   * Returns the contents of the second optional data field for ID-1 style MRZs.
    *
    * @return optional data 2
    */
@@ -632,7 +632,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets the passport holder's gender.
+   * Returns the passport holder's gender.
    *
    * @return gender
    */
@@ -683,9 +683,9 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Gets a hash code for this MRZ info.
+   * Returns the hash code for this MRZ info.
    *
-   * @return a hash code
+   * @return the hash code
    */
   @Override
   public int hashCode() {

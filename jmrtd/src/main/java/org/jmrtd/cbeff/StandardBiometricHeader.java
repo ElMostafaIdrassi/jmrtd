@@ -55,7 +55,7 @@ public class StandardBiometricHeader implements Serializable {
   }
 
   /**
-   * Gets the elements of this standard biometric header.
+   * Returns the elements of this standard biometric header.
    *
    * @return the elements, each consisting of a tag and value
    */

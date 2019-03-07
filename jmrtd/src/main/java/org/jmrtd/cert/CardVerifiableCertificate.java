@@ -135,7 +135,7 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets the signature algorithm.
+   * Returns the signature algorithm.
    *
    * @return an algorithm name
    */
@@ -184,7 +184,7 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets the public key from this certificate.
+   * Returns the public key from this certificate.
    *
    * @return the public key.
    */
@@ -323,7 +323,7 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets the authority reference.
+   * Returns the authority reference.
    *
    * @return the authority reference
    *
@@ -341,7 +341,7 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets the holder reference.
+   * Returns the holder reference.
    *
    * @return the holder reference
    *
@@ -357,7 +357,7 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets the holder authorization template.
+   * Returns the holder authorization template.
    *
    * @return the holder authorization template
    *
@@ -410,7 +410,7 @@ public class CardVerifiableCertificate extends Certificate {
   }
 
   /**
-   * Gets a hash code for this object.
+   * Returns a hash code for this object.
    *
    * @return a hash code for this object
    */

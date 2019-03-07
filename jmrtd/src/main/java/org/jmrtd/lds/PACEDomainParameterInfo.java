@@ -168,7 +168,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the parameters in the form of algorithm identifier
+   * Returns the parameters in the form of algorithm identifier
    * with algorithm 1.2.840.10046.2.1 (DH public number)
    * or 1.2.840.10045.2.1 (EC public key).
    *
@@ -267,7 +267,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   /* TODO: toAlgorithmIdentifier for DH case. */
 
   /**
-   * Gets a BC algorithm identifier object from an EC parameter spec.
+   * Returns a BC algorithm identifier object from an EC parameter spec.
    *
    * @param ecParameterSpec the EC parameter spec
    *
@@ -312,7 +312,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
   /* TODO: toDHParameterSpec for DH case. */
 
   /**
-   * Gets the EC parameter spec form the BC algorithm identifier object.
+   * Returns the EC parameter spec form the BC algorithm identifier object.
    *
    * @param domainParameter the BC algorithm identifier object
    *

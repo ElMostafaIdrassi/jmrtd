@@ -5,7 +5,7 @@
 
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.7.10</version>
+  <version>0.7.11</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.60</version>
+      <version>1.61</version>
     </dependency>
 
     <dependency>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
-      <version>1.60</version>
+      <version>1.61</version>
       <scope>test</scope>
     </dependency>
 
@@ -147,12 +147,6 @@
                 <link>https://docs.oracle.com/javase/8/docs/api</link>
                 <link>https://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.18</link>
               </links>
-              <offlineLinks>
-                <offlineLink>
-                  <url>http://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.18</url>
-                  <location>../scuba_smartcards/target/site/apidocs</location>
-                </offlineLink>
-              </offlineLinks>
             </configuration>
             <executions>
               <execution>

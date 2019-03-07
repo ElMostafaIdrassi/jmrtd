@@ -60,7 +60,7 @@ public class SplittableInputStream extends InputStream {
   }
 
   /**
-   * Gets a copy of the inputstream positioned at <code>position</code>.
+   * Returns a copy of the inputstream positioned at <code>position</code>.
    *
    * @param position a position between <code>0</code> and {@link #getPosition()}
    *

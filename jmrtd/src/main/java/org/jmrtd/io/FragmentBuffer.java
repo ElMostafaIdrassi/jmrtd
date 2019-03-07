@@ -277,7 +277,7 @@ public class FragmentBuffer implements Serializable {
   }
 
   /**
-   * Gets the smallest fragment that contains <code>offset</code> and <code>offset + length</code>
+   * Returns the smallest fragment that contains <code>offset</code> and <code>offset + length</code>
    * that has <strong>not</strong> been buffered in this buffer.
    *
    * @param offset the offset

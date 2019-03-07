@@ -184,7 +184,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets a textual representation of this image info.
+   * Returns a textual representation of this image info.
    *
    * @return a textual representation of this image info
    */
@@ -249,7 +249,7 @@ public abstract class AbstractImageInfo implements ImageInfo {
   }
 
   /**
-   * Gets the encoded image as an input stream.
+   * Returns the encoded image as an input stream.
    *
    * @return an input stream containing the encoded image
    */

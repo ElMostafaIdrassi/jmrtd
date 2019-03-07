@@ -116,7 +116,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the version. This will be 1 or 2.
+   * Returns the version. This will be 1 or 2.
    *
    * @return the version
    */
@@ -144,7 +144,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the object identifier of this Terminal Authentication info.
+   * Returns the object identifier of this Terminal Authentication info.
    *
    * @return an object identifier
    */
@@ -154,7 +154,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier as a human readable string.
+   * Returns the protocol object identifier as a human readable string.
    *
    * @return a string
    */

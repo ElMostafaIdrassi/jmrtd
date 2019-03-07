@@ -226,7 +226,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the quality of the overall scanned finger/palm image as a number
+   * Returns the quality of the overall scanned finger/palm image as a number
    * between 0 and 100. As specified in 7.2.5 of ISO 19794-4.
    *
    * @return the quality of the overall scanned finger/palm image as a number between 0 and 100
@@ -236,7 +236,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the finger/palm position. As specified in Section 7.2.2 of ISO 19794-4.
+   * Returns the finger/palm position. As specified in Section 7.2.2 of ISO 19794-4.
    *
    * @return a constant representing the position (see constant definitions starting with <code>POSITION_</code>)
    */
@@ -245,7 +245,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the compression algorithm. One of
+   * Returns the compression algorithm. One of
    * {@link FingerInfo#COMPRESSION_UNCOMPRESSED_BIT_PACKED},
    * {@link FingerInfo#COMPRESSION_UNCOMPRESSED_NO_BIT_PACKING},
    * {@link FingerInfo#COMPRESSION_JPEG},
@@ -261,7 +261,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the total number of specific views available for this finger.
+   * Returns the total number of specific views available for this finger.
    * As specified in Section 7.2.3 of ISO 19794-4.
    *
    * @return the total number of specific views available for this finger
@@ -271,7 +271,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the specific image view number associated with the finger.
+   * Returns the specific image view number associated with the finger.
    * As specified in Section 7.2.4 of ISO 19794-4.
    *
    * @return the specific image view number associated with the finger
@@ -281,7 +281,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the impression type. As specified in Section 7.2.6 of ISO 19794-4.
+   * Returns the impression type. As specified in Section 7.2.6 of ISO 19794-4.
    *
    * @return a constant indicating the impression type (see constant definitions starting with <code>IMPRESSION_TYPE_</code>)
    */
@@ -347,7 +347,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the record length.
+   * Returns the record length.
    *
    * @return the record length
    */
@@ -357,7 +357,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the format type.
+   * Returns the format type.
    *
    * @return a byte array of length 2
    */
@@ -366,7 +366,7 @@ public class FingerImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the biometric sub-type.
+   * Returns the biometric sub-type.
    *
    * @return the ICAO/CBEFF (BHT) biometric sub-type
    */

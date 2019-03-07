@@ -129,7 +129,7 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier as a human readable string.
+   * Returns the protocol object identifier as a human readable string.
    *
    * @return a string
    */

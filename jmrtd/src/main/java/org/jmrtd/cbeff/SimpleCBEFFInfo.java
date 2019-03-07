@@ -48,7 +48,7 @@ public class SimpleCBEFFInfo<B extends BiometricDataBlock> implements CBEFFInfo 
   }
 
   /**
-   * Gets the biometric data block from this simple CBEFF info.
+   * Returns the biometric data block from this simple CBEFF info.
    *
    * @return a biometric data block
    */

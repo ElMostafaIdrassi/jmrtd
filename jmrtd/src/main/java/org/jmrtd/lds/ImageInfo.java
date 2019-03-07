@@ -58,7 +58,7 @@ public interface ImageInfo extends LDSElement {
   static final int TYPE_IRIS = 3;
 
   /**
-   * Gets the (biometric) type of the image.
+   * Returns the (biometric) type of the image.
    * One of
    * {@link #TYPE_PORTRAIT},
    * {@link #TYPE_SIGNATURE_OR_MARK},
@@ -70,42 +70,42 @@ public interface ImageInfo extends LDSElement {
   int getType();
 
   /**
-   * Gets the mime-type of the encoded image as a <code>String</code>.
+   * Returns the mime-type of the encoded image as a <code>String</code>.
    *
    * @return mime-type string
    */
   String getMimeType();
 
   /**
-   * Gets the width of the image in pixels.
+   * Returns the width of the image in pixels.
    *
    * @return image width
    */
   int getWidth();
 
   /**
-   * Gets the height of the image in pixels.
+   * Returns the height of the image in pixels.
    *
    * @return image height
    */
   int getHeight();
 
   /**
-   * Gets the length of the total record (header and data) in bytes.
+   * Returns the length of the total record (header and data) in bytes.
    *
    * @return the length of the record
    */
   long getRecordLength();
 
   /**
-   * Gets the length of the encoded image in bytes.
+   * Returns the length of the encoded image in bytes.
    *
    * @return the length of the image bytes
    */
   int getImageLength();
 
   /**
-   * Gets an input stream from which the image bytes can be read.
+   * Returns an input stream from which the image bytes can be read.
    *
    * @return image input stream
    */

@@ -132,7 +132,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */
@@ -142,7 +142,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
   }
 
   /**
-   * Gets the embedded iris infos in this file.
+   * Returns the embedded iris infos in this file.
    *
    * @return iris infos
    */

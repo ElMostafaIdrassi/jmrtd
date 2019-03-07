@@ -219,7 +219,7 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
   }
 
   /**
-   * Gets the face image infos embedded in this face info.
+   * Returns the face image infos embedded in this face info.
    *
    * @return the embedded face image infos
    */

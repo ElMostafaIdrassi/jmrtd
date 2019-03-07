@@ -61,7 +61,7 @@ public abstract class DataGroup extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */

@@ -177,7 +177,7 @@ public class COMFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the LDS version as a dot seperated string
+   * Returns the LDS version as a dot seperated string
    * containing version and update level.
    *
    * @return a string of the form "a.b"
@@ -195,7 +195,7 @@ public class COMFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the unicode version as a dot seperated string
+   * Returns the unicode version as a dot seperated string
    * containing major version, minor version, and release level.
    *
    * @return a string of the form "aa.bb.cc"
@@ -218,7 +218,7 @@ public class COMFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets the ICAO datagroup tags as a list of bytes.
+   * Returns the ICAO datagroup tags as a list of bytes.
    *
    * @return a list of bytes
    */
@@ -261,7 +261,7 @@ public class COMFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Gets a textual representation of this file.
+   * Returns a textual representation of this file.
    *
    * @return a textual representation of this file
    */

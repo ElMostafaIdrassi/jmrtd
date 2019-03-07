@@ -47,7 +47,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
   }
 
   /**
-   * Gets the records inside this complex CBEFF info.
+   * Returns the records inside this complex CBEFF info.
    *
    * @return a list of CBEFF infos
    */

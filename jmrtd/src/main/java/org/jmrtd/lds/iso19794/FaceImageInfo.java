@@ -476,7 +476,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the record length.
+   * Returns the record length.
    *
    * @return the record length
    */
@@ -486,7 +486,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the available feature points of this face.
+   * Returns the available feature points of this face.
    *
    * @return feature points
    */
@@ -495,7 +495,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the expression
+   * Returns the expression
    * (neutral, smiling, eyebrow raised, etc).
    *
    * @return expression
@@ -505,7 +505,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the eye color
+   * Returns the eye color
    * (black, blue, brown, etc).
    *
    * @return eye color
@@ -515,7 +515,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the gender
+   * Returns the gender
    * (male, female, etc).
    *
    * @return gender
@@ -525,7 +525,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the hair color
+   * Returns the hair color
    * (bald, black, blonde, etc).
    *
    * @return hair color
@@ -535,7 +535,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the face image type
+   * Returns the face image type
    * (full frontal, token frontal, etc).
    *
    * @return face image type
@@ -545,7 +545,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the feature mask.
+   * Returns the feature mask.
    *
    * @return feature mask
    */
@@ -554,7 +554,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the quality as unsigned integer.
+   * Returns the quality as unsigned integer.
    *
    * @return quality
    */
@@ -563,7 +563,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the source type
+   * Returns the source type
    * (camera, scanner, etc).
    *
    * @return source type
@@ -573,7 +573,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the image data type.
+   * Returns the image data type.
    *
    * @return image data type
    */
@@ -582,7 +582,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the image color space
+   * Returns the image color space
    * (rgb, grayscale, etc).
    *
    * @return image color space
@@ -592,7 +592,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the device type.
+   * Returns the device type.
    *
    * @return device type
    */
@@ -601,7 +601,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the pose angle as an integer array of length 3,
+   * Returns the pose angle as an integer array of length 3,
    * containing yaw, pitch, and roll angle in encoded form.
    *
    * @return an integer array of length 3
@@ -613,7 +613,7 @@ public class FaceImageInfo extends AbstractImageInfo {
   }
 
   /**
-   * Gets the pose angle uncertainty as an integer array of length 3,
+   * Returns the pose angle uncertainty as an integer array of length 3,
    * containing yaw, pitch, and roll angle uncertainty.
    *
    * @return an integer array of length 3
@@ -1018,7 +1018,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /**
-     * Gets the major code of this point.
+     * Returns the major code of this point.
      *
      * @return major code
      */
@@ -1027,7 +1027,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /**
-     * Gets the minor code of this point.
+     * Returns the minor code of this point.
      *
      * @return minor code
      */
@@ -1036,7 +1036,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /**
-     * Gets the type of this point.
+     * Returns the type of this point.
      *
      * @return type
      */
@@ -1045,7 +1045,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /**
-     * Gets the X-coordinate of this point.
+     * Returns the X-coordinate of this point.
      *
      * @return X-coordinate
      */
@@ -1054,7 +1054,7 @@ public class FaceImageInfo extends AbstractImageInfo {
     }
 
     /**
-     * Gets the Y-coordinate of this point.
+     * Returns the Y-coordinate of this point.
      *
      * @return Y-coordinate
      */

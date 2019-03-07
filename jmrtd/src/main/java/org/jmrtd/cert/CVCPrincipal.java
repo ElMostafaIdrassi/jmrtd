@@ -131,7 +131,7 @@ public class CVCPrincipal implements Principal, Serializable {
   }
 
   /**
-   * Gets a textual representation of this principal.
+   * Returns a textual representation of this principal.
    *
    * @return a textual representation of this principal
    */
@@ -141,7 +141,7 @@ public class CVCPrincipal implements Principal, Serializable {
   }
 
   /**
-   * Gets the country.
+   * Returns the country.
    *
    * @return the country
    */
@@ -150,7 +150,7 @@ public class CVCPrincipal implements Principal, Serializable {
   }
 
   /**
-   * Gets the mnemonic.
+   * Returns the mnemonic.
    *
    * @return the mnemonic
    */
@@ -159,7 +159,7 @@ public class CVCPrincipal implements Principal, Serializable {
   }
 
   /**
-   * Gets the sequence number.
+   * Returns the sequence number.
    *
    * @return the seqNumber
    */
@@ -193,7 +193,7 @@ public class CVCPrincipal implements Principal, Serializable {
   }
 
   /**
-   * Gets a hash code of this object.
+   * Returns a hash code of this object.
    *
    * @return the hash code
    */

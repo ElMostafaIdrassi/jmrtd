@@ -112,7 +112,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier.
+   * Returns the protocol object identifier.
    *
    * @return the {@code ID_CA_} object identifier indicating the Chip Authentication protocol
    */
@@ -131,7 +131,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
   }
 
   /**
-   * Gets the protocol object identifier as a human readable string.
+   * Returns the protocol object identifier as a human readable string.
    *
    * @return a string
    */
