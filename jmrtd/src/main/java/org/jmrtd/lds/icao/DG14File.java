@@ -115,6 +115,10 @@ public class DG14File extends DataGroup {
   protected void writeContent(OutputStream outputStream) throws IOException {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     for (SecurityInfo securityInfo: securityInfos) {
+      if (securityInfo == null) {
+        continue;
+      }
+
       ASN1Primitive derObject = securityInfo.getDERObject();
       vector.add(derObject);
     }
