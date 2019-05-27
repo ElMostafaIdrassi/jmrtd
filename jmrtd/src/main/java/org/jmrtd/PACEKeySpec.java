@@ -23,8 +23,11 @@
 package org.jmrtd;
 
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 
 import org.jmrtd.protocol.PACEProtocol;
+
+import net.sf.scuba.util.Hex;
 
 /**
  * A key for PACE, can be CAN, MRZ, PIN, or PUK.
@@ -142,6 +145,63 @@ public class PACEKeySpec implements AccessKeySpec {
    */
   public byte[] getKey() {
     return key;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(key);
+    result = prime * result + keyReference;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    PACEKeySpec other = (PACEKeySpec) obj;
+    if (!Arrays.equals(key, other.key)) {
+      return false;
+    }
+    if (keyReference != other.keyReference) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder()
+        .append("PACEKeySpec [")
+        .append("key: ").append(Hex.bytesToHexString(key)).append(", ")
+        .append("keyReference: ").append(keyReferenceToString(keyReference))
+        .append("]")
+        .toString();
+  }
+
+  private static String keyReferenceToString(byte keyReference) {
+    switch (keyReference) {
+      case PassportService.MRZ_PACE_KEY_REFERENCE:
+        return "MRZ";
+      case PassportService.CAN_PACE_KEY_REFERENCE:
+        return "CAN";
+      case PassportService.PIN_PACE_KEY_REFERENCE:
+        return "PIN";
+      case PassportService.PUK_PACE_KEY_REFERENCE:
+        return "PUK";
+      case PassportService.NO_PACE_KEY_REFERENCE:
+        return "NO";
+      default:
+        return Integer.toString(keyReference);
+    }    
   }
 }
 
