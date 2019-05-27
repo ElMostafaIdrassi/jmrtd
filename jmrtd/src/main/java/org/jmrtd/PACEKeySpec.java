@@ -201,7 +201,7 @@ public class PACEKeySpec implements AccessKeySpec {
         return "NO";
       default:
         return Integer.toString(keyReference);
-    }    
+    }
   }
 }
 

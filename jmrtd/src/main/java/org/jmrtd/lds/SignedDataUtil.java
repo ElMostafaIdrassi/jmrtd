@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Encoding;
@@ -75,6 +73,7 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.jmrtd.Util;
 
 /**
@@ -511,6 +510,44 @@ public final class SignedDataUtil {
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }
 
+//  /**
+//   * Creates a signer info structures.
+//   *
+//   * @param digestAlgorithm the digest algorithm
+//   * @param digestEncryptionAlgorithm the signature algorithm
+//   * @param contentTypeOID the object identifier
+//   * @param contentInfo the content info
+//   * @param encryptedDigest the signature bytes
+//   * @param docSigningCertificate the document signer certificate
+//   *
+//   * @return the signer info structure
+//   *
+//   * @throws GeneralSecurityException on error
+//   */
+//  public static SignerInfo createSignerInfo(String digestAlgorithm,
+//      String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
+//      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
+//
+//    if (encryptedDigest == null) {
+//      throw new IllegalArgumentException("Encrypted digest cannot be null");
+//    }
+//
+//    /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
+//    X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
+//    X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
+//    BigInteger serial = docSigningCertificate.getSerialNumber();
+//    SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
+//
+//    AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
+//    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
+//
+//    ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
+//    ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
+//    ASN1Set unAuthenticatedAttributes = null; // should be empty set?
+//
+//    return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
+//  }
+
   /**
    * Creates a signer info structures.
    *
@@ -534,8 +571,8 @@ public final class SignedDataUtil {
     }
 
     /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
-    X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
-    X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
+    JcaX509CertificateHolder holder = new JcaX509CertificateHolder(docSigningCertificate);
+    X500Name docSignerName = holder.getIssuer();
     BigInteger serial = docSigningCertificate.getSerialNumber();
     SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
 
