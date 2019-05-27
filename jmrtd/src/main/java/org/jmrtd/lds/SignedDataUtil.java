@@ -72,8 +72,8 @@ import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.jmrtd.Util;
 
 /**
@@ -571,8 +571,8 @@ public final class SignedDataUtil {
     }
 
     /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
-    JcaX509CertificateHolder holder = new JcaX509CertificateHolder(docSigningCertificate);
-    X500Name docSignerName = holder.getIssuer();
+    Certificate bcCertificate = Certificate.getInstance(docSigningCertificate.getEncoded());
+    X500Name docSignerName = bcCertificate.getIssuer();
     BigInteger serial = docSigningCertificate.getSerialNumber();
     SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
 
