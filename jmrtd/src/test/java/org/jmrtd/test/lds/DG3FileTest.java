@@ -124,7 +124,7 @@ public class DG3FileTest extends TestCase {
 
       byte[] encodedCopy = copy.getEncoded();
 
-      //			FileOutputStream copyOut = new FileOutputStream(new File(outputDir, "dg3copy.bin"));			
+      //			FileOutputStream copyOut = new FileOutputStream(new File(outputDir, "dg3copy.bin"));
       //			copyOut.write(encodedCopy);
       //			copyOut.flush();
       //			copyOut.close();
@@ -316,7 +316,7 @@ public class DG3FileTest extends TestCase {
       //			out1.write(bytes);
       //			out1.flush();
       //			out1.close();
-      //			
+      //
       //			FileOutputStream out2 = new FileOutputStream("encodedFromByteArrayStream.bin");
       //			out2.write(encodedFromByteArrayStream);
       //			out2.flush();
@@ -441,7 +441,7 @@ public class DG3FileTest extends TestCase {
   public void testFromBin() {
     try {
       InputStream inputStream = ResourceUtil.getInputStream(TEST_FILE);
-      DG3File dg3 = new DG3File(inputStream);						
+      DG3File dg3 = new DG3File(inputStream);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
@@ -458,7 +458,7 @@ public class DG3FileTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
-      
+
       return null;
     }
   }

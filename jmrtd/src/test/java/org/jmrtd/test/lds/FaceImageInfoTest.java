@@ -173,7 +173,7 @@ public class FaceImageInfoTest extends TestCase {
       int sourceType = FaceImageInfo.SOURCE_TYPE_UNSPECIFIED;
       int deviceType = 0x0000;
       int quality = 0x0000;
-      int imageDataType = FaceImageInfo.IMAGE_DATA_TYPE_JPEG;	
+      int imageDataType = FaceImageInfo.IMAGE_DATA_TYPE_JPEG;
       FeaturePoint[] featurePoints = new FeaturePoint[0];
       FaceImageInfo imageInfo = new FaceImageInfo(
           gender, eyeColor, hairColor,

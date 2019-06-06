@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.jmrtd.lds.icao.MRZInfo;
 
@@ -76,7 +75,7 @@ public class MRZInfoTest extends TestCase {
    * NOTE: optional data 2, right
    * alligned
    */
-  private static final String MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1 = 
+  private static final String MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1 =
       "IDBRA123456789712345R00F456912"
           + "7006012F0212311UTO<<<HDFDTR091"
           + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
@@ -190,7 +189,7 @@ public class MRZInfoTest extends TestCase {
       assertEquals(str.length(), 90);
     } else {
       fail("Unsupported document code: " + documentCode);
-    }		
+    }
   }
 
   public void testEncodeToString() {
@@ -244,8 +243,8 @@ public class MRZInfoTest extends TestCase {
 
   public void testBelgianMRZ() {
     try {
-      String specimenSampleMRZ = "IDBEL590330101085020100200<<<<" + 
-          "8502016F0901015BEL<<<<<<<<<<<8" + 
+      String specimenSampleMRZ = "IDBEL590330101085020100200<<<<" +
+          "8502016F0901015BEL<<<<<<<<<<<8" +
           "VAN<DER<VELDEN<<GREET<HILDE<<<";
 
       assertNotNull(specimenSampleMRZ);
@@ -265,7 +264,7 @@ public class MRZInfoTest extends TestCase {
     MRZInfo mrzInfo = new MRZInfo(MRZ_ERIKA_MUSTERMAN_2LINE_ID3);
     MRZInfo mrzInfo1 = new MRZInfo(
         "P<", "D<<", "MUSTERMANN", "ERIKA",
-        "C11T002JM", "D<<", "960812", Gender.FEMALE, "131031", "");	
+        "C11T002JM", "D<<", "960812", Gender.FEMALE, "131031", "");
     assertEquals(mrzInfo, mrzInfo1);
     testDecodeEncode(MRZ_ERIKA_MUSTERMAN_2LINE_ID3, mrzInfo.getDocumentCode(), mrzInfo.getNationality(), mrzInfo.getPrimaryIdentifier(), mrzInfo.getSecondaryIdentifierComponents(), mrzInfo.getDocumentNumber(), mrzInfo.getDateOfBirth(), mrzInfo.getGender(), mrzInfo.getDateOfExpiry(), mrzInfo.getIssuingState());
   }
@@ -334,11 +333,11 @@ public class MRZInfoTest extends TestCase {
     testEquals(MRZ_HAPPY_TRAVELER_2LINE_ID3);
   }
 
-  public void testEqualsId1() {		
+  public void testEqualsId1() {
     testEquals(MRZ_SUSANNA_SAMPLE_3LINE_ID1);
     testEquals(MRZ_PETER_STEVENSON_3LINE_ID1);
   }
-  
+
   public void testEquals(String mrz) {
     try {
       MRZInfo mrzInfo = new MRZInfo(mrz);
@@ -356,7 +355,7 @@ public class MRZInfoTest extends TestCase {
         String dateOfExpiry = mrzInfo.getDateOfExpiry();
         String personalNumber = mrzInfo.getPersonalNumber();
         copy = new MRZInfo(documentCode, issuingState, primaryIdentifier, secondaryIdentifier, documentNumber,
-            nationality, dateOfBirth, gender, dateOfExpiry, personalNumber);	
+            nationality, dateOfBirth, gender, dateOfExpiry, personalNumber);
       } else if (documentCode.startsWith("C") || documentCode.startsWith("I") || documentCode.startsWith("A")) {
         String issuingState = mrzInfo.getIssuingState();
         String primaryIdentifier = mrzInfo.getPrimaryIdentifier();
@@ -426,6 +425,24 @@ public class MRZInfoTest extends TestCase {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
+  }
+
+  /*
+   * Document number check digit indicates extension in optional data,
+   * but optional data is empty.
+   *
+   *
+   *
+   */
+  public void testMRZWithEmptyExtendedDocumentNumber() throws Exception {
+    String mrz = "I<UTOD23145890<<<<<<<<<<<<<<<<" +
+                 "7408122F1204159UTO<<<<<<<<<<<6" +
+                 "ERIKSSON<<ANNA<MARIA<<<<<<<<<<".replaceAll("\n", "");
+
+    assertEquals(90, mrz.length());
+
+    MRZInfo mrzInfo = new MRZInfo(mrz);
+    assertEquals("740812", mrzInfo.getDateOfBirth());
   }
 
   public static MRZInfo createTestObject() {

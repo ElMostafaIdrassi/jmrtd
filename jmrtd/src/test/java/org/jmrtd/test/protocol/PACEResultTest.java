@@ -74,9 +74,9 @@ public class PACEResultTest extends TestCase {
       int keyLength = PACEInfo.toKeyLength(oid);
 
       PACEMappingResult mappingResult = null;
-      
+
       PACEResult paceResult = new PACEResult(paceKey, mappingType, agreementType, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
-      
+
       assertEquals(paceKey, paceResult.getPACEKey());
       assertEquals(mappingType, paceResult.getMappingType());
       assertEquals(agreementType, paceResult.getAgreementAlg());
@@ -112,19 +112,19 @@ public class PACEResultTest extends TestCase {
         int keyLength = PACEInfo.toKeyLength(oid);
 
         PACEMappingResult mappingResult = null;
-        
+
         PACEResult paceResult = new PACEResult(paceKey, mappingType, agreementType, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
         PACEResult anotherPACEResult = new PACEResult(paceKey, mappingType, agreementType, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, wrapper);
 
         assertEquals(paceResult.hashCode(), anotherPACEResult.hashCode());
         assertEquals(paceResult, anotherPACEResult);
-        assertEquals(paceResult.toString(), anotherPACEResult.toString());        
+        assertEquals(paceResult.toString(), anotherPACEResult.toString());
       } catch (Exception e) {
         LOGGER.log(Level.WARNING, "Unexpected exception", e);
         fail(e.getMessage());
       }
   }
-  
+
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();

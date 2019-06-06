@@ -79,8 +79,8 @@ public class PACEInfoTest extends TestCase {
     testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1);
-    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P320_R1); 
-    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1); 
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P320_R1);
+    testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_3DES_CBC_CBC, 2, PACEInfo.PARAM_ID_GFP_1024_160);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_128, 2, PACEInfo.PARAM_ID_GFP_1024_160);
@@ -91,10 +91,10 @@ public class PACEInfoTest extends TestCase {
     testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_GFP_2048_224);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_GFP_2048_256);
   }
-  
+
   public void testPACEInfoCanCreate(String oid, int version, int paramId) {
     try {
-      /* PACEInfo paceInfo = */ new PACEInfo(oid, version, paramId);      
+      /* PACEInfo paceInfo = */ new PACEInfo(oid, version, paramId);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
@@ -116,7 +116,7 @@ public class PACEInfoTest extends TestCase {
     testToParameterSpecNotNull(16);
     testToParameterSpecNotNull(17);
     testToParameterSpecNotNull(18);
-  }	
+  }
 
   public void testToParameterSpecNotNull(int stdDomainParams) {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(BigInteger.valueOf(stdDomainParams));
@@ -138,11 +138,11 @@ public class PACEInfoTest extends TestCase {
     testGetParameterSpecDHParameterSpecOrECParameterSpec(16);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(17);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(18);
-  }	
+  }
 
   public void testGetParameterSpecDHParameterSpecOrECParameterSpec(int stdDomainParams) {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(BigInteger.valueOf(stdDomainParams));
-    assertTrue(paramSpec instanceof DHParameterSpec || paramSpec instanceof ECParameterSpec);		
+    assertTrue(paramSpec instanceof DHParameterSpec || paramSpec instanceof ECParameterSpec);
   }
 
   public void testECDHPrime() {

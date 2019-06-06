@@ -49,13 +49,13 @@ public class CVCAuthorizationTemplateTest extends TestCase {
 //      assertTrue("Failed for " + permission, Permission.READ_ACCESS_DG3_AND_DG4.implies(permission));
 //    }
 //  }
-  
+
   public void testPermissionImplicationReflexive() {
     for (Permission permission: Permission.values()) {
       assertTrue(permission.implies(permission));
     }
   }
-  
+
 //  public void testPermissionImplicationTotal() {
 //    for (Permission permission1: Permission.values()) {
 //      for (Permission permission2: Permission.values()) {

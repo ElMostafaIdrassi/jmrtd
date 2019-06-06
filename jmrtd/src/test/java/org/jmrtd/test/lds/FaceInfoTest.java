@@ -103,7 +103,7 @@ public class FaceInfoTest extends TestCase {
    * - Creator of the biometric reference data(PID) (Optional)
    * - Format owner (Mandatory)
    * - Format type (Mandatory)
-   * 
+   *
    * In practice this means: 0x81 (bio type), 0x82 (bio subtype),
    * 0x87 (format owner), 0x88 (format type) will be present.
    */

@@ -40,18 +40,18 @@ public class DG6FileTest extends TestCase {
 
   public void testDG6File() {
     try {
-      
+
       byte[] encoded = { 0x66, 0x08, 0x02, 0x01, 0x01, 0x5F, 0x40, 0x02, 0x01, 0x02 }; // NOTE: Uses 5F40, i.e. portrait. Not sure if DG6 is supposed to hold portrait images...
       DG6File dg6File = new DG6File(new ByteArrayInputStream(encoded));
-      
+
       assertEquals(DG6File.EF_DG6_TAG, dg6File.getTag());
-      
+
       byte[] imageBytes = { 0x01, 0x02 };
       DisplayedImageInfo image = new DisplayedImageInfo(ImageInfo.TYPE_PORTRAIT, imageBytes);
-      List<DisplayedImageInfo> expectedImages = Arrays.asList(new DisplayedImageInfo[] { image });      
+      List<DisplayedImageInfo> expectedImages = Arrays.asList(new DisplayedImageInfo[] { image });
 
       assertEquals(expectedImages, dg6File.getImages());
-      
+
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());

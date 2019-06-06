@@ -45,7 +45,7 @@ public class ActiveAuthenticationInfoTest extends TestCase {
     assertEquals("id-AA", aaInfo.getProtocolOIDString());
     assertEquals(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID, aaInfo.getSignatureAlgorithmOID());
   }
-  
+
   public void testActiveAuthenticationInfoEquals() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID); //  0.4.0.127.0.7.1.1.4.1.3
     ActiveAuthenticationInfo anotherAAInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID); //  0.4.0.127.0.7.1.1.4.1.3

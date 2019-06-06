@@ -191,12 +191,12 @@ public class DG14FileTest extends TestCase {
 //        LOGGER.info("Writing object: " + securityInfo);
         objectOutputStream.writeObject(securityInfo);
       }
-      
+
       byte[] dg14Encoded = dg14.getEncoded();
-      
+
       objectOutputStream.flush();
       objectOutputStream.close();
-      
+
       ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
       ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
       Object dg14Object = objectInputStream.readObject();
@@ -330,10 +330,10 @@ public class DG14FileTest extends TestCase {
 
     /* For profiles CA_KAT, CA_ATGA:
      *
-     * The SecurityInfos set MUST contain at least one 
-     * ChipAuthenticationPublicKeyInfo element with one of the protocol OID 
-     * defined in the EAC specification (id-PK-DH or id-PK-ECDH). The test 
-     * LDS_E_3 MUST be performed for each 
+     * The SecurityInfos set MUST contain at least one
+     * ChipAuthenticationPublicKeyInfo element with one of the protocol OID
+     * defined in the EAC specification (id-PK-DH or id-PK-ECDH). The test
+     * LDS_E_3 MUST be performed for each
      * ChipAuthenticationPublicKeyInfo element which has such an OID.
      */
     assertTrue(chipAuthenticationPublicKeyInfoCount > 0);
@@ -388,10 +388,10 @@ public class DG14FileTest extends TestCase {
    *       - curve parameter 0 <= a < p
    *       - curve parameter 0 <= b < p
    *       - 4*a^3 + 27*b^2 != 0
-   *       - base point G is on the curve, with both coordinates in range 0 ... p - 1 
-   *       - Cofactor f > 0 
-   *       - order r of base point r > 0 , r != p 
-   *       - r * f <= 2p 
+   *       - base point G is on the curve, with both coordinates in range 0 ... p - 1
+   *       - Cofactor f > 0
+   *       - order r of base point r > 0 , r != p
+   *       - r * f <= 2p
    */
   public void testLDS_E_3(ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo) {
     /* Pre-conditions. */
@@ -507,7 +507,7 @@ public class DG14FileTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
     }
-    
+
     return dg14s;
   }
 
@@ -534,7 +534,7 @@ public class DG14FileTest extends TestCase {
 
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
-      securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));	
+      securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));
       securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC, ChipAuthenticationInfo.VERSION_1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC, ChipAuthenticationInfo.VERSION_1, BigInteger.valueOf(2)));
       securityInfos.add(new TerminalAuthenticationInfo());
@@ -652,7 +652,7 @@ public class DG14FileTest extends TestCase {
 
       List<SecurityInfo> securityInfos = new ArrayList<SecurityInfo>();
       securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey1, BigInteger.valueOf(1)));
-      securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));	
+      securityInfos.add(new ChipAuthenticationPublicKeyInfo(publicKey2, BigInteger.valueOf(2)));
       securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_DH_3DES_CBC_CBC, ChipAuthenticationInfo.VERSION_1, BigInteger.valueOf(1)));
       securityInfos.add(new ChipAuthenticationInfo(ChipAuthenticationInfo.ID_CA_ECDH_3DES_CBC_CBC, ChipAuthenticationInfo.VERSION_1, BigInteger.valueOf(2)));
       securityInfos.add(new TerminalAuthenticationInfo());
@@ -667,7 +667,7 @@ public class DG14FileTest extends TestCase {
 
   /**
    * Figure D.3 from TR 03110 v1.11, specifies DG14 (DH).
-   * 
+   *
    * @return
    */
   public static byte[] getSpecSampleDG14File() {
@@ -694,7 +694,7 @@ public class DG14FileTest extends TestCase {
     if (!(other instanceof DHPublicKey)) {
       return false;
     }
-    
+
     DHPublicKey otherPublicKey = (DHPublicKey)other;
     DHParameterSpec params1 = thisPublicKey.getParams();
     DHParameterSpec params2 = otherPublicKey.getParams();

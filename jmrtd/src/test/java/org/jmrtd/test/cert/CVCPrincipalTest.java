@@ -36,18 +36,18 @@ public class CVCPrincipalTest extends TestCase {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   public void testCVCPrincipalFromUT() {
-    CVCPrincipal principal = new CVCPrincipal("UTDVCS00001");    
+    CVCPrincipal principal = new CVCPrincipal("UTDVCS00001");
     assertEquals(TestCountry.UT, principal.getCountry());
   }
 
   public void testCVCPrincipalFromNL() {
-    CVCPrincipal principal = new CVCPrincipal("NLDVCS00001");    
+    CVCPrincipal principal = new CVCPrincipal("NLDVCS00001");
     assertEquals(ICAOCountry.getInstance("NLD"), principal.getCountry());
   }
 
   public void testCVCPrincipalFromUnknown() {
     try {
-      CVCPrincipal principal = new CVCPrincipal("XYDVCS00001");    
+      CVCPrincipal principal = new CVCPrincipal("XYDVCS00001");
       assertNotNull(principal.getCountry());
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);

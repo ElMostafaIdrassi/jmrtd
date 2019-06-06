@@ -77,7 +77,7 @@ public class DG1FileTest extends TestCase {
       assertEquals(file.getMRZInfo().toString().replace("\n", "").trim(), SMITH_SAMPLE);
 
       file = getSpecSampleObject(LOES_SAMPLE);
-      assertEquals(file.getMRZInfo().toString().replace("\n", "").trim(), LOES_SAMPLE);			
+      assertEquals(file.getMRZInfo().toString().replace("\n", "").trim(), LOES_SAMPLE);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());

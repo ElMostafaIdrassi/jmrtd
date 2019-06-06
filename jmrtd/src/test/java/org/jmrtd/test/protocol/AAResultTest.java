@@ -68,7 +68,7 @@ public class AAResultTest extends TestCase {
       assertEquals(publicKey, aaResult.getPublicKey());
       assertTrue(Arrays.equals(challenge, aaResult.getChallenge()));
       assertTrue(Arrays.equals(response, aaResult.getResponse()));
-   
+
       AAResult anotherAAResult = new AAResult(publicKey, digAlg, sigAlg, Arrays.copyOf(challenge, challenge.length), Arrays.copyOf(response, response.length));
       assertEquals(aaResult.hashCode(), anotherAAResult.hashCode());
       assertEquals(aaResult, anotherAAResult);

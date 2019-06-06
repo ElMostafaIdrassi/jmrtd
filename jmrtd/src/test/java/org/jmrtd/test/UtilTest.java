@@ -37,18 +37,18 @@ import net.sf.scuba.util.Hex;
 
 /**
  * Tests some of the utility functions.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
- * 
+ *
  * @since 0.6.2
  */
 public class UtilTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public void testPadding() {    
+  public void testPadding() {
     testPadding(3, 64);
     testPadding(31, 64);
     testPadding(32, 64);
@@ -88,7 +88,7 @@ public class UtilTest extends TestCase {
   }
 
   public void testPartition(int dataSize, int segmentSize) {
-    Random random = new Random();  
+    Random random = new Random();
     byte[] data = new byte[dataSize];
     random.nextBytes(data);
     List<byte[]> segments = Util.partition(segmentSize, data);
@@ -115,7 +115,7 @@ public class UtilTest extends TestCase {
     assertTrue(stripped[0] != 0x00);
     assertTrue(Arrays.equals(new byte[] { 0x01, 0x02, 0x03, 0x04 }, stripped));
   }
-  
+
   public void testBigIntegerI2OSStripLeadingZeroes() {
     for (long i = 0; i < 66666; i++) {
       BigInteger bigInteger = BigInteger.valueOf(i);

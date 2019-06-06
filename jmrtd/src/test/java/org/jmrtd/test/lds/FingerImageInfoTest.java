@@ -221,7 +221,7 @@ public class FingerImageInfoTest extends TestCase {
 
   //	/**
   //	 * FIXME: this appears to break j2wsq!
-  //	 * 
+  //	 *
   //	 * @param width
   //	 * @param height
   //	 * @return
@@ -229,7 +229,7 @@ public class FingerImageInfoTest extends TestCase {
   //	private static byte[] createTrivialWSQBytes(int width, int height) {
   //		try {
   //			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-  //			ByteArrayOutputStream out = new ByteArrayOutputStream();			
+  //			ByteArrayOutputStream out = new ByteArrayOutputStream();
   //			// Images.writeImage(image, "image/x-wsq", out);
   //			ImageIO.write(image, "wsq", out);
   //			out.flush();
@@ -243,7 +243,7 @@ public class FingerImageInfoTest extends TestCase {
 
   /**
    * FIXME: this appears to break j2wsq!
-   * 
+   *
    * @param width
    * @param height
    * @return
@@ -251,7 +251,7 @@ public class FingerImageInfoTest extends TestCase {
   private static byte[] createTrivialJPGBytes(int width, int height) {
     try {
       BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();			
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
       // Images.writeImage(image, "image/x-wsq", out);
       ImageIO.write(image, "jpg", out);
       out.flush();

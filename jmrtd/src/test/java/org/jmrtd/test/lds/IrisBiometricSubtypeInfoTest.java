@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 public class IrisBiometricSubtypeInfoTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public void testCreate() {
     IrisBiometricSubtypeInfo irisSubtypeInfo = createTestObject();
     int subtypeId = irisSubtypeInfo.getBiometricSubtype();

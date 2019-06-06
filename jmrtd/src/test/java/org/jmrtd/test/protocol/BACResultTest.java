@@ -38,9 +38,9 @@ import junit.framework.TestCase;
 
 /**
  * Test cases for BACResult, the result of the BAC protocol.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  *
  * @since 0.6.2

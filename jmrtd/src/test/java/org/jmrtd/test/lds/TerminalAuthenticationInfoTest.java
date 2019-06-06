@@ -28,15 +28,15 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the TerminalAuthenticationInfo data type.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  *
  * @since 0.6.2
  */
 public class TerminalAuthenticationInfoTest extends TestCase {
-  
+
   public void testTerminalAuthenticationInfo() {
     TerminalAuthenticationInfo taInfo = new TerminalAuthenticationInfo();
     assertEquals(TerminalAuthenticationInfo.ID_TA, taInfo.getObjectIdentifier()); // 0.4.0.127.0.7.2.2.2

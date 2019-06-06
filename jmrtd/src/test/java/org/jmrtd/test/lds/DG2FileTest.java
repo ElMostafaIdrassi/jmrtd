@@ -116,7 +116,7 @@ public class DG2FileTest extends TestCase {
 
   /**
    * Tests if we can decode and then encode.
-   * 
+   *
    * @param dg2File
    * @param n number of times
    */
@@ -195,7 +195,7 @@ public class DG2FileTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
-    }		
+    }
   }
 
   public void testImageBytes0() {

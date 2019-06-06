@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 public class PACEKeySpecTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public void testPACEKeySpec() {
     try {
       String can = "12345";
@@ -45,7 +45,7 @@ public class PACEKeySpecTest extends TestCase {
       assertNotNull(paceCANKey.getKey());
       assertTrue(Arrays.equals(can.getBytes("UTF-8"), paceCANKey.getKey()));
       assertEquals(PassportService.CAN_PACE_KEY_REFERENCE, paceCANKey.getKeyReference());
-      
+
       PACEKeySpec paceMRZKey = PACEKeySpec.createMRZKey(new BACKey("123456789", "710121", "331231"));
       assertEquals("PACE", paceMRZKey.getAlgorithm());
       assertNotNull(paceMRZKey.getKey());
@@ -66,7 +66,7 @@ public class PACEKeySpecTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testPACESecretKeySpec() {
     try {
       String algorithm = "AES"; // ???
@@ -77,6 +77,6 @@ public class PACEKeySpecTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
-    }    
+    }
   }
 }

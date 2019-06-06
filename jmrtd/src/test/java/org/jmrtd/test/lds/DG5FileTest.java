@@ -60,12 +60,12 @@ public class DG5FileTest extends TestCase {
   public void testDG5FileDecode() {
     try {
       byte[] encoded = { 0x65, 0x08, 0x02, 0x01, 0x01, 0x5F, 0x40, 0x02, 0x01, 0x02 };
-      DG5File dg5File = new DG5File(new ByteArrayInputStream(encoded));      
+      DG5File dg5File = new DG5File(new ByteArrayInputStream(encoded));
       assertEquals(DG5File.EF_DG5_TAG, dg5File.getTag());
-      
+
       byte[] imageBytes = { 0x01, 0x02 };
       DisplayedImageInfo image = new DisplayedImageInfo(ImageInfo.TYPE_PORTRAIT, imageBytes);
-      List<DisplayedImageInfo> expectedImages = Arrays.asList(new DisplayedImageInfo[] { image });      
+      List<DisplayedImageInfo> expectedImages = Arrays.asList(new DisplayedImageInfo[] { image });
       assertEquals(new ArrayList<DisplayedImageInfo>(expectedImages), dg5File.getImages());
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);

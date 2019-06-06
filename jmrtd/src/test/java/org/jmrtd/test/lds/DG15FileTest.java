@@ -45,7 +45,7 @@ import net.sf.scuba.util.Hex;
 public class DG15FileTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   public DG15FileTest(String name) {

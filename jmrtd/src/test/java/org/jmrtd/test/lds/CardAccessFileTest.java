@@ -45,7 +45,7 @@ public class CardAccessFileTest extends TestCase {
     Collection<SecurityInfo> actualSecurityInfos = cardAccessFile.getSecurityInfos();
     assertEquals(new HashSet<SecurityInfo>(securityInfos), new HashSet<SecurityInfo>(actualSecurityInfos));
   }
-  
+
   public void testCardAccessFileEquals() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID);
     PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
@@ -57,7 +57,7 @@ public class CardAccessFileTest extends TestCase {
     List<SecurityInfo> anotherSecurityInfos = Arrays.asList(new SecurityInfo[] { anotherAAInfo, anotherPACEInfo });
 
     CardAccessFile anotherCardAccessFile = new CardAccessFile(anotherSecurityInfos);
-    
+
     assertEquals(cardAccessFile, anotherCardAccessFile);
   }
 }

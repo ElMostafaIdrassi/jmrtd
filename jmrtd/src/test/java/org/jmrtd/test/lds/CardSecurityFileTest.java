@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the CardSecurity file.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -60,7 +60,7 @@ public class CardSecurityFileTest extends TestCase {
 
       testSimilar(cardSecurityFile, cardSecurityFile2);
 
-      testAttributesSHA256withECDSASample(cardSecurityFile2);      
+      testAttributesSHA256withECDSASample(cardSecurityFile2);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
       fail(e.getMessage());
@@ -70,7 +70,7 @@ public class CardSecurityFileTest extends TestCase {
   private void testSimilar(CardSecurityFile cardSecurityFile, CardSecurityFile cardSecurityFile2) {
     assertEquals(cardSecurityFile.hashCode(), cardSecurityFile2.hashCode());
     assertEquals(cardSecurityFile, cardSecurityFile2);
-    assertEquals(cardSecurityFile.getDigestAlgorithm(), cardSecurityFile2.getDigestAlgorithm());    
+    assertEquals(cardSecurityFile.getDigestAlgorithm(), cardSecurityFile2.getDigestAlgorithm());
     assertEquals(cardSecurityFile.getDigestEncryptionAlgorithm(), cardSecurityFile2.getDigestEncryptionAlgorithm());
     assertEquals(cardSecurityFile.toString(), cardSecurityFile2.toString());
   }

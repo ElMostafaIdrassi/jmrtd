@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 public class COMFileTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public COMFileTest(String name) {
     super(name);
   }
@@ -53,7 +53,7 @@ public class COMFileTest extends TestCase {
   private void testReflexive(COMFile comFile) {
     try {
       byte[] encoded = comFile.getEncoded();
-      assertNotNull(encoded);			
+      assertNotNull(encoded);
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
       COMFile copy = new COMFile(in);
       assertEquals(comFile, copy);

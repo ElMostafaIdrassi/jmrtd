@@ -40,18 +40,18 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the card verifiable certificate class.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
- * 
+ *
  * @since 0.6.2
  */
 public class CardVerifiableCertificateTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public void testCardVerifiableCertificate() {    
+  public void testCardVerifiableCertificate() {
     try {
       CVCPrincipal authorityReference = new CVCPrincipal("UTDVCS00001");
       CVCPrincipal holderReference = new CVCPrincipal("UTIS00001");
@@ -91,7 +91,7 @@ public class CardVerifiableCertificateTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   /* Adapted from: https://stackoverflow.com/a/2517954/27190 */
   private static boolean isSameDay(Date date1, Date date2) {
     SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");

@@ -100,7 +100,7 @@ public class PACECAMResultTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testPACECAMResultEquals() {
     try {
       String documentNumner = "123456789";
@@ -122,17 +122,17 @@ public class PACECAMResultTest extends TestCase {
 
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
-      
+
       SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
       SecureMessagingWrapper anotherWrapper = new AESSecureMessagingWrapper(encKey, macKey, 0L);
-      
+
       byte[] chipAuthenticationData = new byte[8]; // FIXME: Generate randomly.
 
       byte[] encryptedChipAuthenticationData = new byte[128]; // FIXME: Encrypt chipAuthenticationData ourselves.
 
       PACECAMResult paceCAMResult = new PACECAMResult(paceKey, agreementAlg, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, encryptedChipAuthenticationData, chipAuthenticationData, wrapper);
       PACECAMResult anotherPACECAMResult = new PACECAMResult(paceKey, agreementAlg, cipherAlg, digestAlg, keyLength, mappingResult, pcdKeyPair, piccPublicKey, encryptedChipAuthenticationData, chipAuthenticationData, anotherWrapper);
-      
+
       assertEquals(paceCAMResult.hashCode(), anotherPACECAMResult.hashCode());
       assertEquals(paceCAMResult, anotherPACECAMResult);
       assertEquals(paceCAMResult.toString(), anotherPACECAMResult.toString());

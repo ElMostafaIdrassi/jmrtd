@@ -39,7 +39,7 @@ import net.sf.scuba.util.Hex;
 public class DisplayedImageInfoTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public DisplayedImageInfoTest(String name) {
     super(name);
   }

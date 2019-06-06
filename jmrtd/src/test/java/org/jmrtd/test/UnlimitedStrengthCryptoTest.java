@@ -31,9 +31,9 @@ import junit.framework.TestCase;
 
 /**
  * Tests explicitly if we have unlimited strength cryptography installed on this VM.
- * 
+ *
  * @author The JMRTD team
- * 
+ *
  * @version $Revision$
  */
 public class UnlimitedStrengthCryptoTest extends TestCase {
@@ -42,7 +42,7 @@ public class UnlimitedStrengthCryptoTest extends TestCase {
 
   public void testUnlimitedStrength() {
     try {
-//      LOGGER.info("DEBUG: Checking unlimited crypto for VM " +  System.getProperties());      
+//      LOGGER.info("DEBUG: Checking unlimited crypto for VM " +  System.getProperties());
       assertTrue(Cipher.getMaxAllowedKeyLength("AES") >= 256);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);

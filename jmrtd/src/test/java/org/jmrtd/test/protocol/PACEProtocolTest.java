@@ -121,7 +121,7 @@ public class PACEProtocolTest extends TestCase {
 
   /**
    * G.1.1. ECDH based example
-   * 
+   *
    * This example is based on ECDH applying the standardized BrainpoolP256r1 domain parameters
    * (see RFC 5639).
    */
@@ -171,16 +171,16 @@ public class PACEProtocolTest extends TestCase {
 
       /*
        * Encrypted Nonce.
-       * 
+       *
        * Next, the chip randomly generates the nonce s and encrypts it by means of K_pi.
        */
 
       /* Given in example. */
       byte[] nonceS = Hex.hexStringToBytes("3F00C4D3 9D153F2B 2A214A07 8D899B22");
 
-      /* 
+      /*
        * Map nonce.
-       * 
+       *
        * The nonce is mapped to an ephemeral group generator via generic mapping. The required randomly chosen
        * ephemeral keys are also collected in the next table.
        */
@@ -202,7 +202,7 @@ public class PACEProtocolTest extends TestCase {
       /* Chip's Public Key. */
       ECPoint piccMappingPublicKeyECPoint = new ECPoint(
           Util.os2i(Hex.hexStringToBytes("824FBA91 C9CBE26B EF53A0EB E7342A3B F178CEA9 F45DE0B7 0AA60165 1FBA3F57")),
-          Util.os2i(Hex.hexStringToBytes("30D8C879 AAA9C9F7 3991E61B 58F4D52E B87A0A0C 709A49DC 63719363 CCD13C54")));			
+          Util.os2i(Hex.hexStringToBytes("30D8C879 AAA9C9F7 3991E61B 58F4D52E B87A0A0C 709A49DC 63719363 CCD13C54")));
       PublicKey piccMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccMappingPublicKeyECPoint, ecParams));
 
       /* Given in example. */
@@ -216,7 +216,7 @@ public class PACEProtocolTest extends TestCase {
       //      mappingAgreement.doPhase(piccMappingPublicKey, true);
       //      byte[] sharedSecretH = mappingAgreement.generateSecret();
 
-      PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();      
+      PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();
       mappingAgreement.init(pcdMappingPrivateKey);
       ECPoint sharedSecretH = mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey));
 
@@ -257,7 +257,7 @@ public class PACEProtocolTest extends TestCase {
 
       /*
        * Perform Key Agreement.
-       * 
+       *
        * In the third step, chip and terminal perform an anonymous ECDH key agreement using the new domain
        * parameters determined by the ephemeral group generator G~ of the previous step. According to the Technical
        * Report SAC, only the x-coordinate is required as shared secret since the KDF only uses the first coordinate to
@@ -404,11 +404,11 @@ public class PACEProtocolTest extends TestCase {
       ECFieldFp fieldFp = (ECFieldFp)field;
       result.append("Prime field with prime " + fieldFp.getP());
     } else if (field instanceof ECFieldF2m) {
-      ECFieldF2m fieldF2m = (ECFieldF2m)field;      
+      ECFieldF2m fieldF2m = (ECFieldF2m)field;
       return "Binary field with exponent " + fieldF2m.getM();
     } else {
       result.append("Unknown field of size " + field.getFieldSize());
-    }    
+    }
     result.append(", A: " + curve.getA());
     result.append(", B: " + curve.getB());
     result.append("]");
@@ -423,7 +423,7 @@ public class PACEProtocolTest extends TestCase {
     /*
      * G.1.2. DH based example
      *
-     * The second example is based on DH using the 1024-bit MODP Group with 160-bit Prime Order Subgroup 
+     * The second example is based on DH using the 1024-bit MODP Group with 160-bit Prime Order Subgroup
      * specified by RFC 5114. The example is taken from the EAC 2 worked example (BSI 2010), making minor
      * modifications.
      */
@@ -500,7 +500,7 @@ public class PACEProtocolTest extends TestCase {
           + "6DE4AA40 6C1171FB 43DD939C 4BA16175"
           + "103BA3DE E16419AA 248118F9 0CC36A3D"
           + "6F4C3736 52E0C3CC E7F0F1D0 C5425B36"
-          + "00F0F0D6 A67F004C 8BBA33F2 B4733C72" 
+          + "00F0F0D6 A67F004C 8BBA33F2 B4733C72"
           + "52445C1D FC4F1107 203F71D2 EFB28161"));
       BigInteger pcdPublicKeyFieldElement = Util.os2i(Hex.hexStringToBytes("00907D89 E2D425A1 78AA81AF 4A7774EC"
           + "8E388C11 5CAE6703 1E85EECE 520BD911"
@@ -516,7 +516,7 @@ public class PACEProtocolTest extends TestCase {
           + "AEFB9139 4DA476BD 97B9B14D 0A65C1FC"
           + "71A0E019 CB08AF55 E1F72900 5FBA7E3F"
           + "A5DC4189 9238A250 767A6D46 DB974064"
-          + "386CD456 743585F8 E5D90CC8 B4004B1F" 
+          + "386CD456 743585F8 E5D90CC8 B4004B1F"
           + "6D866C79 CE0584E4 9687FF61 BC29AEA1"));
 
       /* Given in example. */
@@ -644,7 +644,7 @@ public class PACEProtocolTest extends TestCase {
       //			PublicKey piccMappingPublicKey = keyFactory.generatePublic(new ECPublicKeySpec(piccMappingPublicKeyPoint, ecParams));
       PublicKey piccMappingPublicKey = PACEProtocol.decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
 
-      PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();      
+      PACEGMWithECDHAgreement mappingAgreement = new PACEGMWithECDHAgreement();
       mappingAgreement.init(pcdMappingPrivateKey);
       ECPoint mappingSharedSecret = mappingAgreement.doPhase(PACEProtocol.updateParameterSpec(piccMappingPublicKey, pcdMappingPrivateKey));
 
@@ -667,7 +667,7 @@ public class PACEProtocolTest extends TestCase {
   /**
    * Example from
    * Appendix H to Part 11: Worked Example: PACE - Integrated Mapping (Informative).
-   * 
+   *
    * This example is based on the BrainpoolP256r1 elliptic curve.
    * The block cipher used in this example is AES-128.
    */
@@ -675,11 +675,11 @@ public class PACEProtocolTest extends TestCase {
    * Pseudorandom R(s,t) =
    *    E4447E2D FB3586BA C05DDB00 156B57FB
    *    B2179A39 49294C97 25418980 0C517BAA
-   *    8DA0FF39 7ED8C445 D3E421E4 FEB57322 
-   * 
+   *    8DA0FF39 7ED8C445 D3E421E4 FEB57322
+   *
    * Expected R_p(s,t) =
    *    A2F8FF2D F50E52C6 599F386A DCB595D2
-   *    29F6A167 ADE2BE5F 2C3296AD D5B7430E 
+   *    29F6A167 ADE2BE5F 2C3296AD D5B7430E
    */
   public void testPseudoRandomFunctionWorkedExampleH1() {
     try {
@@ -702,7 +702,7 @@ public class PACEProtocolTest extends TestCase {
   /**
    * Example from
    * Appendix H to Part 11: Worked Example: PACE - Integrated Mapping (Informative).
-   * 
+   *
    * This example is based on the BrainpoolP256r1 elliptic curve.
    */
   public void testSpecSamplePACEIMWithECDHPointEncodingExampleH1() {
@@ -751,7 +751,7 @@ public class PACEProtocolTest extends TestCase {
    *    5CF19AFA FF75EFE2 1DC5F6AA 1F9AE46C
    *    25087E73 68166FB0 8C1E4627 AFED7D93
    *    570417B7 90FF7F74 7E57F432 B04E1236
-   *    819E0DFE F5B6E77C A4999925 328182D2 
+   *    819E0DFE F5B6E77C A4999925 328182D2
    */
   public void testPACEIMWithDHWorkedExampleH2() {
     try {

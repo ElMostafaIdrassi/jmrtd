@@ -250,7 +250,7 @@ public class MRZInfo extends AbstractLDSInfo {
       /* line 1, pos 16 to 30, Optional data elements */
       this.optionalData1 = readStringWithFillers(dataIn, 15);
 
-      if (documentNumberCheckDigit == '<') {
+      if (documentNumberCheckDigit == '<' && !optionalData1.isEmpty()) {
         /* Interpret personal number as part of document number, see note j. */
         this.documentNumber += optionalData1.substring(0, optionalData1.length() - 1);
         this.documentNumberCheckDigit = optionalData1.charAt(optionalData1.length() - 1);

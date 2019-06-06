@@ -51,7 +51,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testAESSecureMessagingWrapperEquals() {
     try {
       SecretKey encKey = getRandomAESKey();
@@ -65,7 +65,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testAESSecureMessagingWrapperWrapUnwrap() {
     try {
       SecretKey encKey = getRandomAESKey();
@@ -74,7 +74,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
 
       CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x00, 0x00, new byte[] { 0x3F, 0x00 }, 0x00);
       CommandAPDU wrappedCommandAPDU = wrapper.wrap(commandAPDU);
-      
+
       assertNotNull(wrappedCommandAPDU);
       assertEquals(0x0C, wrappedCommandAPDU.getCLA());
       assertEquals(commandAPDU.getINS(), wrappedCommandAPDU.getINS());
@@ -85,7 +85,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();

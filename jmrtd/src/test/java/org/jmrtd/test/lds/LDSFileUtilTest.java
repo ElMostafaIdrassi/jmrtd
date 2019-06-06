@@ -44,9 +44,9 @@ import junit.framework.TestCase;
 
 /**
  * Tests some of the functionality provided by the {@code LDSFileUtil} class.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class LDSFileUtilTest extends TestCase {
@@ -60,7 +60,7 @@ public class LDSFileUtilTest extends TestCase {
       testGetLDSFile(PassportService.EF_COM, comFile.getEncoded(), comFile);
 
       DG1File dg1File = DG1FileTest.createTestObject();
-      testGetLDSFile(PassportService.EF_DG1, dg1File.getEncoded(), dg1File);    
+      testGetLDSFile(PassportService.EF_DG1, dg1File.getEncoded(), dg1File);
 
       DG2File dg2File = DG2FileTest.createTestObject();
       testGetLDSFile(PassportService.EF_DG2, dg2File.getEncoded(), dg2File);
@@ -136,5 +136,5 @@ public class LDSFileUtilTest extends TestCase {
     SODFile sodFile = SODFileTest.createTestObject("SHA-256", "SHA256WithRSA");
     List<Integer> dgNumbersFromSOd = LDSFileUtil.getDataGroupNumbers(sodFile);
     assertEquals(Arrays.asList(new Integer[] { 1, 2 }), dgNumbersFromSOd);
-  }  
+  }
 }

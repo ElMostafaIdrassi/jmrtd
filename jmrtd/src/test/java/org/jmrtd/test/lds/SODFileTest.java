@@ -245,7 +245,7 @@ public class SODFileTest extends TestCase {
       DG1File dg1File = DG1FileTest.createTestObject();
       byte[] dg1Bytes = dg1File.getEncoded();
       DG2File dg2File = DG2FileTest.getDefaultTestObject();
-      byte[] dg2Bytes = dg2File.getEncoded();			
+      byte[] dg2Bytes = dg2File.getEncoded();
       //			DG15File dg15File = DG15FileTest.createTestObject();
       //			byte[] dg15Bytes = dg15File.getEncoded();
 
@@ -285,7 +285,7 @@ public class SODFileTest extends TestCase {
       //			if (!outputDir.isDirectory()) {
       //				fail("Could not make output dir \"" + outputDir.getAbsolutePath() + "\"");
       //			}
-      //			
+      //
       //
       //			FileOutputStream comOut = new FileOutputStream(new File(outputDir, "EF_COM.bin"));
       //			comOut.write(com.getEncoded());

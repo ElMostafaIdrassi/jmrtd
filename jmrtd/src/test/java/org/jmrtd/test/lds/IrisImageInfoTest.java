@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class IrisImageInfoTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public void testToString() {
     try {
       IrisImageInfo info = createTestObject();

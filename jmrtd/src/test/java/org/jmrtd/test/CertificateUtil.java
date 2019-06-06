@@ -47,9 +47,9 @@ import org.bouncycastle.operator.ContentSigner;
 
 /**
  * Certificate utilities for testing.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
- * 
+ *
  * @version $Revision$
  */
 public class CertificateUtil {
@@ -64,7 +64,7 @@ public class CertificateUtil {
 
   /**
    * Generates a certificate.
-   * 
+   *
    * @param issuer the issuer DN as a comma-separated list
    * @param subject the subject DN as a comma-separated list
    * @param dateOfIssuing the date of issuing
@@ -72,7 +72,7 @@ public class CertificateUtil {
    * @param subjecPublicKey the subject's public key
    * @param issuerPrivateKey the issuer's private key
    * @param signatureAlgorithm the signature algorithm to use in Java mnemonic notation
-   * 
+   *
    * @return the generated certificate
    */
   public static X509Certificate createCertificate(String issuer, String subject, Date dateOfIssuing, Date dateOfExpiry,
@@ -136,5 +136,5 @@ public class CertificateUtil {
         return null;
       }
     }
-  }	
+  }
 }

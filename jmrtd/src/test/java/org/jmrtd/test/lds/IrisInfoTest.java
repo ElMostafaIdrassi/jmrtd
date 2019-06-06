@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class IrisInfoTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public IrisInfoTest(String name) {
     super(name);
   }
@@ -73,7 +73,7 @@ public class IrisInfoTest extends TestCase {
    * - Creator of the biometric reference data(PID) (Optional)
    * - Format owner (Mandatory)
    * - Format type (Mandatory)
-   * 
+   *
    * In practice this means: 0x81 (bio type), 0x82 (bio subtype),
    * 0x87 (format owner), 0x88 (format type) will be present.
    */

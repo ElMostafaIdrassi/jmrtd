@@ -107,7 +107,7 @@ public class BACKeyTest extends TestCase {
     assertEquals("12<<<<<<<", (new BACKey("12", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());
     assertEquals("1<<<<<<<<", (new BACKey("1", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());
     assertEquals("<<<<<<<<<", (new BACKey("", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());
-    
+
     assertEquals("123456789", (new BACKey("123456789", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());
     assertEquals("12345678<", (new BACKey("12345678<", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());
     assertEquals("1234567<<", (new BACKey("1234567<<", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());

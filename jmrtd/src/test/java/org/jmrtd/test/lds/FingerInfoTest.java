@@ -74,7 +74,7 @@ public class FingerInfoTest extends TestCase {
   }
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-  
+
   public void testFields() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testFieldsReasonable(fingerInfo);
@@ -94,7 +94,7 @@ public class FingerInfoTest extends TestCase {
   }
 
   public void testReflexiveReconstruct(FingerInfo fingerInfo) {
-    FingerInfo fingerInfo2 = new FingerInfo(fingerInfo.getCaptureDeviceId(), fingerInfo.getAcquisitionLevel(), fingerInfo.getScaleUnits(), fingerInfo.getHorizontalScanningResolution(), fingerInfo.getVerticalScanningResolution(), fingerInfo.getHorizontalImageResolution(), fingerInfo.getVerticalImageResolution(), fingerInfo.getDepth(), fingerInfo.getCompressionAlgorithm(), fingerInfo.getFingerImageInfos());    
+    FingerInfo fingerInfo2 = new FingerInfo(fingerInfo.getCaptureDeviceId(), fingerInfo.getAcquisitionLevel(), fingerInfo.getScaleUnits(), fingerInfo.getHorizontalScanningResolution(), fingerInfo.getVerticalScanningResolution(), fingerInfo.getHorizontalImageResolution(), fingerInfo.getVerticalImageResolution(), fingerInfo.getDepth(), fingerInfo.getCompressionAlgorithm(), fingerInfo.getFingerImageInfos());
     assertEquals(fingerInfo, fingerInfo2);
   }
 
@@ -194,7 +194,7 @@ public class FingerInfoTest extends TestCase {
    * - Creator of the biometric reference data(PID) (Optional)
    * - Format owner (Mandatory)
    * - Format type (Mandatory)
-   * 
+   *
    * In practice this means: 0x81 (bio type), 0x82 (bio subtype),
    * 0x87 (format owner), 0x88 (format type) will be present.
    */

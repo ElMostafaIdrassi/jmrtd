@@ -49,7 +49,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests for TAResult class.
- * 
+ *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
@@ -107,7 +107,7 @@ public class TAResultTest extends TestCase {
       KeyPair pcdKeyPair = keyPairGenerator.generateKeyPair();
       PublicKey pcdPublicKey = pcdKeyPair.getPublic();
       PrivateKey pcdPrivateKey = pcdKeyPair.getPrivate();
-      
+
       SecretKey encKey = getRandomAESKey();
       SecretKey macKey = getRandomAESKey();
       SecureMessagingWrapper wrapper = new AESSecureMessagingWrapper(encKey, macKey, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L);
@@ -123,7 +123,7 @@ public class TAResultTest extends TestCase {
       byte[] cardChallenge = null;
       EACTAResult taResult = new EACTAResult(caResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
       EACTAResult anotherTAResult = new EACTAResult(anotherCAResult, cvcPrincipal, terminalCertificates, terminalKey, documentNumber, cardChallenge);
-      
+
       assertEquals(taResult.hashCode(), anotherTAResult.hashCode());
       assertEquals(taResult, anotherTAResult);
       assertEquals(taResult.toString(), anotherTAResult.toString());
@@ -131,7 +131,7 @@ public class TAResultTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   private static SecretKey getRandomAESKey() throws NoSuchAlgorithmException {
     KeyGenerator keyFactory = KeyGenerator.getInstance("AES");
     return keyFactory.generateKey();
