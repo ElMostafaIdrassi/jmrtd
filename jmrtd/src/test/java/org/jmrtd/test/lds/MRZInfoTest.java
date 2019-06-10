@@ -430,9 +430,6 @@ public class MRZInfoTest extends TestCase {
   /*
    * Document number check digit indicates extension in optional data,
    * but optional data is empty.
-   *
-   *
-   *
    */
   public void testMRZWithEmptyExtendedDocumentNumber() throws Exception {
     String mrz = "I<UTOD23145890<<<<<<<<<<<<<<<<" +
