@@ -135,6 +135,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
   /**
    * Sends a General Authenticate command.
    * This command is the second command that is sent in the "AES" case.
+   * This uses 256 for the expected length.
    *
    * @param wrapper secure messaging wrapper
    * @param data data to be sent, without the {@code 0x7C} prefix (this method will add it)
@@ -145,6 +146,23 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
    * @throws CardServiceException on error
    */
   public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException {
+    return sendGeneralAuthenticate(wrapper, data, 256, isLast);
+  }
+
+  /**
+   * Sends a General Authenticate command.
+   * This command is the second command that is sent in the "AES" case.
+   *
+   * @param wrapper secure messaging wrapper
+   * @param data data to be sent, without the {@code 0x7C} prefix (this method will add it)
+   * @param le the expected length
+   * @param isLast indicates whether this is the last command in the chain
+   *
+   * @return dynamic authentication data without the {@code 0x7C} prefix (this method will remove it)
+   *
+   * @throws CardServiceException on error
+   */
+  public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, int le, boolean isLast) throws CardServiceException {
     byte[] commandData = TLVUtil.wrapDO(0x7C, data); // FIXME: constant for 0x7C
 
     /*
@@ -152,7 +170,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
      * It MUST be provided for version 2 but MUST NOT be provided for version 1.
      * So, we are expecting 0x7C (= tag), 0x00 (= length) here.
      */
-    CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 4);
+    CommandAPDU capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, le);
     ResponseAPDU rapdu = secureMessagingSender.transmit(wrapper, capdu);
 
     /* Handle error status word. */

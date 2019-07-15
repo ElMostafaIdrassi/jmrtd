@@ -187,6 +187,13 @@ public class PACEKeySpec implements AccessKeySpec {
         .toString();
   }
 
+  /**
+   * Returns a textual representation of the given key reference parameter.
+   *
+   * @param keyReference a key reference parameter
+   *
+   * @return a textual representation of the key reference
+   */
   private static String keyReferenceToString(byte keyReference) {
     switch (keyReference) {
       case PassportService.MRZ_PACE_KEY_REFERENCE:
