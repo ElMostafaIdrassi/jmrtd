@@ -136,7 +136,6 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
     int fac0 = dataInputStream.readInt(); // header (e.g. "FAC", 0x00)						/* 4 */
     if (fac0 != FORMAT_IDENTIFIER) {
       LOGGER.log(Level.WARNING, "'FAC' marker expected! Found " + Integer.toHexString(fac0));
-      //      throw new IllegalArgumentException("'FAC' marker expected! Found " + Integer.toHexString(fac0));
 
       if (fac0 == 0x0000000C) {
 

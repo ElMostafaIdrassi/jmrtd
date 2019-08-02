@@ -419,7 +419,6 @@ public class PACEProtocol {
    */
   public PACEGMMappingResult doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
     try {
-      long t0 = System.currentTimeMillis();
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(params);
       KeyPair pcdMappingKeyPair = keyPairGenerator.generateKeyPair();
