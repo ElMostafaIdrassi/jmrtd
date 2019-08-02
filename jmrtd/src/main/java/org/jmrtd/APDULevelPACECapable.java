@@ -58,5 +58,5 @@ public interface APDULevelPACECapable {
    *
    * @throws CardServiceException on error
    */
-  byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, boolean isLast) throws CardServiceException;
+  byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, int le, boolean isLast) throws CardServiceException;
 }

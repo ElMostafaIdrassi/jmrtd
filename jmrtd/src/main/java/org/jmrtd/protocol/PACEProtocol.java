@@ -352,7 +352,7 @@ public class PACEProtocol {
     try {
       byte[] step1Data = new byte[] { };
       /* Command data is empty. This implies an empty dynamic authentication object. */
-      byte[] step1Response = service.sendGeneralAuthenticate(wrapper, step1Data, false);
+      byte[] step1Response = service.sendGeneralAuthenticate(wrapper, step1Data, 256, false);
       byte[] step1EncryptedNonce = TLVUtil.unwrapDO(0x80, step1Response);
 
       /* (Re)initialize the K_pi cipher for decryption. */
@@ -419,6 +419,7 @@ public class PACEProtocol {
    */
   public PACEGMMappingResult doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
     try {
+      long t0 = System.currentTimeMillis();
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(params);
       KeyPair pcdMappingKeyPair = keyPairGenerator.generateKeyPair();
@@ -427,7 +428,9 @@ public class PACEProtocol {
 
       byte[] pcdMappingEncodedPublicKey = encodePublicKeyForSmartCard(pcdMappingPublicKey);
       byte[] step2Data = TLVUtil.wrapDO(0x81, pcdMappingEncodedPublicKey);
-      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, false);
+
+      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLength, false);
+
       byte[] piccMappingEncodedPublicKey = TLVUtil.unwrapDO(0x82, step2Response);
       PublicKey piccMappingPublicKey = decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
 
@@ -496,7 +499,7 @@ public class PACEProtocol {
       /*
        * NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2).
        */
-      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, false);
+      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLength, false);
 
       if ("ECDH".equals(agreementAlg)) {
         AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
@@ -556,7 +559,7 @@ public class PACEProtocol {
     try {
       byte[] pcdEncodedPublicKey = encodePublicKeyForSmartCard(pcdPublicKey);
       byte[] step3Data = TLVUtil.wrapDO(0x83, pcdEncodedPublicKey);
-      byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, false);
+      byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, maxTranceiveLength, false);
       byte[] piccEncodedPublicKey = TLVUtil.unwrapDO(0x84, step3Response);
       PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 
@@ -624,7 +627,7 @@ public class PACEProtocol {
     try {
       byte[] pcdToken = generateAuthenticationToken(oid, macKey, piccPublicKey);
       byte[] step4Data = TLVUtil.wrapDO(0x85, pcdToken);
-      byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, true);
+      byte[] step4Response = service.sendGeneralAuthenticate(wrapper, step4Data, 256, true);
       TLVInputStream step4ResponseInputStream = new TLVInputStream(new ByteArrayInputStream(step4Response));
       try {
         int tag86 = step4ResponseInputStream.readTag();

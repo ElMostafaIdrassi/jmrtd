@@ -22,6 +22,8 @@
 
 package org.jmrtd.lds.iso19794;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
@@ -37,6 +40,10 @@ import org.jmrtd.cbeff.CBEFFInfo;
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.AbstractListInfo;
+import org.jmrtd.lds.iso19794.FaceImageInfo.EyeColor;
+import org.jmrtd.lds.iso19794.FaceImageInfo.FeaturePoint;
+
+import net.sf.scuba.data.Gender;
 
 /**
  * A facial record consists of a facial record header and one or more facial record datas.
@@ -128,7 +135,51 @@ public class FaceInfo extends AbstractListInfo<FaceImageInfo> implements Biometr
 
     int fac0 = dataInputStream.readInt(); // header (e.g. "FAC", 0x00)						/* 4 */
     if (fac0 != FORMAT_IDENTIFIER) {
-      throw new IllegalArgumentException("'FAC' marker expected! Found " + Integer.toHexString(fac0));
+      LOGGER.log(Level.WARNING, "'FAC' marker expected! Found " + Integer.toHexString(fac0));
+      //      throw new IllegalArgumentException("'FAC' marker expected! Found " + Integer.toHexString(fac0));
+
+      if (fac0 == 0x0000000C) {
+
+        /* Magic JP2 header. Best effort, assume this is a single image. */
+
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(bOut);
+        dataOutputStream.writeInt(fac0);
+
+        int imageLength = (int)dataInputStream.readShort();
+
+        dataOutputStream.writeShort(imageLength);
+
+        int totalBytesRead = 0;
+        while (totalBytesRead < imageLength) {
+          byte[] buffer = new byte[2048];
+          int chunkSize = dataInputStream.read(buffer);
+          if (chunkSize < 0) {
+            break;
+          }
+          bOut.write(buffer);
+          totalBytesRead += chunkSize;
+        }
+
+        /* Construct header with default values. */
+        FaceImageInfo imageInfo = new FaceImageInfo(
+            Gender.UNKNOWN,
+            EyeColor.UNSPECIFIED,
+            0x00,
+            FaceImageInfo.HAIR_COLOR_UNSPECIFIED,
+            FaceImageInfo.EXPRESSION_UNSPECIFIED,
+            new int[] { 0, 0, 0}, new int[] {0, 0, 0},
+            FaceImageInfo.IMAGE_DATA_TYPE_JPEG2000,
+            FaceImageInfo.IMAGE_COLOR_SPACE_UNSPECIFIED,
+            FaceImageInfo.SOURCE_TYPE_UNSPECIFIED,
+            0x00,
+            0,
+            new FeaturePoint[] { },
+            0, 0,
+            new ByteArrayInputStream(bOut.toByteArray()), imageLength, FaceImageInfo.IMAGE_DATA_TYPE_JPEG2000);
+        add(imageInfo);
+        return;
+      }
     }
 
     int version = dataInputStream.readInt(); // version in ASCII (e.g. "010" 0x00)			/* + 4 = 8 */

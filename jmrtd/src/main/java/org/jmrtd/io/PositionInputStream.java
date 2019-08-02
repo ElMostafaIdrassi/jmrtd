@@ -88,13 +88,13 @@ public class PositionInputStream extends InputStream {
   }
 
   @Override
-  public void mark(int readLimit) {
+  public synchronized void mark(int readLimit) {
     carrier.mark(readLimit);
     markedPosition = position;
   }
 
   @Override
-  public void reset() throws IOException {
+  public synchronized void reset() throws IOException {
     carrier.reset();
     position = markedPosition;
   }
