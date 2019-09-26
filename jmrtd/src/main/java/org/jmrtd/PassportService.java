@@ -394,13 +394,14 @@ public class PassportService extends AbstractMRTDCardService {
    * @param keySpec the MRZ
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters the domain params for DH or ECDH
+   * @param parameterId parameter identifier or {@code null}
    *
    * @return the result
    *
    * @throws CardServiceException on error
    */
-  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException {
-    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params);
+  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException {
+    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params, parameterId);
     wrapper = paceResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return paceResult;

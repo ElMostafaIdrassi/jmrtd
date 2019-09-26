@@ -95,8 +95,28 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @return the result
    *
    * @throws CardServiceException if authentication failed or on error
+   *
+   * @deprecated Use the variant with additional parameter identifier
    */
-  public abstract PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException;
+  @Deprecated
+  public PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException {
+    return doPACE(keySpec, oid, params, null);
+  }
+
+  /**
+   * Performs the PACE 2.0 / SAC protocol.
+   * A secure messaging channel is set up as a result.
+   *
+   * @param keySpec the MRZ
+   * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
+   * @param params explicit static domain parameters the domain params for DH or ECDH
+   * @param parameterId parameter identifier or {@code null}
+   *
+   * @return the result
+   *
+   * @throws CardServiceException if authentication failed or on error
+   */
+  public abstract PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException;
 
   /**
    * Selects the card side applet. If PACE has been executed successfully previously, then the card has authenticated

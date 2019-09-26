@@ -157,6 +157,7 @@ public class PACEAPDUSender implements APDULevelPACECapable {
    *
    * @param wrapper secure messaging wrapper
    * @param data data to be sent, without the {@code 0x7C} prefix (this method will add it)
+   * @param le the expected length to send
    * @param isLast indicates whether this is the last command in the chain
    *
    * @return dynamic authentication data without the {@code 0x7C} prefix (this method will remove it)

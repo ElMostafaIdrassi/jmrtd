@@ -79,6 +79,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.x9.X9ECPoint;
 import org.bouncycastle.crypto.params.DHParameters;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
@@ -880,7 +881,7 @@ public final class Util {
             org.bouncycastle.math.ec.ECPoint generator = params.getG();
             org.bouncycastle.math.ec.ECCurve curve = generator.getCurve();
             generator = curve.createPoint(generator.getAffineXCoord().toBigInteger(), generator.getAffineYCoord().toBigInteger());
-            params = new X9ECParameters(params.getCurve(), generator, params.getN(), params.getH(), params.getSeed());
+            params = new X9ECParameters(params.getCurve(), new X9ECPoint(generator, false), params.getN(), params.getH(), params.getSeed());
           } else {
             /* It's not a named curve, we can just return the decoded public key info. */
             return subjectPublicKeyInfo;

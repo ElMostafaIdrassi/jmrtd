@@ -24,12 +24,15 @@ package org.jmrtd.lds;
 
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DLSequence;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.jmrtd.Util;
 
 /**
@@ -55,9 +58,12 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 5687291829854501771L;
 
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+
   private String oid;
 
-  private BigInteger keyId; /* Optional, use null if implicit. */
+  /* Optional, use null if implicit. */
+  private BigInteger keyId;
 
   private PublicKey publicKey;
 
@@ -115,10 +121,15 @@ public class ChipAuthenticationPublicKeyInfo extends SecurityInfo {
   @Deprecated
   public ASN1Primitive getDERObject() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    vector.add(new ASN1ObjectIdentifier(oid));
-    vector.add((Util.toSubjectPublicKeyInfo(publicKey).toASN1Primitive()));
-    if (keyId != null) {
-      vector.add(new ASN1Integer(keyId));
+    SubjectPublicKeyInfo subjectPublicKeyInfo = Util.toSubjectPublicKeyInfo(publicKey);
+    if (subjectPublicKeyInfo == null) {
+      LOGGER.log(Level.WARNING, "Could not convert public key to subject-public-key-info structure");
+    } else {
+      vector.add(new ASN1ObjectIdentifier(oid));
+      vector.add((subjectPublicKeyInfo.toASN1Primitive()));
+      if (keyId != null) {
+        vector.add(new ASN1Integer(keyId));
+      }
     }
     return new DLSequence(vector);
   }

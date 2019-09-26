@@ -168,14 +168,15 @@ public class PACEProtocol {
    * @param accessKey the MRZ or CAN based access key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param params explicit static domain parameters for DH or ECDH
+   * @param parameterId parameter identifier or {@code null}
    *
    * @return a PACE result
    *
    * @throws CardServiceException if authentication failed or on some lower-level error
    */
-  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params) throws CardServiceException {
+  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException {
     try {
-      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
+      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params, parameterId);
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in key derivation step", gse);
     }
@@ -188,12 +189,13 @@ public class PACEProtocol {
    * @param staticPACEKey the password key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
    * @param staticParameters explicit static domain parameters the domain params for DH or ECDH
+   * @param parameterId parameter identifier or {@code null}
    *
    * @return a PACE result
    *
    * @throws CardServiceException if authentication failed or on lower level errors
    */
-  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws CardServiceException {
+  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters, BigInteger parameterId) throws CardServiceException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
@@ -211,15 +213,28 @@ public class PACEProtocol {
 
     try {
 
-      /* FIXME: multiple domain params feature not implemented here, for now. */
-      byte[] referencePrivateKeyOrForComputingSessionKey = null;
-
-      /* Send to the PICC. */
+      /*
+       * Doc 9303 4.4.4: Reference of a public key / secret key. REQUIRED.
+       * The password to be used is indicated as follows:
+       * 0x01: MRZ_information
+       * 0x02: CAN
+       */
       byte paceKeyReference = PassportService.MRZ_PACE_KEY_REFERENCE;
       if (staticPACEKey instanceof PACESecretKeySpec) {
         paceKeyReference = ((PACESecretKeySpec)staticPACEKey).getKeyReference();
       }
 
+      /*
+       * Doc 9303 4.4.4: Reference of a private key / Reference for computing a session key. CONDITIONAL.
+       * This data object is REQUIRED to indicate the identifier of the domain
+       * parameters to be used if the domain parameters are ambiguous, i.e.
+       * more than one set of domain parameters is available for PACE.
+       *
+       * See discussion here: https://sourceforge.net/p/jmrtd/discussion/580232/thread/ff434886d2/.
+       */
+      byte[] referencePrivateKeyOrForComputingSessionKey = parameterId == null ? null : Util.i2os(parameterId);
+
+      /* Send to the PICC. */
       service.sendMSESetATMutualAuth(wrapper, oid, paceKeyReference, referencePrivateKeyOrForComputingSessionKey);
     } catch (CardServiceException cse) {
       throw new PACEException("PICC side error in static PACE key derivation step", cse, cse.getSW());
