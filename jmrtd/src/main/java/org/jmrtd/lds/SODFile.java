@@ -404,12 +404,20 @@ public class SODFile extends AbstractTaggedLDSFile {
    * Returns the issuer name of the document signing certificate
    * as it appears in the signer-info in the signed-data structure.
    *
-   * @return a certificate issuer
+   * @return a certificate issuer, or {@code null} if not present
    */
   public X500Principal getIssuerX500Principal() {
     try {
       IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
+      if (issuerAndSerialNumber == null) {
+        return null;
+      }
+      
       X500Name name = issuerAndSerialNumber.getName();
+      if (name == null) {
+        return null;
+      }
+      
       return new X500Principal(name.getEncoded(ASN1Encoding.DER));
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Could not get issuer", ioe);
@@ -420,10 +428,14 @@ public class SODFile extends AbstractTaggedLDSFile {
   /**
    * Returns the serial number as it appears in the signer-info in the signed-data structure.
    *
-   * @return a certificate serial number
+   * @return a certificate serial number, or {@code null} if not present
    */
   public BigInteger getSerialNumber() {
     IssuerAndSerialNumber issuerAndSerialNumber = SignedDataUtil.getIssuerAndSerialNumber(signedData);
+    if (issuerAndSerialNumber == null) {
+      return null;
+    }
+    
     return issuerAndSerialNumber.getSerialNumber().getValue();
   }
 
