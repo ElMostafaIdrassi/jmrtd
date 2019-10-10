@@ -412,12 +412,12 @@ public class SODFile extends AbstractTaggedLDSFile {
       if (issuerAndSerialNumber == null) {
         return null;
       }
-      
+
       X500Name name = issuerAndSerialNumber.getName();
       if (name == null) {
         return null;
       }
-      
+
       return new X500Principal(name.getEncoded(ASN1Encoding.DER));
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Could not get issuer", ioe);
@@ -435,7 +435,7 @@ public class SODFile extends AbstractTaggedLDSFile {
     if (issuerAndSerialNumber == null) {
       return null;
     }
-    
+
     return issuerAndSerialNumber.getSerialNumber().getValue();
   }
 
