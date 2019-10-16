@@ -411,6 +411,31 @@ public final class SignedDataUtil {
   }
 
   /**
+   * Returns the subject-key-identifier in the given signed-data structure
+   * if the signer is identified through a subject-key-identifier.
+   * This will return {@code null} if the signer is identified through
+   * issuer name and serial number.
+   *
+   * @param signedData the signed-data-structure
+   *
+   * @return the subject-key-identifier
+   */
+  public static byte[] getSubjectKeyIdentifier(SignedData signedData) {
+    SignerInfo signerInfo = getSignerInfo(signedData);
+    SignerIdentifier signerIdentifier = signerInfo.getSID();
+    if (signerIdentifier == null) {
+      return null;
+    }
+
+    ASN1Encodable signerIdentifierId = signerIdentifier.getId();
+    if (signerIdentifierId == null || !(signerIdentifierId instanceof ASN1OctetString)) {
+      return null;
+    }
+
+    return ((ASN1OctetString)signerIdentifierId).getOctets();
+  }
+
+  /**
    * Reads any objects in the given ASN1 octet string (as an ASN1 input stream).
    *
    * @param octetString the octet string
@@ -510,43 +535,43 @@ public final class SignedDataUtil {
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }
 
-//  /**
-//   * Creates a signer info structures.
-//   *
-//   * @param digestAlgorithm the digest algorithm
-//   * @param digestEncryptionAlgorithm the signature algorithm
-//   * @param contentTypeOID the object identifier
-//   * @param contentInfo the content info
-//   * @param encryptedDigest the signature bytes
-//   * @param docSigningCertificate the document signer certificate
-//   *
-//   * @return the signer info structure
-//   *
-//   * @throws GeneralSecurityException on error
-//   */
-//  public static SignerInfo createSignerInfo(String digestAlgorithm,
-//      String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
-//      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
-//
-//    if (encryptedDigest == null) {
-//      throw new IllegalArgumentException("Encrypted digest cannot be null");
-//    }
-//
-//    /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
-//    X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
-//    X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
-//    BigInteger serial = docSigningCertificate.getSerialNumber();
-//    SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
-//
-//    AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
-//    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
-//
-//    ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
-//    ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
-//    ASN1Set unAuthenticatedAttributes = null; // should be empty set?
-//
-//    return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
-//  }
+  //  /**
+  //   * Creates a signer info structures.
+  //   *
+  //   * @param digestAlgorithm the digest algorithm
+  //   * @param digestEncryptionAlgorithm the signature algorithm
+  //   * @param contentTypeOID the object identifier
+  //   * @param contentInfo the content info
+  //   * @param encryptedDigest the signature bytes
+  //   * @param docSigningCertificate the document signer certificate
+  //   *
+  //   * @return the signer info structure
+  //   *
+  //   * @throws GeneralSecurityException on error
+  //   */
+  //  public static SignerInfo createSignerInfo(String digestAlgorithm,
+  //      String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
+  //      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
+  //
+  //    if (encryptedDigest == null) {
+  //      throw new IllegalArgumentException("Encrypted digest cannot be null");
+  //    }
+  //
+  //    /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
+  //    X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
+  //    X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
+  //    BigInteger serial = docSigningCertificate.getSerialNumber();
+  //    SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
+  //
+  //    AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
+  //    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
+  //
+  //    ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
+  //    ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
+  //    ASN1Set unAuthenticatedAttributes = null; // should be empty set?
+  //
+  //    return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
+  //  }
 
   /**
    * Creates a signer info structures.

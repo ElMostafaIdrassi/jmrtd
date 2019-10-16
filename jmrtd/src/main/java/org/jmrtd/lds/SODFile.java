@@ -402,7 +402,9 @@ public class SODFile extends AbstractTaggedLDSFile {
 
   /**
    * Returns the issuer name of the document signing certificate
-   * as it appears in the signer-info in the signed-data structure.
+   * as it appears in the signer-info in the signed-data structure
+   * This returns {@code null} when the signer is identified through
+   * subject-key-identifier instead.
    *
    * @return a certificate issuer, or {@code null} if not present
    */
@@ -426,7 +428,10 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
-   * Returns the serial number as it appears in the signer-info in the signed-data structure.
+   * Returns the serial number as it appears in the signer-info in the
+   * signed-data structure.
+   * This returns {@code null} when the signer is identified through
+   * subject-key-identifier instead.
    *
    * @return a certificate serial number, or {@code null} if not present
    */
@@ -437,6 +442,18 @@ public class SODFile extends AbstractTaggedLDSFile {
     }
 
     return issuerAndSerialNumber.getSerialNumber().getValue();
+  }
+
+  /**
+   * Returns the signer's subject-key-identifier as it appears in the signer-info
+   * in the signed-data structure.
+   * This returns {@code null} when the signer is identified through
+   * issuer name and serial instead.
+   *
+   * @return the subject-key-identifier, or {@code null} if not present
+   */
+  public byte[] getSubjectKeyIdentifier() {
+    return SignedDataUtil.getSubjectKeyIdentifier(signedData);
   }
 
   /**
