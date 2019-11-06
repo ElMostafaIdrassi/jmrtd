@@ -80,9 +80,9 @@ public class BACAPDUSender implements APDULevelBACCapable {
    * @throws CardServiceException on tranceive error
    */
   public synchronized byte[] sendGetChallenge(APDUWrapper wrapper) throws CardServiceException {
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_GET_CHALLENGE, 0x00, 0x00, 8);
-    ResponseAPDU rapdu = service.transmit(capdu);
-    return rapdu.getData();
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_GET_CHALLENGE, 0x00, 0x00, 8);
+    ResponseAPDU responseAPDU = service.transmit(commandAPDU);
+    return responseAPDU.getData();
   }
 
   /**
@@ -145,35 +145,35 @@ public class BACAPDUSender implements APDULevelBACCapable {
       System.arraycopy(ciphertext, 0, data, 0, 32);
       System.arraycopy(mactext, 0, data, 32, 8);
       int le = 40; /* 40 means max ne is 40 (0x28). */
-      CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
-      ResponseAPDU rapdu = service.transmit(capdu);
+      CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
+      ResponseAPDU responseAPDU = service.transmit(commandAPDU);
 
-      if (rapdu == null) {
+      if (responseAPDU == null) {
         throw new CardServiceException("Mutual authentication failed, received null response APDU");
       }
 
-      byte[] rapduBytes = rapdu.getBytes();
-      short sw = (short)rapdu.getSW();
-      if (rapduBytes == null) {
+      byte[] responseAPDUBytes = responseAPDU.getBytes();
+      short sw = (short)responseAPDU.getSW();
+      if (responseAPDUBytes == null) {
         throw new CardServiceException("Mutual authentication failed, received empty data in response APDU", sw);
       }
 
       /* Some MRTDs apparently don't support 40 here, try again with 0. See R2-p1_v2_sIII_0035 (and other issues). */
       if (sw != ISO7816.SW_NO_ERROR) {
         le = 0; /* 0 means ne is max 256 (0xFF). */
-        capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
-        rapdu = service.transmit(capdu);
-        rapduBytes = rapdu.getBytes();
-        sw = (short)rapdu.getSW();
+        commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
+        responseAPDU = service.transmit(commandAPDU);
+        responseAPDUBytes = responseAPDU.getBytes();
+        sw = (short)responseAPDU.getSW();
       }
 
-      if (rapduBytes.length != 42) {
-        throw new AccessDeniedException("Mutual authentication failed: expected length: 40 + 2, actual length: " + rapduBytes.length, sw);
+      if (responseAPDUBytes.length != 42) {
+        throw new AccessDeniedException("Mutual authentication failed: expected length: 40 + 2, actual length: " + responseAPDUBytes.length, sw);
       }
 
       /* Decrypt the response. */
       cipher.init(Cipher.DECRYPT_MODE, kEnc, ZERO_IV_PARAM_SPEC);
-      byte[] result = cipher.doFinal(rapduBytes, 0, rapduBytes.length - 8 - 2);
+      byte[] result = cipher.doFinal(responseAPDUBytes, 0, responseAPDUBytes.length - 8 - 2);
       if (result.length != 32) {
         /* The PICC allowed access, but probably the resulting secure channel will be wrong. */
         throw new CardServiceException("Cryptogram wrong length, was expecting 32, found " + result.length, sw);

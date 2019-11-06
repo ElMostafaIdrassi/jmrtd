@@ -49,7 +49,7 @@ public class CVCAFile extends AbstractLDSFile {
 
   private String caReference = null;
 
-  private String altCaReference = null;
+  private String altCAReference = null;
 
   /**
    * Constructs a CVCA file by reading from a stream.
@@ -79,10 +79,10 @@ public class CVCAFile extends AbstractLDSFile {
    * Constructs a new CVCA file with default file identifier.
    *
    * @param caReference CA reference
-   * @param altCaReference alternative CA reference
+   * @param altCAReference alternative CA reference
    */
-  public CVCAFile(String caReference, String altCaReference) {
-    this(PassportService.EF_CVCA, caReference, altCaReference);
+  public CVCAFile(String caReference, String altCAReference) {
+    this(PassportService.EF_CVCA, caReference, altCAReference);
   }
 
   /**
@@ -90,17 +90,17 @@ public class CVCAFile extends AbstractLDSFile {
    *
    * @param fid file identifier
    * @param caReference main CA certificate reference
-   * @param altCaReference second (alternative) CA certificate reference
+   * @param altCAReference second (alternative) CA certificate reference
    */
-  public CVCAFile(short fid, String caReference, String altCaReference) {
+  public CVCAFile(short fid, String caReference, String altCAReference) {
     if (caReference == null
         || caReference.length() > 16
-        || (altCaReference != null && altCaReference.length() > 16)) {
+        || (altCAReference != null && altCAReference.length() > 16)) {
       throw new IllegalArgumentException();
     }
     this.fid = fid;
     this.caReference = caReference;
-    this.altCaReference = altCaReference;
+    this.altCAReference = altCAReference;
   }
 
   /**
@@ -147,7 +147,7 @@ public class CVCAFile extends AbstractLDSFile {
       }
       data = new byte[length];
       dataIn.readFully(data);
-      altCaReference = new String(data);
+      altCAReference = new String(data);
       tag = dataIn.read();
     }
     while (tag != -1) {
@@ -164,11 +164,11 @@ public class CVCAFile extends AbstractLDSFile {
     result[0] = CAR_TAG;
     result[1] = (byte)caReference.length();
     System.arraycopy(caReference.getBytes(), 0, result, 2, result[1]);
-    if (altCaReference != null) {
+    if (altCAReference != null) {
       int index = result[1] + 2;
       result[index] = CAR_TAG;
-      result[index + 1] = (byte) altCaReference.length();
-      System.arraycopy(altCaReference.getBytes(), 0, result, index + 2,
+      result[index + 1] = (byte)altCAReference.length();
+      System.arraycopy(altCAReference.getBytes(), 0, result, index + 2,
           result[index + 1]);
     }
     outputStream.write(result);
@@ -190,7 +190,7 @@ public class CVCAFile extends AbstractLDSFile {
    * @return the second (alternative) CA Certificate identifier
    */
   public CVCPrincipal getAltCAReference() {
-    return altCaReference == null ? null : new CVCPrincipal(altCaReference);
+    return altCAReference == null ? null : new CVCPrincipal(altCAReference);
   }
 
   /**
@@ -200,8 +200,10 @@ public class CVCAFile extends AbstractLDSFile {
    */
   @Override
   public String toString() {
-    return "CA reference: \"" + caReference + "\""
-        + ((altCaReference != null) ? ", Alternative CA reference: " + altCaReference : "");
+    return new StringBuilder()
+        .append("CA reference: \"").append(caReference).append("\"")
+        .append(((altCAReference != null) ? ", Alternative CA reference: " + altCAReference : ""))
+        .toString();
   }
 
   /**
@@ -222,8 +224,8 @@ public class CVCAFile extends AbstractLDSFile {
 
     CVCAFile otherCVCAFile = (CVCAFile)other;
     return caReference.equals(otherCVCAFile.caReference)
-        && ((altCaReference == null && otherCVCAFile.altCaReference == null)
-            || (altCaReference != null && altCaReference.equals(otherCVCAFile.altCaReference)));
+        && ((altCAReference == null && otherCVCAFile.altCAReference == null)
+            || (altCAReference != null && altCAReference.equals(otherCVCAFile.altCAReference)));
   }
 
   /**
@@ -234,7 +236,7 @@ public class CVCAFile extends AbstractLDSFile {
   @Override
   public int hashCode() {
     return 11 * caReference.hashCode()
-        + ((altCaReference != null) ? 13 * altCaReference.hashCode() : 0)
+        + ((altCAReference != null) ? 13 * altCAReference.hashCode() : 0)
         + 5;
   }
 

@@ -75,27 +75,27 @@ public class AAAPDUSender implements APDULevelAACapable {
       throw new IllegalArgumentException("rndIFD wrong length");
     }
 
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 256);
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 256);
 
-    ResponseAPDU rapdu = null;
+    ResponseAPDU responseAPDU = null;
     short sw = -1;
     try {
-      rapdu = secureMessagingSender.transmit(wrapper, capdu);
-      sw = (short)rapdu.getSW();
+      responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
+      sw = (short)responseAPDU.getSW();
     } catch (CardServiceException cse) {
-      LOGGER.log(Level.INFO, "Exception during transmission of capdu = " + Hex.bytesToHexString(capdu.getBytes()), cse);
+      LOGGER.log(Level.INFO, "Exception during transmission of command APDU = " + Hex.bytesToHexString(commandAPDU.getBytes()), cse);
       sw = (short)cse.getSW();
     }
 
-    if (sw == ISO7816.SW_NO_ERROR && rapdu != null) {
-      return rapdu.getData();
+    if (sw == ISO7816.SW_NO_ERROR && responseAPDU != null) {
+      return responseAPDU.getData();
     } else if ((sw & 0xFF00) == 0x6100) {
-      byte[] normalLengthResponse = rapdu == null ? null : rapdu.getData();
+      byte[] normalLengthResponse = responseAPDU == null ? null : responseAPDU.getData();
 
       /* Something is wrong with that length. Try different length. */
-      capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 65536);
-      rapdu = secureMessagingSender.transmit(wrapper, capdu);
-      byte[] extendedLengthResponse = rapdu == null ? null : rapdu.getData();
+      commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 65536);
+      responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
+      byte[] extendedLengthResponse = responseAPDU == null ? null : responseAPDU.getData();
 
       if (normalLengthResponse == null && extendedLengthResponse == null) {
         throw new CardServiceException("Internal Authenticate failed", sw);
@@ -113,10 +113,10 @@ public class AAAPDUSender implements APDULevelAACapable {
       } else {
         return extendedLengthResponse;
       }
-    } else if (rapdu != null && rapdu.getData() != null) {
+    } else if (responseAPDU != null && responseAPDU.getData() != null) {
       /* If we got some data, return it, independent of what the status is. */
       LOGGER.warning("Internal Authenticate may not have succeeded, got status word " + Integer.toHexString(sw & 0xFFFF));
-      return rapdu.getData();
+      return responseAPDU.getData();
     }
 
     throw new CardServiceException("Internal Authenticate failed", sw);

@@ -25,7 +25,6 @@ package org.jmrtd;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -40,6 +39,7 @@ import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.smartcards.FileInfo;
 import net.sf.scuba.smartcards.FileSystemStructured;
 import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.util.Hex;
 
 /**
  * A file system for ICAO MRTDs (and similar file systems).
@@ -274,10 +274,18 @@ public class DefaultFileSystem implements FileSystemStructured {
         }
         prefix = sendReadBinary(0, READ_AHEAD_LENGTH, false);
       }
-      if (prefix == null || prefix.length != READ_AHEAD_LENGTH) {
-        LOGGER.warning("Something is wrong with prefix, prefix = " + Arrays.toString(prefix));
+      if (prefix == null || prefix.length == 0) {
+        LOGGER.warning("Something is wrong with prefix, prefix = " + Hex.bytesToHexString(prefix));
         return null;
       }
+
+      if (prefix.length < READ_AHEAD_LENGTH) {
+        /* Apparently the complete prefix is the file. */
+        int fileLength = prefix.length;
+        LOGGER.info("Short file " + Integer.toHexString(selectedFID) + " with length: " + fileLength);
+        return new DefaultFileInfo(selectedFID, fileLength);
+      }
+
       ByteArrayInputStream baInputStream = new ByteArrayInputStream(prefix);
       TLVInputStream tlvInputStream = new TLVInputStream(baInputStream);
       try {

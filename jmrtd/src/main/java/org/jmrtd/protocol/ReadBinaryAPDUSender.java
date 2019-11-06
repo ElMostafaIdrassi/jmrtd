@@ -53,10 +53,9 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
     if (aid == null) {
       throw new IllegalArgumentException("AID cannot be null");
     }
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte) 0x04, (byte) 0x0C, aid);
-    ResponseAPDU rapdu = secureMessagingSender.transmit(wrapper, capdu);
-
-    checkStatusWordAfterFileOperation(capdu, rapdu);
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte)0x04, (byte)0x0C, aid);
+    ResponseAPDU responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
+    checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
   }
 
   /**
@@ -69,15 +68,15 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
    * @throws CardServiceException on tranceive error
    */
   public synchronized void sendSelectFile(APDUWrapper wrapper, short fid) throws CardServiceException {
-    byte[] fiddle = { (byte) ((fid >> 8) & 0xFF), (byte) (fid & 0xFF) };
-    CommandAPDU capdu = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte) 0x02, (byte) 0x0c, fiddle, 0);
-    ResponseAPDU rapdu = secureMessagingSender.transmit(wrapper, capdu);
+    byte[] fiddle = { (byte)((fid >> 8) & 0xFF), (byte)(fid & 0xFF) };
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte)0x02, (byte)0x0c, fiddle, 0);
+    ResponseAPDU responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
 
-    if (rapdu == null) {
+    if (responseAPDU == null) {
       return;
     }
 
-    checkStatusWordAfterFileOperation(capdu, rapdu);
+    checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
   }
 
   /**
@@ -150,7 +149,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
 
     byte[] responseData = getResponseData(responseAPDU, isTLVEncodedOffsetNeeded);
     if (responseData == null || responseData.length == 0) {
-      LOGGER.warning("Empty response data: rapduBytes = " + Arrays.toString(responseData) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
+      LOGGER.warning("Empty response data: response APDU bytes = " + Arrays.toString(responseData) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
     } else {
       checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
     }
