@@ -286,21 +286,33 @@ public final class SignedDataUtil {
    *
    * @param signedData the signed data object
    *
-   * @return the algorithm parameters
+   * @return the algorithm parameters, or {@code PSSParameterSpec.DEFAULT} for RSASSA/PSS, or {@code null} on unrecognized algorithms
    */
   public static AlgorithmParameterSpec getDigestEncryptionAlgorithmParams(SignedData signedData) {
     try {
       SignerInfo signerInfo = getSignerInfo(signedData);
       AlgorithmIdentifier digestEncryptionAlgorithm = signerInfo.getDigestEncryptionAlgorithm();
-      ASN1Encodable params = digestEncryptionAlgorithm.getParameters();
-
       String digestEncryptionAlgorithmOID = digestEncryptionAlgorithm.getAlgorithm().getId();
-      if (PKCS1_RSASSA_PSS_OID.equals(digestEncryptionAlgorithmOID)) {
-        RSASSAPSSparams rsaSSAParams = RSASSAPSSparams.getInstance(params);
-        return toAlgorithmParameterSpec(rsaSSAParams);
+      if (!PKCS1_RSASSA_PSS_OID.equals(digestEncryptionAlgorithmOID)) {
+        /* We only support additional parameters for RSASSA/PSS signature algorithm. */
+        return null;
       }
+
+      ASN1Encodable params = digestEncryptionAlgorithm.getParameters();
+      if (params == null) {
+        LOGGER.warning("Cannot get RSASSA/PSS parameters");
+        return null;
+      }
+
+      RSASSAPSSparams rsaSSAParams = RSASSAPSSparams.getInstance(params);
+      if (rsaSSAParams == null) {
+        LOGGER.warning("Cannot get RSASSA/PSS parameters");
+        return null;
+      }
+
+      return toAlgorithmParameterSpec(rsaSSAParams);
     } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "Exception", e);
+      LOGGER.log(Level.WARNING, "Cannot get RSASSA/PSS parameters", e);
     }
 
     return null;
@@ -717,6 +729,26 @@ public final class SignedDataUtil {
   }
 
   /**
+   * Extracts the signer info structure from a signed data structure.
+   *
+   * @param signedData the signed data structure
+   *
+   * @return the signer info structure
+   */
+  public static SignerInfo getSignerInfo(SignedData signedData)  {
+    ASN1Set signerInfos = signedData.getSignerInfos();
+    if (signerInfos == null || signerInfos.size() <= 0) {
+      throw new IllegalArgumentException("No signer info in signed data");
+    }
+
+    if (signerInfos.size() > 1) {
+      LOGGER.warning("Found " + signerInfos.size() + " signerInfos");
+    }
+
+    return SignerInfo.getInstance(signerInfos.getObjectAt(0));
+  }
+
+  /**
    * Returns the common mnemonic string (such as "SHA1", "SHA256withRSA") given an OID.
    *
    * @param oid an object identifier
@@ -982,11 +1014,15 @@ public final class SignedDataUtil {
    *
    * @param rsaSSAParams the RSA-SSA parameter specification to convert
    *
-   * @return a corresponding JCE parameter specification
+   * @return a corresponding JCE parameter specification, or {@code null} if the BC specification specifies an illegal JCE specification
    *
    * @throws NoSuchAlgorithmException on error
    */
   private static AlgorithmParameterSpec toAlgorithmParameterSpec(RSASSAPSSparams rsaSSAParams) throws NoSuchAlgorithmException {
+    if (rsaSSAParams == null) {
+      return null;
+    }
+
     String hashAlgorithmOID = rsaSSAParams.getHashAlgorithm().getAlgorithm().getId();
     AlgorithmIdentifier maskGenAlgorithm = rsaSSAParams.getMaskGenAlgorithm();
     String maskGenAlgorithmOID = maskGenAlgorithm.getAlgorithm().getId();
@@ -996,6 +1032,11 @@ public final class SignedDataUtil {
 
     int saltLength = rsaSSAParams.getSaltLength().intValue();
     int trailerField = rsaSSAParams.getTrailerField().intValue();
+
+    if (hashAlgorithmName == null || maskGenAlgorithmName == null || saltLength < 0 || trailerField < 0) {
+      LOGGER.warning("Cannot get RSASSA/PSS parameters");
+      return null;
+    }
 
     return new PSSParameterSpec(hashAlgorithmName, maskGenAlgorithmName, toMaskGenAlgorithmParameterSpec(maskGenAlgorithm), saltLength, trailerField);
   }
@@ -1021,26 +1062,6 @@ public final class SignedDataUtil {
     }
     /* Default to SHA-1. */
     return new MGF1ParameterSpec("SHA-1");
-  }
-
-  /**
-   * Extracts the signer info structure from a signed data structure.
-   *
-   * @param signedData the signed data structure
-   *
-   * @return the signer info structure
-   */
-  private static SignerInfo getSignerInfo(SignedData signedData)  {
-    ASN1Set signerInfos = signedData.getSignerInfos();
-    if (signerInfos == null || signerInfos.size() <= 0) {
-      throw new IllegalArgumentException("No signer info in signed data");
-    }
-
-    if (signerInfos.size() > 1) {
-      LOGGER.warning("Found " + signerInfos.size() + " signerInfos");
-    }
-
-    return SignerInfo.getInstance(signerInfos.getObjectAt(0));
   }
 
   /**

@@ -232,6 +232,9 @@ public class SODFile extends AbstractTaggedLDSFile {
    */
   public SODFile(InputStream inputStream) throws IOException {
     super(EF_SOD_TAG, inputStream);
+
+    /* Will throw IAE if no signer info. */
+    SignedDataUtil.getSignerInfo(signedData);
   }
 
   @Override
