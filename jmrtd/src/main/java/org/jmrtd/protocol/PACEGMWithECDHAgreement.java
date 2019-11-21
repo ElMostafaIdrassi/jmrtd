@@ -59,7 +59,6 @@ public class PACEGMWithECDHAgreement {
       throw new InvalidKeyException("Not an ECPrivateKey");
     }
     this.privateKey = (ECPrivateKey)privateKey;
-
   }
 
   /**

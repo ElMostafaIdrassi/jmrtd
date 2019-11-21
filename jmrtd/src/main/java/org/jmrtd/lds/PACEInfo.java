@@ -343,8 +343,27 @@ public class PACEInfo extends SecurityInfo {
       return false;
     }
 
-    PACEInfo otherPACEInfo = (PACEInfo) other;
-    return getDERObject().equals(otherPACEInfo.getDERObject());
+    PACEInfo otherPACEInfo = (PACEInfo)other;
+
+    if (protocolOID == null && otherPACEInfo.protocolOID != null) {
+      return false;
+    }
+    if (protocolOID != null && !protocolOID.equals(otherPACEInfo.protocolOID)) {
+      return false;
+    }
+
+    if (version != otherPACEInfo.version) {
+      return false;
+    }
+
+    if (parameterId == null && otherPACEInfo.parameterId != null) {
+      return false;
+    }
+    if (parameterId != null && !parameterId.equals(otherPACEInfo.parameterId)) {
+      return false;
+    }
+
+    return true;
   }
 
   /**

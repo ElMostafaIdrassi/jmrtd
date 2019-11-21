@@ -1023,10 +1023,20 @@ public final class Util {
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();
     BigInteger x = point.getAffineX();
     BigInteger y = point.getAffineY();
+    byte[] xBytes = i2os(x);
+    byte[] yBytes = i2os(y);
+    int difference = xBytes.length - yBytes.length;
+    byte[] zeroes = new byte[Math.abs(difference)];
     try {
       bOut.write(0x04); // FIXME: Constant for 0x04.
-      bOut.write(i2os(x));
-      bOut.write(i2os(y));
+      if (difference < 0) {
+        bOut.write(zeroes);
+      }
+      bOut.write(xBytes);
+      if (difference > 0) {
+        bOut.write(zeroes);
+      }
+      bOut.write(yBytes);
       bOut.close();
     } catch (IOException ioe) {
       throw new IllegalStateException("Exception", ioe);

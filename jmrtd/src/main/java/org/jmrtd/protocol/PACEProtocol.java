@@ -167,16 +167,16 @@ public class PACEProtocol {
    *
    * @param accessKey the MRZ or CAN based access key
    * @param oid as specified in the PACEInfo, indicates GM or IM or CAM, DH or ECDH, cipher, digest, length
-   * @param params explicit static domain parameters for DH or ECDH
+   * @param staticParameters explicit static domain parameters for DH or ECDH
    * @param parameterId parameter identifier or {@code null}
    *
    * @return a PACE result
    *
    * @throws CardServiceException if authentication failed or on some lower-level error
    */
-  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException {
+  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec staticParameters, BigInteger parameterId) throws CardServiceException {
     try {
-      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params, parameterId);
+      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, staticParameters, parameterId);
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in key derivation step", gse);
     }
@@ -1349,7 +1349,7 @@ public class PACEProtocol {
 
     /* Agreement algorithm should be ECDH or DH. */
     if (!("ECDH".equalsIgnoreCase(agreementAlg) || "DH".equalsIgnoreCase(agreementAlg))) {
-      throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found \"" + agreementAlg + "\"");
+      throw new IllegalArgumentException("Unsupported agreement algorithm, expected \"ECDH\" or \"DH\", found \"" + agreementAlg + "\"");
     }
 
     if (cipherAlg == null) {
@@ -1357,12 +1357,12 @@ public class PACEProtocol {
     }
 
     if (!("DESede".equalsIgnoreCase(cipherAlg) || "AES".equalsIgnoreCase(cipherAlg))) {
-      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + cipherAlg + "\"");
+      throw new IllegalArgumentException("Unsupported cipher algorithm, expected \"DESede\" or \"AES\", found \"" + cipherAlg + "\"");
     }
 
     if (!("SHA-1".equalsIgnoreCase(digestAlg) || "SHA1".equalsIgnoreCase(digestAlg)
         || "SHA-256".equalsIgnoreCase(digestAlg) || "SHA256".equalsIgnoreCase(digestAlg))) {
-      throw new IllegalArgumentException("Unsupported cipher algorithm, expected DESede or AES, found \"" + digestAlg + "\"");
+      throw new IllegalArgumentException("Unsupported cipher algorithm, expected \"SHA-1\" or \"SHA-256\", found \"" + digestAlg + "\"");
     }
 
     if (!(keyLength == 128 || keyLength == 192 || keyLength == 256)) {

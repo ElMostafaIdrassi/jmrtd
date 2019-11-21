@@ -219,14 +219,20 @@ public class CardSecurityFile implements Serializable {
    * @return the encoded file
    */
   public byte[] getEncoded() {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     try {
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      writeContent(outputStream);
-      outputStream.close();
-      return outputStream.toByteArray();
+      writeContent(byteArrayOutputStream);
+      byteArrayOutputStream.flush();
+      return byteArrayOutputStream.toByteArray();
     } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Exception while encoding CardSecurityFile", ioe);
+      LOGGER.log(Level.WARNING, "Exception while encoding", ioe);
       return null;
+    } finally {
+      try {
+        byteArrayOutputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream");
+      }
     }
   }
 

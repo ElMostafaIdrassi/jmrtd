@@ -53,7 +53,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
 
-  /** The general Authenticate command is used to perform the PACE protocol. See Section 3.2.2 of SAC-TR 1.01. */
+  /** The general Authenticate command is used to perform the EAC-CA protocol. */
   private static final byte INS_BSI_GENERAL_AUTHENTICATE = (byte)0x86;
 
   private SecureMessagingAPDUSender secureMessagingSender;

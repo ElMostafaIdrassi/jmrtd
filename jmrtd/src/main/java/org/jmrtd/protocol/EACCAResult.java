@@ -99,7 +99,7 @@ public class EACCAResult implements Serializable {
   @Override
   public String toString() {
     return new StringBuilder()
-        .append("CAResult [keyId: ").append(keyId)
+        .append("EACCAResult [keyId: ").append(keyId)
         .append(", PICC public key: ").append(piccPublicKey)
         .append(", wrapper: ").append(wrapper)
         .append(", key hash: ").append(Hex.bytesToHexString(keyHash))

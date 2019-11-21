@@ -22,6 +22,7 @@
 
 package org.jmrtd.lds;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Encoding;
@@ -48,6 +51,8 @@ import org.bouncycastle.asn1.DLSet;
  * @since 0.5.1
  */
 public class CardAccessFile implements Serializable {
+
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.lds");
 
   private static final long serialVersionUID = -3536507558193769951L;
 
@@ -114,6 +119,29 @@ public class CardAccessFile implements Serializable {
     }
     ASN1Set derSet = new DLSet(vector);
     outputStream.write(derSet.getEncoded(ASN1Encoding.DER));
+  }
+
+  /**
+   * Returns a DER encoded of this file.
+   *
+   * @return the encoded file
+   */
+  public byte[] getEncoded() {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    try {
+      writeContent(byteArrayOutputStream);
+      byteArrayOutputStream.flush();
+      return byteArrayOutputStream.toByteArray();
+    } catch (IOException ioe) {
+      LOGGER.log(Level.WARNING, "Exception while encoding", ioe);
+      return null;
+    } finally {
+      try {
+        byteArrayOutputStream.close();
+      } catch (IOException ioe) {
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
+    }
   }
 
   /**
