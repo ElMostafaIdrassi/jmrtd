@@ -1019,24 +1019,14 @@ public final class Util {
    *
    * @return an octet string
    */
-  public static byte[] ecPoint2OS(ECPoint point) {
+  public static byte[] ecPoint2OS(ECPoint point, int bitLength) {
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();
     BigInteger x = point.getAffineX();
     BigInteger y = point.getAffineY();
-    byte[] xBytes = i2os(x);
-    byte[] yBytes = i2os(y);
-    int difference = xBytes.length - yBytes.length;
-    byte[] zeroes = new byte[Math.abs(difference)];
     try {
       bOut.write(0x04); // FIXME: Constant for 0x04.
-      if (difference < 0) {
-        bOut.write(zeroes);
-      }
-      bOut.write(xBytes);
-      if (difference > 0) {
-        bOut.write(zeroes);
-      }
-      bOut.write(yBytes);
+      bOut.write(i2os(x, (int)Math.ceil(bitLength / 8.0)));
+      bOut.write(i2os(y, (int)Math.ceil(bitLength / 8.0)));
       bOut.close();
     } catch (IOException ioe) {
       throw new IllegalStateException("Exception", ioe);
@@ -1091,6 +1081,29 @@ public final class Util {
     org.bouncycastle.math.ec.ECPoint bcPoint = toBouncyCastleECPoint(point, params);
     org.bouncycastle.math.ec.ECPoint bcProd = bcPoint.multiply(s);
     return fromBouncyCastleECPoint(bcProd);
+  }
+
+  /**
+   * Checks whether the given point is on the given curve.
+   * This just checks the Weierstrass equation.
+   *
+   * @param xy a point
+   * @param ecParams parameters specifying the curve
+   *
+   * @return a boolean indicating whether the point is on the curve
+   */
+  public static boolean isPointOnCurve(ECPoint xy, ECParameterSpec ecParams) {
+    BigInteger x = xy.getAffineX();
+    BigInteger y = xy.getAffineY();
+    BigInteger p = getPrime(ecParams);
+
+    EllipticCurve curve = ecParams.getCurve();
+    BigInteger a = curve.getA();
+    BigInteger b = curve.getB();
+    BigInteger lhs = y.multiply(y).mod(p);
+    BigInteger rhs = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(p);
+
+    return lhs.equals(rhs);
   }
 
   /**
@@ -1233,6 +1246,7 @@ public final class Util {
 
   /**
    * Converts the EC parameter specification (including a curve) to a BC typed EC curve.
+   * Currently supports curves over prime fields only.
    *
    * @param params the EC parameter specification
    *

@@ -29,6 +29,7 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.InvalidParameterException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -967,6 +968,10 @@ public class PACEProtocol {
    */
   public static ECPoint icartPointEncode(BigInteger t, ECParameterSpec params) {
     BigInteger p = Util.getPrime(params);
+    if (!BigInteger.valueOf(3).equals(p.mod(BigInteger.valueOf(4)))) {
+      throw new InvalidParameterException("Cannot encode point because p != 3 (mod 4)");
+    }
+
     int cofactor = params.getCofactor();
     BigInteger a = params.getCurve().getA();
     BigInteger b = params.getCurve().getB();
@@ -1186,7 +1191,7 @@ public class PACEProtocol {
 
         /* Public point */
         tlvOutputStream.writeTag(0x86);
-        tlvOutputStream.writeValue(Util.ecPoint2OS(publicPoint));
+        tlvOutputStream.writeValue(Util.ecPoint2OS(publicPoint, params.getCurve().getField().getFieldSize()));
 
         if (!isContextKnown) {
           /* Cofactor */
@@ -1228,7 +1233,7 @@ public class PACEProtocol {
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
       try {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        bOut.write(Util.ecPoint2OS(ecPublicKey.getW()));
+        bOut.write(Util.ecPoint2OS(ecPublicKey.getW(), ecPublicKey.getParams().getCurve().getField().getFieldSize()));
         byte[] encodedPublicKey = bOut.toByteArray();
         bOut.close();
         return encodedPublicKey;

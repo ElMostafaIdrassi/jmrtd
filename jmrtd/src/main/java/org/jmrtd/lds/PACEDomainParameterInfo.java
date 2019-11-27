@@ -294,7 +294,7 @@ public class PACEDomainParameterInfo extends SecurityInfo {
     ASN1Sequence curveObject = new DLSequence(new ASN1Encodable[] { aObject, bObject });
     paramSequenceList.add(curveObject);
 
-    ASN1OctetString basePointObject = new DEROctetString(Util.ecPoint2OS(ecParameterSpec.getGenerator()));
+    ASN1OctetString basePointObject = new DEROctetString(Util.ecPoint2OS(ecParameterSpec.getGenerator(), ecParameterSpec.getCurve().getField().getFieldSize()));
     paramSequenceList.add(basePointObject);
 
     ASN1Integer orderObject = new ASN1Integer(ecParameterSpec.getOrder());

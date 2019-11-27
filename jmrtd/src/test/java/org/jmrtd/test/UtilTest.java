@@ -23,6 +23,7 @@
 package org.jmrtd.test;
 
 import java.math.BigInteger;
+import java.security.spec.ECPoint;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,6 +124,19 @@ public class UtilTest extends TestCase {
       byte[] os = Util.i2os(bigInteger);
       assertTrue(i  + ": " +  Hex.bytesToHexString(bigIBytes) + ", " + Hex.bytesToHexString(os), Arrays.equals(os, Util.stripLeadingZeroes(bigIBytes)));
     }
+  }
+
+  public void testECPointSerDeser() {
+
+    BigInteger x = new BigInteger("1711296670204813060243268632676822234344359677243986977215350947079259342020");
+    BigInteger y = new BigInteger("136486234017883437884169815369656174240202926550835833245936368423753881551");
+    ECPoint point = new ECPoint(x, y);
+
+    byte[] bytes = Util.ecPoint2OS(point, 256);
+    assertTrue(bytes.length == 65); // 1 byte prefix + twice the size of p (as described in BSI TR03111 3.2.1
+    ECPoint deserializedPoint = Util.os2ECPoint(bytes);
+
+    assertTrue(point.equals(deserializedPoint));
   }
 
   private static boolean isPrefixOf(byte[] bytes, byte[] paddedBytes) {
