@@ -23,22 +23,20 @@
 package org.jmrtd.test.lds;
 
 import java.math.BigInteger;
-import java.security.Provider;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.spec.DHParameterSpec;
 
-import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 
 import junit.framework.TestCase;
 
 public class PACEInfoTest extends TestCase {
-
-  private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -98,6 +96,41 @@ public class PACEInfoTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
+    }
+  }
+  
+  public void testPACEInfoGetProtocolOIDString() {
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-3DES-CBC-CBC", PACEInfo.ID_PACE_DH_GM_3DES_CBC_CBC);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_128);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-AES-CBC-CMAC-192", PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_192);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-AES-CBC-CMAC-256", PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_256);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-IM-3DES-CBC-CBC", PACEInfo.ID_PACE_DH_IM_3DES_CBC_CBC);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-IM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_128);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-IM-AES-CBC-CMAC-192", PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_192);
+    testPACEInfoGetProtocolOIDString("id-PACE-DH-IM-AES-CBC-CMAC-256", PACEInfo.ID_PACE_DH_IM_AES_CBC_CMAC_256);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-GM-3DES-CBC-CBC", PACEInfo.ID_PACE_ECDH_GM_3DES_CBC_CBC);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-GM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-GM-AES-CBC-CMAC-192", PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_192);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-GM-AES-CBC-CMAC-256", PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-IM-3DES-CBC-CBC", PACEInfo.ID_PACE_ECDH_IM_3DES_CBC_CBC);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-IM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_128);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-IM-AES-CBC-CMAC-192", PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_192);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-IM-AES-CBC-CMAC-256", PACEInfo.ID_PACE_ECDH_IM_AES_CBC_CMAC_256);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-CAM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_ECDH_CAM_AES_CBC_CMAC_128);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-CAM-AES-CBC-CMAC-192", PACEInfo.ID_PACE_ECDH_CAM_AES_CBC_CMAC_192);
+    testPACEInfoGetProtocolOIDString("id-PACE-ECDH-CAM-AES-CBC-CMAC-256", PACEInfo.ID_PACE_ECDH_CAM_AES_CBC_CMAC_256);
+  }
+
+  public void testPACEInfoGetProtocolOIDString(String str, String oid) {
+    List<Integer> parameterIds = Arrays.asList(PACEInfo.PARAM_ID_ECP_NIST_P192_R1, PACEInfo.PARAM_ID_ECP_NIST_P224_R1, PACEInfo.PARAM_ID_ECP_NIST_P256_R1,
+        PACEInfo.PARAM_ID_ECP_NIST_P384_R1, PACEInfo.PARAM_ID_ECP_NIST_P521_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P192_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P224_R1,
+        PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P320_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P384_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P512_R1,
+        PACEInfo.PARAM_ID_GFP_1024_160, PACEInfo.PARAM_ID_GFP_2048_224, PACEInfo.PARAM_ID_GFP_2048_256);
+    for (int parameterId: parameterIds) { 
+      PACEInfo paceInfo = new PACEInfo(oid, 2, parameterId);
+      assertTrue(str.contains("-"));
+      assertFalse("DEBUG: " + str, str.contains("_"));
+      assertEquals(str, paceInfo.getProtocolOIDString());
     }
   }
 

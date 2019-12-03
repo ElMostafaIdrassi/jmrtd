@@ -608,7 +608,7 @@ public class PACEProtocol {
     try {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
       keyAgreement.init(pcdPrivateKey);
-      keyAgreement.doPhase(updateParameterSpec(piccPublicKey, pcdPrivateKey), true);
+      keyAgreement.doPhase(updateParameterSpec(piccPublicKey, pcdPrivateKey), true);      
       return keyAgreement.generateSecret();
     } catch (GeneralSecurityException gse) {
       LOGGER.log(Level.WARNING, "PCD side error during key agreement", gse);
