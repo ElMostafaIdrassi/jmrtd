@@ -164,10 +164,13 @@ public class EACTAProtocol {
         throw new IllegalArgumentException("Need at least 1 certificate to perform TA, found: " + terminalCertificates);
       }
 
+      if (chipAuthenticationResult == null) {
+        throw new IllegalArgumentException("Could not get EAC-CA key hash");
+      }
       byte[] caKeyHash = chipAuthenticationResult.getKeyHash();
       /* The key hash that resulted from CA. */
       if (caKeyHash == null) {
-        throw new IllegalArgumentException("CA key hash is null");
+        throw new IllegalArgumentException("Could nnot get EAC-CA key hash");
       }
 
       /*

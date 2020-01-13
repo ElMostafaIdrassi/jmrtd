@@ -27,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -52,6 +53,7 @@ import org.jmrtd.protocol.PACEResult;
 import org.jmrtd.protocol.ReadBinaryAPDUSender;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
+import net.sf.scuba.smartcards.APDUEvent;
 import net.sf.scuba.smartcards.APDUListener;
 import net.sf.scuba.smartcards.CardFileInputStream;
 import net.sf.scuba.smartcards.CardService;
@@ -608,5 +610,22 @@ public class PassportService extends AbstractMRTDCardService {
   @Override
   public void removeAPDUListener(APDUListener l) {
     service.removeAPDUListener(l);
+  }
+
+  @Override
+  public Collection<APDUListener> getAPDUListeners() {
+    return service.getAPDUListeners();
+  }
+
+  @Override
+  protected void notifyExchangedAPDU(APDUEvent event) {
+    Collection<APDUListener> apduListeners = getAPDUListeners();
+    if (apduListeners == null || apduListeners.isEmpty()) {
+      return;
+    }
+
+    for (APDUListener apduListener: apduListeners) {
+      apduListener.exchangedAPDU(event);
+    }
   }
 }
