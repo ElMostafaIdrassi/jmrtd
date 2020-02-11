@@ -120,7 +120,7 @@ public class DG15FileTest extends TestCase {
           (byte)0x96, 0x2D, 0x0C, (byte)0xBA, 0x29, (byte)0xC7, (byte)0x84, 0x53, (byte)0x81
       };
       X509EncodedKeySpec spec = new X509EncodedKeySpec(dgValue);
-      KeyFactory kf = KeyFactory.getInstance("EC");
+      KeyFactory kf = KeyFactory.getInstance("EC", BC_PROVIDER);
       PublicKey publicKey = kf.generatePublic(spec);
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
     } catch (Exception e) {

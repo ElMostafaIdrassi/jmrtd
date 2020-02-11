@@ -24,12 +24,15 @@ package org.jmrtd.test.lds;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.jmrtd.lds.icao.MRZInfo;
 
@@ -38,6 +41,7 @@ import net.sf.scuba.data.Country;
 import net.sf.scuba.data.Gender;
 import net.sf.scuba.data.ISOCountry;
 import net.sf.scuba.data.TestCountry;
+import net.sf.scuba.util.Hex;
 
 public class MRZInfoTest extends TestCase {
 
@@ -433,8 +437,8 @@ public class MRZInfoTest extends TestCase {
    */
   public void testMRZWithEmptyExtendedDocumentNumber() throws Exception {
     String mrz = "I<UTOD23145890<<<<<<<<<<<<<<<<" +
-                 "7408122F1204159UTO<<<<<<<<<<<6" +
-                 "ERIKSSON<<ANNA<MARIA<<<<<<<<<<".replaceAll("\n", "");
+        "7408122F1204159UTO<<<<<<<<<<<6" +
+        "ERIKSSON<<ANNA<MARIA<<<<<<<<<<".replaceAll("\n", "");
 
     assertEquals(90, mrz.length());
 

@@ -112,6 +112,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
       assertEquals("0CB000000D9701048E0868DD9FD88472834A00", Hex.bytesToHexString(protectedReadBinaryCommandAPDU.getBytes()));
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
+      fail(e.getMessage());
     }
   }
 
