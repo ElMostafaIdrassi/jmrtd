@@ -357,7 +357,7 @@ public final class SignedDataUtil {
    *
    * @throws SignatureException if the contents do not check out
    */
-  public static byte[] getEContent(SignedData signedData) throws SignatureException{
+  public static byte[] getEContent(SignedData signedData) throws SignatureException {
     SignerInfo signerInfo = getSignerInfo(signedData);
     ASN1Set signedAttributesSet = signerInfo.getAuthenticatedAttributes();
 
@@ -376,16 +376,11 @@ public final class SignedDataUtil {
 
     try {
       attributesBytes = signedAttributesSet.getEncoded(ASN1Encoding.DER);
-
       checkEContent(getAttributes(signedAttributesSet), digAlg, contentBytes);
-
-    } catch (NoSuchAlgorithmException nsae) {
-      LOGGER.log(Level.WARNING, "Error checking signedAttributes in eContent! No such algorithm: \"" + digAlg, nsae);
-    } catch (IOException ioe) {
-      LOGGER.log(Level.WARNING, "Error getting signedAttributes", ioe);
+      return attributesBytes;
+    } catch (Exception e) {
+      throw new SignatureException(e);
     }
-
-    return attributesBytes;
   }
 
   /**
