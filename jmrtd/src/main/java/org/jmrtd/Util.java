@@ -1013,9 +1013,10 @@ public final class Util {
 
   /**
    * Encodes (using BSI encoding) an EC point (for use as public key value).
-   * Prefixes a {@code 0x04} (without a length).
+   * Prefixes a {@code 0x04} tag (without a length).
    *
    * @param point an EC Point
+   * @param bitLength the length in bits to use for each coordinate (the field size)
    *
    * @return an octet string
    */
