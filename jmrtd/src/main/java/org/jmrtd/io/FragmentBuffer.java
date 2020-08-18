@@ -307,7 +307,7 @@ public class FragmentBuffer implements Serializable {
          * This fragment is partially contained in other. Only fetch the trailing part of this fragment.
          */
         int newOffset = other.getOffset() + other.getLength();
-        int newLength = thisOffset + thisLength - newOffset;
+        int newLength = thisLength; // NOTE: this used to be: thisOffset + thisLength - newOffset -- MO 20200818
         thisOffset = newOffset;
         thisLength = newLength;
       }  else if (thisOffset <= other.getOffset() && other.getOffset() + other.getLength() <= thisOffset + thisLength) {
