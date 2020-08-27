@@ -150,9 +150,8 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
     byte[] responseData = getResponseData(responseAPDU, isTLVEncodedOffsetNeeded);
     if (responseData == null || responseData.length == 0) {
       LOGGER.warning("Empty response data: response APDU bytes = " + Arrays.toString(responseData) + ", le = " + le + ", sw = " + Integer.toHexString(sw));
-    } else {
-      checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
     }
+    checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
 
     return responseData;
   }
@@ -194,7 +193,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
     if ((byte)(data[index] & 0x80) == (byte)0x80) {
       index += (data[index] & 0xF);
     }
-    index ++;
+    index++;
     responseData = new byte[data.length - index];
     System.arraycopy(data, index, responseData, 0, responseData.length);
     return responseData;
@@ -209,10 +208,20 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
    * @throws CardServiceException if the response APDU's status word indicates some error
    */
   private static void checkStatusWordAfterFileOperation(CommandAPDU commandAPDU, ResponseAPDU responseAPDU) throws CardServiceException {
+    byte[] data = responseAPDU.getData();
     short sw = (short)responseAPDU.getSW();
     String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(commandAPDU.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(responseAPDU.getBytes());
+
+    /* If wrong length (6700) and no data. We abort. */
+    if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH && (data == null || data.length == 0)) {
+      throw new CardServiceException("Wrong length, " + commandResponseMessage, sw);
+    }
+
     switch(sw) {
       case ISO7816.SW_NO_ERROR:
+        return;
+      case ISO7816.SW_END_OF_FILE:
+        // Fine. Response may have data.
         return;
       case ISO7816.SW_FILE_NOT_FOUND:
         throw new CardServiceException("File not found, " + commandResponseMessage, sw);

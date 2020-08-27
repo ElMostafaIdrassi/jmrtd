@@ -214,8 +214,9 @@ public class DefaultFileSystem implements FileSystemStructured {
          *
          * Bug reproduced using org.jmrtd.AESSecureMessagingWrapper with AES-256.
          */
-
-        responseLength = bytes.length;
+        if (bytes.length < fragment.getLength()) {
+          responseLength = bytes.length;
+        }
       }
       /* Shrink wrap the bytes that are now buffered. */
       /* NOTE: That arraycopy looks costly, consider using dest array and offset params instead of byte[] result... -- MO */
@@ -322,7 +323,7 @@ public class DefaultFileSystem implements FileSystemStructured {
   }
 
   /**
-   * Sends a {@code READ BINARY} command using a short file identifier to the passport,
+   * Sends a {@code READ BINARY} command for the already selected file to the passport,
    * using the wrapper when a secure channel has been set up.
    *
    * @param offset offset into the file
@@ -338,7 +339,7 @@ public class DefaultFileSystem implements FileSystemStructured {
   }
 
   /**
-   * Sends a {@code READ BINARY} command using a short file identifier to the passport,
+   * Sends a {@code READ BINARY} command using an explicit short file identifier to the passport,
    * using the wrapper when a secure channel has been set up.
    *
    * @param sfi the short file identifier byte as int value (between 0 and 255)

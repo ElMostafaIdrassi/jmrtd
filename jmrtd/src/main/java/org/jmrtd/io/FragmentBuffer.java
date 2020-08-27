@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2020  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -277,10 +277,10 @@ public class FragmentBuffer implements Serializable {
   }
 
   /**
-   * Returns the smallest fragment that contains <code>offset</code> and <code>offset + length</code>
-   * that has <strong>not</strong> been buffered in this buffer.
+   * Returns the smallest fragment which, when added, makes the fragment buffer contains
+   * {@code offset} to {@code offset + length} that has <strong>not</strong> been buffered in this buffer.
    *
-   * @param offset the offset
+   * @param offset the offset into the file
    * @param length the length
    *
    * @return the fragment that has not yet been buffered
@@ -307,7 +307,7 @@ public class FragmentBuffer implements Serializable {
          * This fragment is partially contained in other. Only fetch the trailing part of this fragment.
          */
         int newOffset = other.getOffset() + other.getLength();
-        int newLength = thisLength; // NOTE: this used to be: thisOffset + thisLength - newOffset -- MO 20200818
+        int newLength = thisOffset + thisLength - newOffset;
         thisOffset = newOffset;
         thisLength = newLength;
       }  else if (thisOffset <= other.getOffset() && other.getOffset() + other.getLength() <= thisOffset + thisLength) {

@@ -43,6 +43,21 @@ public abstract class FileSystemCardService extends CardService {
    * @return a stream to read from
    *
    * @throws CardServiceException on error creating the stream
+   *
+   * @deprecated Use the other method with explicit max block size
    */
+  @Deprecated
   public abstract CardFileInputStream getInputStream(short fid) throws CardServiceException;
+
+  /**
+   * Returns an input stream to access the file indicated by the file identifier.
+   *
+   * @param fid the file identifier
+   * @param maxBlockSize maximum block size to use for read binaries
+   *
+   * @return a stream to read from
+   *
+   * @throws CardServiceException on error creating the stream
+   */
+  public abstract CardFileInputStream getInputStream(short fid, int maxBlockSize) throws CardServiceException;
 }

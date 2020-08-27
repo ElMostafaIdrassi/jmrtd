@@ -117,7 +117,7 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
   public static final String ID_TA_ECDSA_SHA_224 = EACObjectIdentifiers.id_TA_ECDSA_SHA_224.getId();
 
   /** Used in Terminal Authentication 1 and 2. */
-  public static final String ID_TA_ECDSA_SHA_256 = EACObjectIdentifiers.id_TA_ECDSA_SHA_256.getId(); // HIER "id-TA-ECDSA-SHA-256" is 0.4.0.127.0.7.2.2.2.2.3
+  public static final String ID_TA_ECDSA_SHA_256 = EACObjectIdentifiers.id_TA_ECDSA_SHA_256.getId(); // NOTE: "id-TA-ECDSA-SHA-256" is 0.4.0.127.0.7.2.2.2.2.3
 
   public static final String ID_EC_PUBLIC_KEY_TYPE = X9ObjectIdentifiers.id_publicKeyType.getId();
 

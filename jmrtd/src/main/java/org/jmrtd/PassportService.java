@@ -224,7 +224,7 @@ public class PassportService extends AbstractMRTDCardService {
   public static final byte SFI_CVCA = 0x1C;
 
   /** The default maximal blocksize used for unencrypted APDUs. */
-  public static final int DEFAULT_MAX_BLOCKSIZE = 224;
+  public static final int DEFAULT_MAX_BLOCKSIZE = 223;
 
   /** The normal maximal tranceive length of APDUs. */
   public static final int NORMAL_MAX_TRANCEIVE_LENGTH = 256;
@@ -244,7 +244,9 @@ public class PassportService extends AbstractMRTDCardService {
 
   private SecureMessagingWrapper wrapper;
 
-  private int maxTranceiveLength;
+  private int maxTranceiveLengthForSecureMessaging;
+
+  private int maxTranceiveLengthForPACEProtocol;
 
   private boolean shouldCheckMAC;
 
@@ -267,13 +269,28 @@ public class PassportService extends AbstractMRTDCardService {
    * Creates a new passport service for accessing the passport.
    *
    * @param service another service which will deal with sending the APDUs to the card
-   * @param maxTranceiveLength maximum length for APDUs
+   * @param maxTranceiveLengthForSecureMessaging maximum length to use in secure messaging APDUs, {@code 256} or {@code 65536}
    * @param maxBlockSize maximum buffer size for plain text APDUs
    * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
    * @param shouldCheckMAC whether the secure messaging channels, resulting from BAC, PACE, EAC-CA, should
    *                       check MACs on response APDUs
    */
-  public PassportService(CardService service, int maxTranceiveLength, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) {
+  public PassportService(CardService service,int maxTranceiveLengthForSecureMessaging, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) {
+    this(service, NORMAL_MAX_TRANCEIVE_LENGTH, maxTranceiveLengthForSecureMessaging, maxBlockSize, isSFIEnabled, shouldCheckMAC);
+  }
+
+  /**
+   * Creates a new passport service for accessing the passport.
+   *
+   * @param service another service which will deal with sending the APDUs to the card
+   * @param maxTranceiveLengthForPACEProtocol maximum length  to use in PACE protocol steps, {@code 256} or {@code 65536}
+   * @param maxTranceiveLengthForSecureMessaging maximum length to use in secure messaging APDUs, {@code 256} or {@code 65536}
+   * @param maxBlockSize maximum buffer size for plain text APDUs
+   * @param isSFIEnabled whether short file identifiers should be used for read binaries when possible
+   * @param shouldCheckMAC whether the secure messaging channels, resulting from BAC, PACE, EAC-CA, should
+   *                       check MACs on response APDUs
+   */
+  public PassportService(CardService service, int maxTranceiveLengthForPACEProtocol, int maxTranceiveLengthForSecureMessaging, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) {
     this.service = service;
 
     this.bacSender = new BACAPDUSender(service);
@@ -283,7 +300,8 @@ public class PassportService extends AbstractMRTDCardService {
     this.eacTASender = new EACTAAPDUSender(service);
     this.readBinarySender = new ReadBinaryAPDUSender(service);
 
-    this.maxTranceiveLength = maxTranceiveLength;
+    this.maxTranceiveLengthForPACEProtocol = maxTranceiveLengthForPACEProtocol;
+    this.maxTranceiveLengthForSecureMessaging = maxTranceiveLengthForSecureMessaging;
     this.maxBlockSize = maxBlockSize;
     this.shouldCheckMAC = shouldCheckMAC;
     this.isAppletSelected = false;
@@ -356,11 +374,12 @@ public class PassportService extends AbstractMRTDCardService {
    *
    * @throws CardServiceException if authentication failed
    */
+  @Override
   public synchronized BACResult doBAC(AccessKeySpec bacKey) throws CardServiceException {
     if (!(bacKey instanceof BACKeySpec)) {
       throw new IllegalArgumentException("Unsupported key type");
     }
-    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLength, shouldCheckMAC)).doBAC((BACKeySpec)bacKey);
+    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doBAC((BACKeySpec)bacKey);
     wrapper = bacResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return bacResult;
@@ -382,8 +401,9 @@ public class PassportService extends AbstractMRTDCardService {
    * @throws CardServiceException if authentication failed
    * @throws GeneralSecurityException on security primitives related problems
    */
+  @Override
   public synchronized BACResult doBAC(SecretKey kEnc, SecretKey kMac) throws CardServiceException, GeneralSecurityException {
-    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLength, shouldCheckMAC)).doBAC(kEnc, kMac);
+    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doBAC(kEnc, kMac);
     wrapper = bacResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return bacResult;
@@ -402,8 +422,9 @@ public class PassportService extends AbstractMRTDCardService {
    *
    * @throws CardServiceException on error
    */
+  @Override
   public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException {
-    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params, parameterId);
+    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLengthForPACEProtocol, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doPACE(keySpec, oid, params, parameterId);
     wrapper = paceResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return paceResult;
@@ -424,8 +445,9 @@ public class PassportService extends AbstractMRTDCardService {
    *
    * @throws CardServiceException if CA failed or some error occurred
    */
+  @Override
   public synchronized EACCAResult doEACCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
-    EACCAResult caResult = (new EACCAProtocol(eacCASender, wrapper, maxTranceiveLength, shouldCheckMAC)).doCA(keyId, oid, publicKeyOID, publicKey);
+    EACCAResult caResult = (new EACCAProtocol(eacCASender, wrapper, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doCA(keyId, oid, publicKeyOID, publicKey);
     wrapper = caResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return caResult;
@@ -527,7 +549,7 @@ public class PassportService extends AbstractMRTDCardService {
    * @return the maximum APDU tranceive length
    */
   public int getMaxTranceiveLength() {
-    return maxTranceiveLength;
+    return maxTranceiveLengthForSecureMessaging;
   }
 
   /**
@@ -587,8 +609,26 @@ public class PassportService extends AbstractMRTDCardService {
    * @return the file as an input stream
    *
    * @throws CardServiceException if the file cannot be read
+   *
+   * @deprecated Use the other method with explicit max block size
    */
+  @Deprecated
   public synchronized CardFileInputStream getInputStream(short fid) throws CardServiceException {
+    return getInputStream(fid, maxBlockSize);
+  }
+
+  /**
+   * Returns the file indicated by the file identifier as an input stream.
+   * The resulting input stream will send APDUs to the card as it is being read.
+   *
+   * @param fid the file identifier
+   *
+   * @return the file as an input stream
+   *
+   * @throws CardServiceException if the file cannot be read
+   */
+  @Override
+  public synchronized CardFileInputStream getInputStream(short fid, int maxBlockSize) throws CardServiceException {
     if (!isAppletSelected) {
       synchronized(rootFileSystem) {
         rootFileSystem.selectFile(fid);

@@ -139,7 +139,9 @@ public class PACEProtocol {
 
   private SecureMessagingWrapper wrapper;
 
-  private int maxTranceiveLength;
+  private int maxTranceiveLengthForSecureMessaging;
+
+  private int maxTranceiveLengthForProtocol;
 
   private boolean shouldCheckMAC;
 
@@ -147,6 +149,7 @@ public class PACEProtocol {
 
   /**
    * Constructs a PACE protocol instance.
+   * The max tranceive lengths used during PACE protocol execution will be set to 256.
    *
    * @param service the service for sending APDUs
    * @param wrapper the already established secure messaging channel (or {@code null})
@@ -154,11 +157,33 @@ public class PACEProtocol {
    *        to use in the resulting secure messaging channel
    * @param shouldCheckMAC whether the resulting secure messaging channel should apply strict MAC
    *        checking on response APDUs
+   *
+   * @deprecated Use the other constructor with explicit max tranceive lengths for protocol and secure messaging
    */
-  public PACEProtocol(APDULevelPACECapable service, SecureMessagingWrapper wrapper, int maxTranceiveLength, boolean shouldCheckMAC) {
+  @Deprecated
+  public PACEProtocol(APDULevelPACECapable service, SecureMessagingWrapper wrapper,
+      int maxTranceiveLength, boolean shouldCheckMAC) {
+    this(service, wrapper, 256, maxTranceiveLength, shouldCheckMAC);
+  }
+
+  /**
+   * Constructs a PACE protocol instance.
+   *
+   * @param service the service for sending APDUs
+   * @param wrapper the already established secure messaging channel (or {@code null})
+   * @param maxTranceiveLengthForProtocol the maximal tranceive length PACE during protocol execution, {@code 256} or {@code 65536}
+   * @param maxTranceiveLengthForSecureMessaging the maximal tranceive length (on responses to {@code READ BINARY})
+   *        to use in the resulting secure messaging channel
+   * @param shouldCheckMAC whether the resulting secure messaging channel should apply strict MAC
+   *        checking on response APDUs
+   */
+  public PACEProtocol(APDULevelPACECapable service, SecureMessagingWrapper wrapper,
+      int maxTranceiveLengthForProtocol,
+      int maxTranceiveLengthForSecureMessaging, boolean shouldCheckMAC) {
     this.service = service;
     this.wrapper = wrapper;
-    this.maxTranceiveLength = maxTranceiveLength;
+    this.maxTranceiveLengthForProtocol = maxTranceiveLengthForProtocol;
+    this.maxTranceiveLengthForSecureMessaging = maxTranceiveLengthForSecureMessaging;
     this.shouldCheckMAC = shouldCheckMAC;
     this.random = new SecureRandom();
   }
@@ -306,9 +331,9 @@ public class PACEProtocol {
     try {
       long ssc = wrapper == null ? 0L : wrapper.getSendSequenceCounter();
       if (cipherAlg.startsWith("DESede")) {
-        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, maxTranceiveLength, shouldCheckMAC, 0L);
+        wrapper = new DESedeSecureMessagingWrapper(encKey, macKey, maxTranceiveLengthForSecureMessaging, shouldCheckMAC, 0L);
       } else if (cipherAlg.startsWith("AES")) {
-        wrapper = new AESSecureMessagingWrapper(encKey, macKey, maxTranceiveLength, shouldCheckMAC, ssc);
+        wrapper = new AESSecureMessagingWrapper(encKey, macKey, maxTranceiveLengthForSecureMessaging, shouldCheckMAC, ssc);
       } else {
         LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }
@@ -444,7 +469,7 @@ public class PACEProtocol {
       byte[] pcdMappingEncodedPublicKey = encodePublicKeyForSmartCard(pcdMappingPublicKey);
       byte[] step2Data = TLVUtil.wrapDO(0x81, pcdMappingEncodedPublicKey);
 
-      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLength, false);
+      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLengthForProtocol, false);
 
       byte[] piccMappingEncodedPublicKey = TLVUtil.unwrapDO(0x82, step2Response);
       PublicKey piccMappingPublicKey = decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
@@ -514,7 +539,7 @@ public class PACEProtocol {
       /*
        * NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2).
        */
-      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLength, false);
+      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLengthForProtocol, false);
 
       if ("ECDH".equals(agreementAlg)) {
         AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
@@ -574,7 +599,7 @@ public class PACEProtocol {
     try {
       byte[] pcdEncodedPublicKey = encodePublicKeyForSmartCard(pcdPublicKey);
       byte[] step3Data = TLVUtil.wrapDO(0x83, pcdEncodedPublicKey);
-      byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, maxTranceiveLength, false);
+      byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, maxTranceiveLengthForProtocol, false);
       byte[] piccEncodedPublicKey = TLVUtil.unwrapDO(0x84, step3Response);
       PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 
