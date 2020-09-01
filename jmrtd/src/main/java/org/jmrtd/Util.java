@@ -938,7 +938,7 @@ public final class Util {
         KeyFactory factory = KeyFactory.getInstance("DH");
         return factory.generatePublic(keySpec);
       } catch (GeneralSecurityException gse) {
-        LOGGER.log(Level.FINE, "Not DH public key? Fine, let's try EC public key", gse);
+        LOGGER.log(Level.FINE, "Not DH public key? Fine, try EC public key", gse);
         KeyFactory factory = KeyFactory.getInstance("EC", BC_PROVIDER);
         return factory.generatePublic(keySpec);
       }
@@ -1661,16 +1661,19 @@ public final class Util {
   /**
    * @deprecated Existence of a "hidden SNFS" backdoor cannot be ruled out. see https://eprint.iacr.org/2016/961.pdf
    */
+  @Deprecated
   public static final org.bouncycastle.crypto.params.DHParameters RFC5114_1024_160 = fromPGQ(RFC5114_1024_160_P, RFC5114_1024_160_G, RFC5114_1024_160_Q);
 
   /**
    * @deprecated Existence of a "hidden SNFS" backdoor cannot be ruled out. see https://eprint.iacr.org/2016/961.pdf
    */
+  @Deprecated
   public static final org.bouncycastle.crypto.params.DHParameters RFC5114_2048_224 = fromPGQ(RFC5114_2048_224_P, RFC5114_2048_224_G, RFC5114_2048_224_Q);
 
   /**
    * @deprecated Existence of a "hidden SNFS" backdoor cannot be ruled out. see https://eprint.iacr.org/2016/961.pdf
    */
+  @Deprecated
   public static final org.bouncycastle.crypto.params.DHParameters RFC5114_2048_256 = fromPGQ(RFC5114_2048_256_P, RFC5114_2048_256_G, RFC5114_2048_256_Q);
 
   private static org.bouncycastle.crypto.params.DHParameters fromPGQ(String hexP, String hexG, String hexQ) {

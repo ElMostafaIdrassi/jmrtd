@@ -379,7 +379,7 @@ public class PassportService extends AbstractMRTDCardService {
     if (!(bacKey instanceof BACKeySpec)) {
       throw new IllegalArgumentException("Unsupported key type");
     }
-    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doBAC((BACKeySpec)bacKey);
+    BACResult bacResult = (new BACProtocol(bacSender, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doBAC(bacKey);
     wrapper = bacResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return bacResult;

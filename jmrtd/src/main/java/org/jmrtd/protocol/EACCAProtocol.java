@@ -65,7 +65,7 @@ public class EACCAProtocol {
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
-  private static final int COMMAND_CHAINING_CHUNK_SIZE = 224;
+  private static final int COMMAND_CHAINING_CHUNK_SIZE = 223;
 
   private APDULevelEACCACapable service;
 

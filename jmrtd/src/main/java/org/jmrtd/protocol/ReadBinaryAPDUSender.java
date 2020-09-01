@@ -208,6 +208,10 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
    * @throws CardServiceException if the response APDU's status word indicates some error
    */
   private static void checkStatusWordAfterFileOperation(CommandAPDU commandAPDU, ResponseAPDU responseAPDU) throws CardServiceException {
+    if (responseAPDU == null) {
+      throw new CardServiceException("No response APDU");
+    }
+
     byte[] data = responseAPDU.getData();
     short sw = (short)responseAPDU.getSW();
     String commandResponseMessage = "CAPDU = " + Hex.bytesToHexString(commandAPDU.getBytes()) + ", RAPDU = " + Hex.bytesToHexString(responseAPDU.getBytes());
