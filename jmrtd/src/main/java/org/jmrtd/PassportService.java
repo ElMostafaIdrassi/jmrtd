@@ -447,7 +447,7 @@ public class PassportService extends AbstractMRTDCardService {
    */
   @Override
   public synchronized EACCAResult doEACCA(BigInteger keyId, String oid, String publicKeyOID, PublicKey publicKey) throws CardServiceException {
-    EACCAResult caResult = (new EACCAProtocol(eacCASender, wrapper, maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doCA(keyId, oid, publicKeyOID, publicKey);
+    EACCAResult caResult = (new EACCAProtocol(eacCASender, getWrapper(), maxTranceiveLengthForSecureMessaging, shouldCheckMAC)).doCA(keyId, oid, publicKeyOID, publicKey);
     wrapper = caResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return caResult;
@@ -487,7 +487,7 @@ public class PassportService extends AbstractMRTDCardService {
    */
   public synchronized EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, String documentNumber) throws CardServiceException {
-    return (new EACTAProtocol(eacTASender, wrapper)).doEACTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
+    return (new EACTAProtocol(eacTASender, getWrapper())).doEACTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, documentNumber);
   }
 
   /**
@@ -511,7 +511,7 @@ public class PassportService extends AbstractMRTDCardService {
    */
   public synchronized EACTAResult doEACTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
-    return (new EACTAProtocol(eacTASender, wrapper)).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
+    return (new EACTAProtocol(eacTASender, getWrapper())).doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, paceResult);
   }
 
   /**
@@ -527,7 +527,7 @@ public class PassportService extends AbstractMRTDCardService {
    * @throws CardServiceException on error
    */
   public AAResult doAA(PublicKey publicKey, String digestAlgorithm, String signatureAlgorithm, byte[] challenge) throws CardServiceException {
-    return (new AAProtocol(aaSender, wrapper)).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
+    return (new AAProtocol(aaSender, getWrapper())).doAA(publicKey, digestAlgorithm, signatureAlgorithm, challenge);
   }
 
   /**
@@ -559,6 +559,10 @@ public class PassportService extends AbstractMRTDCardService {
    * @return the wrapper
    */
   public SecureMessagingWrapper getWrapper() {
+    SecureMessagingWrapper ldsSecureMessagingWrapper = (SecureMessagingWrapper)appletFileSystem.getWrapper();
+    if (ldsSecureMessagingWrapper != null && ldsSecureMessagingWrapper.getSendSequenceCounter() > wrapper.getSendSequenceCounter()) {
+      wrapper = ldsSecureMessagingWrapper;
+    }
     return wrapper;
   }
 
@@ -622,6 +626,7 @@ public class PassportService extends AbstractMRTDCardService {
    * The resulting input stream will send APDUs to the card as it is being read.
    *
    * @param fid the file identifier
+   * @param maxBlockSize the blocksize to request in plain READ BINARY commands
    *
    * @return the file as an input stream
    *

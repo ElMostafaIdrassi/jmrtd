@@ -92,6 +92,9 @@ public class SecureMessagingAPDUSender {
       notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++apduCount, commandAPDU, responseAPDU));
     } else {
       try {
+        if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH) {
+          return responseAPDU;
+        }
         if (responseAPDU.getBytes().length <= 2) {
           throw new CardServiceException("Exception during transmission of wrapped APDU"
               + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);

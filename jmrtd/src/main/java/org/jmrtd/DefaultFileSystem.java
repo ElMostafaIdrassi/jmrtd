@@ -33,11 +33,13 @@ import org.jmrtd.io.FragmentBuffer;
 import org.jmrtd.io.FragmentBuffer.Fragment;
 import org.jmrtd.lds.CVCAFile;
 import org.jmrtd.lds.LDSFileUtil;
+import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardServiceException;
 import net.sf.scuba.smartcards.FileInfo;
 import net.sf.scuba.smartcards.FileSystemStructured;
+import net.sf.scuba.smartcards.ISO7816;
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.util.Hex;
 
@@ -68,6 +70,8 @@ public class DefaultFileSystem implements FileSystemStructured {
 
   private boolean isSFIEnabled;
 
+  private int maxReadBinaryLe;
+
   /**
    * A boolean indicating whether we actually already
    * sent the SELECT command to select {@ code selectedFID}.
@@ -81,6 +85,8 @@ public class DefaultFileSystem implements FileSystemStructured {
   private Map<Short, Byte> fidToSFI;
 
   private APDUWrapper wrapper;
+
+  private APDUWrapper oldWrapper;
 
   /**
    * Creates a file system.
@@ -106,6 +112,7 @@ public class DefaultFileSystem implements FileSystemStructured {
     this.isSelected = false;
     this.isSFIEnabled = isSFIEnabled;
     this.fidToSFI = fidToSFI;
+    this.maxReadBinaryLe = PassportService.EXTENDED_MAX_TRANCEIVE_LENGTH;
   }
 
   /**
@@ -115,7 +122,17 @@ public class DefaultFileSystem implements FileSystemStructured {
    * @param wrapper an APDU wrapper
    */
   public void setWrapper(APDUWrapper wrapper) {
+    oldWrapper = this.wrapper;
     this.wrapper = wrapper;
+  }
+
+  /**
+   * Returns the wrapper (secure messaging) currently in use.
+   *
+   * @return the wrapper
+   */
+  public APDUWrapper getWrapper() {
+    return wrapper;
   }
 
   /**
@@ -176,6 +193,8 @@ public class DefaultFileSystem implements FileSystemStructured {
       if (fileInfo == null) {
         throw new IllegalStateException("Could not get file info");
       }
+
+      length = Math.min(length, maxReadBinaryLe);
       Fragment fragment = fileInfo.getSmallestUnbufferedFragment(offset, length);
 
       int responseLength = length;
@@ -227,6 +246,12 @@ public class DefaultFileSystem implements FileSystemStructured {
 
       return result;
     } catch (CardServiceException cse) {
+      short sw = (short)cse.getSW();
+      if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH) {
+        wrapper = oldWrapper;
+        maxReadBinaryLe = PassportService.DEFAULT_MAX_BLOCKSIZE;
+        return new byte[]{ };
+      }
       throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), cse, cse.getSW());
     } catch (Exception e) {
       throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), e);
@@ -335,6 +360,7 @@ public class DefaultFileSystem implements FileSystemStructured {
    * @throws CardServiceException on tranceive error
    */
   public synchronized byte[] sendReadBinary(int offset, int le, boolean isTLVEncodedOffsetNeeded) throws CardServiceException {
+    oldWrapper = wrapper instanceof SecureMessagingWrapper ? SecureMessagingWrapper.getInstance((SecureMessagingWrapper)wrapper)  : wrapper;
     return service.sendReadBinary(wrapper, NO_SFI, offset, le, false, isTLVEncodedOffsetNeeded);
   }
 
