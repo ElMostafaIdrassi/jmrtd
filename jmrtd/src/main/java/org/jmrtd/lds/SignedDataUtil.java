@@ -214,7 +214,7 @@ public final class SignedDataUtil {
   public static ASN1Primitive getContent(SignedData signedData) {
     ContentInfo encapContentInfo = signedData.getEncapContentInfo();
 
-    DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();
+    ASN1OctetString eContent = (ASN1OctetString)encapContentInfo.getContent();
 
     ASN1InputStream inputStream = null;
     try {
@@ -362,7 +362,7 @@ public final class SignedDataUtil {
     ASN1Set signedAttributesSet = signerInfo.getAuthenticatedAttributes();
 
     ContentInfo contentInfo = signedData.getEncapContentInfo();
-    byte[] contentBytes = ((DEROctetString)contentInfo.getContent()).getOctets();
+    byte[] contentBytes = ((ASN1OctetString)contentInfo.getContent()).getOctets();
 
     if (signedAttributesSet.size() == 0) {
       /* Signed attributes absent, return content to be signed... */
@@ -542,44 +542,6 @@ public final class SignedDataUtil {
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }
 
-  //  /**
-  //   * Creates a signer info structures.
-  //   *
-  //   * @param digestAlgorithm the digest algorithm
-  //   * @param digestEncryptionAlgorithm the signature algorithm
-  //   * @param contentTypeOID the object identifier
-  //   * @param contentInfo the content info
-  //   * @param encryptedDigest the signature bytes
-  //   * @param docSigningCertificate the document signer certificate
-  //   *
-  //   * @return the signer info structure
-  //   *
-  //   * @throws GeneralSecurityException on error
-  //   */
-  //  public static SignerInfo createSignerInfo(String digestAlgorithm,
-  //      String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
-  //      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
-  //
-  //    if (encryptedDigest == null) {
-  //      throw new IllegalArgumentException("Encrypted digest cannot be null");
-  //    }
-  //
-  //    /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
-  //    X500Principal docSignerPrincipal = docSigningCertificate.getIssuerX500Principal();
-  //    X500Name docSignerName = new X500Name(docSignerPrincipal.getName(X500Principal.RFC2253));
-  //    BigInteger serial = docSigningCertificate.getSerialNumber();
-  //    SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
-  //
-  //    AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
-  //    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
-  //
-  //    ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
-  //    ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
-  //    ASN1Set unAuthenticatedAttributes = null; // should be empty set?
-  //
-  //    return new SignerInfo(sid, digestAlgorithmObject, authenticatedAttributes, digestEncryptionAlgorithmObject, encryptedDigestObject, unAuthenticatedAttributes);
-  //  }
-
   /**
    * Creates a signer info structures.
    *
@@ -635,7 +597,7 @@ public final class SignedDataUtil {
       digestAlgorithm = "SHA-256";
     }
     MessageDigest dig = Util.getMessageDigest(digestAlgorithm);
-    byte[] contentBytes = ((DEROctetString)contentInfo.getContent()).getOctets();
+    byte[] contentBytes = ((ASN1OctetString)contentInfo.getContent()).getOctets();
     byte[] digestedContentBytes = dig.digest(contentBytes);
     ASN1OctetString digestedContent = new DEROctetString(digestedContentBytes);
     Attribute contentTypeAttribute = new Attribute(new ASN1ObjectIdentifier(RFC_3369_CONTENT_TYPE_OID), createSingletonSet(new ASN1ObjectIdentifier(contentTypeOID)));
@@ -973,7 +935,7 @@ public final class SignedDataUtil {
       if (attrValuesSet.size() != 1) {
         LOGGER.warning("Expected only one attribute value in signedAttribute message digest in eContent!");
       }
-      byte[] storedDigestedContent = ((DEROctetString)attrValuesSet.getObjectAt(0)).getOctets();
+      byte[] storedDigestedContent = ((ASN1OctetString)attrValuesSet.getObjectAt(0)).getOctets();
 
       if (storedDigestedContent == null) {
         LOGGER.warning("Error extracting signedAttribute message digest in eContent!");

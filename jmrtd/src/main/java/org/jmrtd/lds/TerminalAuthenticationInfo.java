@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
@@ -251,12 +252,12 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
             + ", found " + version);
       }
       if (efCVCA != null) {
-        DEROctetString fid = (DEROctetString)efCVCA.getObjectAt(0);
+        ASN1OctetString fid = (ASN1OctetString)efCVCA.getObjectAt(0);
         if (fid.getOctets().length != 2) {
           throw new IllegalArgumentException("Malformed FID.");
         }
         if (efCVCA.size() == 2) {
-          DEROctetString sfi = (DEROctetString)efCVCA.getObjectAt(1);
+          ASN1OctetString sfi = (ASN1OctetString)efCVCA.getObjectAt(1);
           if (sfi.getOctets().length != 1) {
             throw new IllegalArgumentException("Malformed SFI.");
           }
@@ -298,7 +299,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
       return -1;
     }
     ASN1Sequence s = efCVCA;
-    DEROctetString fid = (DEROctetString)s.getObjectAt(0);
+    ASN1OctetString fid = (ASN1OctetString)s.getObjectAt(0);
     byte[] bytes = fid.getOctets();
     return (short)(((bytes[0] & 0xFF) << 8) | (bytes[1] & 0xFF));
   }
@@ -317,7 +318,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
     if (efCVCA.size() != 2) {
       return -1;
     }
-    return ((DEROctetString)efCVCA.getObjectAt(1)).getOctets()[0];
+    return ((ASN1OctetString)efCVCA.getObjectAt(1)).getOctets()[0];
   }
 
   /**

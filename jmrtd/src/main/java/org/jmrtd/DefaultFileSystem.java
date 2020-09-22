@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.io.FragmentBuffer;
@@ -70,7 +71,7 @@ public class DefaultFileSystem implements FileSystemStructured {
 
   private boolean isSFIEnabled;
 
-  private int maxReadBinaryLe;
+  private int maxReadBinaryLength;
 
   /**
    * A boolean indicating whether we actually already
@@ -112,7 +113,7 @@ public class DefaultFileSystem implements FileSystemStructured {
     this.isSelected = false;
     this.isSFIEnabled = isSFIEnabled;
     this.fidToSFI = fidToSFI;
-    this.maxReadBinaryLe = PassportService.EXTENDED_MAX_TRANCEIVE_LENGTH;
+    this.maxReadBinaryLength = PassportService.EXTENDED_MAX_TRANCEIVE_LENGTH;
   }
 
   /**
@@ -133,6 +134,15 @@ public class DefaultFileSystem implements FileSystemStructured {
    */
   public APDUWrapper getWrapper() {
     return wrapper;
+  }
+
+  /**
+   * Returns the currently set maximum length to be requested in READ BINARY commands.
+   *
+   * @return the currently set maximum length to be requested in READ BINARY commands
+   */
+  public int getMaxReadBinaryLength() {
+    return maxReadBinaryLength;
   }
 
   /**
@@ -194,7 +204,7 @@ public class DefaultFileSystem implements FileSystemStructured {
         throw new IllegalStateException("Could not get file info");
       }
 
-      length = Math.min(length, maxReadBinaryLe);
+      length = Math.min(length, maxReadBinaryLength);
       Fragment fragment = fileInfo.getSmallestUnbufferedFragment(offset, length);
 
       int responseLength = length;
@@ -247,11 +257,12 @@ public class DefaultFileSystem implements FileSystemStructured {
       return result;
     } catch (CardServiceException cse) {
       short sw = (short)cse.getSW();
-      if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH) {
+      if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH && maxReadBinaryLength > PassportService.DEFAULT_MAX_BLOCKSIZE) {
         wrapper = oldWrapper;
-        maxReadBinaryLe = PassportService.DEFAULT_MAX_BLOCKSIZE;
+        maxReadBinaryLength = PassportService.DEFAULT_MAX_BLOCKSIZE;
         return new byte[]{ };
       }
+
       throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), cse, cse.getSW());
     } catch (Exception e) {
       throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), e);

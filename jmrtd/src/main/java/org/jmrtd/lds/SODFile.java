@@ -45,6 +45,7 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -556,7 +557,7 @@ public class SODFile extends AbstractTaggedLDSFile {
     try {
       ContentInfo encapContentInfo = signedData.getEncapContentInfo();
       String contentType = encapContentInfo.getContentType().getId();
-      DEROctetString eContent = (DEROctetString)encapContentInfo.getContent();
+      ASN1OctetString eContent = (ASN1OctetString)encapContentInfo.getContent();
       if (!(ICAO_LDS_SOD_OID.equals(contentType)
           || SDU_LDS_SOD_OID.equals(contentType)
           || ICAO_LDS_SOD_ALT_OID.equals(contentType))) {
