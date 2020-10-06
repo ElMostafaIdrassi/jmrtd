@@ -225,8 +225,12 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
       case ISO7816.SW_NO_ERROR:
         return;
       case ISO7816.SW_END_OF_FILE:
-        // Fine. Response may have data.
-        return;
+        if (data == null || data.length == 0) {
+          throw new CardServiceException("End of file, " + commandResponseMessage, sw);
+        } else {
+          /* May have data. Caller should check SW and stop calling on EOF. */
+          return;
+        }
       case ISO7816.SW_FILE_NOT_FOUND:
         throw new CardServiceException("File not found, " + commandResponseMessage, sw);
       case ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED:
