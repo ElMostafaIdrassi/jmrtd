@@ -25,6 +25,7 @@ package org.jmrtd.lds;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -68,7 +69,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   protected CBEFFDataGroup(int dataGroupTag, List<R> subRecords) {
     super(dataGroupTag);
     addAll(subRecords);
-    this.random = new Random();
+    this.random = new SecureRandom();
   }
 
   /**
