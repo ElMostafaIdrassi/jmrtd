@@ -91,7 +91,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param documentNumber document number
    * @param nationality nationality as 3 digit string
    * @param dateOfBirth date of birth
-   * @param gender gender
+   * @param gender gender, must not be {@code null}
    * @param dateOfExpiry date of expiry
    * @param personalNumber either empty, or a personal number of maximum length 14, or other optional data of exact length 15
    */
@@ -102,6 +102,9 @@ public class MRZInfo extends AbstractLDSInfo {
     if (documentCode == null || documentCode.length() < 1 || documentCode.length() > 2
         || !(documentCode.startsWith("P") || documentCode.startsWith("V"))) {
       throw new IllegalArgumentException("Wrong document code: " + documentCode);
+    }
+    if (gender == null) {
+      throw new IllegalArgumentException("Gender must not be null");
     }
     this.documentType = getDocumentTypeFromDocumentCode(documentCode);
     this.documentCode = trimFillerChars(documentCode);
@@ -138,7 +141,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param documentNumber document number
    * @param nationality nationality as 3 digit string
    * @param dateOfBirth date of birth in YYMMDD format
-   * @param gender gender
+   * @param gender gender, must not be {@code null}
    * @param dateOfExpiry date of expiry in YYMMDD format
    * @param optionalData1 optional data in line 1 of maximum length 15
    * @param optionalData2 optional data in line 2 of maximum length 11
@@ -158,7 +161,9 @@ public class MRZInfo extends AbstractLDSInfo {
         || !(documentCode.startsWith("C") || documentCode.startsWith("I") || documentCode.startsWith("A"))) {
       throw new IllegalArgumentException("Wrong document code: " + documentCode);
     }
-
+    if (gender == null) {
+      throw new IllegalArgumentException("Gender must not be null");
+    }
     this.documentType = getDocumentTypeFromDocumentCode(documentCode);
     this.documentCode = trimFillerChars(documentCode);
     this.issuingState = issuingState;
