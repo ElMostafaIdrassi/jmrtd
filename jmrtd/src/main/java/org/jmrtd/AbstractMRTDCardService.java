@@ -211,4 +211,13 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @return the secure messaging wrapper
    */
   public abstract SecureMessagingWrapper getWrapper();
+
+  /**
+   * Returns the currently set maximum length to be requested in READ BINARY commands.
+   * If the applet file system has not yet been selected, this will return
+   * {@link #NORMAL_MAX_TRANCEIVE_LENGTH}.
+   *
+   * @return the currently set maximum length to be requested in READ BINARY commands
+   */
+  public abstract int getMaxReadBinaryLength();
 }

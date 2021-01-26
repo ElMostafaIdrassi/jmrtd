@@ -651,14 +651,14 @@ public class PassportService extends AbstractMRTDCardService {
    * Returns the currently set maximum length to be requested in READ BINARY commands.
    * If the applet file system has not been selected, this will return
    * {@link #NORMAL_MAX_TRANCEIVE_LENGTH}.
-   * 
+   *
    * @return the currently set maximum length to be requested in READ BINARY commands
    */
   public int getMaxReadBinaryLength() {
     if (appletFileSystem == null) {
       return NORMAL_MAX_TRANCEIVE_LENGTH;
     }
-    
+
     return appletFileSystem.getMaxReadBinaryLength();
   }
 
