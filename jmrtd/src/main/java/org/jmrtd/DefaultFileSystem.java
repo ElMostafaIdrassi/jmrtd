@@ -25,8 +25,10 @@ package org.jmrtd;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.io.FragmentBuffer;
@@ -315,34 +317,58 @@ public class DefaultFileSystem implements FileSystemStructured {
         return null;
       }
 
-      if (prefix.length < READ_AHEAD_LENGTH) {
-        /* Apparently the complete prefix is the file. */
-        int fileLength = prefix.length;
-        LOGGER.info("Short file " + Integer.toHexString(selectedFID) + " with length: " + fileLength);
-        return new DefaultFileInfo(selectedFID, fileLength);
+      int fileLength = getFileLength(selectedFID, READ_AHEAD_LENGTH, prefix);
+      if (fileLength < prefix.length) {
+        /* We got more than the file's length. Ignore trailing bytes. */
+        prefix = Arrays.copyOf(prefix, fileLength);
       }
-
-      ByteArrayInputStream baInputStream = new ByteArrayInputStream(prefix);
-      TLVInputStream tlvInputStream = new TLVInputStream(baInputStream);
-      try {
-        int fileLength = 0;
-        int tag = tlvInputStream.readTag();
-        if (tag == CVCAFile.CAR_TAG) {
-          fileLength = CVCAFile.LENGTH;
-        } else {
-          int vLength = tlvInputStream.readLength();
-          int tlLength = prefix.length - baInputStream.available(); /* NOTE: we're using a specific property of ByteArrayInputStream's available method here! */
-          fileLength = tlLength + vLength;
-        }
-        fileInfo = new DefaultFileInfo(selectedFID, fileLength);
-        fileInfo.addFragment(0, prefix);
-        fileInfos.put(selectedFID, fileInfo);
-        return fileInfo;
-      } finally {
-        tlvInputStream.close();
-      }
+      fileInfo = new DefaultFileInfo(selectedFID, fileLength);
+      fileInfo.addFragment(0, prefix);
+      fileInfos.put(selectedFID, fileInfo);
+      return fileInfo;
     } catch (IOException ioe) {
       throw new CardServiceException("Error getting file info for " + Integer.toHexString(selectedFID), ioe);
+    }
+  }
+
+  /**
+   * Determines the file length by inspecting a prefix of bytes read from
+   * the (TLV contents of a) file.
+   *
+   * @param fid the file identifier
+   * @param le the requested length while requesting the prefix
+   * @param prefix the prefix read from the file
+   *
+   * @return the file length
+   *
+   * @throws IOException on error reading the prefix as a TLV sequence
+   */
+  private static int getFileLength(short fid, int le, byte[] prefix) throws IOException {
+    if (prefix.length < le) {
+      /* We got less than asked for, assume prefix is the complete file. */
+      return prefix.length;
+    }
+    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(prefix);
+    TLVInputStream tlvInputStream = new TLVInputStream(byteArrayInputStream);
+    try {
+      int tag = tlvInputStream.readTag();
+      if (tag == CVCAFile.CAR_TAG) {
+        return CVCAFile.LENGTH;
+      }
+
+      /* Determine length based on TLV. */
+      int valueLength = tlvInputStream.readLength();
+      /* NOTE: we're using a specific property of ByteArrayInputStream's available method here! */
+      int tlLength = prefix.length - byteArrayInputStream.available();
+      int fileLength = tlLength + valueLength;
+      return fileLength;
+    } finally {
+      try {
+        tlvInputStream.close();
+      } catch (IOException ioe) {
+        /* Never happens. */
+        LOGGER.log(Level.FINE, "Error closing stream", ioe);
+      }
     }
   }
 

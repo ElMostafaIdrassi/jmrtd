@@ -214,8 +214,8 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
 
   /**
    * Returns the currently set maximum length to be requested in READ BINARY commands.
-   * If the applet file system has not yet been selected, this will return
-   * {@link #NORMAL_MAX_TRANCEIVE_LENGTH}.
+   * If the applet file system has not yet been selected, this will return the normal
+   * length.
    *
    * @return the currently set maximum length to be requested in READ BINARY commands
    */
