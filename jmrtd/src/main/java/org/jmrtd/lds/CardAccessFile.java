@@ -95,12 +95,17 @@ public class CardAccessFile implements Serializable {
     ASN1Set set = (ASN1Set)asn1In.readObject();
     for (int i = 0; i < set.size(); i++) {
       ASN1Primitive object = set.getObjectAt(i).toASN1Primitive();
-      SecurityInfo securityInfo = SecurityInfo.getInstance(object);
-      if (securityInfo == null) {
-        /* NOTE: skipping this unsupported SecurityInfo */
+      try {
+        SecurityInfo securityInfo = SecurityInfo.getInstance(object);
+        if (securityInfo == null) {
+          /* NOTE: skipping this unsupported SecurityInfo */
+          continue;
+        }
+        securityInfos.add(securityInfo);
+      } catch (Exception e) {
+        /* NOTE: skipping this unsupported SecurityInfo. */
         continue;
       }
-      securityInfos.add(securityInfo);
     }
   }
 

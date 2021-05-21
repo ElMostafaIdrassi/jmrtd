@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.APDULevelPACECapable;
-import org.jmrtd.AccessDeniedException;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.APDUWrapper;
@@ -92,6 +91,7 @@ public class PACEAPDUSender implements APDULevelPACECapable {
    *
    * @throws CardServiceException on error
    */
+  @Override
   public synchronized void sendMSESetATMutualAuth(APDUWrapper wrapper, String oid,
       int refPublicKeyOrSecretKey, byte[] refPrivateKeyOrForComputingSessionKey) throws CardServiceException {
 
@@ -164,6 +164,7 @@ public class PACEAPDUSender implements APDULevelPACECapable {
    *
    * @throws CardServiceException on error
    */
+  @Override
   public synchronized byte[] sendGeneralAuthenticate(APDUWrapper wrapper, byte[] data, int le, boolean isLast) throws CardServiceException {
     /* Tranceive APDU. */
     byte[] commandData = TLVUtil.wrapDO(0x7C, data); // FIXME: constant for 0x7C
@@ -173,8 +174,7 @@ public class PACEAPDUSender implements APDULevelPACECapable {
     /* Handle error status word. */
     short sw = (short)rapdu.getSW();
     if (sw != ISO7816.SW_NO_ERROR) {
-      /* If PACE fails at this stage, blame it on the PACE credentials. */
-      throw new AccessDeniedException("Sending general authenticate failed", sw);
+      throw new CardServiceException("Sending general authenticate failed", sw);
     }
     byte[] responseData = rapdu.getData();
     responseData = TLVUtil.unwrapDO(0x7C, responseData);

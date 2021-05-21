@@ -131,6 +131,13 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
   public abstract void sendSelectApplet(boolean shouldUseSecureMessaging) throws CardServiceException;
 
   /**
+   * Selects the master file.
+   *
+   * @throws CardServiceException on error
+   */
+  public abstract void sendSelectMF() throws CardServiceException;
+
+  /**
    * Performs the <i>Active Authentication</i> protocol.
    *
    * @param publicKey the public key to use (usually read from the card)

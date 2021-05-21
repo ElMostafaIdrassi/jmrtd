@@ -9,7 +9,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.jmrtd.APDULevelBACCapable;
-import org.jmrtd.AccessDeniedException;
+import org.jmrtd.AccessControlProtocolException;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.APDUWrapper;
@@ -66,6 +66,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
    *
    * @throws CardServiceException on tranceive error
    */
+  @Override
   public synchronized byte[] sendGetChallenge() throws CardServiceException {
     return sendGetChallenge(null);
   }
@@ -104,6 +105,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
    *
    * @throws CardServiceException on tranceive error
    */
+  @Override
   public synchronized byte[] sendMutualAuth(byte[] rndIFD, byte[] rndICC, byte[] kIFD, SecretKey kEnc, SecretKey kMac) throws CardServiceException {
     try {
       if (rndIFD == null || rndIFD.length != 8) {
@@ -168,7 +170,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
       }
 
       if (responseAPDUBytes.length != 42) {
-        throw new AccessDeniedException("Mutual authentication failed: expected length: 40 + 2, actual length: " + responseAPDUBytes.length, sw);
+        throw new AccessControlProtocolException("Mutual authentication failed: expected length: 40 + 2, actual length: " + responseAPDUBytes.length, 0, sw);
       }
 
       /* Decrypt the response. */

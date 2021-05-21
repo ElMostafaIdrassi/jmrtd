@@ -264,7 +264,7 @@ public class DefaultFileSystem implements FileSystemStructured {
         return new byte[]{ };
       }
 
-      throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), cse, cse.getSW());
+      throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), cse);
     } catch (Exception e) {
       throw new CardServiceException("Read binary failed on file " + (fileInfo == null ? Integer.toHexString(selectedFID) : fileInfo), e);
     }

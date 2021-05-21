@@ -160,7 +160,7 @@ public class ChipAuthenticationInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong identifier: "	+ oid);
       }
       if (version != VERSION_1 && version != VERSION_2) {
-        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2 + ", found " + version);
+        LOGGER.warning("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2 + ", found " + version);
       }
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);

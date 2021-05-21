@@ -28,6 +28,7 @@ import java.security.spec.ECParameterSpec;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import javax.crypto.spec.DHParameterSpec;
 
@@ -52,6 +53,10 @@ import org.jmrtd.Util;
 public class PACEInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 7960925013249578359L;
+
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.lds");
+
+  private static final int VERSION_2 = 2;
 
   /**
    * A DH parameter specification which also keeps track of
@@ -209,8 +214,8 @@ public class PACEInfo extends SecurityInfo {
     if (!checkRequiredIdentifier(oid)) {
       throw new IllegalArgumentException("Invalid OID");
     }
-    if (version != 2) {
-      throw new IllegalArgumentException("Invalid version, must be 2");
+    if (version != VERSION_2) {
+      LOGGER.warning("Invalid version, must be 2");
     }
     this.protocolOID = oid;
     this.version = version;

@@ -354,6 +354,17 @@ public class PassportService extends AbstractMRTDCardService {
   }
 
   /**
+   * Sends a {@code SELECT MF} command to the card.
+   *
+   * @throws CardServiceException on tranceive error
+   */
+  @Override
+  public void sendSelectMF() throws CardServiceException {
+    readBinarySender.sendSelectMF();
+    wrapper = null;
+  }
+
+  /**
    * Returns a boolean that indicates whether this service is open.
    *
    * @return a boolean that indicates whether this service is open

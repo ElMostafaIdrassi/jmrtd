@@ -22,16 +22,17 @@
 
 package org.jmrtd;
 
-import net.sf.scuba.smartcards.CardServiceException;
-
 /**
  * An exception to signal errors during execution of the PACE protocol.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
  * @version $Revision$
+ *
+ * @deprecated Use {@link AccessControlProtocolException} instead.
  */
-public class PACEException extends CardServiceException {
+@Deprecated
+public class PACEException extends AccessControlProtocolException {
 
   private static final long serialVersionUID = 8383980807753919040L;
 
@@ -39,39 +40,43 @@ public class PACEException extends CardServiceException {
    * Creates a {@code PACEException}.
    *
    * @param msg a message
+   * @param step the protocol step that failed
    */
-  public PACEException(String msg) {
-    super(msg);
+  public PACEException(String msg, int step) {
+    super(msg, step);
   }
 
   /**
    * Creates a {@code PACEException}.
    *
    * @param msg a message
+   * @param step the protocol step that failed
    * @param cause the exception causing this exception
    */
-  public PACEException(String msg, Throwable cause) {
-    super(msg, cause);
+  public PACEException(String msg, int step, Throwable cause) {
+    super(msg, step, cause);
   }
 
   /**
    * Creates a PACEException with a specific status word.
    *
    * @param msg a message
+   * @param step the protocol step that failed
    * @param sw the status word that caused this CardServiceException
    */
-  public PACEException(String msg, int sw) {
-    super(msg, sw);
+  public PACEException(String msg, int step, int sw) {
+    super(msg, step, sw);
   }
 
   /**
    * Creates a PACEException with a specific status word.
    *
    * @param msg a message
+   * @param step the protocol step that failed
    * @param cause the exception causing this exception
    * @param sw the status word that caused this CardServiceException
    */
-  public PACEException(String msg, Throwable cause, int sw) {
-    super(msg, cause, sw);
+  public PACEException(String msg, int step, Throwable cause, int sw) {
+    super(msg, step, cause, sw);
   }
 }

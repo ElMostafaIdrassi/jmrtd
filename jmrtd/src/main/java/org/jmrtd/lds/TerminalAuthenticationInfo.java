@@ -22,6 +22,8 @@
 
 package org.jmrtd.lds;
 
+import java.util.logging.Logger;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -54,6 +56,8 @@ import org.bouncycastle.asn1.DLSequence;
 public class TerminalAuthenticationInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 6220506985707094044L;
+
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.lds");
 
   public static final int VERSION_1 = 1;
   private static final int VERSION_2 = 2;
@@ -248,7 +252,7 @@ public class TerminalAuthenticationInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong identifier: " + oid);
       }
       if (version != VERSION_1 && version != VERSION_2) {
-        throw new IllegalArgumentException("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2
+        LOGGER.warning("Wrong version. Was expecting " + VERSION_1 + " or " + VERSION_2
             + ", found " + version);
       }
       if (efCVCA != null) {

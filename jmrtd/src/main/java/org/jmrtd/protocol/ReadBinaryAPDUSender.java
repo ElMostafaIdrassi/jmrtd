@@ -59,6 +59,17 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
   }
 
   /**
+   * Sends a {@code SELECT MF} command to the card.
+   *
+   * @throws CardServiceException on tranceive error
+   */
+  public synchronized void sendSelectMF() throws CardServiceException {
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_SELECT_FILE, (byte)0x00, (byte)0x0C, new byte[] { 0x3F, 0x00 });
+    ResponseAPDU responseAPDU = secureMessagingSender.transmit(null, commandAPDU);
+    checkStatusWordAfterFileOperation(commandAPDU, responseAPDU);
+  }
+
+  /**
    * Sends a {@code SELECT FILE} command to the passport. Secure
    * messaging will be applied to the command and response apdu.
    *

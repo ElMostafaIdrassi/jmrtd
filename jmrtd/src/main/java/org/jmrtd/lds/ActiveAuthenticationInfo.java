@@ -23,6 +23,7 @@
 package org.jmrtd.lds;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -58,6 +59,8 @@ import org.bouncycastle.asn1.DLSequence;
 public class ActiveAuthenticationInfo extends SecurityInfo {
 
   private static final long serialVersionUID = 6830847342039845308L;
+
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.lds");
 
   public static final int VERSION_1 = 1;
 
@@ -263,7 +266,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
         throw new IllegalArgumentException("Wrong identifier: " + oid);
       }
       if (version != VERSION_1) {
-        throw new IllegalArgumentException("Wrong version: " + version);
+        LOGGER.warning("Wrong version: " + version);
       }
 
       /* FIXME check to see if signatureAlgorithmOID is valid. */

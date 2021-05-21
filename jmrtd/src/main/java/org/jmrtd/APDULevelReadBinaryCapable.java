@@ -50,6 +50,13 @@ public interface APDULevelReadBinaryCapable {
   void sendSelectApplet(APDUWrapper wrapper, byte[] aid) throws CardServiceException;
 
   /**
+   * Sends a {@code SELECT MF} command to the card.
+   *
+   * @throws CardServiceException on tranceive error
+   */
+  void sendSelectMF() throws CardServiceException;
+
+  /**
    * Selects a file by file identifier.
    *
    * @param wrapper the APDU wrapper to use

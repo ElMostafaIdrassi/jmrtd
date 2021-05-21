@@ -32,7 +32,10 @@ import net.sf.scuba.smartcards.CardServiceException;
  * @version $Revision$
  *
  * @since 0.4.8
+ *
+ * @deprecated Use {@link AccessControlProtocolException} instead.
  */
+@Deprecated
 public class BACDeniedException extends CardServiceException {
 
   private static final long serialVersionUID = -7094953658210693249L;

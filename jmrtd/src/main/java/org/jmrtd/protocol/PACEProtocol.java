@@ -65,9 +65,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.jmrtd.APDULevelPACECapable;
+import org.jmrtd.AccessControlProtocolException;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
-import org.jmrtd.PACEException;
 import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PACESecretKeySpec;
 import org.jmrtd.PassportService;
@@ -204,7 +204,7 @@ public class PACEProtocol {
     try {
       return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, staticParameters, parameterId);
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in key derivation step", gse);
+      throw new AccessControlProtocolException("PCD side error in key derivation step", 0, gse);
     }
   }
 
@@ -234,7 +234,7 @@ public class PACEProtocol {
     try {
       staticPACECipher = Cipher.getInstance(cipherAlg + "/CBC/NoPadding");
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in static cipher construction during key derivation step", gse);
+      throw new AccessControlProtocolException("PCD side error in static cipher construction during key derivation step", 0, gse);
     }
 
     try {
@@ -263,7 +263,10 @@ public class PACEProtocol {
       /* Send to the PICC. */
       service.sendMSESetATMutualAuth(wrapper, oid, paceKeyReference, referencePrivateKeyOrForComputingSessionKey);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side error in static PACE key derivation step", cse, cse.getSW());
+      throw new AccessControlProtocolException("PICC side error in static PACE key derivation step", 0, cse);
+    } catch (Exception e) {
+      /* NOTE: Any other exception, must be PCD side. */
+      throw new AccessControlProtocolException("PCD side error in static PACE key derivation step", 0, e);
     }
 
     /*
@@ -307,7 +310,7 @@ public class PACEProtocol {
       encKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.ENC_MODE);
       macKey = Util.deriveKey(sharedSecretBytes, cipherAlg, keyLength, Util.MAC_MODE);
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("Security exception during secure messaging key derivation", gse);
+      throw new AccessControlProtocolException("Security exception during secure messaging key derivation", 3, gse);
     }
 
     /*
@@ -338,7 +341,7 @@ public class PACEProtocol {
         LOGGER.warning("Unsupported cipher algorithm " + cipherAlg);
       }
     } catch (GeneralSecurityException gse) {
-      throw new IllegalStateException("Security exception in secure messaging establishment", gse);
+      throw new AccessControlProtocolException("Security exception in secure messaging establishment", 4, gse);
     }
 
     if (MappingType.CAM.equals(mappingType)) {
@@ -386,9 +389,9 @@ public class PACEProtocol {
    *
    * @return the decrypted encrypted PICC nonce
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public byte[] doPACEStep1(SecretKey staticPACEKey, Cipher staticPACECipher) throws PACEException {
+  public byte[] doPACEStep1(SecretKey staticPACEKey, Cipher staticPACECipher) throws AccessControlProtocolException {
     byte[] piccNonce = null;
     try {
       byte[] step1Data = new byte[] { };
@@ -402,9 +405,9 @@ public class PACEProtocol {
       piccNonce = staticPACECipher.doFinal(step1EncryptedNonce);
       return piccNonce;
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side exception in tranceiving nonce step", gse);
+      throw new AccessControlProtocolException("PCD side exception in tranceiving nonce step", 1, gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in tranceiving nonce step", cse);
+      throw new AccessControlProtocolException("PICC side exception in tranceiving nonce step", 1, cse);
     }
   }
 
@@ -430,9 +433,9 @@ public class PACEProtocol {
    *
    * @return the newly computed ephemeral domain parameters
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public PACEMappingResult doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
+  public PACEMappingResult doPACEStep2(MappingType mappingType, String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws AccessControlProtocolException {
     switch(mappingType) {
       case CAM:
         // Fall through to GM case.
@@ -441,7 +444,7 @@ public class PACEProtocol {
       case IM:
         return doPACEStep2IM(agreementAlg, params, piccNonce, staticPACECipher);
       default:
-        throw new PACEException("Unsupported mapping type " + mappingType);
+        throw new AccessControlProtocolException("Unsupported mapping type " + mappingType, 2);
     }
   }
 
@@ -456,9 +459,9 @@ public class PACEProtocol {
    *
    * @return the computed ephemeral domain parameters
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public PACEGMMappingResult doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws PACEException {
+  public PACEGMMappingResult doPACEStep2GM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce) throws AccessControlProtocolException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(params);
@@ -492,10 +495,11 @@ public class PACEProtocol {
         throw new IllegalArgumentException("Unsupported parameters for mapping nonce, expected \"ECDH\" / ECParameterSpec or \"DH\" / DHParameterSpec"
             + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());
       }
-    } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in mapping nonce step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in mapping nonce step", cse);
+      throw new AccessControlProtocolException("PICC side exception in mapping nonce step", 2, cse);
+    } catch (Exception e) {
+      /* NOTE: Any exception, must be PCD side. Typically this is subclass of GeneralSecurityException. */
+      throw new AccessControlProtocolException("PCD side error in mapping nonce step", 2, e);
     }
   }
 
@@ -526,9 +530,9 @@ public class PACEProtocol {
    *
    * @return the computed ephemeral domain parameters
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public PACEIMMappingResult doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws PACEException {
+  public PACEIMMappingResult doPACEStep2IM(String agreementAlg, AlgorithmParameterSpec params, byte[] piccNonce, Cipher staticPACECipher) throws AccessControlProtocolException {
     try {
 
       byte[] pcdNonce = new byte[piccNonce.length];
@@ -552,9 +556,9 @@ public class PACEProtocol {
             + ", found \"" + agreementAlg + "\" /" + params.getClass().getCanonicalName());
       }
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error in mapping nonce step", gse);
+      throw new AccessControlProtocolException("PCD side error in mapping nonce step", 2, gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in mapping nonce step", cse, cse.getSW());
+      throw new AccessControlProtocolException("PICC side exception in mapping nonce step", 2, cse);
     }
   }
 
@@ -567,15 +571,15 @@ public class PACEProtocol {
    *
    * @return the key pair
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public KeyPair doPACEStep3GenerateKeyPair(String agreementAlg, AlgorithmParameterSpec ephemeralParams) throws PACEException {
+  public KeyPair doPACEStep3GenerateKeyPair(String agreementAlg, AlgorithmParameterSpec ephemeralParams) throws AccessControlProtocolException {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(agreementAlg, BC_PROVIDER);
       keyPairGenerator.initialize(ephemeralParams);
       return keyPairGenerator.generateKeyPair();
     } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side error during generation of PCD key pair", gse);
+      throw new AccessControlProtocolException("PCD side error during generation of PCD key pair", 3, gse);
     }
   }
 
@@ -593,9 +597,9 @@ public class PACEProtocol {
    *
    * @return the PICC's public key
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws PACEException {
+  public PublicKey doPACEStep3ExchangePublicKeys(PublicKey pcdPublicKey, AlgorithmParameterSpec ephemeralParams)  throws AccessControlProtocolException {
     try {
       byte[] pcdEncodedPublicKey = encodePublicKeyForSmartCard(pcdPublicKey);
       byte[] step3Data = TLVUtil.wrapDO(0x83, pcdEncodedPublicKey);
@@ -604,16 +608,14 @@ public class PACEProtocol {
       PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 
       if (pcdPublicKey.equals(piccPublicKey)) {
-        throw new PACEException("PCD's public key and PICC's public key are the same in key agreement step!");
+        throw new AccessControlProtocolException("PCD's public key and PICC's public key are the same in key agreement step!", 3);
       }
 
       return piccPublicKey;
-    } catch (IllegalStateException ise) {
-      throw new PACEException("PCD side exception in key agreement step", ise);
-    } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side exception in key agreement step", gse);
     } catch (CardServiceException cse) {
-      throw new PACEException("PICC side exception in key agreement step", cse, cse.getSW());
+      throw new AccessControlProtocolException("PICC side exception in key agreement step", 3, cse);
+    } catch (Exception e) {
+      throw new AccessControlProtocolException("PCD side exception in key agreement step", 3, e);
     }
   }
 
@@ -627,17 +629,16 @@ public class PACEProtocol {
    *
    * @return the shared secret
    *
-   * @throws PACEException on error
+   * @throws AccessControlProtocolException on error
    */
-  public byte[] doPACEStep3KeyAgreement(String agreementAlg, PrivateKey pcdPrivateKey, PublicKey piccPublicKey) throws PACEException {
+  public byte[] doPACEStep3KeyAgreement(String agreementAlg, PrivateKey pcdPrivateKey, PublicKey piccPublicKey) throws AccessControlProtocolException {
     try {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(agreementAlg, BC_PROVIDER);
       keyAgreement.init(pcdPrivateKey);
       keyAgreement.doPhase(updateParameterSpec(piccPublicKey, pcdPrivateKey), true);
       return keyAgreement.generateSecret();
-    } catch (GeneralSecurityException gse) {
-      LOGGER.log(Level.WARNING, "PCD side error during key agreement", gse);
-      throw new PACEException("PCD side error during key agreement");
+    } catch (Exception e) {
+      throw new AccessControlProtocolException("PCD side error during key agreement", 3, e);
     }
   }
 
@@ -703,8 +704,8 @@ public class PACEProtocol {
       }
 
       return null;
-    } catch (GeneralSecurityException gse) {
-      throw new PACEException("PCD side exception in authentication token generation step", gse);
+    } catch (Exception e) {
+      throw new AccessControlProtocolException("PCD side exception in authentication token generation step", 4, e);
     }
   }
 
