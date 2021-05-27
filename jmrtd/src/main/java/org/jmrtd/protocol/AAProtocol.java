@@ -25,6 +25,7 @@ package org.jmrtd.protocol;
 import java.security.PublicKey;
 
 import org.jmrtd.APDULevelAACapable;
+import org.jmrtd.CardServiceProtocolException;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
@@ -73,8 +74,8 @@ public class AAProtocol {
       }
       byte[] response = service.sendInternalAuthenticate(wrapper, challenge);
       return new AAResult(publicKey, digestAlgorithm, signatureAlgorithm, challenge, response);
-    } catch (IllegalArgumentException iae) {
-      throw new CardServiceException("Exception", iae);
+    } catch (Exception e) {
+      throw new CardServiceProtocolException("Exception", 1, e);
     }
   }
 }

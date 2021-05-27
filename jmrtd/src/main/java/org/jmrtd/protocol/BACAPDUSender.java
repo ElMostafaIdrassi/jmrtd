@@ -9,7 +9,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.jmrtd.APDULevelBACCapable;
-import org.jmrtd.AccessControlProtocolException;
+import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.APDUWrapper;
@@ -83,7 +83,11 @@ public class BACAPDUSender implements APDULevelBACCapable {
   public synchronized byte[] sendGetChallenge(APDUWrapper wrapper) throws CardServiceException {
     CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_GET_CHALLENGE, 0x00, 0x00, 8);
     ResponseAPDU responseAPDU = service.transmit(commandAPDU);
-    return responseAPDU.getData();
+    byte[] challenge = responseAPDU.getData();
+    if (challenge == null || challenge.length != 8) {
+      throw new CardServiceException("Get challenge failed", responseAPDU.getSW());
+    }
+    return challenge;
   }
 
   /**
@@ -170,7 +174,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
       }
 
       if (responseAPDUBytes.length != 42) {
-        throw new AccessControlProtocolException("Mutual authentication failed: expected length: 40 + 2, actual length: " + responseAPDUBytes.length, 0, sw);
+        throw new CardServiceProtocolException("Mutual authentication failed: expected length: 40 + 2, actual length: " + responseAPDUBytes.length, 0, sw);
       }
 
       /* Decrypt the response. */

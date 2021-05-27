@@ -33,7 +33,7 @@ import net.sf.scuba.smartcards.CardServiceException;
  *
  * @since 0.4.8
  *
- * @deprecated Use {@link AccessControlProtocolException} instead.
+ * @deprecated Use {@link CardServiceProtocolException} instead.
  */
 @Deprecated
 public class BACDeniedException extends CardServiceException {

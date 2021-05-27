@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.APDULevelAACapable;
+import org.jmrtd.CardServiceProtocolException;
 
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardService;

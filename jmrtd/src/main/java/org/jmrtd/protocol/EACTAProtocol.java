@@ -35,6 +35,7 @@ import java.util.List;
 import javax.crypto.interfaces.DHPublicKey;
 
 import org.jmrtd.APDULevelEACTACapable;
+import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.Util;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 import org.jmrtd.cert.CVCPrincipal;
@@ -225,7 +226,11 @@ public class EACTAProtocol {
            */
           byte[] authorityRefBytes = TLVUtil.wrapDO(0x83, authorityReference.getName().getBytes("ISO-8859-1"));
           service.sendMSESetDST(wrapper, authorityRefBytes);
+        } catch (Exception e) {
+          throw new CardServiceProtocolException("Exception in MSE:SetDST", 1, e);
+        }
 
+        try {
           /* Cert body is already in TLV format. */
           byte[] body = cert.getCertBodyData();
 
@@ -240,11 +245,9 @@ public class EACTAProtocol {
 
           /* Step 2: PSO:Verify Certificate */
           service.sendPSOExtendedLengthMode(wrapper, body, signature);
-        } catch (CardServiceException cse) {
-          throw cse;
         } catch (Exception e) {
           /* FIXME: Does this mean we failed to authenticate? -- MO */
-          throw new CardServiceException("Exception", e);
+          throw new CardServiceProtocolException("Exception", 2, e);
         }
       }
 
@@ -253,44 +256,57 @@ public class EACTAProtocol {
       }
 
       /* Step 3: MSE Set AT */
-      CVCPrincipal holderRef = terminalCert.getHolderReference();
-      byte[] holderRefBytes = TLVUtil.wrapDO(0x83, holderRef.getName().getBytes("ISO-8859-1"));
-      /*
-       * Manage Security Environment: Set for external authentication: Authentication
-       * Template
-       */
-      service.sendMSESetATExtAuth(wrapper, holderRefBytes);
+      try {
+        CVCPrincipal holderRef = terminalCert.getHolderReference();
+        byte[] holderRefBytes = TLVUtil.wrapDO(0x83, holderRef.getName().getBytes("ISO-8859-1"));
+        /*
+         * Manage Security Environment: Set for external authentication: Authentication
+         * Template
+         */
+        service.sendMSESetATExtAuth(wrapper, holderRefBytes);
+      } catch (Exception e) {
+        throw new CardServiceProtocolException("Exception in MSE Set AT", 3, e);
+      }
 
       /* Step 4: send get challenge */
-      byte[] rPICC = service.sendGetChallenge(wrapper);
+      byte[] rPICC = null;
+      try {
+        rPICC = service.sendGetChallenge(wrapper);
+      } catch (Exception e) {
+        throw new CardServiceProtocolException("Exception in Get Challenge", 4, e);
+      }
 
       /* Step 5: external authenticate. */
-      ByteArrayOutputStream dtbs = new ByteArrayOutputStream();
-      dtbs.write(idPICC);
-      dtbs.write(rPICC);
-      dtbs.write(caKeyHash);
-      dtbs.close();
-      byte[] dtbsBytes = dtbs.toByteArray();
+      try {
+        ByteArrayOutputStream dtbs = new ByteArrayOutputStream();
+        dtbs.write(idPICC);
+        dtbs.write(rPICC);
+        dtbs.write(caKeyHash);
+        dtbs.close();
+        byte[] dtbsBytes = dtbs.toByteArray();
 
-      String sigAlg = terminalCert.getSigAlgName();
-      if (sigAlg == null) {
-        throw new IllegalStateException("Could not determine signature algorithm for terminal certificate " + terminalCert.getHolderReference().getName());
-      }
-      Signature sig = Signature.getInstance(sigAlg, BC_PROVIDER);
-      sig.initSign(terminalKey);
-      sig.update(dtbsBytes);
-      byte[] signedData = sig.sign();
-      if (sigAlg.toUpperCase().endsWith("ECDSA")) {
-        int keySize = (int)Math.ceil(((org.bouncycastle.jce.interfaces.ECPrivateKey)terminalKey).getParameters().getCurve().getFieldSize() / 8.0); //TODO: Interop Ispra 20170925
-        signedData = Util.getRawECDSASignature(signedData, keySize);
-      }
+        String sigAlg = terminalCert.getSigAlgName();
+        if (sigAlg == null) {
+          throw new IllegalStateException("Could not determine signature algorithm for terminal certificate " + terminalCert.getHolderReference().getName());
+        }
+        Signature sig = Signature.getInstance(sigAlg, BC_PROVIDER);
+        sig.initSign(terminalKey);
+        sig.update(dtbsBytes);
+        byte[] signedData = sig.sign();
+        if (sigAlg.toUpperCase().endsWith("ECDSA")) {
+          int keySize = (int)Math.ceil(((org.bouncycastle.jce.interfaces.ECPrivateKey)terminalKey).getParameters().getCurve().getFieldSize() / 8.0); //TODO: Interop Ispra 20170925
+          signedData = Util.getRawECDSASignature(signedData, keySize);
+        }
 
-      service.sendMutualAuthenticate(wrapper, signedData);
-      return new EACTAResult(chipAuthenticationResult, caReference, terminalCertificates, terminalKey, null, rPICC);
+        service.sendMutualAuthenticate(wrapper, signedData);
+        return new EACTAResult(chipAuthenticationResult, caReference, terminalCertificates, terminalKey, null, rPICC);
+      } catch (Exception e) {
+        throw new CardServiceProtocolException("Exception in External Authenticate", 5, e);
+      }
     } catch (CardServiceException cse) {
       throw cse;
     } catch (Exception e) {
-      throw new CardServiceException("Exception", e);
+      throw new CardServiceException("Unexpected exception", e);
     }
   }
 

@@ -29,10 +29,10 @@ package org.jmrtd;
  *
  * @version $Revision$
  *
- * @deprecated Use {@link AccessControlProtocolException} instead.
+ * @deprecated Use {@link CardServiceProtocolException} instead.
  */
 @Deprecated
-public class PACEException extends AccessControlProtocolException {
+public class PACEException extends CardServiceProtocolException {
 
   private static final long serialVersionUID = 8383980807753919040L;
 

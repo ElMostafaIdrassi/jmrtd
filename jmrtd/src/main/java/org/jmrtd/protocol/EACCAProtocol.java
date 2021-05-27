@@ -43,6 +43,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 
 import org.jmrtd.APDULevelEACCACapable;
+import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.Util;
 import org.jmrtd.lds.ChipAuthenticationInfo;
 import org.jmrtd.lds.SecurityInfo;
@@ -179,20 +180,23 @@ public class EACCAProtocol {
         byte[] keyIdBytes = Util.i2os(keyId);
         idData = TLVUtil.wrapDO(0x84, keyIdBytes); /* FIXME: Constant for 0x84. */
       }
-      service.sendMSEKAT(wrapper, TLVUtil.wrapDO(0x91, keyData), idData); /* FIXME: Constant for 0x91. */
-    } else if (cipherAlg.startsWith("AES")) {
-      service.sendMSESetATIntAuth(wrapper, oid, keyId);
-      byte[] data = TLVUtil.wrapDO(0x80, keyData); /* FIXME: Constant for 0x80. */
       try {
-        service.sendGeneralAuthenticate(wrapper, data, true);
-      } catch (CardServiceException cse) {
-        LOGGER.log(Level.WARNING, "Failed to send GENERAL AUTHENTICATE, falling back to command chaining", cse);
-        List<byte[]> segments = Util.partition(COMMAND_CHAINING_CHUNK_SIZE, data);
+        service.sendMSEKAT(wrapper, TLVUtil.wrapDO(0x91, keyData), idData); /* FIXME: Constant for 0x91. */
+      } catch (Exception e) {
+        throw new CardServiceProtocolException("Exception during MSE KAT", 1, e);
+      }
+    } else if (cipherAlg.startsWith("AES")) {
+      try {
+        service.sendMSESetATIntAuth(wrapper, oid, keyId);
+      } catch (Exception e) {
+        throw new CardServiceProtocolException("Exception during MSE Set AT Int Auth", 1, e);
+      }
 
-        int index = 0;
-        for (byte[] segment: segments) {
-          service.sendGeneralAuthenticate(wrapper, segment, ++index >= segments.size());
-        }
+      try {
+        byte[] data = TLVUtil.wrapDO(0x80, keyData); /* FIXME: Constant for 0x80. */
+        sendGeneralAuthenticate(service, wrapper, data);
+      } catch (Exception e) {
+        throw new CardServiceProtocolException("Exception during General Authenticate", 2, e);
       }
     } else {
       throw new IllegalStateException("Cannot set up secure channel with cipher " + cipherAlg);
@@ -281,6 +285,27 @@ public class EACCAProtocol {
     }
 
     throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
+  }
+
+  /**
+   * Sends the General Authenticate APDU in the AES case, possibly falling back to Command Chaining.
+   *
+   * @param service the card service
+   * @param wrapper the existing secure messaging wrapper
+   * @param data the key data, already wrapped as a data-object
+   */
+  private static void sendGeneralAuthenticate(APDULevelEACCACapable service, SecureMessagingWrapper wrapper, byte[] data) throws CardServiceException {
+    try {
+      service.sendGeneralAuthenticate(wrapper, data, true);
+    } catch (CardServiceException cse) {
+      LOGGER.log(Level.WARNING, "Failed to send GENERAL AUTHENTICATE, falling back to command chaining", cse);
+      List<byte[]> segments = Util.partition(COMMAND_CHAINING_CHUNK_SIZE, data);
+
+      int index = 0;
+      for (byte[] segment: segments) {
+        service.sendGeneralAuthenticate(wrapper, segment, ++index >= segments.size());
+      }
+    }
   }
 
   /**

@@ -29,7 +29,7 @@ import java.util.Random;
 import javax.crypto.SecretKey;
 
 import org.jmrtd.APDULevelBACCapable;
-import org.jmrtd.AccessControlProtocolException;
+import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
 import org.jmrtd.Util;
@@ -129,7 +129,7 @@ public class BACProtocol {
     try {
       rndICC = service.sendGetChallenge();
     } catch (Exception e) {
-      throw new AccessControlProtocolException("BAC failed in GET CHALLENGE", 1, e);
+      throw new CardServiceProtocolException("BAC failed in GET CHALLENGE", 1, e);
     }
     byte[] rndIFD = new byte[8];
     random.nextBytes(rndIFD);
@@ -139,7 +139,7 @@ public class BACProtocol {
     try {
       response = service.sendMutualAuth(rndIFD, rndICC, kIFD, kEnc, kMac);
     } catch (Exception e) {
-      throw new AccessControlProtocolException("BAC failed in MUTUAL AUTH", 2, e);
+      throw new CardServiceProtocolException("BAC failed in MUTUAL AUTH", 2, e);
     }
     byte[] kICC = new byte[16];
     System.arraycopy(response, 16, kICC, 0, 16);
