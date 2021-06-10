@@ -72,7 +72,7 @@ public class EACCAResult implements Serializable {
   /**
    * Returns the ICC's public key identifier.
    *
-   * @return the key id or -1
+   * @return the key id or {@code null}
    */
   public BigInteger getKeyId() {
     return keyId;
