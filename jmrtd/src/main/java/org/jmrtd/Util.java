@@ -757,6 +757,9 @@ public final class Util {
    * @return another specification not name based
    */
   public static ECParameterSpec toExplicitECParameterSpec(ECParameterSpec params) {
+    if (params == null) {
+      return null;
+    }
     try {
       ECPoint g = params.getGenerator();
       BigInteger n = params.getOrder(); // Order, order
@@ -975,6 +978,41 @@ public final class Util {
       LOGGER.log(Level.WARNING, "Could not make public key param spec explicit", e);
       return publicKey;
     }
+  }
+
+
+  /**
+   * Attempts to add missing parameters to a public key.
+   * If the public key already has appropriate parameters, then this does nothing.
+   *
+   * @param params the parameter spec
+   * @param publicKey the public key
+   *
+   * @return a public key with possibly added parameters
+   */
+  public static PublicKey addMissingParametersToPublicKey(AlgorithmParameterSpec params, PublicKey publicKey) {
+    if (publicKey == null) {
+      return null;
+    }
+    try {
+      String algorithm = publicKey.getAlgorithm();
+      if ("EC".equals(algorithm) || "ECDSA".equals(algorithm) || "ECDH".equals(algorithm)) {
+        if (!(params instanceof ECParameterSpec)) {
+          return publicKey;
+        }
+
+        ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
+        ECPoint w = ecPublicKey.getW();
+        ECPublicKeySpec explicitPublicKeySpec = new ECPublicKeySpec(w, (ECParameterSpec)params);
+
+        return KeyFactory.getInstance("EC", BC_PROVIDER).generatePublic(explicitPublicKeySpec);
+      }
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Could not make public key param spec explicit", e);
+      return publicKey;
+    }
+
+    return publicKey;
   }
 
   /**

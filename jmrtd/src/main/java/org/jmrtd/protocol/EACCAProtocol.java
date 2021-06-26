@@ -273,11 +273,11 @@ public class EACCAProtocol {
    * @throws NoSuchAlgorithmException on error
    */
   public static byte[] getKeyHash(String agreementAlg, PublicKey pcdPublicKey) throws NoSuchAlgorithmException {
-    if ("DH".equals(agreementAlg)) {
+    if ("DH".equals(agreementAlg) || pcdPublicKey instanceof DHPublicKey) {
       /* TODO: this is probably wrong, what should be hashed? */
       MessageDigest md = MessageDigest.getInstance("SHA-1");
       return md.digest(getKeyData(agreementAlg, pcdPublicKey));
-    } else if ("ECDH".equals(agreementAlg)) {
+    } else if ("ECDH".equals(agreementAlg) || pcdPublicKey instanceof ECPublicKey) {
       org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
       byte[] t = Util.i2os(pcdECPublicKey.getQ().getAffineXCoord().toBigInteger());
       int keySize = (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0);

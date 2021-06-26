@@ -65,9 +65,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.jmrtd.APDULevelPACECapable;
-import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
+import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PACESecretKeySpec;
 import org.jmrtd.PassportService;

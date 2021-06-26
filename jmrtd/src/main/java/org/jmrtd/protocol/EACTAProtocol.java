@@ -30,7 +30,10 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.interfaces.ECPublicKey;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.interfaces.DHPublicKey;
 
@@ -56,6 +59,8 @@ import net.sf.scuba.tlv.TLVUtil;
  * @since 0.5.6
  */
 public class EACTAProtocol {
+
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
 
   private static final int TAG_CVCERTIFICATE_SIGNATURE = 0x5F37;
 
@@ -137,7 +142,7 @@ public class EACTAProtocol {
   public synchronized EACTAResult doTA(CVCPrincipal caReference, List<CardVerifiableCertificate> terminalCertificates,
       PrivateKey terminalKey, String taAlg, EACCAResult chipAuthenticationResult, PACEResult paceResult) throws CardServiceException {
     try {
-      byte[] idPICC = deriveIdentifier(paceResult);
+      byte[] idPICC = deriveIdentifier(paceResult.getPICCPublicKey());
       return doTA(caReference, terminalCertificates, terminalKey, taAlg, chipAuthenticationResult, idPICC);
     } catch (NoSuchAlgorithmException e) {
       throw new CardServiceException("No such algorithm", e);
@@ -301,6 +306,7 @@ public class EACTAProtocol {
         service.sendMutualAuthenticate(wrapper, signedData);
         return new EACTAResult(chipAuthenticationResult, caReference, terminalCertificates, terminalKey, null, rPICC);
       } catch (Exception e) {
+        LOGGER.log(Level.WARNING, "Exception", e);
         throw new CardServiceProtocolException("Exception in External Authenticate", 5, e);
       }
     } catch (CardServiceException cse) {
@@ -317,7 +323,10 @@ public class EACTAProtocol {
    *
    * @return the chip identifier
    */
-  private static byte[] deriveIdentifier(String documentNumber) {
+  public static byte[] deriveIdentifier(String documentNumber) {
+    if (documentNumber == null) {
+      return null;
+    }
     int documentNumberLength = documentNumber.length();
     byte[] idPICC = new byte[documentNumberLength + 1];
     try {
@@ -333,47 +342,29 @@ public class EACTAProtocol {
   /**
    * Derives a chip identifier from a PACE result (PACE case).
    *
-   * @param paceResult the PACE result
+   * @param publicKey the PACE result
    *
    * @return the chip identifier
    *
    * @throws NoSuchAlgorithmException on error
    */
-  private static byte[] deriveIdentifier(PACEResult paceResult) throws NoSuchAlgorithmException {
-    String agreementAlg = paceResult.getAgreementAlg();
-    PublicKey pcdPublicKey = paceResult.getPICCPublicKey();
-    if ("DH".equals(agreementAlg)) {
+  public static byte[] deriveIdentifier(PublicKey publicKey) throws NoSuchAlgorithmException {
+    if (publicKey == null) {
+      return null;
+    }
+    String publicKeyAlg = publicKey.getAlgorithm();
+    if ("DH".equals(publicKeyAlg) || publicKey instanceof DHPublicKey) {
       /* TODO: this is probably wrong, what should be hashed? */
       MessageDigest md = MessageDigest.getInstance("SHA-1");
-      return md.digest(getKeyData(agreementAlg, pcdPublicKey));
-    } else if ("ECDH".equals(agreementAlg)) {
-      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      byte[] t = Util.i2os(pcdECPublicKey.getQ().getAffineXCoord().toBigInteger());
-      return Util.alignKeyDataToSize(t, (int)Math.ceil(pcdECPublicKey.getParameters().getCurve().getFieldSize() / 8.0)); // TODO: Interop Ispra for SecP521r1 20170925.
+      DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
+      return md.digest(Util.i2os(dhPublicKey.getY()));
+    } else if ("ECDH".equals(publicKeyAlg) || publicKey instanceof ECPublicKey) {
+      org.bouncycastle.jce.interfaces.ECPublicKey piccECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)publicKey;
+      byte[] t = Util.i2os(piccECPublicKey.getQ().getAffineXCoord().toBigInteger());
+      return Util.alignKeyDataToSize(t, (int)Math.ceil(piccECPublicKey.getParameters().getCurve().getFieldSize() / 8.0)); // TODO: Interop Ispra for SecP521r1 20170925.
     }
 
-    throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + agreementAlg);
-  }
-
-  /**
-   * Returns the encoded public key data to be sent.
-   *
-   * @param agreementAlg the agreement algorithm, either {@code "DH"} or {@code "ECDH"}
-   * @param pcdPublicKey the inspection system's public key
-   *
-   * @return the key data
-   */
-  private static byte[] getKeyData(String agreementAlg, PublicKey pcdPublicKey) {
-    if ("DH".equals(agreementAlg)) {
-      DHPublicKey pcdDHPublicKey = (DHPublicKey)pcdPublicKey;
-      return Util.i2os(pcdDHPublicKey.getY());
-    } else if ("ECDH".equals(agreementAlg)) {
-      /* NOTE: Why are we not relying on JCE here, but on Bouncy instead? */
-      org.bouncycastle.jce.interfaces.ECPublicKey pcdECPublicKey = (org.bouncycastle.jce.interfaces.ECPublicKey)pcdPublicKey;
-      return pcdECPublicKey.getQ().getEncoded(false);
-    }
-
-    throw new IllegalArgumentException("Unsupported agreement algorithm " + agreementAlg);
+    throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + publicKeyAlg);
   }
 }
 

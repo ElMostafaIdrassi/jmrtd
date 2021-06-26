@@ -757,7 +757,7 @@ public class MRZInfo extends AbstractLDSInfo {
       return;
     }
     primaryIdentifier = trimFillerChars(mrzNameString.substring(0, delimIndex));
-    String rest = mrzNameString.substring(mrzNameString.indexOf("<<") + 2);
+    String rest = mrzNameString.substring(delimIndex + 2);
     readSecondaryIdentifiers(rest);
   }
 

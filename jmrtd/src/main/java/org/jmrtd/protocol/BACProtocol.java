@@ -29,9 +29,9 @@ import java.util.Random;
 import javax.crypto.SecretKey;
 
 import org.jmrtd.APDULevelBACCapable;
-import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKeySpec;
+import org.jmrtd.CardServiceProtocolException;
 import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.CardServiceException;

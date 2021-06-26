@@ -35,16 +35,23 @@ import org.ejbca.cvc.AuthorizationRoleEnum;
 public class CVCAuthorizationTemplate {
 
   /**
-   * The issuing authority.
+   * The authorization role.
    *
    * @author The JMRTD team (info@jmrtd.org)
    *
    * @version $Revision$
    */
   public enum Role {
+    /** Certificate authority. */
     CVCA(0xC0),
+
+    /** Document verifier domestic. */
     DV_D(0x80),
+
+    /** Document verifier foreign. */
     DV_F(0x40),
+
+    /** Inspection system. */
     IS(0x00);
 
     private byte value;
@@ -76,9 +83,16 @@ public class CVCAuthorizationTemplate {
    * @version $Revision$
    */
   public enum Permission {
+    /** No read access. */
     READ_ACCESS_NONE(0x00),
+
+    /** Read access to DG3. */
     READ_ACCESS_DG3(0x01),
+
+    /** Read access to DG4. */
     READ_ACCESS_DG4(0x02),
+
+    /** Read access to DG3 and DG4. */
     READ_ACCESS_DG3_AND_DG4(0x03);
 
     private byte value;
