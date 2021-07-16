@@ -81,6 +81,23 @@ public class MRZInfo extends AbstractLDSInfo {
   private String optionalData1; /* NOTE: holds personal number for some issuing states (e.g. NL), but is used to hold (part of) document number for others. */
   private String optionalData2;
 
+  /**
+   * Creates a new 3-line (TD1) MRZ compliant with ICAO Doc 9303 part 3 vol 1.
+   *
+   * @param documentCode document code (1 or 2 digit, has to start with "I", "C", or "A")
+   * @param issuingState issuing state as 3 digit string
+   * @param primaryIdentifier card holder last name
+   * @param secondaryIdentifier card holder first name(s)
+   * @param documentNumber document number
+   * @param nationality nationality as 3 digit string
+   * @param dateOfBirth date of birth in YYMMDD format
+   * @param gender gender, must not be {@code null}
+   * @param dateOfExpiry date of expiry in YYMMDD format
+   * @param optionalData1 optional data in line 1 of maximum length 15
+   * @param optionalData2 optional data in line 2 of maximum length 11
+   *
+   * @return the 3-line MRZ
+   */
   public static MRZInfo createTD1MRZInfo(String documentCode,
       String issuingState,
       String documentNumber,
@@ -106,7 +123,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
   
   /**
-   * Creates a new 2-line MRZ compliant with ICAO Doc 9303 part 1 vol 1.
+   * Creates a new 2-line (TD3) MRZ compliant with ICAO Doc 9303 part 1 vol 1.
    *
    * @param documentCode document code (1 or 2 digit, has to start with "P" or "V")
    * @param issuingState issuing state as 3 digit string
@@ -118,6 +135,8 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param gender gender, must not be {@code null}
    * @param dateOfExpiry date of expiry
    * @param personalNumber either empty, or a personal number of maximum length 14, or other optional data of exact length 15
+   * 
+   * @return the 2-line MRZ
    */
   public static MRZInfo createTD3MRZInfo(String documentCode, String issuingState,
       String primaryIdentifier, String secondaryIdentifier,
