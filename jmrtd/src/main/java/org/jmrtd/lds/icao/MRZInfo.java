@@ -81,6 +81,30 @@ public class MRZInfo extends AbstractLDSInfo {
   private String optionalData1; /* NOTE: holds personal number for some issuing states (e.g. NL), but is used to hold (part of) document number for others. */
   private String optionalData2;
 
+  public static MRZInfo createTD1MRZInfo(String documentCode,
+      String issuingState,
+      String documentNumber,
+      String optionalData1,
+      String dateOfBirth,
+      Gender gender,
+      String dateOfExpiry,
+      String nationality,
+      String optionalData2,
+      String primaryIdentifier,
+      String secondaryIdentifier) {
+    return new MRZInfo(documentCode,
+        issuingState,
+        documentNumber,
+        optionalData1,
+        dateOfBirth,
+        gender,
+        dateOfExpiry,
+        nationality,
+        optionalData2,
+        primaryIdentifier,
+        secondaryIdentifier);
+  }
+  
   /**
    * Creates a new 2-line MRZ compliant with ICAO Doc 9303 part 1 vol 1.
    *
@@ -95,6 +119,33 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param dateOfExpiry date of expiry
    * @param personalNumber either empty, or a personal number of maximum length 14, or other optional data of exact length 15
    */
+  public static MRZInfo createTD3MRZInfo(String documentCode, String issuingState,
+      String primaryIdentifier, String secondaryIdentifier,
+      String documentNumber, String nationality, String dateOfBirth,
+      Gender gender, String dateOfExpiry, String personalNumber) {
+    return new MRZInfo(documentCode, issuingState,
+        primaryIdentifier, secondaryIdentifier,
+        documentNumber, nationality, dateOfBirth,
+        gender, dateOfExpiry, personalNumber);
+  }
+  
+  /**
+   * Creates a new 2-line MRZ compliant with ICAO Doc 9303 part 1 vol 1.
+   *
+   * @param documentCode document code (1 or 2 digit, has to start with "P" or "V")
+   * @param issuingState issuing state as 3 digit string
+   * @param primaryIdentifier card holder last name
+   * @param secondaryIdentifier card holder first name(s)
+   * @param documentNumber document number
+   * @param nationality nationality as 3 digit string
+   * @param dateOfBirth date of birth
+   * @param gender gender, must not be {@code null}
+   * @param dateOfExpiry date of expiry
+   * @param personalNumber either empty, or a personal number of maximum length 14, or other optional data of exact length 15
+   * 
+   * @deprecated Use the corresponding factory method {@link #createTD1MRZInfo(String, String, String, String, String, Gender, String, String, String, String, String)}
+   */
+  @Deprecated
   public MRZInfo(String documentCode, String issuingState,
       String primaryIdentifier, String secondaryIdentifier,
       String documentNumber, String nationality, String dateOfBirth,
@@ -145,7 +196,10 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param dateOfExpiry date of expiry in YYMMDD format
    * @param optionalData1 optional data in line 1 of maximum length 15
    * @param optionalData2 optional data in line 2 of maximum length 11
+   *
+   * @deprecated Use the corresponding factory method {@link #createTD3MRZInfo(String, String, String, String, String, String, String, Gender, String, String)}
    */
+  @Deprecated
   public MRZInfo(String documentCode,
       String issuingState,
       String documentNumber,
@@ -447,7 +501,10 @@ public class MRZInfo extends AbstractLDSInfo {
    * Returns the document type.
    *
    * @return document type
+   * 
+   * @deprecated Caller should determine type based on {@link #getDocumentCode()}
    */
+  @Deprecated
   public int getDocumentType() {
     return documentType;
   }
@@ -767,7 +824,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param secondaryIdentifier the new secondary identifier
    */
   private void readSecondaryIdentifiers(String secondaryIdentifier) {
-    this.secondaryIdentifier = secondaryIdentifier;
+    this.secondaryIdentifier = trimFillerChars(secondaryIdentifier);
   }
 
   /**
