@@ -308,7 +308,7 @@ public class ActiveAuthenticationInfo extends SecurityInfo {
    */
   public static String toSignatureAlgorithmOIDString(String oid) {
     if (ECDSA_PLAIN_SHA1_OID.equals(oid)) {
-      return "ecdsa-plain-SHA224";
+      return "ecdsa-plain-SHA1";
     }
     if (ECDSA_PLAIN_SHA224_OID.equals(oid)) {
       return "ecdsa-plain-SHA224";
