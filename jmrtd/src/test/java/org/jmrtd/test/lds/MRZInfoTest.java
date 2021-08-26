@@ -24,15 +24,12 @@ package org.jmrtd.test.lds;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.jmrtd.lds.icao.MRZInfo;
 
@@ -41,7 +38,6 @@ import net.sf.scuba.data.Country;
 import net.sf.scuba.data.Gender;
 import net.sf.scuba.data.ISOCountry;
 import net.sf.scuba.data.TestCountry;
-import net.sf.scuba.util.Hex;
 
 public class MRZInfoTest extends TestCase {
 
@@ -159,11 +155,19 @@ public class MRZInfoTest extends TestCase {
     testToString(new MRZInfo(MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1), MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1);
   }
 
-  public void testToString() {
+  public void testToStringLoes() {
     MRZInfo mrzInfo = createTestObject();
     String expectedResult = "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<\nXX00000000NLD7110195F1108280123456782<<<<<<2\n";
     testToString(mrzInfo, expectedResult);
+  }
 
+  public void testToStringHappy() {
+    String mrz = "P<USATRAVELER<<HAPPY<<<<<<<<<<<<<<<<<<<<<<<<\n"
+        + "1500000035USA5609165M0811150<<<<<<<<<<<<<<08\n";
+    testToString(new MRZInfo(mrz), mrz);
+  }
+
+  public void testToStringSamples() {
     for (String str: MRZ_SAMPLES) {
       testToString(new MRZInfo(str), str);
     }
@@ -446,6 +450,153 @@ public class MRZInfoTest extends TestCase {
     assertEquals("740812", mrzInfo.getDateOfBirth());
   }
 
+  public void testTD2EncodeDecode() {
+    try {
+      String mrz = "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<"
+          + "D231458907UTO7408122F1204159<<<<<<<6";
+      MRZInfo mrzInfo = new MRZInfo(mrz);
+      assertEquals(MRZInfo.DOC_TYPE_ID2, mrzInfo.getDocumentType());
+      assertEquals("I", mrzInfo.getDocumentCode());
+      assertEquals("UTO", mrzInfo.getIssuingState());
+      assertEquals("ERIKSSON", mrzInfo.getPrimaryIdentifier());
+      assertEquals("ANNA MARIA", mrzInfo.getSecondaryIdentifier());
+      assertEquals("D23145890", mrzInfo.getDocumentNumber());
+      assertEquals("UTO", mrzInfo.getNationality());
+      assertEquals("740812", mrzInfo.getDateOfBirth());
+      assertEquals(Gender.FEMALE, mrzInfo.getGender());
+      assertEquals("120415", mrzInfo.getDateOfExpiry());
+      assertEquals("", mrzInfo.getOptionalData1());
+
+      byte[] encoded = mrzInfo.getEncoded();
+      MRZInfo decodedMRZInfo = new MRZInfo(new ByteArrayInputStream(encoded), mrz.replace("\n", "").length());
+      assertEquals(mrzInfo, decodedMRZInfo);
+
+      assertEquals(MRZInfo.DOC_TYPE_ID2, decodedMRZInfo.getDocumentType());
+      assertEquals("I", decodedMRZInfo.getDocumentCode());
+      assertEquals("UTO", decodedMRZInfo.getIssuingState());
+      assertEquals("ERIKSSON", decodedMRZInfo.getPrimaryIdentifier());
+      assertEquals("ANNA MARIA", decodedMRZInfo.getSecondaryIdentifier());
+      assertEquals("D23145890", decodedMRZInfo.getDocumentNumber());
+      assertEquals("UTO", decodedMRZInfo.getNationality());
+      assertEquals("740812", decodedMRZInfo.getDateOfBirth());
+      assertEquals(Gender.FEMALE, decodedMRZInfo.getGender());
+      assertEquals("120415", decodedMRZInfo.getDateOfExpiry());
+      assertEquals("", decodedMRZInfo.getOptionalData1());
+
+      MRZInfo constructedMRZInfo = MRZInfo.createTD2MRZInfo("I<", "UTO", "ERIKSSON", "ANNA MARIA", "D23145890", "UTO", "740812", Gender.FEMALE, "120415", "");
+      assertEquals(mrzInfo, constructedMRZInfo);
+      assertEquals(mrz.replace("\n", ""), constructedMRZInfo.toString().replace("\n", ""));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+  }
+
+  public void testTD2ExtendedDocumentNumber() {
+    try {
+      MRZInfo mrzInfo = MRZInfo.createTD2MRZInfo("I<", "UTO", "ERIKSSON", "ANNA MARIA", "12345678910", "UTO", "740812", Gender.FEMALE, "120415", null);
+      assertEquals("12345678910", mrzInfo.getDocumentNumber());
+      assertEquals("", mrzInfo.getOptionalData1());
+      String mrz =  mrzInfo.toString().replace("\n", "");
+      assertEquals("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<123456789<UTO7408122F1204159104<<<<4", mrzInfo.toString().replace("\n", ""));
+
+      MRZInfo reconstructedMRZInfo = new MRZInfo(mrz);
+
+      assertEquals("12345678910", reconstructedMRZInfo.getDocumentNumber());
+      assertEquals("", reconstructedMRZInfo.getOptionalData1());
+
+      assertEquals("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<123456789<UTO7408122F1204159104<<<<4", reconstructedMRZInfo.toString().replace("\n", ""));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+    }
+  }
+
+  public void testMRVA() {
+    try {
+//      String mrz = "V<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\n"
+//          + "L8988901C4XXX4009078F96121096ZE184226B<<<<<<".replace("\n", "");
+//      MRZInfo mrzInfo = new MRZInfo(mrz);
+//      assertEquals("V", mrzInfo.getDocumentCode());
+//      assertEquals("UTO", mrzInfo.getIssuingState());
+//      assertEquals("ERIKSSON", mrzInfo.getPrimaryIdentifier());
+//      assertEquals("ANNA MARIA", mrzInfo.getSecondaryIdentifier());
+//      assertEquals("L8988901C", mrzInfo.getDocumentNumber());
+//      assertEquals("XXX", mrzInfo.getNationality());
+//      assertEquals("400907", mrzInfo.getDateOfBirth());
+//      assertEquals(Gender.FEMALE, mrzInfo.getGender());
+//      assertEquals("961210", mrzInfo.getDateOfExpiry());
+//      assertEquals("6ZE184226B", mrzInfo.getOptionalData1());
+      
+      MRZInfo constructedMRZInfo = MRZInfo.createMRVAMRZInfo("V<", "UTO", "ERIKSSON", "ANNA MARIA", "L8988901C", "XXX", "400907", Gender.FEMALE, "961210", "6ZE184226B");
+//      assertEquals(mrzInfo, constructedMRZInfo);
+      
+      assertEquals("V", constructedMRZInfo.getDocumentCode());
+      assertEquals("UTO", constructedMRZInfo.getIssuingState());
+      assertEquals("ERIKSSON", constructedMRZInfo.getPrimaryIdentifier());
+      assertEquals("ANNA MARIA", constructedMRZInfo.getSecondaryIdentifier());
+      assertEquals("L8988901C", constructedMRZInfo.getDocumentNumber());
+      assertEquals("XXX", constructedMRZInfo.getNationality());
+      assertEquals("400907", constructedMRZInfo.getDateOfBirth());
+      assertEquals(Gender.FEMALE, constructedMRZInfo.getGender());
+      assertEquals("961210", constructedMRZInfo.getDateOfExpiry());
+      assertEquals("6ZE184226B", constructedMRZInfo.getOptionalData1());
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+  
+  public void testMRVB() {
+    try {
+      String mrz = "V<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nL8988901C4XXX4009078F9612109<<<<<<<<".replace("\n", "");
+      MRZInfo mrzInfo = new MRZInfo(mrz);
+      assertEquals("V", mrzInfo.getDocumentCode());
+      assertEquals("UTO", mrzInfo.getIssuingState());
+      assertEquals("ERIKSSON", mrzInfo.getPrimaryIdentifier());
+      assertEquals("ANNA MARIA", mrzInfo.getSecondaryIdentifier());
+      assertEquals("L8988901C", mrzInfo.getDocumentNumber());
+      assertEquals("XXX", mrzInfo.getNationality());
+      assertEquals("400907", mrzInfo.getDateOfBirth());
+      assertEquals(Gender.FEMALE, mrzInfo.getGender());
+      assertEquals("961210", mrzInfo.getDateOfExpiry());
+      assertEquals("", mrzInfo.getOptionalData1());
+      
+      MRZInfo constructedMRZInfo = MRZInfo.createMRVBMRZInfo("V<", "UTO", "ERIKSSON", "ANNA MARIA", "L8988901C", "XXX", "400907", Gender.FEMALE, "961210", "");
+      assertEquals(mrzInfo, constructedMRZInfo);
+      
+      assertEquals("V", constructedMRZInfo.getDocumentCode());
+      assertEquals("UTO", constructedMRZInfo.getIssuingState());
+      assertEquals("ERIKSSON", constructedMRZInfo.getPrimaryIdentifier());
+      assertEquals("ANNA MARIA", constructedMRZInfo.getSecondaryIdentifier());
+      assertEquals("L8988901C", constructedMRZInfo.getDocumentNumber());
+      assertEquals("XXX", constructedMRZInfo.getNationality());
+      assertEquals("400907", constructedMRZInfo.getDateOfBirth());
+      assertEquals(Gender.FEMALE, constructedMRZInfo.getGender());
+      assertEquals("961210", constructedMRZInfo.getDateOfExpiry());
+      assertEquals("", constructedMRZInfo.getOptionalData1());
+      
+      assertEquals(mrzInfo.toString().replace("\n", ""), constructedMRZInfo.toString().replace("\n", ""));
+      
+      MRZInfo reconstructedMRZInfo = new MRZInfo(constructedMRZInfo.toString().replace("\n", ""));
+      assertEquals(mrzInfo, reconstructedMRZInfo);
+      
+      assertEquals("V", reconstructedMRZInfo.getDocumentCode());
+      assertEquals("UTO", reconstructedMRZInfo.getIssuingState());
+      assertEquals("ERIKSSON", reconstructedMRZInfo.getPrimaryIdentifier());
+      assertEquals("ANNA MARIA", reconstructedMRZInfo.getSecondaryIdentifier());
+      assertEquals("L8988901C", reconstructedMRZInfo.getDocumentNumber());
+      assertEquals("XXX", reconstructedMRZInfo.getNationality());
+      assertEquals("400907", reconstructedMRZInfo.getDateOfBirth());
+      assertEquals(Gender.FEMALE, reconstructedMRZInfo.getGender());
+      assertEquals("961210", reconstructedMRZInfo.getDateOfExpiry());
+      assertEquals("", constructedMRZInfo.getOptionalData1());
+      
+      assertEquals(mrzInfo.toString().replace("\n", ""), reconstructedMRZInfo.toString().replace("\n", ""));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
   public static MRZInfo createTestObject() {
     String documentCode = "P<";
     Country issuingState = ISOCountry.NL;
@@ -460,7 +611,7 @@ public class MRZInfoTest extends TestCase {
     cal.set(2011, 8 - 1, 28);
     String dateOfExpiry = SDF.format(cal.getTime());
     String personalNumber = "123456782";
-    return new MRZInfo(documentCode, issuingState.toAlpha3Code(),
+    return MRZInfo.createTD3MRZInfo(documentCode, issuingState.toAlpha3Code(),
         primaryIdentifier, secondaryIdentifier, documentNumber, nationality.toAlpha3Code(),
         dateOfBirth, gender, dateOfExpiry, personalNumber);
   }
