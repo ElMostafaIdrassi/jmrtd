@@ -293,6 +293,8 @@ public class EACCAProtocol {
    * @param service the card service
    * @param wrapper the existing secure messaging wrapper
    * @param data the key data, already wrapped as a data-object
+   *
+   * @throws CardServiceException on low-level communication error
    */
   private static void sendGeneralAuthenticate(APDULevelEACCACapable service, SecureMessagingWrapper wrapper, byte[] data) throws CardServiceException {
     try {

@@ -239,6 +239,26 @@ public class SODFileTest extends TestCase {
     }
   }
 
+  public void testBCX500Name() {
+    try {
+      SODFile sodFile = createTestObject("SHA-1", "SHA256WithRSA");
+      X509Certificate docSigningCertificate = sodFile.getDocSigningCertificate();
+      X500Principal issuerPrincipal = docSigningCertificate.getIssuerX500Principal();
+      X500Name docSignerName = X500Name.getInstance(issuerPrincipal.getEncoded());
+      assertEquals(4, docSignerName.getRDNs().length);
+      assertTrue(Arrays.equals(docSignerName.getEncoded(), issuerPrincipal.getEncoded()));
+      X500Name docSignerNameFromRFC1779String = new X500Name(issuerPrincipal.getName(X500Principal.RFC1779));
+      assertEquals(docSignerName, docSignerNameFromRFC1779String);
+      assertEquals(4, docSignerNameFromRFC1779String.getRDNs().length);
+      X500Name docSignerNameFromRFC2253String = new X500Name(issuerPrincipal.getName(X500Principal.RFC2253));
+      assertEquals(docSignerName, docSignerNameFromRFC2253String);
+      assertEquals(4, docSignerNameFromRFC2253String.getRDNs().length);
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Unexpected exception" , e);
+      fail(e.getMessage());
+    }
+  }
+
   public static SODFile createTestObject(String digestAlgorithm, String signatureAlgorithm) {
     try {
       Date today = Calendar.getInstance().getTime();

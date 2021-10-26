@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -72,7 +74,6 @@ import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.jmrtd.Util;
 
@@ -535,10 +536,31 @@ public final class SignedDataUtil {
   public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm,
       String contentTypeOID, ContentInfo contentInfo, byte[] encryptedDigest,
       X509Certificate docSigningCertificate) throws GeneralSecurityException {
+    return createSignedData(digestAlgorithm, digestEncryptionAlgorithm, null, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate);
+  }
+
+  /**
+   * Creates a signed data structure, for inclusion in a security object.
+   *
+   * @param digestAlgorithm the digest algorithm
+   * @param digestEncryptionAlgorithm the signature algorithm
+   * @param digestEncryptionParameters the digest encryption algorithm parameters
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info
+   * @param encryptedDigest the signature bytes
+   * @param docSigningCertificate the document signer certificate
+   *
+   * @return the signed data structure
+   *
+   * @throws GeneralSecurityException on error
+   */
+  public static SignedData createSignedData(String digestAlgorithm, String digestEncryptionAlgorithm, AlgorithmParameterSpec digestEncryptionParameters,
+      String contentTypeOID, ContentInfo contentInfo, byte[] encryptedDigest,
+      X509Certificate docSigningCertificate) throws GeneralSecurityException {
     ASN1Set digestAlgorithmsSet = createSingletonSet(createDigestAlgorithms(digestAlgorithm));
     ASN1Set certificates =  createSingletonSet(createCertificate(docSigningCertificate));
     ASN1Set crls = null;
-    ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Primitive());
+    ASN1Set signerInfos = createSingletonSet(createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, digestEncryptionParameters, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate).toASN1Primitive());
     return new SignedData(digestAlgorithmsSet, contentInfo, certificates, crls, signerInfos);
   }
 
@@ -559,19 +581,39 @@ public final class SignedDataUtil {
   public static SignerInfo createSignerInfo(String digestAlgorithm,
       String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo,
       byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
+    return createSignerInfo(digestAlgorithm, digestEncryptionAlgorithm, null, contentTypeOID, contentInfo, encryptedDigest, docSigningCertificate);
+  }
+
+  /**
+   * Creates a signer info structures.
+   *
+   * @param digestAlgorithm the digest algorithm
+   * @param digestEncryptionAlgorithm the signature algorithm
+   * @param digestEncryptionParameters the digest encryption algorithm parameters, or {@code null}
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info
+   * @param encryptedDigest the signature bytes
+   * @param docSigningCertificate the document signer certificate
+   *
+   * @return the signer info structure
+   *
+   * @throws GeneralSecurityException on error
+   */
+  public static SignerInfo createSignerInfo(String digestAlgorithm,
+      String digestEncryptionAlgorithm, AlgorithmParameterSpec digestEncryptionParameters, String contentTypeOID, ContentInfo contentInfo,
+      byte[] encryptedDigest, X509Certificate docSigningCertificate) throws GeneralSecurityException {
 
     if (encryptedDigest == null) {
       throw new IllegalArgumentException("Encrypted digest cannot be null");
     }
 
     /* Get the issuer name (CN, O, OU, C) from the cert and put it in a SignerIdentifier struct. */
-    Certificate bcCertificate = Certificate.getInstance(docSigningCertificate.getEncoded());
-    X500Name docSignerName = bcCertificate.getIssuer();
+    X500Name docSignerName = X500Name.getInstance(docSigningCertificate.getIssuerX500Principal().getEncoded());
     BigInteger serial = docSigningCertificate.getSerialNumber();
     SignerIdentifier sid = new SignerIdentifier(new IssuerAndSerialNumber(docSignerName, serial));
 
     AlgorithmIdentifier digestAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestAlgorithm)));
-    AlgorithmIdentifier digestEncryptionAlgorithmObject = new AlgorithmIdentifier(new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm)));
+    AlgorithmIdentifier digestEncryptionAlgorithmObject = getDigestEncryptionAlgorithmObject(digestEncryptionAlgorithm, digestEncryptionParameters);
 
     ASN1Set authenticatedAttributes = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo); // struct containing the hash of content
     ASN1OctetString encryptedDigestObject = new DEROctetString(encryptedDigest); // this is the signature
@@ -666,6 +708,23 @@ public final class SignedDataUtil {
    * @return the signed data
    */
   public static byte[] signData(String digestAlgorithm, String digestEncryptionAlgorithm, String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey, String provider) {
+    return signData(digestAlgorithm, digestEncryptionAlgorithm, null, contentTypeOID, contentInfo, privateKey, provider);
+  }
+
+  /**
+   * Signs the (authenticated attributes derived from the given) data.
+   *
+   * @param digestAlgorithm the digest algorithm
+   * @param digestEncryptionAlgorithm the signature algorithm
+   * @param digestEncryptionParameters the parameters, or {@code null}
+   * @param contentTypeOID the object identifier
+   * @param contentInfo the content info
+   * @param privateKey the private key to use for signing
+   * @param provider the preferred provider to use
+   *
+   * @return the signed data
+   */
+  public static byte[] signData(String digestAlgorithm, String digestEncryptionAlgorithm, AlgorithmParameterSpec digestEncryptionParameters, String contentTypeOID, ContentInfo contentInfo, PrivateKey privateKey, String provider) {
     byte[] encryptedDigest = null;
     try {
       byte[] dataToBeSigned = createAuthenticatedAttributes(digestAlgorithm, contentTypeOID, contentInfo).getEncoded(ASN1Encoding.DER);
@@ -674,6 +733,9 @@ public final class SignedDataUtil {
         s = Signature.getInstance(digestEncryptionAlgorithm, provider);
       } else {
         s = Signature.getInstance(digestEncryptionAlgorithm);
+      }
+      if(digestEncryptionParameters != null) {
+        s.setParameter(digestEncryptionParameters);
       }
       s.initSign(privateKey);
       s.update(dataToBeSigned);
@@ -1019,6 +1081,32 @@ public final class SignedDataUtil {
     }
     /* Default to SHA-1. */
     return new MGF1ParameterSpec("SHA-1");
+  }
+
+  /**
+   * Constructs the BC algorithm identifier for the given signature algorithm, taking into account
+   * the parameters if they are non-null.
+   *
+   * @param digestEncryptionAlgorithm a Java mnemonic algorithm string
+   * @param digestEncryptionParameters the parameters, or {@code null}
+   *
+   * @return the algorithm identifier
+   *
+   * @throws GeneralSecurityException when the algorithm is not recognized
+   */
+  private static AlgorithmIdentifier getDigestEncryptionAlgorithmObject(String digestEncryptionAlgorithm, AlgorithmParameterSpec digestEncryptionParameters) throws GeneralSecurityException {
+    ASN1ObjectIdentifier digestEncryptionAlgOID = new ASN1ObjectIdentifier(lookupOIDByMnemonic(digestEncryptionAlgorithm));
+    if (digestEncryptionParameters == null) {
+      return new AlgorithmIdentifier(digestEncryptionAlgOID);
+    }
+
+    try {
+      AlgorithmParameters params = AlgorithmParameters.getInstance(digestEncryptionAlgorithm);
+      params.init(digestEncryptionParameters);
+      return new AlgorithmIdentifier(digestEncryptionAlgOID, ASN1Primitive.fromByteArray(params.getEncoded()));
+    } catch (IOException ioe) {
+      throw new InvalidAlgorithmParameterException("Unable to encode parameters object", ioe);
+    }
   }
 
   /**

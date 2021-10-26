@@ -140,6 +140,26 @@ public class SODFile extends AbstractTaggedLDSFile {
   }
 
   /**
+   * Constructs a Security Object data structure.
+   *
+   * @param digestAlgorithm a digest algorithm, such as "SHA1" or "SHA256"
+   * @param digestEncryptionAlgorithm a digest encryption algorithm, such as "SHA256withRSA"
+   * @param digestEncryptionParameters the digest encryption algorithm parameters
+   * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
+   * @param privateKey private key to sign the data
+   * @param docSigningCertificate the document signing certificate
+   *
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
+   */
+  public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
+      AlgorithmParameterSpec digestEncryptionParameters,
+      Map<Integer, byte[]> dataGroupHashes,
+      PrivateKey privateKey,
+      X509Certificate docSigningCertificate) throws GeneralSecurityException {
+    this(digestAlgorithm, digestEncryptionAlgorithm, digestEncryptionParameters, dataGroupHashes, privateKey, docSigningCertificate, null);
+  }
+
+  /**
    * Constructs a Security Object data structure using a specified signature provider.
    *
    * @param digestAlgorithm a digest algorithm, such as "SHA-1" or "SHA-256"
@@ -156,6 +176,28 @@ public class SODFile extends AbstractTaggedLDSFile {
       PrivateKey privateKey,
       X509Certificate docSigningCertificate, String provider) throws GeneralSecurityException {
     this(digestAlgorithm, digestEncryptionAlgorithm, dataGroupHashes, privateKey, docSigningCertificate, provider, null, null);
+  }
+
+
+  /**
+   * Constructs a Security Object data structure using a specified signature provider.
+   *
+   * @param digestAlgorithm a digest algorithm, such as "SHA-1" or "SHA-256"
+   * @param digestEncryptionAlgorithm a digest encryption algorithm, such as "SHA256withRSA"
+   * @param digestEncryptionParameters the digest encryption algorithm parameters
+   * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
+   * @param privateKey private key to sign the contents
+   * @param docSigningCertificate the document signing certificate to embed
+   * @param provider specific signature provider that should be used to create the signature
+   *
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
+   */
+  public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
+      AlgorithmParameterSpec digestEncryptionParameters,
+      Map<Integer, byte[]> dataGroupHashes,
+      PrivateKey privateKey,
+      X509Certificate docSigningCertificate, String provider) throws GeneralSecurityException {
+    this(digestAlgorithm, digestEncryptionAlgorithm, digestEncryptionParameters, dataGroupHashes, privateKey, docSigningCertificate, provider, null, null);
   }
 
   /**
@@ -184,6 +226,42 @@ public class SODFile extends AbstractTaggedLDSFile {
 
       signedData = SignedDataUtil.createSignedData(digestAlgorithm,
           digestEncryptionAlgorithm,
+          ICAO_LDS_SOD_OID, contentInfo,
+          encryptedDigest, docSigningCertificate);
+    } catch (IOException ioe) {
+      throw new IllegalArgumentException("Error creating signedData", ioe);
+    }
+  }
+
+  /**
+   * Constructs a Security Object data structure using a specified signature provider.
+   *
+   * @param digestAlgorithm a digest algorithm, such as "SHA-1" or "SHA-256"
+   * @param digestEncryptionAlgorithm a digest encryption algorithm, such as "SHA256withRSA"
+   * @param digestEncryptionParameters the digest encryption algorithm parameters
+   * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
+   * @param privateKey private key to sign the data
+   * @param docSigningCertificate the document signing certificate
+   * @param provider specific signature provider that should be used to create the signature
+   * @param ldsVersion LDS version
+   * @param unicodeVersion Unicode version
+   *
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
+   */
+  public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
+      AlgorithmParameterSpec digestEncryptionParameters,
+      Map<Integer, byte[]> dataGroupHashes,
+      PrivateKey privateKey,
+      X509Certificate docSigningCertificate, String provider,
+      String ldsVersion, String unicodeVersion) throws GeneralSecurityException {
+    super(EF_SOD_TAG);
+    try {
+      ContentInfo contentInfo = toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, ldsVersion, unicodeVersion);
+      byte[] encryptedDigest = SignedDataUtil.signData(digestAlgorithm, digestEncryptionAlgorithm, digestEncryptionParameters, ICAO_LDS_SOD_OID, contentInfo, privateKey, provider);
+
+      signedData = SignedDataUtil.createSignedData(digestAlgorithm,
+          digestEncryptionAlgorithm,
+          digestEncryptionParameters,
           ICAO_LDS_SOD_OID, contentInfo,
           encryptedDigest, docSigningCertificate);
     } catch (IOException ioe) {
@@ -223,6 +301,43 @@ public class SODFile extends AbstractTaggedLDSFile {
       throw new IllegalArgumentException("Error creating signedData", ioe);
     }
   }
+
+  /**
+   * Constructs a Security Object data structure.
+   *
+   * @param digestAlgorithm a digest algorithm, such as "SHA-1" or "SHA-256"
+   * @param digestEncryptionAlgorithm a digest encryption algorithm, such as "SHA256withRSA"
+   * @param digestEncryptionParameters the digest encryption algorithm parameters
+   * @param dataGroupHashes maps datagroup numbers (1 to 16) to hashes of the data groups
+   * @param encryptedDigest externally signed contents
+   * @param docSigningCertificate the document signing certificate
+   *
+   * @throws GeneralSecurityException if either of the algorithm parameters is not recognized, or if the document signing certificate cannot be used
+   */
+  public SODFile(String digestAlgorithm, String digestEncryptionAlgorithm,
+      AlgorithmParameterSpec digestEncryptionParameters,
+      Map<Integer, byte[]> dataGroupHashes,
+      byte[] encryptedDigest,
+      X509Certificate docSigningCertificate) throws GeneralSecurityException {
+    super(EF_SOD_TAG);
+
+    if (dataGroupHashes == null) {
+      throw new IllegalArgumentException("Cannot construct security object from null datagroup hashes");
+    }
+
+    try {
+      signedData = SignedDataUtil.createSignedData(digestAlgorithm,
+          digestEncryptionAlgorithm,
+          digestEncryptionParameters,
+          ICAO_LDS_SOD_OID,
+          toContentInfo(ICAO_LDS_SOD_OID, digestAlgorithm, dataGroupHashes, null, null),
+          encryptedDigest,
+          docSigningCertificate);
+    } catch (IOException ioe) {
+      throw new IllegalArgumentException("Error creating signedData", ioe);
+    }
+  }
+
 
   /**
    * Constructs a Security Object data structure.
