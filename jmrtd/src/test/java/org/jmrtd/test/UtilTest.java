@@ -156,7 +156,7 @@ public class UtilTest extends TestCase {
 
     return true;
   }
-  
+
   /**
    * https://sourceforge.net/p/jmrtd/bugs/57/
    */
@@ -174,7 +174,7 @@ public class UtilTest extends TestCase {
     byte[] os2 = Util.ecPoint2OS(p, 256);
     LOGGER.info("DEBUG: os2 = " + Hex.bytesToHexString(os2));
     assertTrue(Arrays.equals(os, os2));
-    
+
 
   }
 }

@@ -33,16 +33,21 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
+import java.security.interfaces.DSAParams;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECField;
 import java.security.spec.ECFieldF2m;
 import java.security.spec.ECFieldFp;
@@ -64,6 +69,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -980,7 +986,6 @@ public final class Util {
     }
   }
 
-
   /**
    * Attempts to add missing parameters to a public key.
    * If the public key already has appropriate parameters, then this does nothing.
@@ -1628,6 +1633,43 @@ public final class Util {
     }
 
     return segments;
+  }
+
+  /**
+   * Returns the algorithm parameter specification from the given key.
+   *
+   * @param key the key
+   *
+   * @return an algorithm parameter specification, or {@code null}
+   *
+   * @throws GeneralSecurityException on error
+   */
+  public static AlgorithmParameterSpec getAlgorithmParams(Key key) throws GeneralSecurityException {
+    if (key == null) {
+      throw new IllegalArgumentException("Key is null");
+    }
+    if (key instanceof DHPublicKey) {
+      return ((DHPublicKey)key).getParams();
+    } else if (key instanceof ECPublicKey) {
+      return ((ECPublicKey)key).getParams();
+    } else if (key instanceof RSAPublicKey) {
+      return ((RSAPublicKey)key).getParams();
+    } else if (key instanceof DSAPublicKey) {
+      DSAParams dsaParams = ((DSAPublicKey)key).getParams();
+      return new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
+    } else  if (key instanceof DHPrivateKey) {
+      return ((DHPrivateKey)key).getParams();
+    } else if (key instanceof ECPrivateKey) {
+      return ((ECPrivateKey)key).getParams();
+    } else if (key instanceof RSAPrivateKey) {
+      return ((RSAPrivateKey)key).getParams();
+    } else if (key instanceof DSAPrivateKey) {
+      DSAPrivateKey dsaPrivateKey = (DSAPrivateKey)key;
+      DSAParams dsaParams = dsaPrivateKey.getParams();
+      return new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
+    } else {
+      throw new NoSuchAlgorithmException("Unsupported key type");
+    }
   }
 
   /**

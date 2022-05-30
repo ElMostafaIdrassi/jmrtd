@@ -525,10 +525,10 @@ public class MRZInfoTest extends TestCase {
 //      assertEquals(Gender.FEMALE, mrzInfo.getGender());
 //      assertEquals("961210", mrzInfo.getDateOfExpiry());
 //      assertEquals("6ZE184226B", mrzInfo.getOptionalData1());
-      
+
       MRZInfo constructedMRZInfo = MRZInfo.createMRVAMRZInfo("V<", "UTO", "ERIKSSON", "ANNA MARIA", "L8988901C", "XXX", "400907", Gender.FEMALE, "961210", "6ZE184226B");
 //      assertEquals(mrzInfo, constructedMRZInfo);
-      
+
       assertEquals("V", constructedMRZInfo.getDocumentCode());
       assertEquals("UTO", constructedMRZInfo.getIssuingState());
       assertEquals("ERIKSSON", constructedMRZInfo.getPrimaryIdentifier());
@@ -544,7 +544,7 @@ public class MRZInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testMRVB() {
     try {
       String mrz = "V<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nL8988901C4XXX4009078F9612109<<<<<<<<".replace("\n", "");
@@ -559,10 +559,10 @@ public class MRZInfoTest extends TestCase {
       assertEquals(Gender.FEMALE, mrzInfo.getGender());
       assertEquals("961210", mrzInfo.getDateOfExpiry());
       assertEquals("", mrzInfo.getOptionalData1());
-      
+
       MRZInfo constructedMRZInfo = MRZInfo.createMRVBMRZInfo("V<", "UTO", "ERIKSSON", "ANNA MARIA", "L8988901C", "XXX", "400907", Gender.FEMALE, "961210", "");
       assertEquals(mrzInfo, constructedMRZInfo);
-      
+
       assertEquals("V", constructedMRZInfo.getDocumentCode());
       assertEquals("UTO", constructedMRZInfo.getIssuingState());
       assertEquals("ERIKSSON", constructedMRZInfo.getPrimaryIdentifier());
@@ -573,12 +573,12 @@ public class MRZInfoTest extends TestCase {
       assertEquals(Gender.FEMALE, constructedMRZInfo.getGender());
       assertEquals("961210", constructedMRZInfo.getDateOfExpiry());
       assertEquals("", constructedMRZInfo.getOptionalData1());
-      
+
       assertEquals(mrzInfo.toString().replace("\n", ""), constructedMRZInfo.toString().replace("\n", ""));
-      
+
       MRZInfo reconstructedMRZInfo = new MRZInfo(constructedMRZInfo.toString().replace("\n", ""));
       assertEquals(mrzInfo, reconstructedMRZInfo);
-      
+
       assertEquals("V", reconstructedMRZInfo.getDocumentCode());
       assertEquals("UTO", reconstructedMRZInfo.getIssuingState());
       assertEquals("ERIKSSON", reconstructedMRZInfo.getPrimaryIdentifier());
@@ -589,12 +589,21 @@ public class MRZInfoTest extends TestCase {
       assertEquals(Gender.FEMALE, reconstructedMRZInfo.getGender());
       assertEquals("961210", reconstructedMRZInfo.getDateOfExpiry());
       assertEquals("", constructedMRZInfo.getOptionalData1());
-      
+
       assertEquals(mrzInfo.toString().replace("\n", ""), reconstructedMRZInfo.toString().replace("\n", ""));
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
+  }
+
+  /* https://sourceforge.net/p/jmrtd/bugs/63/ */
+  public void testBug63() {
+    String strMRZ = "IDBRA123456789712345R00F4569<<"
+                  + "7006012F0212311UTO<<<HDFDTR091"
+                  + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
+    MRZInfo mrz = new MRZInfo(strMRZ);
+    assertEquals(strMRZ.replace("\n", ""), mrz.toString().replace("\n", ""));
   }
 
   public static MRZInfo createTestObject() {

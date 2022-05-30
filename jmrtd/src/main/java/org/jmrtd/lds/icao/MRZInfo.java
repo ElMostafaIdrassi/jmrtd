@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2022  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1204,7 +1204,7 @@ public class MRZInfo extends AbstractLDSInfo {
       this.secondaryIdentifier = "";
       return;
     }
-    primaryIdentifier = trimTrailingFillerChars(mrzNameString.substring(0, delimIndex));
+    primaryIdentifier = trimTrailingFillerChars(mrzNameString.substring(0, delimIndex)).replace("<", " ");
     String rest = mrzNameString.substring(delimIndex + 2);
     readSecondaryIdentifiers(rest);
   }

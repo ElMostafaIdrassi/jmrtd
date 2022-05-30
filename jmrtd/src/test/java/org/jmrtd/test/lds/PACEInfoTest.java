@@ -98,7 +98,7 @@ public class PACEInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   public void testPACEInfoGetProtocolOIDString() {
     testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-3DES-CBC-CBC", PACEInfo.ID_PACE_DH_GM_3DES_CBC_CBC);
     testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_128);
@@ -126,7 +126,7 @@ public class PACEInfoTest extends TestCase {
         PACEInfo.PARAM_ID_ECP_NIST_P384_R1, PACEInfo.PARAM_ID_ECP_NIST_P521_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P192_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P224_R1,
         PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P320_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P384_R1, PACEInfo.PARAM_ID_ECP_BRAINPOOL_P512_R1,
         PACEInfo.PARAM_ID_GFP_1024_160, PACEInfo.PARAM_ID_GFP_2048_224, PACEInfo.PARAM_ID_GFP_2048_256);
-    for (int parameterId: parameterIds) { 
+    for (int parameterId: parameterIds) {
       PACEInfo paceInfo = new PACEInfo(oid, 2, parameterId);
       assertTrue(str.contains("-"));
       assertFalse("DEBUG: " + str, str.contains("_"));
