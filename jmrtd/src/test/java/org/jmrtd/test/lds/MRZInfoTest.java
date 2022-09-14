@@ -512,22 +512,22 @@ public class MRZInfoTest extends TestCase {
 
   public void testMRVA() {
     try {
-//      String mrz = "V<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\n"
-//          + "L8988901C4XXX4009078F96121096ZE184226B<<<<<<".replace("\n", "");
-//      MRZInfo mrzInfo = new MRZInfo(mrz);
-//      assertEquals("V", mrzInfo.getDocumentCode());
-//      assertEquals("UTO", mrzInfo.getIssuingState());
-//      assertEquals("ERIKSSON", mrzInfo.getPrimaryIdentifier());
-//      assertEquals("ANNA MARIA", mrzInfo.getSecondaryIdentifier());
-//      assertEquals("L8988901C", mrzInfo.getDocumentNumber());
-//      assertEquals("XXX", mrzInfo.getNationality());
-//      assertEquals("400907", mrzInfo.getDateOfBirth());
-//      assertEquals(Gender.FEMALE, mrzInfo.getGender());
-//      assertEquals("961210", mrzInfo.getDateOfExpiry());
-//      assertEquals("6ZE184226B", mrzInfo.getOptionalData1());
+      //      String mrz = "V<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\n"
+      //          + "L8988901C4XXX4009078F96121096ZE184226B<<<<<<".replace("\n", "");
+      //      MRZInfo mrzInfo = new MRZInfo(mrz);
+      //      assertEquals("V", mrzInfo.getDocumentCode());
+      //      assertEquals("UTO", mrzInfo.getIssuingState());
+      //      assertEquals("ERIKSSON", mrzInfo.getPrimaryIdentifier());
+      //      assertEquals("ANNA MARIA", mrzInfo.getSecondaryIdentifier());
+      //      assertEquals("L8988901C", mrzInfo.getDocumentNumber());
+      //      assertEquals("XXX", mrzInfo.getNationality());
+      //      assertEquals("400907", mrzInfo.getDateOfBirth());
+      //      assertEquals(Gender.FEMALE, mrzInfo.getGender());
+      //      assertEquals("961210", mrzInfo.getDateOfExpiry());
+      //      assertEquals("6ZE184226B", mrzInfo.getOptionalData1());
 
       MRZInfo constructedMRZInfo = MRZInfo.createMRVAMRZInfo("V<", "UTO", "ERIKSSON", "ANNA MARIA", "L8988901C", "XXX", "400907", Gender.FEMALE, "961210", "6ZE184226B");
-//      assertEquals(mrzInfo, constructedMRZInfo);
+      //      assertEquals(mrzInfo, constructedMRZInfo);
 
       assertEquals("V", constructedMRZInfo.getDocumentCode());
       assertEquals("UTO", constructedMRZInfo.getIssuingState());
@@ -600,10 +600,80 @@ public class MRZInfoTest extends TestCase {
   /* https://sourceforge.net/p/jmrtd/bugs/63/ */
   public void testBug63() {
     String strMRZ = "IDBRA123456789712345R00F4569<<"
-                  + "7006012F0212311UTO<<<HDFDTR091"
-                  + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
+        + "7006012F0212311UTO<<<HDFDTR091"
+        + "OLIVEIRA<<MARIA<SILVA<<<<<<<<<";
     MRZInfo mrz = new MRZInfo(strMRZ);
     assertEquals(strMRZ.replace("\n", ""), mrz.toString().replace("\n", ""));
+  }
+
+  public void testPRTFromPrado() {
+    String documentCode = "I";
+    String issuingState = "PRT";
+    String documentNumber = "000024759ZZ7"; // 2
+    String optionalData1 = "<<<<<<<<<<<";
+    String optionalData2 = "<<<<<<<<<<<";
+    String dateOfBirth = "801010"; // 0
+    Gender gender = Gender.FEMALE;
+    String dateOfExpiry = "200601"; // 7
+    String nationality = "PRT";
+    String mrzSurname ="CARLOS<MONTEIRO";
+    String mrzgivennames= "AMELIA<VANESS";
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(documentCode, issuingState, documentNumber, optionalData1, dateOfBirth, gender, dateOfExpiry, nationality, optionalData2, mrzSurname, mrzgivennames);
+
+    LOGGER.info("DEBUG: mrzInfo =\n" + mrzInfo);
+
+    // I<PRT119000652<ZX46<<<<<<<<<<<
+    // 0M2906128PRT<<<<<<<<<<<4
+    // MENDES<ESTEVES<<RUI<G<<<<<<<<<
+
+    assertEquals("000024759ZZ7", mrzInfo.getDocumentNumber());
+
+    LOGGER.info("DEBUG: d0 = " + MRZInfo.checkDigit("000024759<ZZ70<<<<<<<<<<<80101002006017<<<<<<<<<<<"));
+    LOGGER.info("DEBUG: d2 = " + MRZInfo.checkDigit("000024759<ZZ72<<<<<<<<<<<80101002006017<<<<<<<<<<<"));
+  }
+
+  public void testCanGenderBeNull() {
+    try {
+      MRZInfo mrzInfo = new MRZInfo("PN", "UTO", "DOE", "JOHN", "900DC0DE", "NLD", "741113", Gender.UNSPECIFIED, "381113", "272174695");
+      mrzInfo.setGender(null);
+      assertNotNull(mrzInfo.toString());
+    } catch (Exception expected) {
+      LOGGER.log(Level.FINE, "Expected exception", expected);
+    }
+  }
+
+  public void testBug65() {
+    String documentCode = "I";
+    String issuingState = "PRT";
+    String nationality = "PRT";
+    String documentNumber = "119000652ZX4";
+    String optionalData1 = "";
+    String optionalData2 = "";
+    String dateOfBirth = "810923";
+    Gender gender = Gender.MALE;
+    String dateOfExpiry = "290612";
+    String nationalityCode = "PRT";
+    String mrzSurname ="MENDES<ESTEVES<NOGUEIRA";
+    String mrzgivennames= "RUI<G";
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(documentCode, issuingState, documentNumber, optionalData1, dateOfBirth, gender, dateOfExpiry, nationality, optionalData2, mrzSurname, mrzgivennames);
+
+    // Expecting:
+    //    I<PRT119000652<ZX46<<<<<<<<<<<
+    //    8109231M2906128PRT<<<<<<<<<<<2
+    //    MENDES<ESTEVES<NOGUEIRA<<RUI<G
+
+    LOGGER.info("DEBUG: mrzInfo =\n" + mrzInfo);
+
+    assertEquals("119000652ZX4", mrzInfo.getDocumentNumber());
+    assertEquals("", mrzInfo.getOptionalData1());
+    assertEquals("", mrzInfo.getOptionalData2());
+
+    String mrzString = mrzInfo.toString().replace("\n", "");
+    assertTrue(mrzString.contains("119000652<ZX46"));
+    assertTrue(mrzString.contains("8109231"));
+    assertTrue(mrzString.contains("2906128"));
+
+    assertEquals('2', MRZInfo.checkDigit("119000652<ZX46<<<<<<<<<<<81092312906128<<<<<<<<<<<"));
   }
 
   public static MRZInfo createTestObject() {
