@@ -1523,7 +1523,6 @@ public class MRZInfo extends AbstractLDSInfo {
         composite.append(dateOfExpiry);
         composite.append(dateOfExpiryCheckDigit);
         composite.append(mrzFormat(optionalData2, 11));
-        System.out.println("DEBUG: composite = " + composite.toString());
         return composite.toString();
       case TD2:
         /* Fall through... */

@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,6 +36,7 @@ import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.MRZInfo;
 
 import junit.framework.TestCase;
+import net.sf.scuba.data.Gender;
 import net.sf.scuba.util.Hex;
 
 public class DG1FileTest extends TestCase {
@@ -82,6 +84,40 @@ public class DG1FileTest extends TestCase {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
+  }
+
+  /* Doc 9303 - Part 5. */
+  public void testTD1() throws Exception {
+    DG1File dg1File = new DG1File(MRZInfo.createTD1MRZInfo(
+        "I", "UTO", "123456789", "",
+        "850101", Gender.FEMALE, "321123", "UTO", "",
+        "ERIKSSON", "ANNA MARIA"));
+    byte[] dg1Encoded = dg1File.getEncoded();
+    DG1File reencodedDG1File = new DG1File(new ByteArrayInputStream(dg1Encoded));
+    assertTrue(Arrays.equals(dg1Encoded, reencodedDG1File.getEncoded()));
+    assertEquals(MRZInfo.DOC_TYPE_ID1, reencodedDG1File.getMRZInfo().getDocumentType());
+  }
+
+  /* Doc 9303 - part 6. */
+  public void testTD2() throws Exception {
+    DG1File dg1File = new DG1File(MRZInfo.createTD2MRZInfo(
+        "A", "UTO", "ERIKSSON", "ANNA MARIA",
+        "123456789", "UTO", "740812", Gender.FEMALE, "321123", ""));
+    byte[] dg1Encoded = dg1File.getEncoded();
+    DG1File reencodedDG1File = new DG1File(new ByteArrayInputStream(dg1Encoded));
+    assertTrue(Arrays.equals(dg1Encoded, reencodedDG1File.getEncoded()));
+    assertEquals(MRZInfo.DOC_TYPE_ID2, reencodedDG1File.getMRZInfo().getDocumentType());
+  }
+
+  /* Doc 9303 - Part 4. */
+  public void testTD3() throws Exception {
+    DG1File dg1File = new DG1File(MRZInfo.createTD3MRZInfo(
+        "P", "UTO", "VILARCHO FERNANDEZ", "JOSE RAMON",
+        "123456789", "UTO", "850101", Gender.MALE, "321123", ""));
+    byte[] dg1Encoded = dg1File.getEncoded();
+    DG1File reencodedDG1File = new DG1File(new ByteArrayInputStream(dg1Encoded));
+    assertTrue(Arrays.equals(dg1Encoded, reencodedDG1File.getEncoded()));
+    assertEquals(MRZInfo.DOC_TYPE_ID3, reencodedDG1File.getMRZInfo().getDocumentType());
   }
 
   public void testLength() {
