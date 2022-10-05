@@ -199,6 +199,16 @@ public class DG11FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
+  
+  /**
+   * https://sourceforge.net/p/jmrtd/bugs/65/
+   */
+  public void testNullDate() {
+    String nameOfHolder = "SOME<MRZ_FORMATTED<NAME";
+    DG11File dg11 = new DG11File(nameOfHolder, null, null, (Date)null, null, null, null, null, null, null, null, null, null);
+    assertEquals(nameOfHolder, dg11.getNameOfHolder());
+    assertNull(dg11.getFullDateOfBirth());
+  }
 
   public static DG11File createComplexTestObject() {
     String fullNamePrimaryIdentifier = "TEST";

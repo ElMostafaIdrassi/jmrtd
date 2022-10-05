@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2022  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -150,7 +150,8 @@ public class DG11File extends DataGroup {
       List<String> otherValidTDNumbers, String custodyInformation) {
     this(nameOfHolder,
         otherNames, personalNumber,
-        new SimpleDateFormat(SDF).format(fullDateOfBirth), placeOfBirth, permanentAddress,
+        fullDateOfBirth == null ? null: new SimpleDateFormat(SDF).format(fullDateOfBirth),
+        placeOfBirth, permanentAddress,
         telephone, profession, title,
         personalSummary, proofOfCitizenship,
         otherValidTDNumbers, custodyInformation);
