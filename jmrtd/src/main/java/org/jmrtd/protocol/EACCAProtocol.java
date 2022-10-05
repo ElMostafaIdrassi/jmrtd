@@ -115,10 +115,15 @@ public class EACCAProtocol {
       throw new IllegalArgumentException("PICC public key is null");
     }
 
-    String agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
-    if (agreementAlg == null) {
-      throw new IllegalArgumentException("Unknown agreement algorithm");
+    String agreementAlg = null;
+    try {
+      agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
+    } catch (NumberFormatException nfe) {
+      LOGGER.log(Level.WARNING, "Unknown object identifier " + oid);
+      oid = inferChipAuthenticationOIDfromPublicKeyOID(oid);
+      agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
     }
+
     if (!("ECDH".equals(agreementAlg) || "DH".equals(agreementAlg))) {
       throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);
     }
