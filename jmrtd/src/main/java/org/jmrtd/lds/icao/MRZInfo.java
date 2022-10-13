@@ -124,8 +124,9 @@ public class MRZInfo extends AbstractLDSInfo {
   private char documentNumberCheckDigit;
   private char dateOfBirthCheckDigit;
   private char dateOfExpiryCheckDigit;
+  private char personalNumberCheckDigit; /* NOTE: Over optionalData1, but only for TD3. When empty we prefer '<' over '0'. */
   private char compositeCheckDigit;
-  private String optionalData1; /* NOTE: holds personal number for some issuing states (e.g. NL), but is used to hold (part of) document number for others. */
+  private String optionalData1; /* NOTE: For TD1 holds personal number for some issuing states (e.g. NL), but is used to hold (part of) document number for others. */
   private String optionalData2;
 
   /**
@@ -464,15 +465,15 @@ public class MRZInfo extends AbstractLDSInfo {
 
     this.documentCode = trimTrailingFillerChars(documentCode);
     this.issuingState = issuingState;
-    this.primaryIdentifier = primaryIdentifier;
-    this.secondaryIdentifier = secondaryIdentifier;
+    this.primaryIdentifier = trimTrailingFillerChars(primaryIdentifier).replace("<", " ");
+    this.secondaryIdentifier = trimTrailingFillerChars(secondaryIdentifier).replace("<", " ");
     this.documentNumber = trimTrailingFillerChars(documentNumber);
     this.nationality = nationality;
     this.dateOfBirth = dateOfBirth;
     this.gender = gender;
     this.dateOfExpiry = dateOfExpiry;
-    this.optionalData1 = optionalData1 == null ? "" : optionalData1;
-    this.optionalData2 = optionalData2;
+    this.optionalData1 = optionalData1 == null ? "" : trimTrailingFillerChars(optionalData1);
+    this.optionalData2 = optionalData2 == null ? null : trimTrailingFillerChars(optionalData2);
     checkDigit();
   }
 
@@ -530,7 +531,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return the issuing state
    */
   public String getIssuingState() {
-    return issuingState;
+    return mrzFormat(issuingState, 3);
   }
 
   /**
@@ -566,7 +567,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return a country
    */
   public String getNationality() {
-    return nationality;
+    return mrzFormat(nationality, 3);
   }
 
   /**
@@ -651,7 +652,7 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   @Deprecated
   public void setPrimaryIdentifier(String primaryIdentifier) {
-    this.primaryIdentifier = primaryIdentifier.trim();
+    this.primaryIdentifier = trimTrailingFillerChars(primaryIdentifier).replace("<", " ");
     checkDigit();
   }
 
@@ -742,7 +743,8 @@ public class MRZInfo extends AbstractLDSInfo {
     if (personalNumber == null || personalNumber.length() > 14) {
       throw new IllegalArgumentException("Wrong personal number");
     }
-    this.optionalData1 = mrzFormat(personalNumber, 14) + checkDigit(personalNumber, true);
+    this.optionalData1 = mrzFormat(personalNumber, 14);
+    this.personalNumberCheckDigit = checkDigit(this.optionalData1);
   }
 
   /**
@@ -849,18 +851,17 @@ public class MRZInfo extends AbstractLDSInfo {
 
     MRZInfo other = (MRZInfo)obj;
 
-    return
-        ((documentCode == null && other.documentCode == null) || documentCode !=  null && documentCode.equals(other.documentCode))
-        && ((issuingState == null && other.issuingState == null) || issuingState != null && issuingState.equals(other.issuingState))
-        && ((primaryIdentifier == null && other.primaryIdentifier == null) || primaryIdentifier != null && primaryIdentifier.equals(other.primaryIdentifier))
-        && ((secondaryIdentifier == null && other.secondaryIdentifier == null) || equalsModuloFillerChars(secondaryIdentifier, other.secondaryIdentifier))
-        && ((nationality == null && other.nationality == null) || nationality != null && nationality.equals(other.nationality))
-        && ((documentNumber == null && other.documentNumber == null) || documentNumber != null && documentNumber.equals(other.documentNumber))
-        && ((optionalData1 == null && other.optionalData1 == null) || optionalData1 != null && optionalData1.equals(other.optionalData1) || getPersonalNumber().equals(other.getPersonalNumber()))
+    return equalsModuloFillerChars(documentCode, other.documentCode)
+        && equalsModuloFillerChars(issuingState, other.issuingState)
+        && equalsModuloFillerChars(primaryIdentifier, other.primaryIdentifier)
+        && equalsModuloFillerChars(secondaryIdentifier, other.secondaryIdentifier)
+        && equalsModuloFillerChars(nationality, other.nationality)
+        && equalsModuloFillerChars(documentNumber, other.documentNumber)
+        && (equalsModuloFillerChars(optionalData1, other.optionalData1) || equalsModuloFillerChars(getPersonalNumber(), other.getPersonalNumber()))
         && ((dateOfBirth == null && other.dateOfBirth == null) || dateOfBirth != null && dateOfBirth.equals(other.dateOfBirth))
         && ((gender == null && other.gender == null) || gender != null && gender.equals(other.gender))
         && ((dateOfExpiry == null && other.dateOfExpiry == null) || dateOfExpiry != null && dateOfExpiry.equals(other.dateOfExpiry))
-        && ((optionalData2 == null && other.optionalData2 == null) || optionalData2 != null && equalsModuloFillerChars(optionalData2, other.optionalData2));
+        && equalsModuloFillerChars(optionalData2, other.optionalData2);
   }
 
   /**
@@ -922,7 +923,7 @@ public class MRZInfo extends AbstractLDSInfo {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     /* line 1, pos 3 to 5 Issuing State or organization */
-    this.issuingState = readCountry(dataIn);
+    this.issuingState = readCountryCode(dataIn);
 
     /* line 1, pos 6 to 14 Document number */
     this.documentNumber = readString(dataIn, 9);
@@ -942,7 +943,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentNumber = trimTrailingFillerChars(this.documentNumber);
 
     /* line 2, pos 1 to 6, Date of birth */
-    this.dateOfBirth = readDateOfBirth(dataIn);
+    this.dateOfBirth = readDate(dataIn);
 
     /* line 2, pos 7, Check digit */
     this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
@@ -951,16 +952,16 @@ public class MRZInfo extends AbstractLDSInfo {
     this.gender = readGender(dataIn);
 
     /* line 2, Pos 9 to 14, Date of expiry */
-    this.dateOfExpiry = readDateOfExpiry(dataIn);
+    this.dateOfExpiry = readDate(dataIn);
 
     /* line 2, pos 15, Check digit */
     this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
 
     /* line 2, pos 16 to 18, Nationality */
-    this.nationality = readCountry(dataIn);
+    this.nationality = readCountryCode(dataIn);
 
     /* line 2, pos 19 to 29, Optional data elements */
-    this.optionalData2 = readString(dataIn, 11);
+    this.optionalData2 = trimTrailingFillerChars(readString(dataIn, 11));
 
     /* line 2, pos 30, Overall check digit */
     this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
@@ -981,7 +982,7 @@ public class MRZInfo extends AbstractLDSInfo {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     /* line 1, pos 3 to 5 */
-    this.issuingState = readCountry(dataIn);
+    this.issuingState = readCountryCode(dataIn);
 
     /* line 1, pos 6 to 36 */
     readNameIdentifiers(readString(dataIn, 31));
@@ -989,11 +990,11 @@ public class MRZInfo extends AbstractLDSInfo {
     /* line 2 */
     this.documentNumber = trimTrailingFillerChars(readString(dataIn, 9));
     this.documentNumberCheckDigit = (char)dataIn.readUnsignedByte();
-    this.nationality = readCountry(dataIn);
-    this.dateOfBirth = readDateOfBirth(dataIn);
+    this.nationality = readCountryCode(dataIn);
+    this.dateOfBirth = readDate(dataIn);
     this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
     this.gender = readGender(dataIn);
-    this.dateOfExpiry = readDateOfExpiry(dataIn);
+    this.dateOfExpiry = readDate(dataIn);
     this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
     this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 7));
 
@@ -1020,7 +1021,7 @@ public class MRZInfo extends AbstractLDSInfo {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     /* line 1, pos 3 to 5 */
-    this.issuingState = readCountry(dataIn);
+    this.issuingState = readCountryCode(dataIn);
 
     /* line 1, pos 6 to 44 */
     readNameIdentifiers(readString(dataIn, 39));
@@ -1028,14 +1029,19 @@ public class MRZInfo extends AbstractLDSInfo {
     /* line 2 */
     this.documentNumber = trimTrailingFillerChars(readString(dataIn, 9));
     this.documentNumberCheckDigit = (char)dataIn.readUnsignedByte();
-    this.nationality = readCountry(dataIn);
-    this.dateOfBirth = readDateOfBirth(dataIn);
+    this.nationality = readCountryCode(dataIn);
+    this.dateOfBirth = readDate(dataIn);
     this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
     this.gender = readGender(dataIn);
-    this.dateOfExpiry = readDateOfExpiry(dataIn);
+    this.dateOfExpiry = readDate(dataIn);
     this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
-    this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 15));
-    this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
+    if (documentType == DocumentType.MRVA) {
+      this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 16));
+    } else {
+      this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 14));
+      this.personalNumberCheckDigit = (char)dataIn.readUnsignedByte();
+      this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
+    }
   }
 
   /**
@@ -1066,6 +1072,29 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
+   * Tests equality of two MRZ string while ignoring extra filler characters.
+   *
+   * @param str1 an MRZ string
+   * @param str2 another MRZ string
+   *
+   * @return a boolean indicating whether the strings are equal modulo filler characters
+   */
+  public static boolean equalsModuloFillerChars(String str1, String str2) {
+    if (str1 == str2) {
+      return true;
+    }
+    if (str1 == null) {
+      str1 = "";
+    }
+    if (str2 == null) {
+      str2 = "";
+    }
+
+    int length = Math.max(str1.length(), str2.length());
+    return mrzFormat(str1, length).equals(mrzFormat(str2, length));
+  }
+
+  /**
    * Writes this MRZ to stream.
    *
    * @param outputStream the stream to write to
@@ -1077,7 +1106,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
     /* top line */
     writeDocumentType(dataOut);
-    writeIssuingState(dataOut);
+    writeCountryCode(issuingState, dataOut);
 
     boolean isExtendedDocumentNumber = documentNumber.length() > 9 && equalsModuloFillerChars(optionalData1, "");
     if (isExtendedDocumentNumber) {
@@ -1110,7 +1139,7 @@ public class MRZInfo extends AbstractLDSInfo {
     writeGender(dataOut);
     writeDateOfExpiry(dataOut);
     dataOut.write(dateOfExpiryCheckDigit);
-    writeNationality(dataOut);
+    writeCountryCode(nationality, dataOut);
     writeString(optionalData2, dataOut, 11);
     dataOut.write(compositeCheckDigit);
 
@@ -1130,7 +1159,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
     /* top line */
     writeDocumentType(dataOut);
-    writeIssuingState(dataOut);
+    writeCountryCode(issuingState, dataOut);
     writeName(dataOut, 31);
 
     /* bottom line */
@@ -1144,7 +1173,7 @@ public class MRZInfo extends AbstractLDSInfo {
       dataOut.write(documentNumberCheckDigit);
     }
 
-    writeNationality(dataOut);
+    writeCountryCode(nationality, dataOut);
     writeDateOfBirth(dataOut);
     dataOut.write(dateOfBirthCheckDigit);
     writeGender(dataOut);
@@ -1173,13 +1202,13 @@ public class MRZInfo extends AbstractLDSInfo {
 
     /* top line */
     writeDocumentType(dataOut);
-    writeIssuingState(dataOut);
+    writeCountryCode(issuingState, dataOut);
     writeName(dataOut, 39);
 
     /* bottom line */
     writeString(documentNumber, dataOut, 9);
     dataOut.write(documentNumberCheckDigit);
-    writeNationality(dataOut);
+    writeCountryCode(nationality, dataOut);
     writeDateOfBirth(dataOut);
     dataOut.write(dateOfBirthCheckDigit);
     writeGender(dataOut);
@@ -1188,7 +1217,9 @@ public class MRZInfo extends AbstractLDSInfo {
     if (documentType == DocumentType.MRVA) {
       writeString(optionalData1, dataOut, 16);
     } else {
-      writeString(optionalData1, dataOut, 15); /* NOTE: already includes check digit of personal number. */
+      // Must be TD3.
+      writeString(optionalData1, dataOut, 14);
+      dataOut.write(personalNumberCheckDigit);
       dataOut.write(compositeCheckDigit);
     }
   }
@@ -1241,8 +1272,8 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @throws IOException on error writing to the stream
    */
-  private void writeIssuingState(DataOutputStream dataOutputStream) throws IOException {
-    dataOutputStream.write(issuingState.getBytes("UTF-8"));
+  private static void writeCountryCode(String countryCode, DataOutputStream dataOutputStream) throws IOException {
+    dataOutputStream.write(mrzFormat(countryCode, 3).getBytes("UTF-8"));
   }
 
   /**
@@ -1276,17 +1307,6 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   private void writeDateOfBirth(DataOutputStream dataOutputStream) throws IOException {
     dataOutputStream.write(dateOfBirth.getBytes("UTF-8"));
-  }
-
-  /**
-   * Writes the nationality to a stream.
-   *
-   * @param dataOutputStream the stream to write to
-   *
-   * @throws IOException on error writing to the stream
-   */
-  private void writeNationality(DataOutputStream dataOutputStream) throws IOException {
-    dataOutputStream.write(nationality.getBytes("UTF-8"));
   }
 
   /**
@@ -1343,11 +1363,11 @@ public class MRZInfo extends AbstractLDSInfo {
       /* optional data field is not used */
       return "";
     } else if (personalNumber.length() == 15) {
-      /* it's either a personalNumber with check digit included, or some other optional data */
+      /* it's either a personalNumber with check digit included, or some other optional data. FIXME: Is this case possible? */
       return personalNumber;
     } else if (personalNumber.length() <= 14) {
       /* we'll assume it's a personalNumber without check digit, and we add the check digit ourselves */
-      return mrzFormat(personalNumber, 14) + checkDigit(personalNumber, true);
+      return mrzFormat(personalNumber, 14);
     } else {
       throw new IllegalArgumentException("Wrong personal number: " + personalNumber);
     }
@@ -1404,8 +1424,8 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @throws IOException error reading from the stream
    */
-  private String readCountry(DataInputStream inputStream) throws IOException {
-    return readString(inputStream, 3);
+  private static String readCountryCode(DataInputStream inputStream) throws IOException {
+    return trimTrailingFillerChars(readString(inputStream, 3));
   }
 
   /**
@@ -1429,10 +1449,8 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Reads the date of birth of the passport holder.
-   * As only the rightmost two digits are stored,
-   * the assumption that this is a date in the recent
-   * past is made.
+   * Reads a date.
+   * Result is typically in {@code "yyMMdd"} format.
    *
    * @param inputStream the stream to read from
    *
@@ -1441,24 +1459,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @throws IOException if something goes wrong
    * @throws NumberFormatException if a data could not be constructed
    */
-  private String readDateOfBirth(DataInputStream inputStream) throws IOException, NumberFormatException {
-    return readString(inputStream, 6);
-  }
-
-  /**
-   * Reads the date of expiry of this document.
-   * As only the rightmost two digits are stored,
-   * the assumption that this is a date in the near
-   * future is made.
-   *
-   * @param inputStream the stream to read from
-   *
-   * @return the date of expiry
-   *
-   * @throws IOException if something goes wrong
-   * @throws NumberFormatException if a date could not be constructed
-   */
-  private String readDateOfExpiry(DataInputStream inputStream) throws IOException {
+  private String readDate(DataInputStream inputStream) throws IOException, NumberFormatException {
     return readString(inputStream, 6);
   }
 
@@ -1472,7 +1473,7 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @throws IOException on error reading from the stream
    */
-  private String readString(DataInputStream inputStream, int count) throws IOException {
+  private static String readString(DataInputStream inputStream, int count) throws IOException {
     byte[] data = new byte[count];
     inputStream.readFully(data);
     return new String(data).trim();
@@ -1537,17 +1538,25 @@ public class MRZInfo extends AbstractLDSInfo {
         composite.append(mrzFormat(optionalData1, 7));
         return composite.toString();
       case TD3:
-        /* Fall through... */
-      case MRVA:
-        /* Must be ID3. */
         /* Composite check digit lower line: 1-10, 14-20, 22-43. */
-        composite.append(documentNumber);
+        composite.append(mrzFormat(documentNumber, 9));
         composite.append(documentNumberCheckDigit);
         composite.append(dateOfBirth);
         composite.append(dateOfBirthCheckDigit);
         composite.append(dateOfExpiry);
         composite.append(dateOfExpiryCheckDigit);
-        composite.append(mrzFormat(optionalData1, 15));
+        composite.append(mrzFormat(optionalData1, 14));
+        composite.append(personalNumberCheckDigit);
+        return composite.toString();
+      case MRVA:
+        /* Composite check digit lower line: 1-10, 14-20, 22-43. */
+        composite.append(mrzFormat(documentNumber, 9));
+        composite.append(documentNumberCheckDigit);
+        composite.append(dateOfBirth);
+        composite.append(dateOfBirthCheckDigit);
+        composite.append(dateOfExpiry);
+        composite.append(dateOfExpiryCheckDigit);
+        composite.append(mrzFormat(optionalData1, 16));
         return composite.toString();
       default:
         throw new IllegalStateException("Unsupported document type");
@@ -1564,9 +1573,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.dateOfExpiryCheckDigit = checkDigit(dateOfExpiry);
 
     if (documentType == DocumentType.TD3 && optionalData1.length() < 15) {
-      String personalNumber = mrzFormat(optionalData1, 14);
-      char personalNumberCheckDigit = checkDigit(mrzFormat(optionalData1, 14), true); /* FIXME: Uses '<' over '0'. Where specified? */
-      optionalData1 = personalNumber + personalNumberCheckDigit;
+      this.personalNumberCheckDigit = checkDigit(mrzFormat(optionalData1, 14), true); /* FIXME: Uses '<' over '0'. Where specified? */
     }
 
     this.compositeCheckDigit = checkDigit(getComposite(documentType));
@@ -1604,29 +1611,6 @@ public class MRZInfo extends AbstractLDSInfo {
       result.append("<");
     }
     return result.toString();
-  }
-
-  /**
-   * Tests equality of two MRZ string while ignoring extra filler characters.
-   *
-   * @param str1 an MRZ string
-   * @param str2 another MRZ string
-   *
-   * @return a boolean indicating whether the strings are equal modulo filler characters
-   */
-  public static boolean equalsModuloFillerChars(String str1, String str2) {
-    if (str1 == str2) {
-      return true;
-    }
-    if (str1 == null) {
-      str1 = "";
-    }
-    if (str2 == null) {
-      str2 = "";
-    }
-
-    int length = Math.max(str1.length(), str2.length());
-    return mrzFormat(str1, length).equals(mrzFormat(str2, length));
   }
 
   /**
@@ -1711,6 +1695,9 @@ public class MRZInfo extends AbstractLDSInfo {
    * @return a trimmed string
    */
   private static String trimTrailingFillerChars(String str) {
+    if (str == null) {
+      str = "";
+    }
     byte[] chars = str.trim().getBytes();
     for (int i = chars.length - 1; i >= 0; i--) {
       if (chars[i] == '<') {

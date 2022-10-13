@@ -199,7 +199,7 @@ public class DG11FileTest extends TestCase {
       fail(e.getMessage());
     }
   }
-  
+
   /**
    * https://sourceforge.net/p/jmrtd/bugs/65/
    */
