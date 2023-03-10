@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2023  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,7 @@ public class ICAOCountry extends Country {
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   public static final ICAOCountry DE = new ICAOCountry("DE", "D<<", "Germany", "German");
+  public static final ICAOCountry RKS = new ICAOCountry("KS", "RKS", "Republic of Kosovo", "Kosovar");
 
   public static final ICAOCountry GBD = new ICAOCountry("GB","GBD","British Dependent territories citizen");
   public static final ICAOCountry GBN = new ICAOCountry("GB","GBN","British National (Overseas)");
@@ -65,14 +66,18 @@ public class ICAOCountry extends Country {
   /** Part D: Other issuing authorities. */
   public static final ICAOCountry XBA = new ICAOCountry("XX", "XBA", "African Development Bank (ADB)");
   public static final ICAOCountry XIM = new ICAOCountry("XX", "XIM", "African Export-Import Bank (AFREXIM bank)");
-  public static final ICAOCountry XCC = new ICAOCountry("XC","XCC","Carribean Community or one of its emissaries (CARICOM)");
+  public static final ICAOCountry XCC = new ICAOCountry("XC", "XCC","Carribean Community or one of its emissaries (CARICOM)");
+  public static final ICAOCountry XCE = new ICAOCountry("XX", "XCE", "Council of Europe");
   public static final ICAOCountry XCO = new ICAOCountry("XX", "XCO", "Common Market for Eastern an Southern Africa (COMESA)");
   public static final ICAOCountry XEC = new ICAOCountry("XX", "XEC", "Economic Community of West African States (ECOWAS)");
   public static final ICAOCountry XPO = new ICAOCountry("XP", "XPO", "International Criminal Police Organization (INTERPOL)");
-  public static final ICAOCountry XOM = new ICAOCountry("XO","XOM","Sovereign Military Order of Malta or one of its emissaries");
+  public static final ICAOCountry XES = new ICAOCountry("XX", "XES", "Organization of Eastern Caribbean States (OECS)");
+  public static final ICAOCountry XMP = new ICAOCountry("XX", "XMP", "Parliamentary Assembly of the Mediterranean (PAM)");
+  public static final ICAOCountry XOM = new ICAOCountry("XO", "XOM","Sovereign Military Order of Malta or one of its emissaries");
+  public static final ICAOCountry XDC = new ICAOCountry("XX", "XDC", "Southern African Development Community");
 
   private static final ICAOCountry[] VALUES = {
-      DE,
+      DE, RKS,
       GBD, GBN, GBO, GBP, GBS,
       XXA, XXB, XXC, XXX,
       EUE,

@@ -405,7 +405,7 @@ public class MRZInfoTest extends TestCase {
       fail(e.getMessage());
     }
   }
-
+  
   public void testArnjlotMalaysia() {
     String anonymizedSample =
         "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
@@ -746,6 +746,13 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo.getGender(), mrzInfoConstructedWithNoFillers.getGender());
     assertEquals(mrzInfo.getDateOfExpiry(), mrzInfoConstructedWithNoFillers.getDateOfExpiry());
     assertEquals(mrzInfo, mrzInfoConstructedWithNoFillers);
+  }
+  
+  public void testVietnam() {
+    MRZInfo mrzInfo = MRZInfo.createTD3MRZInfo(
+        "P", "VNM", "DE BRUIJN", "WILLEKE LISELOTTE",
+        "SPECIMEN", "VNM", "980101", Gender.FEMALE, "250505", "");
+    assertEquals(88, mrzInfo.toString().replace("\n", "").length());
   }
 
   public void testNLDTD3New() {
