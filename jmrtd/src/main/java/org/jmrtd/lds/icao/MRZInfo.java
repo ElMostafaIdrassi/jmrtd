@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2022  The JMRTD team
+ * Copyright (C) 2006 - 2023  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -517,7 +517,7 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Returns the document type.
+   * Returns the document code.
    *
    * @return document type
    */
@@ -996,17 +996,23 @@ public class MRZInfo extends AbstractLDSInfo {
     this.gender = readGender(dataIn);
     this.dateOfExpiry = readDate(dataIn);
     this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
-    this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 7));
+    if (documentType == DocumentType.MRVB) {
+      this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 8));
+    } else if (documentType == DocumentType.TD2){
+      this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 7));
 
-    if (documentType == DocumentType.TD2 && documentNumberCheckDigit == '<' && !optionalData1.isEmpty()) {
-      /* Interpret optional data as part of document number, see note j. */
-      this.documentNumber += optionalData1.substring(0, optionalData1.length() - 1);
-      this.documentNumberCheckDigit = optionalData1.charAt(optionalData1.length() - 1);
-      this.optionalData1 = "";
+      if (documentNumberCheckDigit == '<' && !optionalData1.isEmpty()) {
+        /* Interpret optional data as part of document number, see note j. */
+        this.documentNumber += optionalData1.substring(0, optionalData1.length() - 1);
+        this.documentNumberCheckDigit = optionalData1.charAt(optionalData1.length() - 1);
+        this.optionalData1 = "";
+      }
     }
     this.documentNumber = trimTrailingFillerChars(this.documentNumber);
 
-    this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
+    if (documentType == DocumentType.TD2) {
+      this.compositeCheckDigit = (char)dataIn.readUnsignedByte(); // FIXME: Not for MRV-B?
+    }
   }
 
   /**
@@ -1067,7 +1073,7 @@ public class MRZInfo extends AbstractLDSInfo {
         writeObjectTD3OrMRVA(outputStream);
         break;
       default:
-        throw new IllegalStateException("Unsupported document type ");
+        throw new IllegalStateException("Unsupported document type");
     }
   }
 
@@ -1526,8 +1532,6 @@ public class MRZInfo extends AbstractLDSInfo {
         composite.append(mrzFormat(optionalData2, 11));
         return composite.toString();
       case TD2:
-        /* Fall through... */
-      case MRVB:
         /* Composite check digit lower line: 1-10, 14-20, 22-35. */
         composite.append(documentNumber);
         composite.append(documentNumberCheckDigit);
@@ -1537,6 +1541,9 @@ public class MRZInfo extends AbstractLDSInfo {
         composite.append(dateOfExpiryCheckDigit);
         composite.append(mrzFormat(optionalData1, 7));
         return composite.toString();
+      case MRVB:
+        /* No composite checkdigit for MRV-B. */
+        return null;
       case TD3:
         /* Composite check digit lower line: 1-10, 14-20, 22-43. */
         composite.append(mrzFormat(documentNumber, 9));
@@ -1549,15 +1556,8 @@ public class MRZInfo extends AbstractLDSInfo {
         composite.append(personalNumberCheckDigit);
         return composite.toString();
       case MRVA:
-        /* Composite check digit lower line: 1-10, 14-20, 22-43. */
-        composite.append(mrzFormat(documentNumber, 9));
-        composite.append(documentNumberCheckDigit);
-        composite.append(dateOfBirth);
-        composite.append(dateOfBirthCheckDigit);
-        composite.append(dateOfExpiry);
-        composite.append(dateOfExpiryCheckDigit);
-        composite.append(mrzFormat(optionalData1, 16));
-        return composite.toString();
+        /* No composite checkdigit for MRV-A. */
+        return null;
       default:
         throw new IllegalStateException("Unsupported document type");
     }
