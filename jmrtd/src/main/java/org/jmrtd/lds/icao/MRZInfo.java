@@ -932,13 +932,21 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentNumberCheckDigit = (char)dataIn.readUnsignedByte();
 
     /* line 1, pos 16 to 30, Optional data elements */
-    this.optionalData1 = trimTrailingFillerChars(readString(dataIn, 15));
+    String rawOptionalData1 = readString(dataIn, 15);
+    this.optionalData1 = trimTrailingFillerChars(rawOptionalData1);
 
     if (documentNumberCheckDigit == '<' && !optionalData1.isEmpty()) {
       /* Interpret personal number as part of document number, see note j. */
-      this.documentNumber += optionalData1.substring(0, optionalData1.length() - 1);
-      this.documentNumberCheckDigit = optionalData1.charAt(optionalData1.length() - 1);
-      this.optionalData1 = "";
+      int extendedDocumentNumberEnd = optionalData1.indexOf('<');
+      if (extendedDocumentNumberEnd < 0) {
+        extendedDocumentNumberEnd = optionalData1.length();
+      }
+
+      String documentNumberRemainder = optionalData1.substring(0, extendedDocumentNumberEnd - 1);
+      this.documentNumber += documentNumberRemainder;
+      this.documentNumberCheckDigit = optionalData1.charAt(extendedDocumentNumberEnd - 1);
+
+      this.optionalData1 = optionalData1.substring(Integer.min(extendedDocumentNumberEnd + 1, optionalData1.length()));
     }
     this.documentNumber = trimTrailingFillerChars(this.documentNumber);
 
@@ -1011,7 +1019,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentNumber = trimTrailingFillerChars(this.documentNumber);
 
     if (documentType == DocumentType.TD2) {
-      this.compositeCheckDigit = (char)dataIn.readUnsignedByte(); // FIXME: Not for MRV-B?
+      this.compositeCheckDigit = (char)dataIn.readUnsignedByte();
     }
   }
 
@@ -1114,7 +1122,7 @@ public class MRZInfo extends AbstractLDSInfo {
     writeDocumentType(dataOut);
     writeCountryCode(issuingState, dataOut);
 
-    boolean isExtendedDocumentNumber = documentNumber.length() > 9 && equalsModuloFillerChars(optionalData1, "");
+    boolean isExtendedDocumentNumber = documentNumber.length() > 9;
     if (isExtendedDocumentNumber) {
       /*
        * If document number has more than 9 character, the 9 principal
@@ -1132,7 +1140,7 @@ public class MRZInfo extends AbstractLDSInfo {
        */
       writeString(documentNumber.substring(0, 9), dataOut, 9);
       dataOut.write('<'); /* NOTE: instead of check digit */
-      writeString(documentNumber.substring(9, documentNumber.length()) + documentNumberCheckDigit + "<", dataOut, 15);
+      writeString(documentNumber.substring(9) + Character.toString(documentNumberCheckDigit) + "<" + optionalData1, dataOut, 15);
     } else {
       writeString(documentNumber, dataOut, 9); /* FIXME: max size of field */
       dataOut.write(documentNumberCheckDigit);
@@ -1188,7 +1196,7 @@ public class MRZInfo extends AbstractLDSInfo {
     if (documentType == DocumentType.MRVB) {
       writeString(optionalData1, dataOut, 8);
     } else if (isExtendedDocumentNumber) {
-      writeString(documentNumber.substring(9, documentNumber.length()) + documentNumberCheckDigit + "<", dataOut, 7);
+      writeString(documentNumber.substring(9) + documentNumberCheckDigit + "<", dataOut, 7);
       dataOut.write(compositeCheckDigit);
     } else {
       writeString(optionalData1, dataOut, 7);
@@ -1500,7 +1508,7 @@ public class MRZInfo extends AbstractLDSInfo {
       case TD1:
         /*
          * Upper line:
-         * 6-30, i.e., documentNumber, documentNumberCheckDigit, personalNumber(15)
+         * 6-30, i.e., documentNumber, documentNumberCheckDigit, optionaldata1(15)
          *
          * Middle line:
          * 1-7, i.e., dateOfBirth, dateOfBirthCheckDigit
@@ -1520,10 +1528,11 @@ public class MRZInfo extends AbstractLDSInfo {
           String documentNumberRemainder = documentNumber.substring(9);
           composite.append(documentNumberRemainder);
           composite.append(documentNumberCheckDigit);
+          composite.append('<');
 
           /* Remainder of optional data 1 (removing any prefix). */
-          String optionalData1Remainder = mrzFormat(optionalData1, 15).substring(documentNumberRemainder.length() + 1);
-          composite.append(mrzFormat(optionalData1Remainder, optionalData1Remainder.length()));
+          String optionalData1Remainder = mrzFormat(optionalData1, 15 - 2 - documentNumberRemainder.length());
+          composite.append(optionalData1Remainder);
         }
         composite.append(dateOfBirth);
         composite.append(dateOfBirthCheckDigit);

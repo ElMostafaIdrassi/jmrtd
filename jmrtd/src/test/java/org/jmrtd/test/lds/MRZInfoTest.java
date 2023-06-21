@@ -897,8 +897,8 @@ public class MRZInfoTest extends TestCase {
    */
   public void testBELID() {
     String mrzString = getMRZString("IDBEL000000387<2899<<<<<<<<<<<"
-        + "9502286F3001064BEL950228998741"
-        + "SPECIMEN<<SPECIMEN<<<<<<<<<<<<");
+                                  + "9502286F3001064BEL950228998741"
+                                  + "SPECIMEN<<SPECIMEN<<<<<<<<<<<<");
 
     MRZInfo mrzInfo = new MRZInfo(mrzString);
     assertEquals(mrzString, getMRZString(mrzInfo));
@@ -973,6 +973,202 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, mrzInfoConstructedWithNoFillers);
   }
 
+  public void testTD1LongDocumentNumberAndAlsoOptionalData1() {
+    MRZInfo mrzInfo = new MRZInfo(
+              "I<NLD123456789<010<OHDA1<<<<<<\n"
+            + "6503101F3108022NLDOPT<DATA2<<5\n"
+            + "DE<BRUIJN<<WILLEKE<LISELOTTE<<");
+
+    assertEquals("12345678901", mrzInfo.getDocumentNumber());
+    assertEquals("OHDA1", mrzInfo.getOptionalData1());
+
+    MRZInfo reconstructedMRZInfo = reconstruct(mrzInfo);
+
+    assertEquals("OHDA1", reconstructedMRZInfo.getOptionalData1());
+    assertEquals("12345678901", reconstructedMRZInfo.getDocumentNumber());
+
+    assertEquals(getMRZString(mrzInfo), getMRZString(reconstructedMRZInfo));
+  }
+
+  public void testTD1ConstructedLongDocumentNumberAndAlsoOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "I<", "NLD", "12345678901", "OHDA1",
+        "650310", Gender.FEMALE, "310802", "NLD", "OPT<DATA2",
+        "DE<BRUIJN", "WILLEKE<LISELOTTE");
+
+    String expectedMRZString =
+        getMRZString("I<NLD123456789<010<OHDA1<<<<<<\n"
+                   + "6503101F3108022NLDOPT<DATA2<<5\n"
+                   + "DE<BRUIJN<<WILLEKE<LISELOTTE<<");
+
+    assertEquals("12345678901", mrzInfo.getDocumentNumber());
+    assertEquals("OHDA1", mrzInfo.getOptionalData1());
+
+    MRZInfo reconstructedMRZInfo = reconstruct(mrzInfo);
+    assertEquals("12345678901", reconstructedMRZInfo.getDocumentNumber());
+    assertEquals("OHDA1", reconstructedMRZInfo.getOptionalData1());
+
+    assertEquals(expectedMRZString, getMRZString(mrzInfo));
+    assertEquals(getMRZString(mrzInfo), getMRZString(reconstructedMRZInfo));
+    assertEquals(expectedMRZString, getMRZString(reconstructedMRZInfo));
+
+    MRZInfo reconstructedResconstructedMRZInfo = new MRZInfo(getMRZString(reconstructedMRZInfo));
+    assertEquals("12345678901", reconstructedResconstructedMRZInfo.getDocumentNumber());
+    assertEquals("OHDA1", reconstructedResconstructedMRZInfo.getOptionalData1());
+  }
+
+  public void testTD1ConstructedLongDocumentNumberAndAlsoMaxOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "I<", "NLD", "1234567890", "OHDA1234567X",
+        "650310", Gender.FEMALE, "310802", "NLD", "OPT<DATA2",
+        "DE<BRUIJN", "WILLEKE<LISELOTTE");
+
+    String expectedMRZString =
+        getMRZString("I<NLD123456789<07<OHDA1234567X"
+                   + "6503101F3108022NLDOPT<DATA2<<1"
+                   + "DE<BRUIJN<<WILLEKE<LISELOTTE<<");
+
+    assertEquals("1234567890", mrzInfo.getDocumentNumber());
+    assertEquals("OHDA1234567X", mrzInfo.getOptionalData1());
+
+    MRZInfo reconstructedMRZInfo = reconstruct(mrzInfo);
+    assertEquals("1234567890", reconstructedMRZInfo.getDocumentNumber());
+    assertEquals("OHDA1234567X", reconstructedMRZInfo.getOptionalData1());
+
+    assertEquals(expectedMRZString, getMRZString(mrzInfo));
+    assertEquals(getMRZString(mrzInfo), getMRZString(reconstructedMRZInfo));
+    assertEquals(expectedMRZString, getMRZString(reconstructedMRZInfo));
+
+    MRZInfo reconstructedResconstructedMRZInfo = new MRZInfo(getMRZString(reconstructedMRZInfo));
+    assertEquals("1234567890", reconstructedResconstructedMRZInfo.getDocumentNumber());
+    assertEquals("OHDA1234567X", reconstructedResconstructedMRZInfo.getOptionalData1());
+  }
+
+  public void testTD1ConstructedLongMaxDocumentNumberAndAlsoOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "I<", "NLD", "123456789012345678801", "X",
+        "650310", Gender.FEMALE, "310802", "NLD", "OPT<DATA2",
+        "DE<BRUIJN", "WILLEKE<LISELOTTE");
+
+    String expectedMRZString =
+        getMRZString("I<NLD123456789<0123456788018<X"
+                   + "6503101F3108022NLDOPT<DATA2<<5"
+                   + "DE<BRUIJN<<WILLEKE<LISELOTTE<<");
+
+    assertEquals(expectedMRZString, getMRZString(mrzInfo));
+
+    assertEquals("123456789012345678801", mrzInfo.getDocumentNumber());
+    assertEquals("X", mrzInfo.getOptionalData1());
+
+    MRZInfo reconstructedMRZInfo = reconstruct(mrzInfo);
+    assertEquals("123456789012345678801", reconstructedMRZInfo.getDocumentNumber());
+    assertEquals("X", reconstructedMRZInfo.getOptionalData1());
+
+    assertEquals(getMRZString(mrzInfo), getMRZString(reconstructedMRZInfo));
+    assertEquals(expectedMRZString, getMRZString(reconstructedMRZInfo));
+
+    MRZInfo reconstructedResconstructedMRZInfo = new MRZInfo(getMRZString(reconstructedMRZInfo));
+    assertEquals("123456789012345678801", reconstructedResconstructedMRZInfo.getDocumentNumber());
+    assertEquals("X", reconstructedResconstructedMRZInfo.getOptionalData1());
+  }
+
+  public void testTD1ConstructedMaxDocumentNumberAndNoOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "I<", "NLD", "1234567890123456788012", "",
+        "650310", Gender.FEMALE, "310802", "NLD", "OPT<DATA2",
+        "DE<BRUIJN", "WILLEKE<LISELOTTE");
+
+    String expectedMRZString =
+        getMRZString("I<NLD123456789<01234567880122<"
+                   + "6503101F3108022NLDOPT<DATA2<<8"
+                   + "DE<BRUIJN<<WILLEKE<LISELOTTE<<");
+
+    assertEquals(expectedMRZString, getMRZString(mrzInfo));
+
+    assertEquals("1234567890123456788012", mrzInfo.getDocumentNumber());
+    assertEquals("", mrzInfo.getOptionalData1());
+
+    MRZInfo reconstructedMRZInfo = reconstruct(mrzInfo);
+    assertEquals("1234567890123456788012", reconstructedMRZInfo.getDocumentNumber());
+    assertEquals("", reconstructedMRZInfo.getOptionalData1());
+
+    assertEquals(getMRZString(mrzInfo), getMRZString(reconstructedMRZInfo));
+    assertEquals(expectedMRZString, getMRZString(reconstructedMRZInfo));
+
+    MRZInfo reconstructedResconstructedMRZInfo = new MRZInfo(getMRZString(reconstructedMRZInfo));
+    assertEquals("1234567890123456788012", reconstructedResconstructedMRZInfo.getDocumentNumber());
+    assertEquals("", reconstructedResconstructedMRZInfo.getOptionalData1());
+  }
+
+  public void testTD1AUTDocumentNumberAndOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "ID", "AUT", "PA1234567", "",
+        "811231", Gender.FEMALE, "310801", "AUT", "",
+        "MUSTERFRAU", "MARIA");
+
+    assertEquals("IDAUTPA12345673<<<<<<<<<<<<<<<"
+               + "8112314F3108011AUT<<<<<<<<<<<6"
+               + "MUSTERFRAU<<MARIA<<<<<<<<<<<<<", getMRZString(mrzInfo));
+
+    assertEquals(mrzInfo, new MRZInfo(mrzInfo.toString()));
+    assertEquals(mrzInfo, reconstruct(mrzInfo));
+  }
+
+  public void testTD1BELDocumentNumberAndOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "ID", "BEL", "600001131775", "",
+        "130101", Gender.FEMALE, "231120", "UTO", "13010112359",
+        "SPECIMEN", "SPECIMEN");
+
+    assertEquals("IDBEL600001131<7755<<<<<<<<<<<"
+               + "1301014F2311207UTO130101123596"
+               + "SPECIMEN<<SPECIMEN<<<<<<<<<<<<", getMRZString(mrzInfo));
+
+    assertEquals(mrzInfo, new MRZInfo(mrzInfo.toString()));
+    assertEquals(mrzInfo, reconstruct(mrzInfo));
+  }
+
+  public void testTD1ESPDocumentNumberAndOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "ID", "ESP", "CAA000000", "99999999R",
+        "800101", Gender.FEMALE, "310602", "ESP", "",
+        "ESPANOLA ESPANOLA", "CARMEN");
+
+    assertEquals("IDESPCAA000000499999999R<<<<<<"
+               + "8001014F3106028ESP<<<<<<<<<<<1"
+               + "ESPANOLA<ESPANOLA<<CARMEN<<<<<", getMRZString(mrzInfo));
+
+    assertEquals("CAA000000", mrzInfo.getDocumentNumber());
+    assertEquals("99999999R", mrzInfo.getOptionalData1());
+    assertEquals(mrzInfo, new MRZInfo(mrzInfo.toString()));
+    assertEquals(mrzInfo, reconstruct(mrzInfo));
+  }
+
+  public void testTD1ESTDocumentNumberAndOptionalData1() {
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "ID", "EST", "AS0002262", "38001085718",
+        "800108", Gender.MALE, "260628", "EST", "",
+        "JOEORG", "JAAK KRISTJAN");
+
+    assertEquals("IDESTAS0002262038001085718<<<<"
+               + "8001081M2606288EST<<<<<<<<<<<9"
+               + "JOEORG<<JAAK<KRISTJAN<<<<<<<<<", getMRZString(mrzInfo));
+
+    assertEquals("AS0002262", mrzInfo.getDocumentNumber());
+    assertEquals("38001085718", mrzInfo.getOptionalData1());
+    assertEquals(mrzInfo, new MRZInfo(mrzInfo.toString()));
+    assertEquals(mrzInfo, reconstruct(mrzInfo));
+  }
+
+  public void testTD1LongDocumentNumberNoOptionalData1() {
+    String optionalData1 = "";
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "I", "NLD", "12345678901", optionalData1,
+        "650310", Gender.FEMALE, "310802", "NLD", "OPT<DATA2",
+        "DE BRUIJN", "WILLEKE LISELOTTE");
+    assertEquals("", mrzInfo.getOptionalData1());
+  }
+
   public void testOptionalData1TD1() {
     // Old style NIK (Dutch Id card)
     String bsn = "299496892";
@@ -981,6 +1177,8 @@ public class MRZInfoTest extends TestCase {
         "I", "NLD", "SPECIMEN1", optionalData1,
         "650310", Gender.FEMALE, "310802", "NLD", "OPT<DATA2",
         "DE BRUIJN", "WILLEKE LISELOTTE");
+
+    assertTrue(optionalData1.startsWith(mrzInfo.getPersonalNumber()));
 
     assertEquals(optionalData1, mrzInfo.getOptionalData1());
     assertEquals("OPT<DATA2", mrzInfo.getOptionalData2());
@@ -1154,6 +1352,33 @@ public class MRZInfoTest extends TestCase {
     assertEquals(8, mrzInfoMRVB.getOptionalData1().length());
   }
 
+  public void testTD1OptionalData1OptionalData2() {
+    String optionalData1 = "OPT DATA1     1"; // Length 15
+    String optionalData2 = "OPT DATA  2"; // Length 11
+
+    MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
+        "I", "NLD", "SPECI2021", optionalData1,
+        "650310", Gender.FEMALE, "310802", "NLD", optionalData2,
+        "DE BRUIJN", "WILLEKE LISELOTTE");
+
+    assertEquals(getMRZString("I<NLDSPECI20212OPT<DATA1<<<<<1\n"
+                            + "6503101F3108022NLDOPT<DATA<<22\n"
+                            + "DE<BRUIJN<<WILLEKE<LISELOTTE<<"), getMRZString(mrzInfo));
+
+    // When constructing from fields, we get the original fields that were set.
+    assertEquals(optionalData1, mrzInfo.getOptionalData1());
+    assertEquals(optionalData2, mrzInfo.getOptionalData2());
+
+    // When parsing from MRZ string, we get fields with fillers, but trailing fillers are stripped.
+    MRZInfo reparsedMRZInfo = new MRZInfo(getMRZString(mrzInfo));
+
+    String expectedOptionalData1 = "OPT<DATA1<<<<<1"; // length 15
+    String expectedOptionalData2 = "OPT<DATA<<2"; // length 11
+
+    assertEquals(expectedOptionalData1, reparsedMRZInfo.getOptionalData1());
+    assertEquals(expectedOptionalData2, reparsedMRZInfo.getOptionalData2());
+  }
+
   /* HELPERS BELOW. */
 
   public static MRZInfo createTestObject() {
@@ -1173,20 +1398,6 @@ public class MRZInfoTest extends TestCase {
     return MRZInfo.createTD3MRZInfo(documentCode, issuingState.toAlpha3Code(),
         primaryIdentifier, secondaryIdentifier, documentNumber, nationality.toAlpha3Code(),
         dateOfBirth, gender, dateOfExpiry, personalNumber);
-  }
-
-  private static String getMRZString(MRZInfo mrzInfo) {
-    if (mrzInfo == null) {
-      return null;
-    }
-    return getMRZString(mrzInfo.toString());
-  }
-
-  private static String getMRZString(String mrzString) {
-    if (mrzString == null) {
-      return null;
-    }
-    return mrzString.replaceAll("\n", "").trim();
   }
 
   private static MRZInfo reconstruct(MRZInfo mrzInfo) {
@@ -1257,5 +1468,19 @@ public class MRZInfoTest extends TestCase {
     } else {
       throw new IllegalArgumentException("Unsupported document code: " + documentCode + " and/or length: " + mrzLength);
     }
+  }
+
+  private static String getMRZString(MRZInfo mrzInfo) {
+    if (mrzInfo == null) {
+      return null;
+    }
+    return getMRZString(mrzInfo.toString());
+  }
+
+  private static String getMRZString(String mrzString) {
+    if (mrzString == null) {
+      return null;
+    }
+    return mrzString.replaceAll("\n", "").trim();
   }
 }
