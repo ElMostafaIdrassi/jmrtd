@@ -60,6 +60,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DLSequence;
@@ -179,7 +180,7 @@ public final class SignedDataUtil {
       throw new IOException("Was expecting signed-data content type OID (" + RFC_3369_SIGNED_DATA_OID + "), found " + contentTypeOID);
     }
 
-    ASN1Primitive asn1SequenceWithSignedData = getObjectFromTaggedObject(sequence.getObjectAt(1));
+    ASN1Object asn1SequenceWithSignedData = getObjectFromTaggedObject(sequence.getObjectAt(1));
 
     if (!(asn1SequenceWithSignedData instanceof ASN1Sequence)) {
       throw new IOException("Was expecting an ASN.1 sequence as content");
@@ -246,19 +247,24 @@ public final class SignedDataUtil {
    *
    * @throws IOException if the input is not a tagged object or the tagNo is not 0
    */
-  public static ASN1Primitive getObjectFromTaggedObject(ASN1Encodable asn1Encodable) throws IOException {
+  public static ASN1Object getObjectFromTaggedObject(ASN1Encodable asn1Encodable) throws IOException {
     if (!(asn1Encodable instanceof ASN1TaggedObject)) {
       throw new IOException("Was expecting an ASN1TaggedObject, found " + asn1Encodable.getClass().getCanonicalName());
     }
 
     ASN1TaggedObject asn1TaggedObject = (ASN1TaggedObject)asn1Encodable;
 
+    int tagClass = asn1TaggedObject.getTagClass();
+    if (tagClass != BERTags.CONTEXT_SPECIFIC) {
+      throw new IOException("Was expecting CONTEXT_SPECIFIC tag class in ASN1 tagged object, found " + Integer.toHexString(tagClass));
+    }
+
     int tagNo = asn1TaggedObject.getTagNo();
     if (tagNo != 0) {
       throw new IOException("Was expecting tag 0, found " + Integer.toHexString(tagNo));
     }
 
-    return asn1TaggedObject.getObject();
+    return asn1TaggedObject.getExplicitBaseObject();
   }
 
   /**
