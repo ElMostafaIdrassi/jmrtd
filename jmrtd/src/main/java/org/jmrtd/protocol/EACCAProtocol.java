@@ -103,7 +103,7 @@ public class EACCAProtocol {
    *
    * @param keyId passport's public key id (stored in DG14), {@code null} if none
    * @param oid the object identifier indicating the Chip Authentication protocol
-   * @param publicKeyOID the OID indicating the type of public key
+   * @param publicKeyOID the object identifier indicating the type of public key
    * @param piccPublicKey PICC's public key (stored in DG14)
    *
    * @return the Chip Authentication result
@@ -115,21 +115,19 @@ public class EACCAProtocol {
       throw new IllegalArgumentException("PICC public key is null");
     }
 
+    if (oid == null) {
+      oid = inferChipAuthenticationOIDfromPublicKeyOID(publicKeyOID);
+    }
+    
     String agreementAlg = null;
     try {
       agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
     } catch (NumberFormatException nfe) {
-      LOGGER.log(Level.WARNING, "Unknown object identifier " + oid);
-      oid = inferChipAuthenticationOIDfromPublicKeyOID(oid);
-      agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);
+      LOGGER.log(Level.WARNING, "Unknown object identifier " + oid, nfe);
     }
 
     if (!("ECDH".equals(agreementAlg) || "DH".equals(agreementAlg))) {
       throw new IllegalArgumentException("Unsupported agreement algorithm, expected ECDH or DH, found " + agreementAlg);
-    }
-
-    if (oid == null) {
-      oid = inferChipAuthenticationOIDfromPublicKeyOID(publicKeyOID);
     }
 
     try {

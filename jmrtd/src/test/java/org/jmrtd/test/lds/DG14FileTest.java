@@ -61,6 +61,7 @@ import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.TerminalAuthenticationInfo;
 import org.jmrtd.lds.icao.DG14File;
+import org.jmrtd.protocol.EACCAProtocol;
 import org.jmrtd.test.ResourceUtil;
 
 import junit.framework.TestCase;
@@ -92,7 +93,7 @@ public class DG14FileTest extends TestCase {
        */
       KeyPairGenerator keyGen2 = KeyPairGenerator.getInstance("DH", "SunJCE");
 
-//      LOGGER.info("DEBUG: DG14FileTest: Generating key pair 2");
+      //      LOGGER.info("DEBUG: DG14FileTest: Generating key pair 2");
       KeyPair keyPair2 = keyGen2.generateKeyPair();
       assertNotNull(keyPair2);
 
@@ -104,8 +105,8 @@ public class DG14FileTest extends TestCase {
       keys.put(1, publicKey1);
       keys.put(2, publicKey2);
 
-//      LOGGER.info("DEBUG: publicKey1.getAlgorithm() = " + publicKey1.getAlgorithm());
-//      LOGGER.info("DEBUG: publicKey2.getAlgorithm() = " + publicKey2.getAlgorithm());
+      //      LOGGER.info("DEBUG: publicKey1.getAlgorithm() = " + publicKey1.getAlgorithm());
+      //      LOGGER.info("DEBUG: publicKey2.getAlgorithm() = " + publicKey2.getAlgorithm());
 
       Map<Integer, String> algs = new TreeMap<Integer, String>();
       algs.put(1, SecurityInfo.ID_CA_DH_3DES_CBC_CBC);
@@ -188,7 +189,7 @@ public class DG14FileTest extends TestCase {
       objectOutputStream.writeObject(dg14);
 
       for (SecurityInfo securityInfo: securityInfos) {
-//        LOGGER.info("Writing object: " + securityInfo);
+        //        LOGGER.info("Writing object: " + securityInfo);
         objectOutputStream.writeObject(securityInfo);
       }
 
@@ -218,7 +219,7 @@ public class DG14FileTest extends TestCase {
 
       Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
       for (SecurityInfo securityInfo: securityInfos) {
-//        LOGGER.info("DEBUG: securityInfo " + securityInfo);
+        //        LOGGER.info("DEBUG: securityInfo " + securityInfo);
       }
 
       //			assertTrue(Arrays.equals(specSample, encoded));
@@ -227,7 +228,7 @@ public class DG14FileTest extends TestCase {
       Collection<SecurityInfo> copySecurityInfos = copy.getSecurityInfos();
 
       for (SecurityInfo securityInfo: copySecurityInfos) {
-//        LOGGER.info("DEBUG: securityInfo " + securityInfo);
+        //        LOGGER.info("DEBUG: securityInfo " + securityInfo);
       }
 
       assertEquals(securityInfos, copySecurityInfos);
@@ -246,9 +247,9 @@ public class DG14FileTest extends TestCase {
       byte[] encoded1 = file0.getEncoded();
       DG14File file1 = new DG14File(new ByteArrayInputStream(encoded1));
       byte[] encoded2 = file1.getEncoded();
-//      LOGGER.info("encoded0: " + encoded0.length);
-//      LOGGER.info("encoded1: " + encoded1.length);
-//      LOGGER.info("encoded2: " + encoded2.length);
+      //      LOGGER.info("encoded0: " + encoded0.length);
+      //      LOGGER.info("encoded1: " + encoded1.length);
+      //      LOGGER.info("encoded2: " + encoded2.length);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
