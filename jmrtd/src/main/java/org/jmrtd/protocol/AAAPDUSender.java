@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2023  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -64,18 +64,20 @@ public class AAAPDUSender implements APDULevelAACapable {
    * This is part of AA.
    *
    * @param wrapper secure messaging wrapper
+   * @param signatureLength the (expected) length of the signature in bits
    * @param rndIFD the challenge to send
    *
    * @return the response from the passport (status word removed)
    *
    * @throws CardServiceException on tranceive error
    */
-  public synchronized byte[] sendInternalAuthenticate(APDUWrapper wrapper, byte[] rndIFD) throws CardServiceException {
+  public synchronized byte[] sendInternalAuthenticate(APDUWrapper wrapper, int signatureLength, byte[] rndIFD) throws CardServiceException {
     if (rndIFD == null || rndIFD.length != 8) {
       throw new IllegalArgumentException("rndIFD wrong length");
     }
 
-    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, 256);
+    int le = signatureLength <= 231 * 8 ? 256 : 65536;
+    CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_INTERNAL_AUTHENTICATE, 0x00, 0x00, rndIFD, le);
 
     ResponseAPDU responseAPDU = null;
     short sw = -1;
@@ -89,7 +91,9 @@ public class AAAPDUSender implements APDULevelAACapable {
 
     if (sw == ISO7816.SW_NO_ERROR && responseAPDU != null) {
       return responseAPDU.getData();
-    } else if ((sw & 0xFF00) == 0x6100) {
+    }
+
+    if ((sw & 0xFF00) == 0x6100 && le == 256) {
       byte[] normalLengthResponse = responseAPDU == null ? null : responseAPDU.getData();
 
       /* Something is wrong with that length. Try different length. */

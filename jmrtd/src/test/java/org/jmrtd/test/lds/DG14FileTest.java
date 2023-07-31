@@ -61,7 +61,6 @@ import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.TerminalAuthenticationInfo;
 import org.jmrtd.lds.icao.DG14File;
-import org.jmrtd.protocol.EACCAProtocol;
 import org.jmrtd.test.ResourceUtil;
 
 import junit.framework.TestCase;

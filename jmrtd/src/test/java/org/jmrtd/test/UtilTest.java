@@ -23,6 +23,12 @@
 package org.jmrtd.test;
 
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Signature;
 import java.security.spec.ECPoint;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,6 +84,63 @@ public class UtilTest extends TestCase {
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
     }
+  }
+
+  public void testApproximateSignatureSize() {
+    Security.addProvider(Util.getBouncyCastleProvider());
+    try {
+      KeyPairGenerator keyPairGenerator;
+
+      keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+      keyPairGenerator.initialize(512);
+      testApproximateSignatureSize(512, "SHA256WithRSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(1024);
+      testApproximateSignatureSize(1024, "SHA256WithRSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(2048);
+      testApproximateSignatureSize(2048, "SHA256WithRSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator = KeyPairGenerator.getInstance("EC", Util.getBouncyCastleProvider());
+
+      keyPairGenerator.initialize(Util.getECParameterSpec("secp224r1"));
+      testApproximateSignatureSize(448, "SHA256WithECDSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(Util.getECParameterSpec("secp256r1"));
+      testApproximateSignatureSize(512, "SHA256WithECDSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(Util.getECParameterSpec("secp384r1"));
+      testApproximateSignatureSize(768, "SHA256WithECDSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(Util.getECParameterSpec("brainpoolP224r1"));
+      testApproximateSignatureSize(448, "SHA256WithECDSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(Util.getECParameterSpec("brainpoolP384r1"));
+      testApproximateSignatureSize(768, "SHA256WithECDSA", keyPairGenerator.generateKeyPair());
+
+      keyPairGenerator.initialize(Util.getECParameterSpec("brainpoolP512r1"));
+      testApproximateSignatureSize(1024, "SHA256WithECDSA", keyPairGenerator.generateKeyPair());
+
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
+  public void testApproximateSignatureSize(int expectedSize, String sigAlg, KeyPair keyPair) throws GeneralSecurityException {
+    assertEquals(expectedSize, Util.getApproximateSignatureSize(keyPair.getPublic()));
+    assertEquals(expectedSize, Util.getApproximateSignatureSize(keyPair.getPrivate()));
+
+    Random random = new SecureRandom();
+    byte[] dataToBeSigned = new byte[8];
+    random.nextBytes(dataToBeSigned);
+    Signature sig = Signature.getInstance(sigAlg, Util.getBouncyCastleProvider());
+    sig.initSign(keyPair.getPrivate());
+    sig.update(new byte[8]);
+    int sigSize = 8 * sig.sign().length;
+    LOGGER.info("DEBUG: " + sigAlg + ", expectedSize = " + expectedSize + ", sigSize = "+ sigSize);
+    assertTrue(expectedSize <= sigSize && sigSize <= expectedSize + (expectedSize / 2));
   }
 
   public void testPartition() {

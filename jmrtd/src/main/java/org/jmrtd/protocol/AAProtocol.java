@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2023  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@ import java.security.PublicKey;
 
 import org.jmrtd.APDULevelAACapable;
 import org.jmrtd.CardServiceProtocolException;
+import org.jmrtd.Util;
 
 import net.sf.scuba.smartcards.CardServiceException;
 
@@ -72,7 +73,7 @@ public class AAProtocol {
       if (challenge == null || challenge.length != 8) {
         throw new IllegalArgumentException("AA failed: bad challenge");
       }
-      byte[] response = service.sendInternalAuthenticate(wrapper, challenge);
+      byte[] response = service.sendInternalAuthenticate(wrapper, Util.getApproximateSignatureSize(publicKey), challenge);
       return new AAResult(publicKey, digestAlgorithm, signatureAlgorithm, challenge, response);
     } catch (Exception e) {
       throw new CardServiceProtocolException("Exception", 1, e);

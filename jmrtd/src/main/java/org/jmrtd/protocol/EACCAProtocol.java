@@ -118,7 +118,7 @@ public class EACCAProtocol {
     if (oid == null) {
       oid = inferChipAuthenticationOIDfromPublicKeyOID(publicKeyOID);
     }
-    
+
     String agreementAlg = null;
     try {
       agreementAlg = ChipAuthenticationInfo.toKeyAgreementAlgorithm(oid);

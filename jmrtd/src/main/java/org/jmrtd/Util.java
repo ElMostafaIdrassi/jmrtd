@@ -93,6 +93,7 @@ import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
+import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.jmrtd.lds.PACEInfo;
@@ -726,6 +727,46 @@ public final class Util {
       }
     }
     return algorithm;
+  }
+
+  /**
+   * Returns a JCE parameter specification for the given named curve, or {@code null}
+   *
+   * @param curveName a curve name
+   *
+   * @return the JCE parameter specification
+   */
+  public static ECParameterSpec getECParameterSpec(String curveName) {
+    ECNamedCurveParameterSpec bcParamSpec = ECNamedCurveTable.getParameterSpec(curveName);
+    return new ECNamedCurveSpec(bcParamSpec.getName(), bcParamSpec.getCurve(), bcParamSpec.getG(), bcParamSpec.getN(), bcParamSpec.getH(), bcParamSpec.getSeed());
+  }
+
+  /**
+   * Returns the approximate size of signatures made or verifiable using that key in bits.
+   * The key should be a public or private key suitable for signature creation or verfication.
+   * For RSA this is just {@code N}.
+   * For ECDSA this is {@code 2 * N} (but the actual size of signatures will be slightly larger).
+   * Silently returns {@code 0} for unsupported key types (such as DSA).
+   *
+   * @param key the key
+   *
+   * @return the size in bits
+   */
+  public static int getApproximateSignatureSize(Key key) {
+    if (key instanceof RSAPublicKey) {
+      return ((RSAPublicKey)key).getModulus().bitLength();
+    } else if (key instanceof RSAPrivateKey) {
+      return ((RSAPrivateKey)key).getModulus().bitLength();
+    } else if (key instanceof ECPublicKey) {
+      int keySize = (int)Math.ceil(((ECPublicKey)key).getParams().getCurve().getField().getFieldSize());
+      return 2 * keySize;
+    } else if (key instanceof ECPrivateKey) {
+      int keySize = (int)Math.ceil(((ECPrivateKey)key).getParams().getCurve().getField().getFieldSize());
+      return 2 * keySize;
+    }
+
+    LOGGER.warning("Unknown key type, returning 0");
+    return 0;
   }
 
   /**
