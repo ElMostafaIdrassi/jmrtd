@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2023  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -607,7 +607,7 @@ public class PACEProtocol {
       byte[] piccEncodedPublicKey = TLVUtil.unwrapDO(0x84, step3Response);
       PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 
-      if (pcdPublicKey.equals(piccPublicKey)) {
+      if (keysAreEqual(pcdPublicKey, piccPublicKey)) {
         throw new CardServiceProtocolException("PCD's public key and PICC's public key are the same in key agreement step!", 3);
       }
 
@@ -1362,6 +1362,24 @@ public class PACEProtocol {
    */
   private static byte[] computeKeySeedForPACE(String documentNumber, String dateOfBirth, String dateOfExpiry) throws GeneralSecurityException {
     return Util.computeKeySeed(documentNumber, dateOfBirth, dateOfExpiry, "SHA-1", false);
+  }
+
+  /**
+   * Compares two keys, taking into account that an exception might
+   * be thrown doing so. Returns {@code false} if an exception is thrown.
+   *
+   * @param first the first key
+   * @param second the second key
+   *
+   * @return a boolean indicating equivalence of the two keys
+   */
+  private static boolean keysAreEqual(PublicKey first, PublicKey second) {
+    try {
+      return first.equals(second);
+    } catch (RuntimeException e) {
+      LOGGER.log(Level.WARNING, "Exception during public key equals", e);
+      return false;
+    }
   }
 
   /**
