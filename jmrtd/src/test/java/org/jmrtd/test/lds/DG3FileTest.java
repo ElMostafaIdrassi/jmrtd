@@ -25,7 +25,6 @@ package org.jmrtd.test.lds;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.InputStream;
-import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,8 +80,6 @@ public class DG3FileTest extends TestCase {
         }
         recordNumber ++;
       }
-    } catch (AccessControlException ace) {
-      LOGGER.info("DEBUG: *************** could not get access to DG3 *********");
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
@@ -154,8 +151,6 @@ public class DG3FileTest extends TestCase {
         }
         fingerInfoIndex ++;
       }
-    } catch (AccessControlException ace) {
-      LOGGER.info("DEBUG: could not access DG3, ignoring this DG3 file");
     } catch(Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());

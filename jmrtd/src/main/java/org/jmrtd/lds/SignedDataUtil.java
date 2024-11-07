@@ -23,6 +23,7 @@
 package org.jmrtd.lds;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -168,8 +169,8 @@ public final class SignedDataUtil {
    * @throws IOException on error reading from the stream
    */
   public static SignedData readSignedData(InputStream inputStream) throws IOException {
-    ASN1InputStream asn1InputStream = new ASN1InputStream(inputStream);
-    ASN1Sequence sequence = (ASN1Sequence)asn1InputStream.readObject();
+    ASN1InputStream asn1InputStream = new ASN1InputStream(inputStream, true);
+    ASN1Sequence sequence = ASN1Sequence.getInstance(asn1InputStream.readObject());
 
     if (sequence.size() != 2) {
       throw new IOException("Was expecting a DER sequence of length 2, found a DER sequence of length " + sequence.size());

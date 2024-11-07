@@ -25,16 +25,17 @@ package org.jmrtd.lds.icao;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
 import org.jmrtd.cbeff.BiometricDataBlockEncoder;
-import org.jmrtd.cbeff.CBEFFInfo;
-import org.jmrtd.cbeff.ComplexCBEFFInfo;
+import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
-import org.jmrtd.cbeff.SimpleCBEFFInfo;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.FaceInfo;
@@ -48,19 +49,36 @@ import org.jmrtd.lds.iso19794.FaceInfo;
  *
  * @version $Revision$
  */
-public class DG2File extends CBEFFDataGroup<FaceInfo> {
+public class DG2File extends CBEFFDataGroup {
 
   private static final long serialVersionUID = 414300652684010416L;
 
-  private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FaceInfo>() {
-    public FaceInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
-      return new FaceInfo(sbh, inputStream);
-    }
-  });
+  private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(getDecoderMap());
 
-  private static final ISO781611Encoder<FaceInfo> ENCODER = new ISO781611Encoder<FaceInfo>(new BiometricDataBlockEncoder<FaceInfo>() {
-    public void encode(FaceInfo info, OutputStream outputStream) throws IOException {
-      info.writeObject(outputStream);
+  private static Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>>  getDecoderMap() {
+    Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> decoders = new HashMap<Integer, BiometricDataBlockDecoder<BiometricDataBlock>>();
+
+    /* 5F2E */
+    decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
+      public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+        return new FaceInfo(sbh, inputStream);
+      }
+    });
+
+    /* 7F2E */
+    decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
+      public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+        return new FaceInfo(sbh, inputStream);
+      }
+    });
+    return decoders;
+  }
+
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_19794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+    public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
+      if (info instanceof FaceInfo) {
+        ((FaceInfo)info).writeObject(outputStream);
+      }
     }
   });
 
@@ -70,7 +88,7 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
    * @param faceInfos records
    */
   public DG2File(List<FaceInfo> faceInfos) {
-    super(EF_DG2_TAG, faceInfos);
+    super(EF_DG2_TAG, fromFaceInfos(faceInfos), false);
   }
 
   /**
@@ -81,38 +99,17 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
    * @throws IOException on error reading from input stream
    */
   public DG2File(InputStream inputStream) throws IOException {
-    super(EF_DG2_TAG, inputStream);
+    super(EF_DG2_TAG, inputStream, false);
   }
 
   @Override
-  protected void readContent(InputStream inputStream) throws IOException {
-    ComplexCBEFFInfo complexCBEFFInfo = DECODER.decode(inputStream);
-    List<CBEFFInfo> records = complexCBEFFInfo.getSubRecords();
-    for (CBEFFInfo cbeffInfo: records) {
-      if (!(cbeffInfo instanceof SimpleCBEFFInfo<?>)) {
-        throw new IOException("Was expecting a SimpleCBEFFInfo, found " + cbeffInfo.getClass().getSimpleName());
-      }
-      SimpleCBEFFInfo<?> simpleCBEFFInfo = (SimpleCBEFFInfo<?>)cbeffInfo;
-      BiometricDataBlock bdb = simpleCBEFFInfo.getBiometricDataBlock();
-      if (!(bdb instanceof FaceInfo)) {
-        throw new IOException("Was expecting a FaceInfo, found " + bdb.getClass().getSimpleName());
-      }
-      FaceInfo faceInfo = (FaceInfo)bdb;
-      add(faceInfo);
-    }
-
-    /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
+  public ISO781611Decoder<BiometricDataBlock> getDecoder() {
+    return DECODER;
   }
 
   @Override
-  protected void writeContent(OutputStream outputStream) throws IOException {
-    ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
-    List<FaceInfo> faceInfos = getSubRecords();
-    for (FaceInfo faceInfo: faceInfos) {
-      SimpleCBEFFInfo<FaceInfo> simpleCBEFFInfo = new SimpleCBEFFInfo<FaceInfo>(faceInfo);
-      cbeffInfo.add(simpleCBEFFInfo);
-    }
-    ENCODER.encode(cbeffInfo, outputStream);
+  public ISO781611Encoder<BiometricDataBlock> getEncoder() {
+    return ISO_19794_ENCODER;
   }
 
   /**
@@ -131,14 +128,17 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
    * @return face infos
    */
   public List<FaceInfo> getFaceInfos() {
-    return getSubRecords();
+    return toFaceInfos(getSubRecords());
   }
 
   /**
    * Adds a face info to this file.
    *
    * @param faceInfo the face info to add
+   *
+   * @deprecated Will be removed.
    */
+  @Deprecated
   public void addFaceInfo(FaceInfo faceInfo) {
     add(faceInfo);
   }
@@ -147,8 +147,38 @@ public class DG2File extends CBEFFDataGroup<FaceInfo> {
    * Removes a face info from this file.
    *
    * @param index the index of the face info to remove
+   *
+   * @deprecated Will be removed.
    */
+  @Deprecated
   public void removeFaceInfo(int index) {
     remove(index);
+  }
+
+  private static List<BiometricDataBlock> fromFaceInfos(List<FaceInfo> faceInfos) {
+    if (faceInfos == null) {
+      return null;
+    }
+
+    List<BiometricDataBlock> records = new ArrayList<BiometricDataBlock>(faceInfos.size());
+    for (FaceInfo faceInfo: faceInfos) {
+      records.add(faceInfo);
+    }
+
+    return records;
+  }
+
+  private static List<FaceInfo> toFaceInfos(List<BiometricDataBlock> records) {
+    if (records == null) {
+      return null;
+    }
+
+    List<FaceInfo> faceInfos = new ArrayList<FaceInfo>(records.size());
+    for (BiometricDataBlock record: records) {
+      if (record instanceof FaceInfo) {
+        faceInfos.add((FaceInfo)record);
+      }
+    }
+    return faceInfos;
   }
 }

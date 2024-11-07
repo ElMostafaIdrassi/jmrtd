@@ -1379,6 +1379,54 @@ public class MRZInfoTest extends TestCase {
     assertEquals(expectedOptionalData2, reparsedMRZInfo.getOptionalData2());
   }
 
+  public void testGBRNoPrimary() {
+    MRZInfo mrzInfo = new MRZInfo("IRGBRZU12345673<<<<<<<<<<<<<<<"
+          + "6608198F0808088COU<<<<<<<<<<<6"
+          + "A<BBBBBBBB<CCCCC<DDDDD<<<<<<<<");
+
+    assertEquals("A BBBBBBBB CCCCC DDDDD", mrzInfo.getPrimaryIdentifier());
+    assertEquals("", mrzInfo.getSecondaryIdentifier());
+  }
+
+  public void testGetNameOfHolder() {
+    testGetNameOfHolder("OTHER<FORTYFOUR<<ANNA<NICHOLA", new MRZInfo("P<GBROTHER<FORTYFOUR<<ANNA<NICHOLA<<<<<<<<<<"
+                                                                   + "CCC0143561GBR6001010F27080121234567890123450"));
+    testGetNameOfHolder("OTHER<FORTYFOUR<<ANNA<NICHOLA", new MRZInfo("V<GBROTHER<FORTYFOUR<<ANNA<NICHOLA<<<<<<<<<<"
+                                                                   + "CCC0143561GBR6001010F27080121234567890123450"));
+    testGetNameOfHolder("OTHER<FORTYFOUR<<ANNA<NICHOLA", new MRZInfo("I<UTOOTHER<FORTYFOUR<<ANNA<NICHOLA<<"
+                                                                   + "CCC0143561GBR6001010F270801234567892"));
+    testGetNameOfHolder("OTHER<FORTYFOUR<<ANNA<NICHOLA", new MRZInfo("V<UTOOTHER<FORTYFOUR<<ANNA<NICHOLA<<"
+                                                                   + "CCC0143561GBR6001010F270801234567892"));
+    testGetNameOfHolder("OTHER<FORTYFOUR<<ANNA<NICHOLA", new MRZInfo("IRGBRZU12345673<<<<<<<<<<<<<<<"
+                                                                   + "6608198F0808088COU<<<<<<<<<<<6"
+                                                                   + "OTHER<FORTYFOUR<<ANNA<NICHOLA<"));
+
+    testGetNameOfHolder("OTHER<FORTYSEVEN<<ANN<NICHOLA<MARGARETH", new MRZInfo("P<GBROTHER<FORTYSEVEN<<ANN<NICHOLA<MARGARETH"
+        + "CCC0143561GBR6001010F27080121234567890123450"));
+
+    testGetNameOfHolder("OTHER<FORTYFOUR<ANNA<NICHOLA", new MRZInfo("P<GBROTHER<FORTYFOUR<ANNA<NICHOLA<<<<<<<<<<<"
+                                                                   + "CCC0143561GBR6001010F27080121234567890123450"));
+    testGetNameOfHolder("A<BBBBBBBB<CCCCC<DDDDD", new MRZInfo("IRGBRZU12345673<<<<<<<<<<<<<<<"
+                                                            + "6608198F0808088COU<<<<<<<<<<<6"
+                                                            + "A<BBBBBBBB<CCCCC<DDDDD<<<<<<<<"));
+
+    testGetNameOfHolder("OTHER<FORTYSEVEN<ANNA<NICHOLA<MARGARETH", new MRZInfo("P<GBROTHER<FORTYSEVEN<ANNA<NICHOLA<MARGARETH"
+                                                                             + "CCC0143561GBR6001010F27080121234567890123450"));
+
+    testGetNameOfHolder("<<HER<FORTYSEVEN<ANNA<NICHOLA<MARGARETH", new MRZInfo("P<GBR<<HER<FORTYSEVEN<ANNA<NICHOLA<MARGARETH"
+        + "CCC0143561GBR6001010F27080121234567890123450"));
+  }
+
+  public void testGetNameOfHolder(String expectedNameOfHolder, MRZInfo mrzInfo) {
+    assertEquals(expectedNameOfHolder, mrzInfo.getNameOfHolder());
+    assertEquals(expectedNameOfHolder, reconstruct(mrzInfo).getNameOfHolder());
+    assertEquals(expectedNameOfHolder, new MRZInfo(getMRZString(mrzInfo)).getNameOfHolder());
+
+    String primaryIdentifier = mrzInfo.getPrimaryIdentifier();
+    assertTrue(expectedNameOfHolder.contains(mrzInfo.getPrimaryIdentifier().replace(" ", "<")));
+    assertTrue(expectedNameOfHolder.contains(mrzInfo.getSecondaryIdentifier().replace(" ", "<")));
+  }
+
   /* HELPERS BELOW. */
 
   public static MRZInfo createTestObject() {

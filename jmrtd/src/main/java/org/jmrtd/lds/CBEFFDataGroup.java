@@ -28,12 +28,18 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
+import org.jmrtd.cbeff.CBEFFInfo;
+import org.jmrtd.cbeff.ComplexCBEFFInfo;
 import org.jmrtd.cbeff.ISO781611;
+import org.jmrtd.cbeff.ISO781611Decoder;
+import org.jmrtd.cbeff.ISO781611Encoder;
+import org.jmrtd.cbeff.SimpleCBEFFInfo;
 
 import net.sf.scuba.tlv.TLVOutputStream;
 
@@ -44,11 +50,9 @@ import net.sf.scuba.tlv.TLVOutputStream;
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
- * @param <R> the type of the elements
- *
  * @version $Revision$
  */
-public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataGroup {
+public abstract class CBEFFDataGroup extends DataGroup {
 
   private static final long serialVersionUID = 2702959939408371946L;
 
@@ -58,17 +62,21 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   private Random random;
 
   /** Records in the BIT group. Each record represents a single BIT. */
-  private List<R> subRecords;
+  private List<BiometricDataBlock> subRecords;
+
+  protected boolean shouldAddRandomDataIfEmpty;
 
   /**
    * Creates a CBEFF data group.
    *
    * @param dataGroupTag the data group tag
    * @param subRecords the sub-records contained in this data group
+   * @param shouldAddRandomDataIfEmpty whether to include random data if there are no records
    */
-  protected CBEFFDataGroup(int dataGroupTag, List<R> subRecords) {
+  protected CBEFFDataGroup(int dataGroupTag, List<BiometricDataBlock> subRecords, boolean shouldAddRandomDataIfEmpty) {
     super(dataGroupTag);
     addAll(subRecords);
+    this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
     this.random = new SecureRandom();
   }
 
@@ -77,12 +85,52 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    *
    * @param dataGroupTag the datagroup tag to use
    * @param inputStream an input stream
+   * @param shouldAddRandomDataIfEmpty whether to include random data if there are no records
    *
    * @throws IOException on error
    */
-  protected CBEFFDataGroup(int dataGroupTag, InputStream inputStream) throws IOException {
+  protected CBEFFDataGroup(int dataGroupTag, InputStream inputStream, boolean shouldAddRandomDataIfEmpty) throws IOException {
     super(dataGroupTag, inputStream);
+    this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
     this.random = new Random();
+  }
+
+  public abstract ISO781611Decoder<BiometricDataBlock> getDecoder();
+
+  public abstract ISO781611Encoder<BiometricDataBlock> getEncoder();
+
+  @Override
+  protected void readContent(InputStream inputStream) throws IOException {
+    ISO781611Decoder<BiometricDataBlock> decoder = getDecoder();
+    ComplexCBEFFInfo<BiometricDataBlock> complexCBEFFInfo = decoder.decode(inputStream);
+    List<CBEFFInfo<BiometricDataBlock>> records = complexCBEFFInfo.getSubRecords();
+    for (CBEFFInfo<BiometricDataBlock> cbeffInfo: records) {
+      if (!(cbeffInfo instanceof SimpleCBEFFInfo<?>)) {
+        throw new IOException("Was expecting a SimpleCBEFFInfo, found " + cbeffInfo.getClass().getSimpleName());
+      }
+      SimpleCBEFFInfo<?> simpleCBEFFInfo = (SimpleCBEFFInfo<?>)cbeffInfo;
+      BiometricDataBlock bdb = simpleCBEFFInfo.getBiometricDataBlock();
+      add(bdb);
+    }
+
+    /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
+  }
+
+  @Override
+  protected void writeContent(OutputStream outputStream) throws IOException {
+    ISO781611Encoder<BiometricDataBlock> encoder = getEncoder();
+    ComplexCBEFFInfo<BiometricDataBlock> cbeffInfo = new ComplexCBEFFInfo<BiometricDataBlock>();
+    List<BiometricDataBlock> records = getSubRecords();
+    for (BiometricDataBlock record: records) {
+      SimpleCBEFFInfo<BiometricDataBlock> simpleCBEFFInfo = new SimpleCBEFFInfo<BiometricDataBlock>(record);
+      cbeffInfo.add(simpleCBEFFInfo);
+    }
+    encoder.encode(cbeffInfo, outputStream);
+
+    /* NOTE: Supplement to ICAO Doc 9303 R7-p1_v2_sIII_0057. */
+    if (shouldAddRandomDataIfEmpty) {
+      writeOptionalRandomData(outputStream);
+    }
   }
 
   /**
@@ -90,9 +138,9 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    *
    * @param record the record to add
    */
-  public void add(R record) {
+  public void add(BiometricDataBlock record) {
     if (subRecords == null) {
-      subRecords = new ArrayList<R>();
+      subRecords = new ArrayList<BiometricDataBlock>();
     }
     subRecords.add(record);
   }
@@ -102,9 +150,9 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    *
    * @param records the records to add
    */
-  public void addAll(List<R> records) {
+  public void addAll(List<BiometricDataBlock> records) {
     if (subRecords == null) {
-      subRecords = new ArrayList<R>();
+      subRecords = new ArrayList<BiometricDataBlock>();
     }
     subRecords.addAll(records);
   }
@@ -116,7 +164,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    */
   public void remove(int index) {
     if (subRecords == null) {
-      subRecords = new ArrayList<R>();
+      subRecords = new ArrayList<BiometricDataBlock>();
     }
     subRecords.remove(index);
   }
@@ -134,7 +182,7 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
       result.append("null");
     } else {
       boolean isFirst = true;
-      for (R subRecord: subRecords) {
+      for (BiometricDataBlock subRecord: subRecords) {
         if (!isFirst) {
           result.append(", ");
         } else {
@@ -152,11 +200,11 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
    *
    * @return the records in this data group
    */
-  public List<R> getSubRecords() {
+  public List<BiometricDataBlock> getSubRecords() {
     if (subRecords == null) {
-      subRecords = new ArrayList<R>();
+      subRecords = new ArrayList<BiometricDataBlock>();
     }
-    return new ArrayList<R>(subRecords);
+    return new ArrayList<BiometricDataBlock>(subRecords);
   }
 
   @Override
@@ -167,23 +215,22 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
     if (other == this) {
       return true;
     }
-    if (!(other instanceof CBEFFDataGroup<?>)) {
+    if (!(other instanceof CBEFFDataGroup)) {
       return false;
     }
 
     try {
-      @SuppressWarnings("unchecked")
-      CBEFFDataGroup<R> otherDG = (CBEFFDataGroup<R>)other;
-      List<R> subRecords = getSubRecords();
-      List<R> otherSubRecords = otherDG.getSubRecords();
+      CBEFFDataGroup otherDG = (CBEFFDataGroup)other;
+      List<BiometricDataBlock> subRecords = getSubRecords();
+      List<BiometricDataBlock> otherSubRecords = otherDG.getSubRecords();
       int subRecordCount = subRecords.size();
       if (subRecordCount != otherSubRecords.size()) {
         return false;
       }
 
       for (int i = 0; i < subRecordCount; i++) {
-        R subRecord = subRecords.get(i);
-        R otherSubRecord = otherSubRecords.get(i);
+        BiometricDataBlock subRecord = subRecords.get(i);
+        BiometricDataBlock otherSubRecord = otherSubRecords.get(i);
         if (subRecord == null) {
           if (otherSubRecord != null) {
             return false;
@@ -203,14 +250,15 @@ public abstract class CBEFFDataGroup<R extends BiometricDataBlock> extends DataG
   @Override
   public int hashCode() {
     int result = 1234567891;
-    List<R> subRecords = getSubRecords();
-    for (R record: subRecords) {
+    List<BiometricDataBlock> subRecords = getSubRecords();
+    for (BiometricDataBlock record: subRecords) {
       if (record == null) {
         result = 3 * result + 5;
       } else {
         result = 5 * (result + record.hashCode()) + 7;
       }
     }
+    result = shouldAddRandomDataIfEmpty ? 13 * result + 111 : 17 * result + 123;
     return 7 * result + 11;
   }
 

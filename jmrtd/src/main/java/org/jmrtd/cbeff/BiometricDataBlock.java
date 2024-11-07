@@ -40,5 +40,5 @@ public interface BiometricDataBlock extends Serializable {
    *
    * @return the standard biometric header
    */
-  public StandardBiometricHeader getStandardBiometricHeader();
+  StandardBiometricHeader getStandardBiometricHeader();
 }

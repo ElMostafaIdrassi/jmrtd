@@ -535,16 +535,47 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Returns the passport holder's last name.
+   * Returns the name of the holder (primary and secondary identifiers).
+   * Double filler separates primary from secondary identifiers.
+   * Single fillers separate components within identifiers.
+   * Trailing fillers are removed.
    *
-   * @return name
+   * @return the name of holder
+   */
+  public String getNameOfHolder() {
+    switch (documentType) {
+    case TD1:
+      return trimTrailingFillerChars(nameToString(primaryIdentifier, secondaryIdentifier, 30));
+    case TD2:
+      /* Fall through. */
+    case MRVB:
+      return trimTrailingFillerChars(nameToString(primaryIdentifier, secondaryIdentifier, 31));
+    case TD3:
+      /* Fall through. */
+    case MRVA:
+      return trimTrailingFillerChars(nameToString(primaryIdentifier, secondaryIdentifier, 39));
+    default:
+      throw new IllegalStateException("Unsupported document type");
+    }
+  }
+
+  /**
+   * Returns the passport holder's primary identifier (last name).
+   * Trailing fillers will have been removed.
+   * Fillers (separating the components within this identifier)
+   * will have been replaced by spaces.
+   *
+   * @return the primary identifier
    */
   public String getPrimaryIdentifier() {
     return primaryIdentifier;
   }
 
   /**
-   * Returns the document holder's first names.
+   * Returns the document holder's secondary identifier (first names).
+   * Trailing fillers will have been removed.
+   * Fillers (separating the components within this identifier)
+   * will have been replaced by spaces.
    *
    * @return the secondary identifier
    */

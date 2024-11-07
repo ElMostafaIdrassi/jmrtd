@@ -102,6 +102,7 @@ import org.jmrtd.lds.icao.MRZInfo;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVUtil;
+import net.sf.scuba.util.Hex;
 
 /**
  * Some static helper functions. Mostly dealing with low-level crypto.
@@ -449,7 +450,7 @@ public final class Util {
    * @throws IOException on error
    */
   public static byte[] getRawECDSASignature(byte[] signedData, int keySize) throws IOException {
-    ASN1InputStream asn1In = new ASN1InputStream(signedData);
+    ASN1InputStream asn1In = new ASN1InputStream(signedData, true);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
       ASN1Sequence obj = (ASN1Sequence)asn1In.readObject();
@@ -908,7 +909,7 @@ public final class Util {
     try {
       String algorithm = publicKey.getAlgorithm();
       if ("EC".equals(algorithm) || "ECDH".equals(algorithm) || (publicKey instanceof ECPublicKey)) {
-        ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
+        ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded(), true);
         try {
           SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(asn1In.readObject());
           AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
@@ -950,7 +951,7 @@ public final class Util {
           asn1In.close();
         }
       } else if ("DH".equals(algorithm) || (publicKey instanceof DHPublicKey)) {
-        ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded());
+        ASN1InputStream asn1In = new ASN1InputStream(publicKey.getEncoded(), true);
         try {
           SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance((asn1In.readObject()));
           AlgorithmIdentifier algorithmIdentifier = subjectPublicKeyInfo.getAlgorithm();
@@ -982,7 +983,7 @@ public final class Util {
    */
   public static PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) {
     try {
-      byte[] encodedPublicKeyInfoBytes = subjectPublicKeyInfo.getEncoded(ASN1Encoding.DER);
+      byte[] encodedPublicKeyInfoBytes = subjectPublicKeyInfo.getEncoded(ASN1Encoding.DER); // HIER
       KeySpec keySpec = new X509EncodedKeySpec(encodedPublicKeyInfoBytes);
       try {
         KeyFactory factory = KeyFactory.getInstance("DH");

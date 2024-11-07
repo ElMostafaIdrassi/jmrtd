@@ -139,7 +139,6 @@ public class UtilTest extends TestCase {
     sig.initSign(keyPair.getPrivate());
     sig.update(new byte[8]);
     int sigSize = 8 * sig.sign().length;
-    LOGGER.info("DEBUG: " + sigAlg + ", expectedSize = " + expectedSize + ", sigSize = "+ sigSize);
     assertTrue(expectedSize <= sigSize && sigSize <= expectedSize + (expectedSize / 2));
   }
 
@@ -228,16 +227,10 @@ public class UtilTest extends TestCase {
     BigInteger y = new BigInteger(Hex.hexStringToBytes("004D3F9BC97AFDF8ABD9B561E63C0239763976A9FEB1EFFD816A140D791217CF"));
     ECPoint point = new ECPoint(x, y);
     byte[] os = Util.ecPoint2OS(point, 256);
-    LOGGER.info("DEBUG: os = " + Hex.bytesToHexString(os));
 
     ECPoint p = Util.os2ECPoint(os);
-    LOGGER.info("DEBUG: x = " + Hex.bytesToHexString(p.getAffineX().toByteArray()));
-    LOGGER.info("DEBUG: y = " + Hex.bytesToHexString(p.getAffineY().toByteArray()));
 
     byte[] os2 = Util.ecPoint2OS(p, 256);
-    LOGGER.info("DEBUG: os2 = " + Hex.bytesToHexString(os2));
     assertTrue(Arrays.equals(os, os2));
-
-
   }
 }

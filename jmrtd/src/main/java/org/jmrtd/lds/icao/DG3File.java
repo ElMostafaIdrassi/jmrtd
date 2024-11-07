@@ -25,16 +25,14 @@ package org.jmrtd.lds.icao;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
 import org.jmrtd.cbeff.BiometricDataBlockEncoder;
-import org.jmrtd.cbeff.CBEFFInfo;
-import org.jmrtd.cbeff.ComplexCBEFFInfo;
 import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
-import org.jmrtd.cbeff.SimpleCBEFFInfo;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.FingerInfo;
@@ -47,23 +45,23 @@ import org.jmrtd.lds.iso19794.FingerInfo;
  *
  * @version $Revision$
  */
-public class DG3File extends CBEFFDataGroup<FingerInfo> {
+public class DG3File extends CBEFFDataGroup {
 
   private static final long serialVersionUID = -1037522331623814528L;
 
-  private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<FingerInfo>() {
-    public FingerInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+  private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(new BiometricDataBlockDecoder<BiometricDataBlock>() {
+    public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
       return new FingerInfo(sbh, inputStream);
     }
   });
 
-  private static final ISO781611Encoder<FingerInfo> ENCODER = new ISO781611Encoder<FingerInfo>(new BiometricDataBlockEncoder<FingerInfo>() {
-    public void encode(FingerInfo info, OutputStream outputStream) throws IOException {
-      info.writeObject(outputStream);
+  private static final ISO781611Encoder<BiometricDataBlock> ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+    public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
+      if (info instanceof FingerInfo) {
+        ((FingerInfo)info).writeObject(outputStream);
+      }
     }
   });
-
-  private boolean shouldAddRandomDataIfEmpty;
 
   /**
    * Creates a new file with the specified records.
@@ -81,8 +79,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
    * @param shouldAddRandomDataIfEmpty whether to add random data when there are no records to encode
    */
   public DG3File(List<FingerInfo> fingerInfos, boolean shouldAddRandomDataIfEmpty) {
-    super(EF_DG3_TAG, fingerInfos);
-    this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
+    super(EF_DG3_TAG, fromFingerInfos(fingerInfos), shouldAddRandomDataIfEmpty);
   }
 
   /**
@@ -93,42 +90,17 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
    * @throws IOException on error reading from input stream
    */
   public DG3File(InputStream inputStream) throws IOException {
-    super(EF_DG3_TAG, inputStream);
+    super(EF_DG3_TAG, inputStream, false);
   }
 
   @Override
-  protected void readContent(InputStream inputStream) throws IOException {
-    ComplexCBEFFInfo cbeffInfo = DECODER.decode(inputStream);
-    List<CBEFFInfo> records = cbeffInfo.getSubRecords();
-    for (CBEFFInfo record: records) {
-      if (!(record instanceof SimpleCBEFFInfo<?>)) {
-        throw new IOException("Was expecting a SimpleCBEFFInfo, found " + record.getClass().getSimpleName());
-      }
-      BiometricDataBlock bdb = ((SimpleCBEFFInfo<?>)record).getBiometricDataBlock();
-      if (!(bdb instanceof FingerInfo)) {
-        throw new IOException("Was expecting a FingerInfo, found " + bdb.getClass().getSimpleName());
-      }
-      FingerInfo fingerInfo = (FingerInfo)bdb;
-      add(fingerInfo);
-    }
-
-    /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
+  public ISO781611Decoder<BiometricDataBlock> getDecoder() {
+    return DECODER;
   }
 
   @Override
-  protected void writeContent(OutputStream outputStream) throws IOException {
-    ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
-    List<FingerInfo> fingerInfos = getSubRecords();
-    for (FingerInfo fingerInfo: fingerInfos) {
-      SimpleCBEFFInfo<FingerInfo> simpleCBEFFInfo = new SimpleCBEFFInfo<FingerInfo>(fingerInfo);
-      cbeffInfo.add(simpleCBEFFInfo);
-    }
-    ENCODER.encode(cbeffInfo, outputStream);
-
-    /* NOTE: Supplement to ICAO Doc 9303 R7-p1_v2_sIII_0057. */
-    if (shouldAddRandomDataIfEmpty) {
-      writeOptionalRandomData(outputStream);
-    }
+  public ISO781611Encoder<BiometricDataBlock> getEncoder() {
+    return ENCODER;
   }
 
   /**
@@ -147,7 +119,7 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
    * @return finger infos
    */
   public List<FingerInfo> getFingerInfos() {
-    return getSubRecords();
+    return toFingerInfos(getSubRecords());
   }
 
   /**
@@ -189,5 +161,32 @@ public class DG3File extends CBEFFDataGroup<FingerInfo> {
 
     DG3File other = (DG3File)obj;
     return shouldAddRandomDataIfEmpty == other.shouldAddRandomDataIfEmpty;
+  }
+
+  private static List<BiometricDataBlock> fromFingerInfos(List<FingerInfo> fingerInfos) {
+    if (fingerInfos == null) {
+      return null;
+    }
+
+    List<BiometricDataBlock> records = new ArrayList<BiometricDataBlock>(fingerInfos.size());
+    for (FingerInfo fingerInfo: fingerInfos) {
+      records.add(fingerInfo);
+    }
+
+    return records;
+  }
+
+  private static List<FingerInfo> toFingerInfos(List<BiometricDataBlock> records) {
+    if (records == null) {
+      return null;
+    }
+
+    List<FingerInfo> FingerInfos = new ArrayList<FingerInfo>(records.size());
+    for (BiometricDataBlock record: records) {
+      if (record instanceof FingerInfo) {
+        FingerInfos.add((FingerInfo)record);
+      }
+    }
+    return FingerInfos;
   }
 }

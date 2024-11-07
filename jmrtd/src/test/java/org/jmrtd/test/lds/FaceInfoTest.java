@@ -142,7 +142,6 @@ public class FaceInfoTest extends TestCase {
       FaceInfo faceInfo = createTestObject();
       byte[] encoded = faceInfo.getEncoded();
       FaceInfo faceInfo2 = new FaceInfo(faceInfo.getStandardBiometricHeader(), new ByteArrayInputStream(encoded));
-      LOGGER.info("DEBUG: faceInfo = " + faceInfo);
       assertEquals(faceInfo, faceInfo2);
       assertEquals(faceInfo.toString(), faceInfo2.toString());
     } catch (Exception e) {

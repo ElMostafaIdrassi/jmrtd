@@ -35,15 +35,15 @@ import java.util.List;
  *
  * @since 0.4.7
  */
-public class ComplexCBEFFInfo implements CBEFFInfo {
+public class ComplexCBEFFInfo<R extends BiometricDataBlock> implements CBEFFInfo<R> {
 
-  private List<CBEFFInfo> subRecords;
+  private List<CBEFFInfo<R>> subRecords;
 
   /**
    * Constructs a default complex info, with an empty list of sub-records.
    */
   public ComplexCBEFFInfo() {
-    this.subRecords = new ArrayList<CBEFFInfo>();
+    this.subRecords = new ArrayList<CBEFFInfo<R>>();
   }
 
   /**
@@ -51,8 +51,8 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
    *
    * @return a list of CBEFF infos
    */
-  public List<CBEFFInfo> getSubRecords() {
-    return new ArrayList<CBEFFInfo>(this.subRecords);
+  public List<CBEFFInfo<R>> getSubRecords() {
+    return new ArrayList<CBEFFInfo<R>>(this.subRecords);
   }
 
   /**
@@ -60,7 +60,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
    *
    * @param subRecord the CBEFF info to add
    */
-  public void add(CBEFFInfo subRecord) {
+  public void add(CBEFFInfo<R> subRecord) {
     this.subRecords.add(subRecord);
   }
 
@@ -69,7 +69,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
    *
    * @param subRecords a list of CBEFF infos
    */
-  public void addAll(List<CBEFFInfo> subRecords) {
+  public void addAll(List<CBEFFInfo<R>> subRecords) {
     this.subRecords.addAll(subRecords);
   }
 
@@ -101,7 +101,7 @@ public class ComplexCBEFFInfo implements CBEFFInfo {
       return false;
     }
 
-    ComplexCBEFFInfo otherRecord = (ComplexCBEFFInfo)other;
+    ComplexCBEFFInfo<?> otherRecord = (ComplexCBEFFInfo<?>)other;
     return subRecords.equals(otherRecord.getSubRecords());
   }
 

@@ -92,9 +92,10 @@ public class DG14File extends DataGroup {
 
   @Override
   protected void readContent(InputStream inputStream) throws IOException {
-    securityInfos = new HashSet<SecurityInfo>();
-    ASN1InputStream asn1In = new ASN1InputStream(inputStream);
-    ASN1Set set = (ASN1Set)asn1In.readObject();
+    ASN1InputStream asn1In = new ASN1InputStream(inputStream, true);
+    ASN1Primitive asn1Primitive = asn1In.readObject();
+    ASN1Set set = ASN1Set.getInstance(asn1Primitive);
+    securityInfos = new HashSet<SecurityInfo>(set.size());
     for (int i = 0; i < set.size(); i++) {
       ASN1Primitive object = set.getObjectAt(i).toASN1Primitive();
       try {

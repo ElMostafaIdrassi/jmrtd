@@ -28,7 +28,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -158,8 +157,6 @@ public class DG4FileTest extends TestCase {
         }
         recordNumber ++;
       }
-    } catch (AccessControlException ace) {
-      LOGGER.log(Level.WARNING, "Exception", ace);
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());

@@ -25,16 +25,14 @@ package org.jmrtd.lds.icao;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
 import org.jmrtd.cbeff.BiometricDataBlockEncoder;
-import org.jmrtd.cbeff.CBEFFInfo;
-import org.jmrtd.cbeff.ComplexCBEFFInfo;
 import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
-import org.jmrtd.cbeff.SimpleCBEFFInfo;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.IrisInfo;
@@ -47,23 +45,23 @@ import org.jmrtd.lds.iso19794.IrisInfo;
  *
  * @version $Revision$
  */
-public class DG4File extends CBEFFDataGroup<IrisInfo> {
+public class DG4File extends CBEFFDataGroup {
 
   private static final long serialVersionUID = -1290365855823447586L;
 
-  private static final ISO781611Decoder DECODER = new ISO781611Decoder(new BiometricDataBlockDecoder<IrisInfo>() {
-    public IrisInfo decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+  private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(new BiometricDataBlockDecoder<BiometricDataBlock>() {
+    public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
       return new IrisInfo(sbh, inputStream);
     }
   });
 
-  private static final ISO781611Encoder<IrisInfo> ENCODER = new ISO781611Encoder<IrisInfo>(new BiometricDataBlockEncoder<IrisInfo>() {
-    public void encode(IrisInfo info, OutputStream outputStream) throws IOException {
-      info.writeObject(outputStream);
+  private static final ISO781611Encoder<BiometricDataBlock> ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+    public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
+      if (info instanceof IrisInfo) {
+        ((IrisInfo)info).writeObject(outputStream);
+      }
     }
   });
-
-  private boolean shouldAddRandomDataIfEmpty;
 
   /**
    * Creates a new file with the specified records.
@@ -81,7 +79,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
    * @param shouldAddRandomDataIfEmpty indicates whether the encoder should add random data when no templates are present
    */
   public DG4File(List<IrisInfo> irisInfos, boolean shouldAddRandomDataIfEmpty) {
-    super(EF_DG4_TAG, irisInfos);
+    super(EF_DG4_TAG, fromIrisInfos(irisInfos), shouldAddRandomDataIfEmpty);
     this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
   }
 
@@ -93,42 +91,17 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
    * @throws IOException on error reading from input stream
    */
   public DG4File(InputStream inputStream) throws IOException {
-    super(EF_DG4_TAG, inputStream);
+    super(EF_DG4_TAG, inputStream, false);
   }
 
   @Override
-  protected void readContent(InputStream inputStream) throws IOException {
-    ComplexCBEFFInfo cbeffInfo = DECODER.decode(inputStream);
-    List<CBEFFInfo> records = cbeffInfo.getSubRecords();
-    for (CBEFFInfo record: records) {
-      if (!(record instanceof SimpleCBEFFInfo<?>)) {
-        throw new IOException("Was expecting a SimpleCBEFFInfo, found " + record.getClass().getSimpleName());
-      }
-      BiometricDataBlock bdb = ((SimpleCBEFFInfo<?>)record).getBiometricDataBlock();
-      if (!(bdb instanceof IrisInfo)) {
-        throw new IOException("Was expecting an IrisInfo, found " + bdb.getClass().getSimpleName());
-      }
-      IrisInfo irisInfo = (IrisInfo)bdb;
-      add(irisInfo);
-    }
-
-    /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
+  public ISO781611Decoder<BiometricDataBlock> getDecoder() {
+    return DECODER;
   }
 
   @Override
-  protected void writeContent(OutputStream outputStream) throws IOException {
-    ComplexCBEFFInfo cbeffInfo = new ComplexCBEFFInfo();
-    List<IrisInfo> irisInfos = getSubRecords();
-    for (IrisInfo irisInfo: irisInfos) {
-      SimpleCBEFFInfo<IrisInfo> simpleCBEFFInfo = new SimpleCBEFFInfo<IrisInfo>(irisInfo);
-      cbeffInfo.add(simpleCBEFFInfo);
-    }
-    ENCODER.encode(cbeffInfo, outputStream);
-
-    /* NOTE: Supplement to ICAO Doc 9303 R7-p1_v2_sIII_0057. */
-    if (shouldAddRandomDataIfEmpty) {
-      writeOptionalRandomData(outputStream);
-    }
+  public ISO781611Encoder<BiometricDataBlock> getEncoder() {
+    return ENCODER;
   }
 
   /**
@@ -147,7 +120,7 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
    * @return iris infos
    */
   public List<IrisInfo> getIrisInfos() {
-    return getSubRecords();
+    return toIrisInfos(getSubRecords());
   }
 
   /**
@@ -189,5 +162,32 @@ public class DG4File extends CBEFFDataGroup<IrisInfo> {
 
     DG4File other = (DG4File)obj;
     return shouldAddRandomDataIfEmpty == other.shouldAddRandomDataIfEmpty;
+  }
+
+  private static List<BiometricDataBlock> fromIrisInfos(List<IrisInfo> irisInfos) {
+    if (irisInfos == null) {
+      return null;
+    }
+
+    List<BiometricDataBlock> records = new ArrayList<BiometricDataBlock>(irisInfos.size());
+    for (IrisInfo irisInfo: irisInfos) {
+      records.add(irisInfo);
+    }
+
+    return records;
+  }
+
+  private static List<IrisInfo> toIrisInfos(List<BiometricDataBlock> records) {
+    if (records == null) {
+      return null;
+    }
+
+    List<IrisInfo> irisInfos = new ArrayList<IrisInfo>(records.size());
+    for (BiometricDataBlock record: records) {
+      if (record instanceof IrisInfo) {
+        irisInfos.add((IrisInfo)record);
+      }
+    }
+    return irisInfos;
   }
 }

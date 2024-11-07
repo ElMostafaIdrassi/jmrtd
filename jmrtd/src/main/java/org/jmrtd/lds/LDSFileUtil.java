@@ -130,6 +130,62 @@ public final class LDSFileUtil {
     }
   }
 
+  public static COMFile getCOMFile(InputStream inputStream) throws IOException {
+    return new COMFile(inputStream);
+  }
+
+  public static CVCAFile getCVCAFile(InputStream inputStream) throws IOException {
+    return new CVCAFile(inputStream);
+  }
+
+  public static DG1File getDG1File(InputStream inputStream) throws IOException {
+    return new DG1File(inputStream);
+  }
+
+  public static DG2File getDG2File(InputStream inputStream) throws IOException {
+    return new DG2File(inputStream);
+  }
+
+  public static DG3File getDG3File(InputStream inputStream) throws IOException {
+    return new DG3File(inputStream);
+  }
+
+  public static DG4File getDG4File(InputStream inputStream) throws IOException {
+    return new DG4File(inputStream);
+  }
+
+  public static DG5File getDG5File(InputStream inputStream) throws IOException {
+    return new DG5File(inputStream);
+  }
+
+  public static DG6File getDG6File(InputStream inputStream) throws IOException {
+    return new DG6File(inputStream);
+  }
+
+  public static DG7File getDG7File(InputStream inputStream) throws IOException {
+    return new DG7File(inputStream);
+  }
+
+  public static DG11File getDG11File(InputStream inputStream) throws IOException {
+    return new DG11File(inputStream);
+  }
+
+  public static DG12File getDG12File(InputStream inputStream) throws IOException {
+    return new DG12File(inputStream);
+  }
+
+  public static DG14File getDG14File(InputStream inputStream) throws IOException {
+    return new DG14File(inputStream);
+  }
+
+  public static DG15File getDG15File(InputStream inputStream) throws IOException {
+    return new DG15File(inputStream);
+  }
+
+  public static SODFile getSODFile(InputStream inputStream) throws IOException {
+    return new SODFile(inputStream);
+  }
+
   /**
    * Finds a file identifier for an ICAO tag.
    *

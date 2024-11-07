@@ -31,7 +31,7 @@ package org.jmrtd.cbeff;
  *
  * @since 0.4.7
  */
-public interface CBEFFInfo {
+public interface CBEFFInfo<R extends BiometricDataBlock> {
 
   /*
    * Biometric type value, based on
@@ -109,26 +109,26 @@ public interface CBEFFInfo {
    * Section 6.5.7 of ISO/IEC 19785-1.
    */
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_NONE = 0x00;					      /* 00000000 */
+  public static final int BIOMETRIC_SUBTYPE_NONE = 0x00;                /* 00000000 */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_RIGHT = 0x01;			    /* xxxxxx01 */
+  public static final int BIOMETRIC_SUBTYPE_MASK_RIGHT = 0x01;          /* xxxxxx01 */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_LEFT = 0x02;				    /* xxxxxx10 */
+  public static final int BIOMETRIC_SUBTYPE_MASK_LEFT = 0x02;           /* xxxxxx10 */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_THUMB = 0x04;			    /* xxx001xx */
+  public static final int BIOMETRIC_SUBTYPE_MASK_THUMB = 0x04;          /* xxx001xx */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER = 0x08;	/* xxx010xx */
+  public static final int BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER = 0x08; /* xxx010xx */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER = 0x0C;	/* xxx011xx */
+  public static final int BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER = 0x0C;  /* xxx011xx */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_RING_FINGER = 0x10;		/* xxx100xx */
+  public static final int BIOMETRIC_SUBTYPE_MASK_RING_FINGER = 0x10;    /* xxx100xx */
 
   /** Biometric subtype. */
-  public static final int BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER = 0x14;	/* xxx101xx */
+  public static final int BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER = 0x14;  /* xxx101xx */
 }
