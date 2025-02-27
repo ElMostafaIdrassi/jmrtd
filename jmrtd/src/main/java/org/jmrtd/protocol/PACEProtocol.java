@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2023  The JMRTD team
+ * Copyright (C) 2006 - 2025  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -472,7 +472,7 @@ public class PACEProtocol {
       byte[] pcdMappingEncodedPublicKey = encodePublicKeyForSmartCard(pcdMappingPublicKey);
       byte[] step2Data = TLVUtil.wrapDO(0x81, pcdMappingEncodedPublicKey);
 
-      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLengthForProtocol, false);
+      byte[] step2Response = service.sendGeneralAuthenticate(wrapper, step2Data, step2Data.length > 233 ? PassportService.EXTENDED_MAX_TRANCEIVE_LENGTH : maxTranceiveLengthForProtocol, false);
 
       byte[] piccMappingEncodedPublicKey = TLVUtil.unwrapDO(0x82, step2Response);
       PublicKey piccMappingPublicKey = decodePublicKeyFromSmartCard(piccMappingEncodedPublicKey, params);
@@ -543,7 +543,7 @@ public class PACEProtocol {
       /*
        * NOTE: The context specific data object 0x82 SHALL be empty (TR SAC 3.3.2).
        */
-      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, maxTranceiveLengthForProtocol, false);
+      /* byte[] step2Response = */ service.sendGeneralAuthenticate(wrapper, step2Data, step2Data.length > 233 ? PassportService.EXTENDED_MAX_TRANCEIVE_LENGTH : maxTranceiveLengthForProtocol , false);
 
       if ("ECDH".equals(agreementAlg)) {
         AlgorithmParameterSpec ephemeralParameters = mapNonceIMWithECDH(piccNonce, pcdNonce, staticPACECipher.getAlgorithm(), (ECParameterSpec)params);
@@ -603,7 +603,7 @@ public class PACEProtocol {
     try {
       byte[] pcdEncodedPublicKey = encodePublicKeyForSmartCard(pcdPublicKey);
       byte[] step3Data = TLVUtil.wrapDO(0x83, pcdEncodedPublicKey);
-      byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, maxTranceiveLengthForProtocol, false);
+      byte[] step3Response = service.sendGeneralAuthenticate(wrapper, step3Data, step3Data.length > 233 ? PassportService.EXTENDED_MAX_TRANCEIVE_LENGTH : maxTranceiveLengthForProtocol, false);
       byte[] piccEncodedPublicKey = TLVUtil.unwrapDO(0x84, step3Response);
       PublicKey piccPublicKey = decodePublicKeyFromSmartCard(piccEncodedPublicKey, ephemeralParams);
 

@@ -39,6 +39,9 @@ import org.jmrtd.cbeff.ISO781611Encoder;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.FaceInfo;
+import org.jmrtd.lds.iso39794.FaceImageDataBlock;
+
+import net.sf.scuba.tlv.TLVInputStream;
 
 /**
  * File structure for the EF_DG2 file.
@@ -55,7 +58,7 @@ public class DG2File extends CBEFFDataGroup {
 
   private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(getDecoderMap());
 
-  private static Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>>  getDecoderMap() {
+  private static Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> getDecoderMap() {
     Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> decoders = new HashMap<Integer, BiometricDataBlockDecoder<BiometricDataBlock>>();
 
     /* 5F2E */
@@ -68,7 +71,14 @@ public class DG2File extends CBEFFDataGroup {
     /* 7F2E */
     decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
       public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
-        return new FaceInfo(sbh, inputStream);
+        TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
+        int tag = tlvInputStream.readTag(); // 0xA1
+        if (tag != 0xA1) {
+          /* ISO/IEC 39794-5 Application Profile for eMRTDs Version – 1.00: Table 2: Data Structure under DO7F2E. */
+          LOGGER.warning("Expected tag A1, found " + Integer.toHexString(tag));
+        }
+        tlvInputStream.readLength();
+        return new FaceImageDataBlock(sbh, inputStream);
       }
     });
     return decoders;
