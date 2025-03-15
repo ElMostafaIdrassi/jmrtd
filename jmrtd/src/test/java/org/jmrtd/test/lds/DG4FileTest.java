@@ -205,8 +205,7 @@ public class DG4FileTest extends TestCase {
           imageTransformation,
           deviceUniqueId,
           Arrays.asList(new IrisBiometricSubtypeInfo[] { irisBiometricSubtypeInfo }));
-      DG4File dg4 = new DG4File(Arrays.asList(new IrisInfo[] { irisInfo }));
-      dg4.addIrisInfo(IrisInfoTest.createTestObject());
+      DG4File dg4 = new DG4File(Arrays.asList(new IrisInfo[] { irisInfo, IrisInfoTest.createTestObject() }));
       return dg4;
     } catch (IOException ioe) {
       fail(ioe.getMessage());

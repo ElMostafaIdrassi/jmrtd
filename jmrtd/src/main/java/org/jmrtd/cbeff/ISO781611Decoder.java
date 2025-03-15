@@ -43,10 +43,12 @@ import net.sf.scuba.tlv.TLVUtil;
  */
 public class ISO781611Decoder<B extends BiometricDataBlock> implements ISO781611 {
 
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd.cbeff");
 
   private Map<Integer, BiometricDataBlockDecoder<B>> bdbDecoders;
 
+  private BiometricEncodingType encodingType;
+  
   /**
    * Constructs an ISO7816-11 decoder that uses the given BDB decoder.
    *
@@ -72,6 +74,10 @@ public class ISO781611Decoder<B extends BiometricDataBlock> implements ISO781611
    */
   public ComplexCBEFFInfo<B> decode(InputStream inputStream) throws IOException {
     return readBITGroup(inputStream);
+  }
+
+  public BiometricEncodingType getEncodingType() {
+    return encodingType;
   }
 
   /**
@@ -297,9 +303,10 @@ public class ISO781611Decoder<B extends BiometricDataBlock> implements ISO781611
     if (bioDataBlockTag != BIOMETRIC_DATA_BLOCK_TAG /* 5F2E */ &&
         bioDataBlockTag != BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG /* 7F2E */) {
       throw new IllegalArgumentException("Expected tag BIOMETRIC_DATA_BLOCK_TAG (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_TAG)
-        + ") or BIOMETRIC_DATA_BLOCK_CONSTRUCTED_ALT (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG)
-        + "), found " + Integer.toHexString(bioDataBlockTag));
+      + ") or BIOMETRIC_DATA_BLOCK_CONSTRUCTED_ALT (" + Integer.toHexString(BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG)
+      + "), found " + Integer.toHexString(bioDataBlockTag));
     }
+    encodingType = BiometricEncodingType.fromBDBTag(bioDataBlockTag);
     int length = tlvIn.readLength();
     BiometricDataBlockDecoder<B> bdbDecoder = bdbDecoders.get(bioDataBlockTag);
     if (bdbDecoder == null) {

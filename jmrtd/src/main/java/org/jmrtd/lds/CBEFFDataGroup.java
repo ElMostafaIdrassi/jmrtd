@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
+import org.jmrtd.cbeff.BiometricEncodingType;
 import org.jmrtd.cbeff.CBEFFInfo;
 import org.jmrtd.cbeff.ComplexCBEFFInfo;
 import org.jmrtd.cbeff.ISO781611;
@@ -55,7 +56,7 @@ public abstract class CBEFFDataGroup extends DataGroup {
 
   private static final long serialVersionUID = 2702959939408371946L;
 
-  protected static final Logger LOGGER = Logger.getLogger("org.jmrtd");
+  protected static final Logger LOGGER = Logger.getLogger("org.jmrtd.lds");
 
   /** For writing the optional random data block. */
   private Random random;
@@ -65,14 +66,18 @@ public abstract class CBEFFDataGroup extends DataGroup {
 
   protected boolean shouldAddRandomDataIfEmpty;
 
+  protected BiometricEncodingType encodingType;
+
   /**
    * Creates a CBEFF data group.
    *
    * @param dataGroupTag the data group tag
+   * @param encodingType encoding type, either ISO19794 or ISO39794
    * @param subRecords the sub-records contained in this data group
    * @param shouldAddRandomDataIfEmpty whether to include random data if there are no records
    */
-  protected CBEFFDataGroup(int dataGroupTag, List<BiometricDataBlock> subRecords, boolean shouldAddRandomDataIfEmpty) {
+  protected CBEFFDataGroup(int dataGroupTag, BiometricEncodingType encodingType,
+      List<? extends BiometricDataBlock> subRecords, boolean shouldAddRandomDataIfEmpty) {
     super(dataGroupTag);
     addAll(subRecords);
     this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
@@ -98,6 +103,10 @@ public abstract class CBEFFDataGroup extends DataGroup {
 
   public abstract ISO781611Encoder<BiometricDataBlock> getEncoder();
 
+  public BiometricEncodingType getEncodingType() {
+    return encodingType;
+  }
+
   @Override
   protected void readContent(InputStream inputStream) throws IOException {
     ISO781611Decoder<BiometricDataBlock> decoder = getDecoder();
@@ -111,6 +120,7 @@ public abstract class CBEFFDataGroup extends DataGroup {
       BiometricDataBlock bdb = simpleCBEFFInfo.getBiometricDataBlock();
       add(bdb);
     }
+    encodingType = decoder.getEncodingType();
 
     /* FIXME: by symmetry, shouldn't there be a readOptionalRandomData here? */
   }
@@ -130,42 +140,6 @@ public abstract class CBEFFDataGroup extends DataGroup {
     if (shouldAddRandomDataIfEmpty) {
       writeOptionalRandomData(outputStream);
     }
-  }
-
-  /**
-   * Adds a record to this data group.
-   *
-   * @param record the record to add
-   */
-  public void add(BiometricDataBlock record) {
-    if (subRecords == null) {
-      subRecords = new ArrayList<BiometricDataBlock>();
-    }
-    subRecords.add(record);
-  }
-
-  /**
-   * Adds all records in a list to this data group.
-   *
-   * @param records the records to add
-   */
-  public void addAll(List<BiometricDataBlock> records) {
-    if (subRecords == null) {
-      subRecords = new ArrayList<BiometricDataBlock>();
-    }
-    subRecords.addAll(records);
-  }
-
-  /**
-   * Removes the record at the given index.
-   *
-   * @param index the index of the record to remove
-   */
-  public void remove(int index) {
-    if (subRecords == null) {
-      subRecords = new ArrayList<BiometricDataBlock>();
-    }
-    subRecords.remove(index);
   }
 
   /**
@@ -281,5 +255,29 @@ public abstract class CBEFFDataGroup extends DataGroup {
     byte[] value = new byte[8];
     random.nextBytes(value);
     tlvOut.writeValue(value);
+  }
+
+  /**
+   * Adds a record to this data group.
+   *
+   * @param record the record to add
+   */
+  private void add(BiometricDataBlock record) {
+    if (subRecords == null) {
+      subRecords = new ArrayList<BiometricDataBlock>();
+    }
+    subRecords.add(record);
+  }
+
+  /**
+   * Adds all records in a list to this data group.
+   *
+   * @param records the records to add
+   */
+  private void addAll(List<? extends BiometricDataBlock> records) {
+    if (subRecords == null) {
+      subRecords = new ArrayList<BiometricDataBlock>();
+    }
+    subRecords.addAll(records);
   }
 }

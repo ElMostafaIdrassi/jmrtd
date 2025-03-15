@@ -26,16 +26,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
 import org.jmrtd.cbeff.BiometricDataBlockEncoder;
+import org.jmrtd.cbeff.BiometricEncodingType;
+import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.IrisInfo;
+import org.jmrtd.lds.iso39794.IrisImageDataBlock;
+
+import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * File structure for the EF_DG4 file.
@@ -49,16 +57,47 @@ public class DG4File extends CBEFFDataGroup {
 
   private static final long serialVersionUID = -1290365855823447586L;
 
-  private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(new BiometricDataBlockDecoder<BiometricDataBlock>() {
-    public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
-      return new IrisInfo(sbh, inputStream);
-    }
-  });
+  private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(getDecoderMap());
 
-  private static final ISO781611Encoder<BiometricDataBlock> ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+  private static Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> getDecoderMap() {
+    Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> decoders = new HashMap<Integer, BiometricDataBlockDecoder<BiometricDataBlock>>();
+
+    /* 5F2E */
+    decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
+      public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+        return new IrisInfo(sbh, inputStream);
+      }
+    });
+
+    /* 7F2E */
+    decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
+      public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+        TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
+        int tag = tlvInputStream.readTag(); // 0xA1
+        if (tag != 0xA1) {
+          LOGGER.warning("Expected tag A1, found " + Integer.toHexString(tag));
+        }
+        tlvInputStream.readLength();
+        return new IrisImageDataBlock(sbh, inputStream);
+      }
+    });
+    return decoders;
+  }
+
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_19794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof IrisInfo) {
         ((IrisInfo)info).writeObject(outputStream);
+      }
+    }
+  });
+
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+    public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
+      if (info instanceof IrisImageDataBlock) {
+        TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+        tlvOutputStream.writeTag(0xA1);
+        tlvOutputStream.writeValue(((IrisImageDataBlock)info).getEncoded());
       }
     }
   });
@@ -79,7 +118,7 @@ public class DG4File extends CBEFFDataGroup {
    * @param shouldAddRandomDataIfEmpty indicates whether the encoder should add random data when no templates are present
    */
   public DG4File(List<IrisInfo> irisInfos, boolean shouldAddRandomDataIfEmpty) {
-    super(EF_DG4_TAG, fromIrisInfos(irisInfos), shouldAddRandomDataIfEmpty);
+    super(EF_DG4_TAG, BiometricEncodingType.ISO_19794, fromIrisInfos(irisInfos), shouldAddRandomDataIfEmpty);
     this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
   }
 
@@ -101,7 +140,17 @@ public class DG4File extends CBEFFDataGroup {
 
   @Override
   public ISO781611Encoder<BiometricDataBlock> getEncoder() {
-    return ENCODER;
+    if (encodingType == null) {
+      return ISO_19794_ENCODER;
+    }
+    switch (encodingType) {
+    case ISO_19794:
+      return ISO_19794_ENCODER;
+    case ISO_39794:
+      return ISO_39794_ENCODER;
+    default:
+      return ISO_19794_ENCODER;
+    }
   }
 
   /**
@@ -121,24 +170,6 @@ public class DG4File extends CBEFFDataGroup {
    */
   public List<IrisInfo> getIrisInfos() {
     return toIrisInfos(getSubRecords());
-  }
-
-  /**
-   * Adds an iris info to this file.
-   *
-   * @param irisInfo an iris info
-   */
-  public void addIrisInfo(IrisInfo irisInfo) {
-    add(irisInfo);
-  }
-
-  /**
-   * Removes an iris info from this file.
-   *
-   * @param index the index of the iris info to remove
-   */
-  public void removeIrisInfo(int index) {
-    remove(index);
   }
 
   @Override

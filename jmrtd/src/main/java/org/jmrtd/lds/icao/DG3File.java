@@ -33,6 +33,7 @@ import java.util.Map;
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
 import org.jmrtd.cbeff.BiometricDataBlockEncoder;
+import org.jmrtd.cbeff.BiometricEncodingType;
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
@@ -42,6 +43,7 @@ import org.jmrtd.lds.iso19794.FingerInfo;
 import org.jmrtd.lds.iso39794.FingerImageDataBlock;
 
 import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * File structure for the EF_DG3 file.
@@ -73,7 +75,6 @@ public class DG3File extends CBEFFDataGroup {
         TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
         int tag = tlvInputStream.readTag(); // 0xA1
         if (tag != 0xA1) {
-          /* ISO/IEC 39794-5 Application Profile for eMRTDs Version – 1.00: Table 2: Data Structure under DO7F2E. */
           LOGGER.warning("Expected tag A1, found " + Integer.toHexString(tag));
         }
         tlvInputStream.readLength();
@@ -91,11 +92,24 @@ public class DG3File extends CBEFFDataGroup {
     }
   });
 
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+    public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
+      if (info instanceof FingerImageDataBlock) {
+        TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+        tlvOutputStream.writeTag(0xA1);
+        tlvOutputStream.writeValue(((FingerImageDataBlock)info).getEncoded());
+      }
+    }
+  });
+
   /**
    * Creates a new file with the specified records.
    *
    * @param fingerInfos records
+   *
+   * @deprecated Use the corresponding factory method for ISO19794 instead
    */
+  @Deprecated
   public DG3File(List<FingerInfo> fingerInfos) {
     this(fingerInfos, true);
   }
@@ -107,7 +121,7 @@ public class DG3File extends CBEFFDataGroup {
    * @param shouldAddRandomDataIfEmpty whether to add random data when there are no records to encode
    */
   public DG3File(List<FingerInfo> fingerInfos, boolean shouldAddRandomDataIfEmpty) {
-    super(EF_DG3_TAG, fromFingerInfos(fingerInfos), shouldAddRandomDataIfEmpty);
+    super(EF_DG3_TAG, BiometricEncodingType.ISO_19794, fromFingerInfos(fingerInfos), shouldAddRandomDataIfEmpty);
   }
 
   /**
@@ -128,7 +142,17 @@ public class DG3File extends CBEFFDataGroup {
 
   @Override
   public ISO781611Encoder<BiometricDataBlock> getEncoder() {
-    return ISO_19794_ENCODER;
+    if (encodingType == null) {
+      return ISO_19794_ENCODER;
+    }
+    switch (encodingType) {
+    case ISO_19794:
+      return ISO_19794_ENCODER;
+    case ISO_39794:
+      return ISO_39794_ENCODER;
+    default:
+      return ISO_19794_ENCODER;
+    }
   }
 
   /**
@@ -148,30 +172,6 @@ public class DG3File extends CBEFFDataGroup {
    */
   public List<FingerInfo> getFingerInfos() {
     return toFingerInfos(getSubRecords());
-  }
-
-  /**
-   * Adds a finger info to this file.
-   *
-   * @param fingerInfo the finger info to add
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-   public void addFingerInfo(FingerInfo fingerInfo) {
-    add(fingerInfo);
-  }
-
-  /**
-   * Removes a finger info from this file.
-   *
-   * @param index the index of the finger info to remove
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  public void removeFingerInfo(int index) {
-    remove(index);
   }
 
   @Override

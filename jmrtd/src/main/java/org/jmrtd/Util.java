@@ -102,7 +102,6 @@ import org.jmrtd.lds.icao.MRZInfo;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVUtil;
-import net.sf.scuba.util.Hex;
 
 /**
  * Some static helper functions. Mostly dealing with low-level crypto.

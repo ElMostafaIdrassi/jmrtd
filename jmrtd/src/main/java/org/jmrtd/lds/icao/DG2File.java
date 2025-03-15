@@ -33,6 +33,7 @@ import java.util.Map;
 import org.jmrtd.cbeff.BiometricDataBlock;
 import org.jmrtd.cbeff.BiometricDataBlockDecoder;
 import org.jmrtd.cbeff.BiometricDataBlockEncoder;
+import org.jmrtd.cbeff.BiometricEncodingType;
 import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
@@ -42,6 +43,7 @@ import org.jmrtd.lds.iso19794.FaceInfo;
 import org.jmrtd.lds.iso39794.FaceImageDataBlock;
 
 import net.sf.scuba.tlv.TLVInputStream;
+import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * File structure for the EF_DG2 file.
@@ -92,13 +94,26 @@ public class DG2File extends CBEFFDataGroup {
     }
   });
 
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+    public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
+      if (info instanceof FaceImageDataBlock) {
+        TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+        tlvOutputStream.writeTag(0xA1);
+        tlvOutputStream.writeValue(((FaceImageDataBlock)info).getEncoded());
+      }
+    }
+  });
+
   /**
    * Creates a new file with the specified records.
    *
    * @param faceInfos records
+   *
+   * @deprecated Use the corresponding factory method for ISO19794 instead
    */
+  @Deprecated
   public DG2File(List<FaceInfo> faceInfos) {
-    super(EF_DG2_TAG, fromFaceInfos(faceInfos), false);
+    this(BiometricEncodingType.ISO_19794, faceInfos);
   }
 
   /**
@@ -112,6 +127,18 @@ public class DG2File extends CBEFFDataGroup {
     super(EF_DG2_TAG, inputStream, false);
   }
 
+  private DG2File(BiometricEncodingType encodingType, List<? extends BiometricDataBlock> biometricDataBlocks) {
+    super(EF_DG2_TAG, encodingType, biometricDataBlocks, false);
+  }
+
+  public static DG2File createISO19794DG2File(List<FaceInfo> faceInfos) {
+    return new DG2File(BiometricEncodingType.ISO_19794, faceInfos);
+  }
+
+  public static DG2File createISO39794DG2File(List<FaceImageDataBlock> faceImageDataBlocks) {
+    return new DG2File(BiometricEncodingType.ISO_39794, faceImageDataBlocks);
+  }
+
   @Override
   public ISO781611Decoder<BiometricDataBlock> getDecoder() {
     return DECODER;
@@ -119,7 +146,17 @@ public class DG2File extends CBEFFDataGroup {
 
   @Override
   public ISO781611Encoder<BiometricDataBlock> getEncoder() {
-    return ISO_19794_ENCODER;
+    if (encodingType == null) {
+      return ISO_19794_ENCODER;
+    }
+    switch (encodingType) {
+    case ISO_19794:
+      return ISO_19794_ENCODER;
+    case ISO_39794:
+      return ISO_39794_ENCODER;
+    default:
+      return ISO_19794_ENCODER;
+    }
   }
 
   /**
@@ -136,46 +173,12 @@ public class DG2File extends CBEFFDataGroup {
    * Returns the face infos embedded in this file.
    *
    * @return face infos
+   *
+   * @deprecated Use {@link #getSubRecords()} and check with {@code instanceof} instead
    */
+  @Deprecated
   public List<FaceInfo> getFaceInfos() {
     return toFaceInfos(getSubRecords());
-  }
-
-  /**
-   * Adds a face info to this file.
-   *
-   * @param faceInfo the face info to add
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  public void addFaceInfo(FaceInfo faceInfo) {
-    add(faceInfo);
-  }
-
-  /**
-   * Removes a face info from this file.
-   *
-   * @param index the index of the face info to remove
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  public void removeFaceInfo(int index) {
-    remove(index);
-  }
-
-  private static List<BiometricDataBlock> fromFaceInfos(List<FaceInfo> faceInfos) {
-    if (faceInfos == null) {
-      return null;
-    }
-
-    List<BiometricDataBlock> records = new ArrayList<BiometricDataBlock>(faceInfos.size());
-    for (FaceInfo faceInfo: faceInfos) {
-      records.add(faceInfo);
-    }
-
-    return records;
   }
 
   private static List<FaceInfo> toFaceInfos(List<BiometricDataBlock> records) {
