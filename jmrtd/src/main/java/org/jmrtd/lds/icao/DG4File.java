@@ -167,7 +167,10 @@ public class DG4File extends CBEFFDataGroup {
    * Returns the embedded iris infos in this file.
    *
    * @return iris infos
+   * 
+   * @deprecated Use {@link #getSubRecords()} and check with {@code instanceof} instead
    */
+  @Deprecated
   public List<IrisInfo> getIrisInfos() {
     return toIrisInfos(getSubRecords());
   }
