@@ -36,6 +36,11 @@
 package org.jmrtd.lds.iso39794;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.jmrtd.ASN1Util;
 
 //  LandmarkCoordinates ::= CHOICE {
 //    base [0] LandmarkCoordinatesBase,
@@ -53,4 +58,46 @@ public interface FaceImageLandmarkCoordinates extends Serializable {
   int hashCode();
 
   boolean equals(Object other);
+
+  //  LandmarkCoordinates ::= CHOICE {
+  //    base [0] LandmarkCoordinatesBase,
+  //    extensionBlock [1] LandmarkCoordinatesExtensionBlock
+  //  }
+  //
+  //  LandmarkCoordinatesBase ::= CHOICE {
+  //    coordinateCartesian2DBlock [0] CoordinateCartesian2DUnsignedShortBlock,
+  //    coordinateTextureImageBlock [1] CoordinateTextureImageBlock,
+  //    coordinateCartesian3DBlock [2] CoordinateCartesian3DUnsignedShortBlock
+  //  }
+
+  static FaceImageLandmarkCoordinates decodeLandmarkCoordinates(ASN1Encodable asn1Encodable) {
+    Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
+    if (taggedObjects.containsKey(0)) {
+      Map<Integer, ASN1Encodable> baseTaggedObjects = ASN1Util.decodeTaggedObjects(taggedObjects.get(0));
+      if (baseTaggedObjects.containsKey(0)) {
+        return new CoordinateCartesian2DUnsignedShortBlock(baseTaggedObjects.get(0));
+      } else if (baseTaggedObjects.containsKey(1)) {
+        return new FaceImageCoordinateTextureImageBlock(baseTaggedObjects.get(1));
+      } else if (baseTaggedObjects.containsKey(2)) {
+        return new CoordinateCartesian3DUnsignedShortBlock(baseTaggedObjects.get(2));
+      }
+    }
+
+    return null;
+  }
+
+  static ASN1Encodable encodeLandmarkCoordinates(FaceImageLandmarkCoordinates landmarkCoordinates) {
+    Map<Integer, ASN1Encodable> baseTaggedObjects = new HashMap<Integer, ASN1Encodable>();
+    if (landmarkCoordinates instanceof CoordinateCartesian2DUnsignedShortBlock) {
+      baseTaggedObjects.put(0, ((CoordinateCartesian2DUnsignedShortBlock)landmarkCoordinates).getASN1Object());
+    } else if (landmarkCoordinates instanceof FaceImageCoordinateTextureImageBlock) {
+      baseTaggedObjects.put(1, ((FaceImageCoordinateTextureImageBlock)landmarkCoordinates).getASN1Object());
+    } else if (landmarkCoordinates instanceof CoordinateCartesian3DUnsignedShortBlock) {
+      baseTaggedObjects.put(2, ((CoordinateCartesian3DUnsignedShortBlock)landmarkCoordinates).getASN1Object());
+    }
+
+    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
+    taggedObjects.put(0, ASN1Util.encodeTaggedObjects(baseTaggedObjects));
+    return ASN1Util.encodeTaggedObjects(taggedObjects);
+  }
 }

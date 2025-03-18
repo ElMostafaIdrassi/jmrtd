@@ -67,28 +67,7 @@ public class QualityBlock extends Block {
   QualityBlock(ASN1Encodable asn1Encodable) {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
     algorithmIdBlock = new RegistryIdBlock(taggedObjects.get(0));
-    score = decodeScoreOrError(taggedObjects.get(1));
-  }
-
-  //  ScoreOrError ::= CHOICE {
-  //    score   [0] Score,
-  //    error   [1] ScoringError
-  //  }
-
-  private static int decodeScoreOrError(ASN1Encodable asn1Encodable) {
-    Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
-    if (taggedObjects.containsKey(0)) {
-      return ASN1Util.decodeInt(taggedObjects.get(0));
-    }
-
-    /* NOTE: We could navigate the object under [1], and distinguish between failureToAssess or extension. */
-    return -1;
-  }
-
-  private static ASN1Encodable encodeScoreOrError(int score) {
-    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
-    taggedObjects.put(0, ASN1Util.encodeInt(score));
-    return ASN1Util.encodeTaggedObjects(taggedObjects);
+    score = ISO39794Util.decodeScoreOrError(taggedObjects.get(1));
   }
 
   public RegistryIdBlock getAlgorithmIdBlock() {
@@ -132,7 +111,7 @@ public class QualityBlock extends Block {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, algorithmIdBlock.getASN1Object());
     if (score >= 0) {
-      taggedObjects.put(1, encodeScoreOrError(score));
+      taggedObjects.put(1, ISO39794Util.encodeScoreOrError(score));
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

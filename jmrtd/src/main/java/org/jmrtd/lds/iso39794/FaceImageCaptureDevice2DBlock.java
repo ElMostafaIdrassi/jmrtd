@@ -47,7 +47,7 @@ public class FaceImageCaptureDevice2DBlock extends Block {
 
   private static final long serialVersionUID = -8445632002285427924L;
 
-  public enum CaptureDeviceTechnologyId2DCode {
+  public static enum CaptureDeviceTechnologyId2DCode implements EncodableEnum<CaptureDeviceTechnologyId2DCode> {
     UNKNOWN(0),
     STATIC_PHOTOGRAPH_FROM_UNKNOWN_SOURCE(1),
     STATIC_PHOTOGRAPH_FROM_DIGITAL_STILL_IMAGE_CAMERA(2),
@@ -67,16 +67,7 @@ public class FaceImageCaptureDevice2DBlock extends Block {
     }
 
     public static CaptureDeviceTechnologyId2DCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (CaptureDeviceTechnologyId2DCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, CaptureDeviceTechnologyId2DCode.class);
     }
   }
 

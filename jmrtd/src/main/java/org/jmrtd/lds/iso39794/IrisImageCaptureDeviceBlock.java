@@ -38,6 +38,7 @@ package org.jmrtd.lds.iso39794;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.jmrtd.ASN1Util;
@@ -46,7 +47,7 @@ public class IrisImageCaptureDeviceBlock extends Block {
 
   private static final long serialVersionUID = -4279701511600052026L;
 
-  public enum CaptureDeviceTechnologyIdCode {
+  public enum CaptureDeviceTechnologyIdCode implements EncodableEnum<CaptureDeviceTechnologyIdCode> {
     UNKNOWN(0),
     CMOS_CCD(1);
 
@@ -61,16 +62,7 @@ public class IrisImageCaptureDeviceBlock extends Block {
     }
 
     public static CaptureDeviceTechnologyIdCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (CaptureDeviceTechnologyIdCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, CaptureDeviceTechnologyIdCode.class);
     }
   }
 
@@ -119,14 +111,33 @@ public class IrisImageCaptureDeviceBlock extends Block {
 
   @Override
   public int hashCode() {
-    // TODO Auto-generated method stub
-    return 0;
+    return Objects.hash(captureDeviceTechnologyIdCode, certifications, model);
   }
 
   @Override
-  public boolean equals(Object other) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    IrisImageCaptureDeviceBlock other = (IrisImageCaptureDeviceBlock) obj;
+    return captureDeviceTechnologyIdCode == other.captureDeviceTechnologyIdCode
+        && Objects.equals(certifications, other.certifications) && Objects.equals(model, other.model);
+  }
+
+  @Override
+  public String toString() {
+    return "IrisImageCaptureDeviceBlock ["
+        + "model: " + model
+        + ", captureDeviceTechnologyIdCode: " + captureDeviceTechnologyIdCode
+        + ", certifications: " + certifications
+        + "]";
   }
 
   /* PACKAGE */

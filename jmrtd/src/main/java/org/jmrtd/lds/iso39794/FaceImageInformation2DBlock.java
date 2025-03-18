@@ -49,7 +49,7 @@ public class FaceImageInformation2DBlock extends Block {
 
   private static final long serialVersionUID = 76880187801114756L;
 
-  public static enum ImageDataFormatCode {
+  public static enum ImageDataFormatCode implements EncodableEnum<ImageDataFormatCode> {
     UNKNOWN(0, "image/raw"),
     JPEG(2, "image/jpeg"),
     JPEG2000_LOSSY(3, "image/jp2"),
@@ -69,16 +69,7 @@ public class FaceImageInformation2DBlock extends Block {
     }
 
     public static ImageDataFormatCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (ImageDataFormatCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, ImageDataFormatCode.class);
     }
 
     public String getMimeType() {
@@ -93,7 +84,7 @@ public class FaceImageInformation2DBlock extends Block {
     }
   }
 
-  public static enum FaceImageKind2DCode {
+  public static enum FaceImageKind2DCode implements EncodableEnum<FaceImageKind2DCode> {
     MRTD(0),
     GENERAL_PURPOSE(1);
 
@@ -108,20 +99,11 @@ public class FaceImageInformation2DBlock extends Block {
     }
 
     public static FaceImageKind2DCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (FaceImageKind2DCode value: values()) {
-        if (code == value.getCode()) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, FaceImageKind2DCode.class);
     }
   }
 
-  public enum LossyTransformationAttemptsCode {
+  public static enum LossyTransformationAttemptsCode implements EncodableEnum<LossyTransformationAttemptsCode> {
     UNKNOWN(0),
     ZERO(1),
     ONE(2),
@@ -138,27 +120,18 @@ public class FaceImageInformation2DBlock extends Block {
     }
 
     public static LossyTransformationAttemptsCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (LossyTransformationAttemptsCode value: values()) {
-        if (code == value.getCode()) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, LossyTransformationAttemptsCode.class);
     }
   }
 
-  public static enum ImageColourSpaceCode {
+  public static enum ImageColourSpaceCode implements EncodableEnum<ImageColourSpaceCode> {
     UNKNOWN(0),
     OTHER(1),
-    RGB_24_BIT(2),
-    RGB_48_BIT(3),
+    RGB_24BIT(2),
+    RGB_48BIT(3),
     YUV_422(4),
-    GREYSCALE_8_BIT(5),
-    GREYSCALE_16_BIT(6);
+    GREYSCALE_8BIT(5),
+    GREYSCALE_16BIT(6);
 
     private int code;
 
@@ -171,16 +144,7 @@ public class FaceImageInformation2DBlock extends Block {
     }
 
     public static ImageColourSpaceCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (ImageColourSpaceCode value: values()) {
-        if (code == value.getCode()) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, ImageColourSpaceCode.class);
     }
   }
 

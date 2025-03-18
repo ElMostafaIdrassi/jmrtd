@@ -55,7 +55,7 @@ public class PADDataBlock extends Block {
 
   private static final long serialVersionUID = 1498548397505331884L;
 
-  public enum PADDecisionCode {
+  public static enum PADDecisionCode implements EncodableEnum<PADDecisionCode> {
     NO_ATTACK(0),
     ATTACK(1),
     FAILURE_TO_ASSESS(2);
@@ -71,20 +71,11 @@ public class PADDataBlock extends Block {
     }
 
     public static PADDecisionCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (PADDecisionCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, PADDecisionCode.class);
     }
   }
 
-  public enum PADCaptureContextCode {
+  public static enum PADCaptureContextCode implements EncodableEnum<PADCaptureContextCode> {
     ENROLMENT(0),
     VERIFICATION(1),
     IDENTIFICATION(2);
@@ -100,20 +91,11 @@ public class PADDataBlock extends Block {
     }
 
     public static PADCaptureContextCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (PADCaptureContextCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, PADCaptureContextCode.class);
     }
   }
 
-  public enum PADSupervisionLevelCode {
+  public static enum PADSupervisionLevelCode implements EncodableEnum<PADSupervisionLevelCode> {
     UNKNOWN(0),
     CONTROLLED(1),
     ASSISTED(2),
@@ -131,20 +113,11 @@ public class PADDataBlock extends Block {
     }
 
     public static PADSupervisionLevelCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (PADSupervisionLevelCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, PADSupervisionLevelCode.class);
     }
   }
 
-  public enum PADCriteriaCategoryCode {
+  public static enum PADCriteriaCategoryCode implements EncodableEnum<PADCriteriaCategoryCode> {
     UNKNOWN(0),
     INDIVIDUAL(1),
     COMMON(2);
@@ -160,16 +133,7 @@ public class PADDataBlock extends Block {
     }
 
     public static PADCriteriaCategoryCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (PADCriteriaCategoryCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, PADCriteriaCategoryCode.class);
     }
   }
 
@@ -227,7 +191,7 @@ public class PADDataBlock extends Block {
   PADDataBlock(ASN1Encodable asn1Encodable) {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
     if (taggedObjects.containsKey(0)) {
-      padDecisionCode = decodePADDecision(taggedObjects.get(0));
+      padDecisionCode = PADDecisionCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(0)));
     }
     if (taggedObjects.containsKey(1)) {
       padScoreBlocks = PADScoreBlock.decodePADScoreBlocks(taggedObjects.get(1));
@@ -236,16 +200,16 @@ public class PADDataBlock extends Block {
       padExtendedDataBlocks = ExtendedDataBlock.decodeExtendedDataBlocks(taggedObjects.get(2));
     }
     if (taggedObjects.containsKey(3)) {
-      padCaptureContextCode =  decodePADCaptureContext(taggedObjects.get(3));
+      padCaptureContextCode =  PADCaptureContextCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(3)));
     }
     if (taggedObjects.containsKey(4)) {
-      padSupervisionLevelCode = decodePADSupervisionLevel(taggedObjects.get(4));
+      padSupervisionLevelCode = PADSupervisionLevelCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(4)));
     }
     if (taggedObjects.containsKey(5)) {
       riskLevel = ASN1Util.decodeInt(taggedObjects.get(5));
     }
     if (taggedObjects.containsKey(6)) {
-      padCriteriaCategoryCode = decodePADCriteriaCategory(taggedObjects.get(6));
+      padCriteriaCategoryCode = PADCriteriaCategoryCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(6)));
     }
     if (taggedObjects.containsKey(7)) {
       parameter = ASN1OctetString.getInstance(taggedObjects.get(7)).getOctets();
@@ -374,7 +338,7 @@ public class PADDataBlock extends Block {
     if (padExtendedDataBlocks != null) {
       taggedObjects.put(2, ISO39794Util.encodeBlocks(padExtendedDataBlocks));
     }
-    if (padExtendedDataBlocks != null) {
+    if (padCaptureContextCode != null) {
       taggedObjects.put(3, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padCaptureContextCode.getCode()));
     }
     if (padSupervisionLevelCode != null) {
@@ -399,22 +363,6 @@ public class PADDataBlock extends Block {
   }
 
   /* PRIVATE */
-
-  private static PADDecisionCode decodePADDecision(ASN1Encodable asn1Encodable) {
-    return PADDecisionCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
-
-  private static PADCaptureContextCode decodePADCaptureContext(ASN1Encodable asn1Encodable) {
-    return PADCaptureContextCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
-
-  private static PADSupervisionLevelCode decodePADSupervisionLevel(ASN1Encodable asn1Encodable) {
-    return PADSupervisionLevelCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
-
-  private static PADCriteriaCategoryCode decodePADCriteriaCategory(ASN1Encodable asn1Encodable) {
-    return PADCriteriaCategoryCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
 
   private static List<byte[]> decodePADChallenges(ASN1Encodable asn1Encodable) {
     List<ASN1Encodable> challengeASN1Objects = ASN1Util.list(asn1Encodable);

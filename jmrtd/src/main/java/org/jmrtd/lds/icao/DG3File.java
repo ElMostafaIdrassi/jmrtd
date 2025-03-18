@@ -169,7 +169,7 @@ public class DG3File extends CBEFFDataGroup {
    * Returns the finger infos embedded in this file.
    *
    * @return finger infos
-   * 
+   *
    * @deprecated Use {@link #getSubRecords()} and check with {@code instanceof} instead
    */
   @Deprecated

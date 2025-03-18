@@ -48,7 +48,7 @@ public class ISO781611Decoder<B extends BiometricDataBlock> implements ISO781611
   private Map<Integer, BiometricDataBlockDecoder<B>> bdbDecoders;
 
   private BiometricEncodingType encodingType;
-  
+
   /**
    * Constructs an ISO7816-11 decoder that uses the given BDB decoder.
    *

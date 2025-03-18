@@ -37,6 +37,7 @@ package org.jmrtd.lds.iso39794;
 
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,6 @@ import java.util.Objects;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.jmrtd.ASN1Util;
 import org.jmrtd.lds.ImageInfo;
-
 
 public class FaceImageRepresentationBlock extends Block implements ImageInfo {
 
@@ -255,40 +255,6 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 
-  /* PACKAGE */
-
-  @Override
-  ASN1Encodable getASN1Object() {
-    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
-    taggedObjects.put(0, ASN1Util.encodeBigInteger(representationId));
-    taggedObjects.put(1, encodeImageRepresentation2DBlock(imageRepresentation2DBlock));
-    if (captureDateTimeBlock != null) {
-      taggedObjects.put(2, captureDateTimeBlock.getASN1Object());
-    }
-    if (qualityBlocks != null) {
-      taggedObjects.put(3, ISO39794Util.encodeBlocks(qualityBlocks));
-    }
-    if (padDataBlocks != null) {
-      taggedObjects.put(4, ISO39794Util.encodeBlocks(padDataBlocks));
-    }
-    if (sessionId != null) {
-      taggedObjects.put(5, ASN1Util.encodeBigInteger(sessionId));
-    }
-    if (derivedFrom != null) {
-      taggedObjects.put(6, ASN1Util.encodeBigInteger(derivedFrom));
-    }
-    if (captureDeviceBlock != null) {
-      taggedObjects.put(7, captureDeviceBlock.getASN1Object());
-    }
-    if (identityMetadataBlock != null) {
-      taggedObjects.put(8, identityMetadataBlock.getASN1Object());
-    }
-    if (landmarkBlocks != null) {
-      taggedObjects.put(9, ISO39794Util.encodeBlocks(landmarkBlocks));
-    }
-    return ASN1Util.encodeTaggedObjects(taggedObjects);
-  }
-
   @Override
   public int getType() {
     return TYPE_PORTRAIT;
@@ -353,5 +319,55 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
       return null;
     }
     return imageRepresentation2DBlock.getRepresentationData2DInputStream();
+  }
+
+  /* PACKAGE */
+
+  @Override
+  ASN1Encodable getASN1Object() {
+    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
+    taggedObjects.put(0, ASN1Util.encodeBigInteger(representationId));
+    taggedObjects.put(1, encodeImageRepresentation2DBlock(imageRepresentation2DBlock));
+    if (captureDateTimeBlock != null) {
+      taggedObjects.put(2, captureDateTimeBlock.getASN1Object());
+    }
+    if (qualityBlocks != null) {
+      taggedObjects.put(3, ISO39794Util.encodeBlocks(qualityBlocks));
+    }
+    if (padDataBlocks != null) {
+      taggedObjects.put(4, ISO39794Util.encodeBlocks(padDataBlocks));
+    }
+    if (sessionId != null) {
+      taggedObjects.put(5, ASN1Util.encodeBigInteger(sessionId));
+    }
+    if (derivedFrom != null) {
+      taggedObjects.put(6, ASN1Util.encodeBigInteger(derivedFrom));
+    }
+    if (captureDeviceBlock != null) {
+      taggedObjects.put(7, captureDeviceBlock.getASN1Object());
+    }
+    if (identityMetadataBlock != null) {
+      taggedObjects.put(8, identityMetadataBlock.getASN1Object());
+    }
+    if (landmarkBlocks != null) {
+      taggedObjects.put(9, ISO39794Util.encodeBlocks(landmarkBlocks));
+    }
+    return ASN1Util.encodeTaggedObjects(taggedObjects);
+  }
+
+  // RepresentationBlocks ::= SEQUENCE SIZE (1) OF RepresentationBlock
+
+  static List<FaceImageRepresentationBlock> decodeRepresentationBlocks(ASN1Encodable asn1Encodable) {
+    List<FaceImageRepresentationBlock> blocks = new ArrayList<FaceImageRepresentationBlock>();
+    if (ASN1Util.isSequenceOfSequences(asn1Encodable)) {
+      List<ASN1Encodable> blockASN1Objects = ASN1Util.list(asn1Encodable);
+      for (ASN1Encodable blockASN1Object: blockASN1Objects) {
+        blocks.add(new FaceImageRepresentationBlock(blockASN1Object));
+      }
+    } else {
+      blocks.add(new FaceImageRepresentationBlock(asn1Encodable));
+    }
+
+    return blocks;
   }
 }

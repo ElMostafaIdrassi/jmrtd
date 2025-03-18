@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: $
+ * $Id$
  */
 
 package org.jmrtd.cbeff;
@@ -28,7 +28,7 @@ package org.jmrtd.cbeff;
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
- * @version $Revision: $
+ * @version $Revision$
  */
 public enum BiometricEncodingType {
 
@@ -43,7 +43,7 @@ public enum BiometricEncodingType {
 
   /**
    * Maps tag to encoding type.
-   * 
+   *
    * @param bioDataBlockTag either {@code 0x5F2E} or {@code 0x7F2E}
    *
    * @return the corresponding type

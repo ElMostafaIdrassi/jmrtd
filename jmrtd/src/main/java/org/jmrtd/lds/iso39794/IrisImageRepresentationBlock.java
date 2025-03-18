@@ -54,7 +54,7 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
 
   private static final long serialVersionUID = -982987535985932641L;
 
-  public enum EyeLabelCode {
+  public static enum EyeLabelCode implements EncodableEnum<EyeLabelCode> {
     UNKNOWN(0) ,
     RIGHT_IRIS(1) ,
     LEFT_IRIS(2);
@@ -70,20 +70,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static EyeLabelCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (EyeLabelCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, EyeLabelCode.class);
     }
   }
 
-  public enum IrisImageKindCode {
+  public static enum IrisImageKindCode implements EncodableEnum<IrisImageKindCode> {
     UNCROPPED(1),
     VGA(2),
     CROPPED(3),
@@ -100,20 +91,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static IrisImageKindCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (IrisImageKindCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, IrisImageKindCode.class);
     }
   }
 
-  public enum ImageDataFormatCode {
+  public static enum ImageDataFormatCode implements EncodableEnum<ImageDataFormatCode> {
     PGM(0, "image/pgm"),
     PPM(1, "image/ppm"),
     PNG(2, "image/png"),
@@ -137,20 +119,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static ImageDataFormatCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (ImageDataFormatCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, ImageDataFormatCode.class);
     }
   }
 
-  public enum HorizontalOrientationCode {
+  public static enum HorizontalOrientationCode implements EncodableEnum<HorizontalOrientationCode> {
     UNDEFINED(0) ,
     LEFT_TO_RIGHT(1) ,
     RIGHT_TO_LEFT(2);
@@ -166,20 +139,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static HorizontalOrientationCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (HorizontalOrientationCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, HorizontalOrientationCode.class);
     }
   }
 
-  public enum VerticalOrientationCode {
+  public static enum VerticalOrientationCode implements EncodableEnum<VerticalOrientationCode> {
     UNDEFINED(0),
     TOP_TO_BOTTOM(1) ,
     BOTTOM_TO_TOP(2);
@@ -195,20 +159,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static VerticalOrientationCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (VerticalOrientationCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, VerticalOrientationCode.class);
     }
   }
 
-  public enum CompressionHistoryCode {
+  public static enum CompressionHistoryCode implements EncodableEnum<CompressionHistoryCode> {
     UNDEFINED(0),
     LOSSLESS_OR_NONE(1) ,
     LOSSY(2);
@@ -224,20 +179,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static CompressionHistoryCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (CompressionHistoryCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, CompressionHistoryCode.class);
     }
   }
 
-  public enum RangingErrorCode {
+  public static enum RangingErrorCode implements EncodableEnum<RangingErrorCode> {
     UNASSIGNED(0),
     FAILED(1),
     OVERFLOW(2);
@@ -253,16 +199,7 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static RangingErrorCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (RangingErrorCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, RangingErrorCode.class);
     }
   }
 
@@ -386,8 +323,8 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     horizontalOrientationCode =  HorizontalOrientationCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(4)));
     verticalOrientationCode =  VerticalOrientationCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(5)));
     compressionHistoryCode =  CompressionHistoryCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(6)));
-    captureDateTimeBlock = new DateTimeBlock(taggedObjects.get(7));
-    decodeRangeOrError(taggedObjects.get(8));
+    decodeRangeOrError(taggedObjects.get(7));
+    captureDateTimeBlock = new DateTimeBlock(taggedObjects.get(8));
     imageData = (ASN1OctetString.getInstance(taggedObjects.get(9))).getOctets();
     if (taggedObjects.containsKey(10)) {
       captureDeviceBlock = new IrisImageCaptureDeviceBlock(taggedObjects.get(10));
@@ -572,11 +509,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     taggedObjects.put(5, ASN1Util.encodeInt(verticalOrientationCode.getCode()));
     taggedObjects.put(6, ASN1Util.encodeInt(compressionHistoryCode.getCode()));
     if (range != null) {
-      taggedObjects.put(8, ASN1Util.encodeInt(range));
+      taggedObjects.put(7, ASN1Util.encodeInt(range));
     } else if (rangingErrorCode != null) {
-      taggedObjects.put(8, ASN1Util.encodeInt(rangingErrorCode.getCode()));
+      taggedObjects.put(7, ASN1Util.encodeInt(rangingErrorCode.getCode()));
     }
-    // TODO: 8
+    taggedObjects.put(8, captureDateTimeBlock.getASN1Object());
     taggedObjects.put(9, new DEROctetString(imageData));
     if (captureDeviceBlock != null) {
       taggedObjects.put(10, captureDeviceBlock.getASN1Object());
@@ -616,7 +553,9 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
     if (taggedObjects.containsKey(0)) {
       range = ASN1Util.decodeInt(taggedObjects.get(0));
+      rangingErrorCode = null;
     } else if (taggedObjects.containsKey(1)) {
+      range = null;
       rangingErrorCode = RangingErrorCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(1)));
     }
   }

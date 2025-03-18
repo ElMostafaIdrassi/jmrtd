@@ -51,7 +51,7 @@ public class FingerImageSpatialSamplingRateBlock extends Block {
   //    cm(1)
   //  }
 
-  public enum UnitDimensionCode {
+  public static enum UnitDimensionCode implements EncodableEnum<UnitDimensionCode> {
     INCH(0),
     CM(1);
 
@@ -66,16 +66,7 @@ public class FingerImageSpatialSamplingRateBlock extends Block {
     }
 
     public static UnitDimensionCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (UnitDimensionCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, UnitDimensionCode.class);
     }
   }
 

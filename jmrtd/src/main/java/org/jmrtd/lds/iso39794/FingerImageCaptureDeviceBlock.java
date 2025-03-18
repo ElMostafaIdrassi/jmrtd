@@ -47,7 +47,7 @@ public class FingerImageCaptureDeviceBlock extends Block {
 
   private static final long serialVersionUID = -5356682106972185445L;
 
-  public enum CaptureDeviceTechnologyIdCode {
+  public static enum CaptureDeviceTechnologyIdCode implements EncodableEnum<CaptureDeviceTechnologyIdCode> {
     UNKNOWN_CAPTURE_DEVICE_TECHNOLOGY(0),
     OTHER_CAPTURE_DEVICE_TECHNOLOGY(1),
     SCANNED_INK_ON_PAPER(2),
@@ -77,21 +77,13 @@ public class FingerImageCaptureDeviceBlock extends Block {
       this.code = code;
     }
 
+    @Override
     public int getCode() {
       return code;
     }
 
     public static CaptureDeviceTechnologyIdCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (CaptureDeviceTechnologyIdCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, CaptureDeviceTechnologyIdCode.class);
     }
   }
 

@@ -49,7 +49,7 @@ public class FingerImageAnnotationBlock extends Block {
 
   private static final long serialVersionUID = -716107883353729322L;
 
-  public static enum AnnotationReasonCode {
+  public static enum AnnotationReasonCode implements EncodableEnum<AnnotationReasonCode> {
     UNKNOWN(0),
     OTHER(1),
     AMPUTATED(2),
@@ -69,16 +69,7 @@ public class FingerImageAnnotationBlock extends Block {
     }
 
     public static AnnotationReasonCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (AnnotationReasonCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, AnnotationReasonCode.class);
     }
   }
 

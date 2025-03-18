@@ -55,7 +55,6 @@ public class IrisImageLocalisationBlock extends Block {
   private int irisDiameterSmallest;
   private int irisDiameterLargest;
 
-
   //  Coordinate ::=  INTEGER (1..65535)
   //  Diameter ::=    INTEGER (1..65535)
 

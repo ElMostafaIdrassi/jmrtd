@@ -47,6 +47,7 @@ import java.util.Objects;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1VisibleString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
@@ -58,7 +59,7 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
 
   private static final long serialVersionUID = -9136319709147388829L;
 
-  public enum ImpressionCode {
+  public static enum ImpressionCode implements EncodableEnum<ImpressionCode> {
     PLAIN_CONTACT(0),
     ROLLED_CONTACT(1),
     LATENT_IMAGE(4),
@@ -76,25 +77,17 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
       this.code = code;
     }
 
+    @Override
     public int getCode() {
       return code;
     }
 
     public static ImpressionCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (ImpressionCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, ImpressionCode.class);
     }
   }
 
-  public enum ImageDataFormatCode {
+  public static enum ImageDataFormatCode implements EncodableEnum<ImageDataFormatCode> {
     PGM(0, "image/pgm"),
     WSQ(1, "image/x-wsq"),
     JPEG2000_LOSSY(2, "image/jp2"),
@@ -108,6 +101,7 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
       this.code = code;
     }
 
+    @Override
     public int getCode() {
       return code;
     }
@@ -117,16 +111,7 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     public static ImageDataFormatCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (ImageDataFormatCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, ImageDataFormatCode.class);
     }
   }
 
@@ -443,7 +428,7 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
     taggedObjects.put(2, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(imageDataFormat.getCode()));
     taggedObjects.put(3, new DEROctetString(imageData));
     if (captureDateTimeBlock != null) {
-      taggedObjects.put(4, null);
+      taggedObjects.put(4, captureDateTimeBlock.getASN1Object());
     }
     if (captureDeviceBlock != null) {
       taggedObjects.put(5, captureDeviceBlock.getASN1Object());
@@ -517,16 +502,19 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
   }
 
   private static List<String> decodeCommentBlocks(ASN1Encodable asn1Encodable) {
-    if (ASN1Util.isSequenceOfSequences(asn1Encodable)) {
+    if (asn1Encodable instanceof ASN1Sequence) {
       List<ASN1Encodable> blockASN1Objects = ASN1Util.list(asn1Encodable);
       List<String> blocks = new ArrayList<String>(blockASN1Objects.size());
       for (ASN1Encodable blockASN1Object: blockASN1Objects) {
         blocks.add(ASN1VisibleString.getInstance(blockASN1Object).getString());
       }
       return blocks;
-    } else {
+    } else if (asn1Encodable instanceof ASN1VisibleString) {
       return Collections.singletonList(ASN1VisibleString.getInstance(asn1Encodable).getString());
     }
+
+    LOGGER.warning("Cannot decode comment blocks!");
+    return null;
   }
 
   private static ASN1Encodable encodeCommentBlocks(List<String> comments) {

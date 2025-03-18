@@ -37,7 +37,6 @@ package org.jmrtd.lds.iso39794;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +91,7 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
 
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
     versionBlock = new VersionBlock(taggedObjects.get(0));
-    representationBlocks = decodeRepresentationBlocks(taggedObjects.get(1));
+    representationBlocks = FaceImageRepresentationBlock.decodeRepresentationBlocks(taggedObjects.get(1));
   }
 
   public int getRepresentationId() {
@@ -143,24 +142,6 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
         + ", representationBlocks: " + representationBlocks
         + ", sbh: " + sbh
         + "]";
-  }
-
-  /* PRIVATE */
-
-  // RepresentationBlocks ::= SEQUENCE SIZE (1) OF RepresentationBlock
-
-  private static List<FaceImageRepresentationBlock> decodeRepresentationBlocks(ASN1Encodable asn1Encodable) {
-    List<FaceImageRepresentationBlock> blocks = new ArrayList<FaceImageRepresentationBlock>();
-    if (ASN1Util.isSequenceOfSequences(asn1Encodable)) {
-      List<ASN1Encodable> blockASN1Objects = ASN1Util.list(asn1Encodable);
-      for (ASN1Encodable blockASN1Object: blockASN1Objects) {
-        blocks.add(new FaceImageRepresentationBlock(blockASN1Object));
-      }
-    } else {
-      blocks.add(new FaceImageRepresentationBlock(asn1Encodable));
-    }
-
-    return blocks;
   }
 
   /* PACKAGE */

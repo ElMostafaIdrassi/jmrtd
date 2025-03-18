@@ -48,7 +48,7 @@ public class FaceImageIdentityMetadataBlock extends Block {
 
   private static final long serialVersionUID = 5968313840533997792L;
 
-  public enum GenderCode {
+  public static enum GenderCode implements EncodableEnum<GenderCode> {
     UNKNOWN(0),
     OTHER(1),
     MALE(2),
@@ -65,17 +65,11 @@ public class FaceImageIdentityMetadataBlock extends Block {
     }
 
     public static GenderCode fromCode(int code) {
-      for (GenderCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return UNKNOWN;
+      return EncodableEnum.fromCode(code, GenderCode.class);
     }
   }
 
-  public enum EyeColourCode {
+  public static enum EyeColourCode implements EncodableEnum<EyeColourCode> {
     UNKNOWN(0),
     OTHER(1),
     BLACK(2),
@@ -98,20 +92,11 @@ public class FaceImageIdentityMetadataBlock extends Block {
     }
 
     public static EyeColourCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (EyeColourCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, EyeColourCode.class);
     }
   }
 
-  public enum HairColourCode {
+  public static enum HairColourCode implements EncodableEnum<HairColourCode> {
     UNKNOWN(0),
     OTHER(1),
     BALD(2),
@@ -134,16 +119,7 @@ public class FaceImageIdentityMetadataBlock extends Block {
     }
 
     public static HairColourCode fromCode(int code) {
-      if (code < 0) {
-        return null;
-      }
-      for (HairColourCode value: values()) {
-        if (code == value.code) {
-          return value;
-        }
-      }
-
-      return null;
+      return EncodableEnum.fromCode(code, HairColourCode.class);
     }
   }
 

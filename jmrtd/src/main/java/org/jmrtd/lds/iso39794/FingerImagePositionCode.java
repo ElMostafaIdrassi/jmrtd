@@ -35,7 +35,7 @@
 
 package org.jmrtd.lds.iso39794;
 
-public enum FingerImagePositionCode {
+public enum FingerImagePositionCode implements EncodableEnum<FingerImagePositionCode> {
   UNKNOWN_POSITION(0),
   RIGHT_THUMB_FINGER(1),
   RIGHT_INDEX_FINGER(2),
@@ -123,21 +123,12 @@ public enum FingerImagePositionCode {
     this.code = code;
   }
 
+  @Override
   public int getCode() {
     return code;
   }
 
   public static FingerImagePositionCode fromCode(int code) {
-    if (code < 0) {
-      return null;
-    }
-    for (FingerImagePositionCode value: values()) {
-      if (code == value.code) {
-        return value;
-      }
-    }
-
-    return null;
+    return EncodableEnum.fromCode(code, FingerImagePositionCode.class);
   }
 }
-
