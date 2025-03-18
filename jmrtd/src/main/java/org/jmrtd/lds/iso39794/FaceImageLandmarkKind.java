@@ -41,7 +41,7 @@ import java.util.Map;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.jmrtd.ASN1Util;
 
-abstract interface FaceImageLandmarkKind {
+public interface FaceImageLandmarkKind {
 
   public static enum MPEGFeaturePointCode implements EncodableEnum<MPEGFeaturePointCode>, FaceImageLandmarkKind {
     MPEG4_POINT_CODE_02_01(0),
