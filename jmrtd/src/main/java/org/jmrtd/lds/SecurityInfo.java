@@ -25,9 +25,11 @@ package org.jmrtd.lds;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -37,6 +39,7 @@ import org.bouncycastle.asn1.eac.EACObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.jmrtd.ASN1Util;
 import org.jmrtd.Util;
 
 /* FIXME: dependency on BC in interface? */
@@ -210,22 +213,19 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
    *
    * @return a concrete security info object
    */
-  public static SecurityInfo getInstance(ASN1Primitive obj) {
+  public static SecurityInfo getInstance(ASN1Encodable obj) {
     try {
-      ASN1Sequence sequence = (ASN1Sequence)obj;
-      String oid = ((ASN1ObjectIdentifier)sequence.getObjectAt(0)).getId();
-      ASN1Primitive requiredData = sequence.getObjectAt(1).toASN1Primitive();
-      ASN1Primitive optionalData = null;
-      if (sequence.size() == 3) {
-        optionalData = sequence.getObjectAt(2).toASN1Primitive();
-      }
+      List<ASN1Encodable> sequence = ASN1Util.list(obj);
+      String oid = ASN1ObjectIdentifier.getInstance(sequence.get(0)).getId();
+      ASN1Encodable requiredData = sequence.get(1);
+      ASN1Encodable optionalData = sequence.size() <= 2 ? null : sequence.get(2);
 
       if (ActiveAuthenticationInfo.checkRequiredIdentifier(oid)) {
-        int version = ((ASN1Integer)requiredData).getValue().intValue();
+        int version = ASN1Integer.getInstance(requiredData).getValue().intValue();
         if (optionalData == null) {
           return new ActiveAuthenticationInfo(oid, version, null);
         } else {
-          String signatureAlgorithmOID = ((ASN1ObjectIdentifier)optionalData).getId();
+          String signatureAlgorithmOID = ASN1ObjectIdentifier.getInstance(optionalData).getId();
           return new ActiveAuthenticationInfo(oid, version, signatureAlgorithmOID);
         }
       } else if (ChipAuthenticationPublicKeyInfo.checkRequiredIdentifier(oid)) {
@@ -233,38 +233,38 @@ public abstract class SecurityInfo extends AbstractLDSInfo {
         if (optionalData == null) {
           return new ChipAuthenticationPublicKeyInfo(oid, Util.toPublicKey(subjectPublicKeyInfo));
         } else {
-          ASN1Integer optionalDataAsASN1Integer = (ASN1Integer)optionalData;
+          ASN1Integer optionalDataAsASN1Integer = ASN1Integer.getInstance(optionalData);
           BigInteger keyId = optionalDataAsASN1Integer.getValue();
           return new ChipAuthenticationPublicKeyInfo(oid, Util.toPublicKey(subjectPublicKeyInfo), keyId);
         }
       } else if (ChipAuthenticationInfo.checkRequiredIdentifier(oid)) {
-        int version = ((ASN1Integer)requiredData).getValue().intValue();
+        int version = ASN1Integer.getInstance(requiredData).getValue().intValue();
         if (optionalData == null) {
           return new ChipAuthenticationInfo(oid, version);
         } else {
-          ASN1Integer optionalDataAsASN1Integer = (ASN1Integer)optionalData;
+          ASN1Integer optionalDataAsASN1Integer = ASN1Integer.getInstance(optionalData);
           BigInteger keyId = optionalDataAsASN1Integer.getValue();
           return new ChipAuthenticationInfo(oid, version, keyId);
         }
       } else if (TerminalAuthenticationInfo.checkRequiredIdentifier(oid)) {
-        int version = ((ASN1Integer)requiredData).getValue().intValue();
+        int version = ASN1Integer.getInstance(requiredData).getValue().intValue();
         if (optionalData == null) {
           return new TerminalAuthenticationInfo(oid, version);
         } else {
-          ASN1Sequence efCVCA = (ASN1Sequence)optionalData;
+          ASN1Sequence efCVCA = ASN1Sequence.getInstance(optionalData);
           return new TerminalAuthenticationInfo(oid, version, efCVCA);
         }
       } else if (PACEInfo.checkRequiredIdentifier(oid)) {
-        int version = ((ASN1Integer)requiredData).getValue().intValue();
+        int version = ASN1Integer.getInstance(requiredData).getValue().intValue();
         int parameterId = -1;
         if (optionalData != null) {
-          parameterId = ((ASN1Integer)optionalData).getValue().intValue();
+          parameterId = ASN1Integer.getInstance(optionalData).getValue().intValue();
         }
         return new PACEInfo(oid, version, parameterId);
       } else if (PACEDomainParameterInfo.checkRequiredIdentifier(oid)) {
         AlgorithmIdentifier domainParameters = AlgorithmIdentifier.getInstance(requiredData);
         if (optionalData != null) {
-          BigInteger parameterId = ((ASN1Integer)optionalData).getValue();
+          BigInteger parameterId = ASN1Integer.getInstance(optionalData).getValue();
           return new PACEDomainParameterInfo(oid, domainParameters, parameterId);
         }
         return new PACEDomainParameterInfo(oid, domainParameters);

@@ -596,18 +596,6 @@ public class MRZInfoTest extends TestCase {
     assertEquals('8', MRZInfo.checkDigit("000024759<ZZ72<<<<<<<<<<<80101002006017<<<<<<<<<<<"));
   }
 
-  public void testCanGenderBeNull() {
-    try {
-      MRZInfo mrzInfo = MRZInfo.createTD3MRZInfo(
-          "PN", "UTO", "DOE", "JOHN", "900DC0DE",
-          "NLD", "741113", Gender.UNSPECIFIED, "381113", "272174695");
-      mrzInfo.setGender(null);
-      assertNotNull(mrzInfo.toString());
-    } catch (Exception expected) {
-      LOGGER.log(Level.FINE, "Expected exception", expected);
-    }
-  }
-
   public void testBug65() {
     String documentCode = "I";
     String issuingState = "PRT";

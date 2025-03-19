@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2023  The JMRTD team
+ * Copyright (C) 2006 - 2025  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import org.jmrtd.lds.AbstractLDSInfo;
 
@@ -119,7 +120,7 @@ public class MRZInfo extends AbstractLDSInfo {
   private String nationality;
   private String documentNumber;
   private String dateOfBirth;
-  private Gender gender;
+  private String gender;
   private String dateOfExpiry;
   private char documentNumberCheckDigit;
   private char dateOfBirthCheckDigit;
@@ -151,7 +152,7 @@ public class MRZInfo extends AbstractLDSInfo {
       String documentNumber,
       String optionalData1,
       String dateOfBirth,
-      Gender gender,
+      Object gender,
       String dateOfExpiry,
       String nationality,
       String optionalData2,
@@ -190,7 +191,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public static MRZInfo createTD2MRZInfo(String documentCode, String issuingState,
       String primaryIdentifier, String secondaryIdentifier,
       String documentNumber, String nationality, String dateOfBirth,
-      Gender gender, String dateOfExpiry, String optionalData) {
+      Object gender, String dateOfExpiry, String optionalData) {
     return new MRZInfo(DocumentType.TD2,
         documentCode,
         issuingState,
@@ -224,7 +225,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public static MRZInfo createTD3MRZInfo(String documentCode, String issuingState,
       String primaryIdentifier, String secondaryIdentifier,
       String documentNumber, String nationality, String dateOfBirth,
-      Gender gender, String dateOfExpiry, String personalNumber) {
+      Object gender, String dateOfExpiry, String personalNumber) {
     return new MRZInfo(DocumentType.TD3,
         documentCode,
         issuingState,
@@ -258,7 +259,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public static MRZInfo createMRVAMRZInfo(String documentCode, String issuingState,
       String primaryIdentifier, String secondaryIdentifier,
       String documentNumber, String nationality, String dateOfBirth,
-      Gender gender, String dateOfExpiry, String optionalData) {
+      Object gender, String dateOfExpiry, String optionalData) {
     return new MRZInfo(DocumentType.MRVA,
         documentCode,
         issuingState,
@@ -292,7 +293,7 @@ public class MRZInfo extends AbstractLDSInfo {
   public static MRZInfo createMRVBMRZInfo(String documentCode, String issuingState,
       String primaryIdentifier, String secondaryIdentifier,
       String documentNumber, String nationality, String dateOfBirth,
-      Gender gender, String dateOfExpiry, String optionalData) {
+      Object gender, String dateOfExpiry, String optionalData) {
     return new MRZInfo(DocumentType.MRVB,
         documentCode,
         issuingState,
@@ -321,7 +322,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param dateOfExpiry date of expiry
    * @param personalNumber either empty, or a personal number of maximum length 14, or other optional data of exact length 15
    *
-   * @deprecated Use the corresponding factory method {@link #createTD1MRZInfo(String, String, String, String, String, Gender, String, String, String, String, String)}
+   * @deprecated Use the corresponding factory method {@link #createTD1MRZInfo(String, String, String, String, String, Object, String, String, String, String, String)}
    */
   @Deprecated
   public MRZInfo(String documentCode, String issuingState,
@@ -357,7 +358,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param optionalData1 optional data in line 1 of maximum length 15
    * @param optionalData2 optional data in line 2 of maximum length 11
    *
-   * @deprecated Use the corresponding factory method {@link #createTD3MRZInfo(String, String, String, String, String, String, String, Gender, String, String)}
+   * @deprecated Use the corresponding factory method {@link #createTD3MRZInfo(String, String, String, String, String, String, String, Object, String, String)}
    */
   @Deprecated
   public MRZInfo(String documentCode,
@@ -429,7 +430,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @param documentNumber the document number
    * @param optionalData1 optional data or personal number including check digit
    * @param dateOfBirth date of birth in yyMMdd format
-   * @param gender the gender
+   * @param genderObject the gender
    * @param dateOfExpiry the date of expiry in yyMMdd format
    * @param nationality the nationality 3 alpha string
    * @param optionalData2 optional optional data 2
@@ -442,7 +443,7 @@ public class MRZInfo extends AbstractLDSInfo {
       String documentNumber,
       String optionalData1,
       String dateOfBirth,
-      Gender gender,
+      Object genderObject,
       String dateOfExpiry,
       String nationality,
       String optionalData2,
@@ -459,7 +460,7 @@ public class MRZInfo extends AbstractLDSInfo {
       throw new IllegalArgumentException("Wrong optional data length");
     }
 
-    if (gender == null) {
+    if (genderObject == null) {
       throw new IllegalArgumentException("Gender must not be null");
     }
 
@@ -470,7 +471,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentNumber = trimTrailingFillerChars(documentNumber);
     this.nationality = nationality;
     this.dateOfBirth = dateOfBirth;
-    this.gender = gender;
+    this.gender = genderToString(genderObject);
     this.dateOfExpiry = dateOfExpiry;
     this.optionalData1 = optionalData1 == null ? "" : trimTrailingFillerChars(optionalData1);
     this.optionalData2 = optionalData2 == null ? null : trimTrailingFillerChars(optionalData2);
@@ -621,9 +622,21 @@ public class MRZInfo extends AbstractLDSInfo {
    * Returns the passport holder's gender.
    *
    * @return gender
+   * 
+   * @deprecated Result type will be changed to {@linkplain String} in future version. Use {@link #getGenderCode()} instead.
    */
+  @Deprecated
   public Gender getGender() {
-    return gender;
+    return stringToGender(gender);
+  }
+  
+  /**
+   * Returns the passport holder's gender.
+   *
+   * @return gender
+   */
+  public Gender getGenderCode() {
+    return stringToGender(gender);
   }
 
   /**
@@ -645,182 +658,6 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Sets the document code.
-   *
-   * @param documentCode the new document code
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setDocumentCode(String documentCode) {
-    this.documentCode = documentCode;
-    this.documentType = getDocumentTypeFromDocumentCode(documentCode);
-    if (documentType == DocumentType.TD1 && optionalData2 == null) {
-      optionalData2 = "";
-    }
-    /* FIXME: need to adjust some other lengths if we go from ID1 to ID3 or back... */
-  }
-
-  /**
-   * Sets the document number.
-   *
-   * @param documentNumber new document number
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setDocumentNumber(String documentNumber) {
-    this.documentNumber = documentNumber.trim();
-    checkDigit();
-  }
-
-  /**
-   * Sets the passport holder's last name.
-   *
-   * @param primaryIdentifier new primary identifier
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setPrimaryIdentifier(String primaryIdentifier) {
-    this.primaryIdentifier = trimTrailingFillerChars(primaryIdentifier).replace("<", " ");
-    checkDigit();
-  }
-
-  /**
-   * Sets the passport holder's first names.
-   *
-   * @param secondaryIdentifiers new secondary identifiers
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setSecondaryIdentifierComponents(String[] secondaryIdentifiers) {
-    if (secondaryIdentifiers == null) {
-      this.secondaryIdentifier = null;
-    } else {
-      StringBuilder stringBuilder = new StringBuilder();
-      for (int i = 0; i < secondaryIdentifiers.length; i++) {
-        stringBuilder.append(secondaryIdentifiers[i]);
-        if (i < secondaryIdentifiers.length - 1) {
-          stringBuilder.append('<');
-        }
-      }
-    }
-    checkDigit();
-  }
-
-  /**
-   * Sets the passport holder's first names.
-   *
-   * @param secondaryIdentifiers new secondary identifiers
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setSecondaryIdentifiers(String secondaryIdentifiers) {
-    readSecondaryIdentifiers(secondaryIdentifiers.trim());
-    checkDigit();
-  }
-
-  /**
-   * Sets the date of birth.
-   *
-   * @param dateOfBirth new date of birth
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setDateOfBirth(String dateOfBirth) {
-    this.dateOfBirth = dateOfBirth;
-    checkDigit();
-  }
-
-  /**
-   * Sets the date of expiry.
-   *
-   * @param dateOfExpiry new date of expiry
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setDateOfExpiry(String dateOfExpiry) {
-    this.dateOfExpiry = dateOfExpiry;
-    checkDigit();
-  }
-
-  /**
-   * Sets the issuing state.
-   *
-   * @param issuingState new issuing state
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setIssuingState(String issuingState) {
-    this.issuingState = issuingState;
-    checkDigit();
-  }
-
-  /**
-   * Sets the personal number. Replacing any optional data 1.
-   *
-   * @param personalNumber new personal number
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setPersonalNumber(String personalNumber) {
-    if (personalNumber == null || personalNumber.length() > 14) {
-      throw new IllegalArgumentException("Wrong personal number");
-    }
-    this.optionalData1 = mrzFormat(personalNumber, 14);
-    this.personalNumberCheckDigit = checkDigit(this.optionalData1);
-  }
-
-  /**
-   * Sets the passport holder's nationality.
-   *
-   * @param nationality new nationality
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setNationality(String nationality) {
-    this.nationality = nationality;
-    checkDigit();
-  }
-
-  /**
-   * Sets the contents for the second optional data field for ID-1 style MRZs.
-   *
-   * @param optionalData2 optional data 2
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setOptionalData2(String optionalData2) {
-    this.optionalData2 = trimTrailingFillerChars(optionalData2);
-    checkDigit();
-  }
-
-  /**
-   * Sets the gender.
-   *
-   * @param gender new gender
-   *
-   * @deprecated Class will become immutable
-   */
-  @Deprecated
-  public void setGender(Gender gender) {
-    if (gender == null) {
-      throw new IllegalArgumentException("Gender must not be null");
-    }
-    this.gender = gender;
-    checkDigit();
-  }
-
-  /**
    * Creates a textual representation of this MRZ.
    * This is the 2 or 3 line representation
    * (depending on the document type) as it
@@ -836,18 +673,18 @@ public class MRZInfo extends AbstractLDSInfo {
     try {
       String str = new String(getEncoded(), "UTF-8");
       switch(str.length()) {
-        case 90: /* ID1 */
-          return str.substring(0, 30) + "\n"
-          + str.substring(30, 60) + "\n"
-          + str.substring(60, 90) + "\n";
-        case 72: /* ID2 */
-          return str.substring(0, 36) + "\n"
-          + str.substring(36, 72) + "\n";
-        case 88: /* ID3 */
-          return str.substring(0, 44) + "\n"
-          + str.substring(44, 88) + "\n";
-        default:
-          return str;
+      case 90: /* ID1 */
+        return str.substring(0, 30) + "\n"
+        + str.substring(30, 60) + "\n"
+        + str.substring(60, 90) + "\n";
+      case 72: /* ID2 */
+        return str.substring(0, 36) + "\n"
+        + str.substring(36, 72) + "\n";
+      case 88: /* ID3 */
+        return str.substring(0, 44) + "\n"
+        + str.substring(44, 88) + "\n";
+      default:
+        return str;
       }
     } catch (UnsupportedEncodingException uee) {
       throw new IllegalStateException(uee);
@@ -923,22 +760,22 @@ public class MRZInfo extends AbstractLDSInfo {
     this.documentCode = trimTrailingFillerChars(readString(dataIn, 2));
     this.documentType = getDocumentType(this.documentCode, length);
     switch (this.documentType) {
-      case TD1:
-        readObjectTD1(dataIn);
-        break;
-      case TD2:
-        /* Fall through... */
-      case MRVB:
-        readObjectTD2orMRVB(dataIn);
-        break;
-      case MRVA:
-        /* Fall through... */
-      case TD3:
-        /* Fall through... */
-      default:
-        /* Assume it's a ID3 document, i.e. 2-line MRZ. */
-        readObjectTD3OrMRVA(dataIn);
-        break;
+    case TD1:
+      readObjectTD1(dataIn);
+      break;
+    case TD2:
+      /* Fall through... */
+    case MRVB:
+      readObjectTD2orMRVB(dataIn);
+      break;
+    case MRVA:
+      /* Fall through... */
+    case TD3:
+      /* Fall through... */
+    default:
+      /* Assume it's a ID3 document, i.e. 2-line MRZ. */
+      readObjectTD3OrMRVA(dataIn);
+      break;
     }
   }
 
@@ -988,7 +825,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
 
     /* line 2, pos 8, Sex */
-    this.gender = readGender(dataIn);
+    this.gender = readString(dataIn, 1);
 
     /* line 2, Pos 9 to 14, Date of expiry */
     this.dateOfExpiry = readDate(dataIn);
@@ -1032,7 +869,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.nationality = readCountryCode(dataIn);
     this.dateOfBirth = readDate(dataIn);
     this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
-    this.gender = readGender(dataIn);
+    this.gender = readString(dataIn, 1);
     this.dateOfExpiry = readDate(dataIn);
     this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
     if (documentType == DocumentType.MRVB) {
@@ -1062,7 +899,7 @@ public class MRZInfo extends AbstractLDSInfo {
    *
    * @throws IOException on error reading from the stream
    */
- private void readObjectTD3OrMRVA(InputStream inputStream) throws IOException {
+  private void readObjectTD3OrMRVA(InputStream inputStream) throws IOException {
     DataInputStream dataIn = inputStream instanceof DataInputStream ? (DataInputStream)inputStream : new DataInputStream(inputStream);
 
     /* line 1, pos 3 to 5 */
@@ -1077,7 +914,7 @@ public class MRZInfo extends AbstractLDSInfo {
     this.nationality = readCountryCode(dataIn);
     this.dateOfBirth = readDate(dataIn);
     this.dateOfBirthCheckDigit = (char)dataIn.readUnsignedByte();
-    this.gender = readGender(dataIn);
+    this.gender = readString(dataIn, 1);
     this.dateOfExpiry = readDate(dataIn);
     this.dateOfExpiryCheckDigit = (char)dataIn.readUnsignedByte();
     if (documentType == DocumentType.MRVA) {
@@ -1098,21 +935,21 @@ public class MRZInfo extends AbstractLDSInfo {
   @Override
   public void writeObject(OutputStream outputStream) throws IOException {
     switch (documentType) {
-      case TD1:
-        writeObjectTD1(outputStream);
-        break;
-      case TD2:
-        /* Fall through. */
-      case MRVB:
-        writeObjectTD2OrMRVB(outputStream);
-        break;
-      case TD3:
-        /* Fall through. */
-      case MRVA:
-        writeObjectTD3OrMRVA(outputStream);
-        break;
-      default:
-        throw new IllegalStateException("Unsupported document type");
+    case TD1:
+      writeObjectTD1(outputStream);
+      break;
+    case TD2:
+      /* Fall through. */
+    case MRVB:
+      writeObjectTD2OrMRVB(outputStream);
+      break;
+    case TD3:
+      /* Fall through. */
+    case MRVA:
+      writeObjectTD3OrMRVA(outputStream);
+      break;
+    default:
+      throw new IllegalStateException("Unsupported document type");
     }
   }
 
@@ -1340,7 +1177,7 @@ public class MRZInfo extends AbstractLDSInfo {
    * @throws IOException on error writing to the stream
    */
   private void writeGender(DataOutputStream dataOutputStream) throws IOException {
-    dataOutputStream.write(genderToString(gender).getBytes("UTF-8"));
+    dataOutputStream.write(gender.getBytes("UTF-8"));
   }
 
   /**
@@ -1380,19 +1217,39 @@ public class MRZInfo extends AbstractLDSInfo {
   /**
    * Converts a gender to a string to be used in an MRZ.
    *
-   * @param gender the gender
+   * @param genderObject the gender
    *
    * @return a string to be used in an MRZ
    */
-  private static String genderToString(Gender gender) {
-    switch (gender) {
+  private static String genderToString(Object genderObject) {
+    if (genderObject instanceof Gender) {
+      switch ((Gender)genderObject) {
       case MALE:
         return "M";
       case FEMALE:
         return "F";
       default:
         return "<";
+      }
     }
+
+    return Objects.toString(genderObject);
+  }
+
+  /**
+   * Converts a gender string to a value of the {@linkplain Gender} enum.
+   * 
+   * @param genderStr a gender string
+   * @return
+   */
+  private static Gender stringToGender(String genderStr) {
+    if ("M".equalsIgnoreCase(genderStr)) {
+      return Gender.MALE;
+    }
+    if ("F".equalsIgnoreCase(genderStr)) {
+      return Gender.FEMALE;
+    }
+    return Gender.UNKNOWN;
   }
 
   /**
@@ -1474,26 +1331,6 @@ public class MRZInfo extends AbstractLDSInfo {
   }
 
   /**
-   * Reads the 1 letter gender information.
-   *
-   * @param inputStream input source
-   *
-   * @return the gender of the passport holder
-   *
-   * @throws IOException if something goes wrong
-   */
-  private Gender readGender(DataInputStream inputStream) throws IOException {
-    String genderStr = readString(inputStream, 1);
-    if ("M".equalsIgnoreCase(genderStr)) {
-      return Gender.MALE;
-    }
-    if ("F".equalsIgnoreCase(genderStr)) {
-      return Gender.FEMALE;
-    }
-    return Gender.UNKNOWN;
-  }
-
-  /**
    * Reads a date.
    * Result is typically in {@code "yyMMdd"} format.
    *
@@ -1536,70 +1373,70 @@ public class MRZInfo extends AbstractLDSInfo {
     int documentNumberLength = documentNumber.length();
 
     switch (documentType) {
-      case TD1:
-        /*
-         * Upper line:
-         * 6-30, i.e., documentNumber, documentNumberCheckDigit, optionaldata1(15)
-         *
-         * Middle line:
-         * 1-7, i.e., dateOfBirth, dateOfBirthCheckDigit
-         * 9-15, i.e., dateOfExpiry, dateOfExpiryCheckDigit
-         * 19-29, i.e., optionalData2(11)
-         */
-        if (documentNumberLength <= 9) {
-          composite.append(mrzFormat(documentNumber, 9));
-          composite.append(documentNumberCheckDigit);
-          composite.append(mrzFormat(optionalData1, 15));
-        } else {
-          /* Document number, first 9 characters. */
-          composite.append(documentNumber.substring(0, 9));
-          composite.append("<"); /* Filler instead of check digit. */
-
-          /* Remainder of document number. */
-          String documentNumberRemainder = documentNumber.substring(9);
-          composite.append(documentNumberRemainder);
-          composite.append(documentNumberCheckDigit);
-          composite.append('<');
-
-          /* Remainder of optional data 1 (removing any prefix). */
-          String optionalData1Remainder = mrzFormat(optionalData1, 15 - 2 - documentNumberRemainder.length());
-          composite.append(optionalData1Remainder);
-        }
-        composite.append(dateOfBirth);
-        composite.append(dateOfBirthCheckDigit);
-        composite.append(dateOfExpiry);
-        composite.append(dateOfExpiryCheckDigit);
-        composite.append(mrzFormat(optionalData2, 11));
-        return composite.toString();
-      case TD2:
-        /* Composite check digit lower line: 1-10, 14-20, 22-35. */
-        composite.append(documentNumber);
-        composite.append(documentNumberCheckDigit);
-        composite.append(dateOfBirth);
-        composite.append(dateOfBirthCheckDigit);
-        composite.append(dateOfExpiry);
-        composite.append(dateOfExpiryCheckDigit);
-        composite.append(mrzFormat(optionalData1, 7));
-        return composite.toString();
-      case MRVB:
-        /* No composite checkdigit for MRV-B. */
-        return null;
-      case TD3:
-        /* Composite check digit lower line: 1-10, 14-20, 22-43. */
+    case TD1:
+      /*
+       * Upper line:
+       * 6-30, i.e., documentNumber, documentNumberCheckDigit, optionaldata1(15)
+       *
+       * Middle line:
+       * 1-7, i.e., dateOfBirth, dateOfBirthCheckDigit
+       * 9-15, i.e., dateOfExpiry, dateOfExpiryCheckDigit
+       * 19-29, i.e., optionalData2(11)
+       */
+      if (documentNumberLength <= 9) {
         composite.append(mrzFormat(documentNumber, 9));
         composite.append(documentNumberCheckDigit);
-        composite.append(dateOfBirth);
-        composite.append(dateOfBirthCheckDigit);
-        composite.append(dateOfExpiry);
-        composite.append(dateOfExpiryCheckDigit);
-        composite.append(mrzFormat(optionalData1, 14));
-        composite.append(personalNumberCheckDigit);
-        return composite.toString();
-      case MRVA:
-        /* No composite checkdigit for MRV-A. */
-        return null;
-      default:
-        throw new IllegalStateException("Unsupported document type");
+        composite.append(mrzFormat(optionalData1, 15));
+      } else {
+        /* Document number, first 9 characters. */
+        composite.append(documentNumber.substring(0, 9));
+        composite.append("<"); /* Filler instead of check digit. */
+
+        /* Remainder of document number. */
+        String documentNumberRemainder = documentNumber.substring(9);
+        composite.append(documentNumberRemainder);
+        composite.append(documentNumberCheckDigit);
+        composite.append('<');
+
+        /* Remainder of optional data 1 (removing any prefix). */
+        String optionalData1Remainder = mrzFormat(optionalData1, 15 - 2 - documentNumberRemainder.length());
+        composite.append(optionalData1Remainder);
+      }
+      composite.append(dateOfBirth);
+      composite.append(dateOfBirthCheckDigit);
+      composite.append(dateOfExpiry);
+      composite.append(dateOfExpiryCheckDigit);
+      composite.append(mrzFormat(optionalData2, 11));
+      return composite.toString();
+    case TD2:
+      /* Composite check digit lower line: 1-10, 14-20, 22-35. */
+      composite.append(documentNumber);
+      composite.append(documentNumberCheckDigit);
+      composite.append(dateOfBirth);
+      composite.append(dateOfBirthCheckDigit);
+      composite.append(dateOfExpiry);
+      composite.append(dateOfExpiryCheckDigit);
+      composite.append(mrzFormat(optionalData1, 7));
+      return composite.toString();
+    case MRVB:
+      /* No composite checkdigit for MRV-B. */
+      return null;
+    case TD3:
+      /* Composite check digit lower line: 1-10, 14-20, 22-43. */
+      composite.append(mrzFormat(documentNumber, 9));
+      composite.append(documentNumberCheckDigit);
+      composite.append(dateOfBirth);
+      composite.append(dateOfBirthCheckDigit);
+      composite.append(dateOfExpiry);
+      composite.append(dateOfExpiryCheckDigit);
+      composite.append(mrzFormat(optionalData1, 14));
+      composite.append(personalNumberCheckDigit);
+      return composite.toString();
+    case MRVA:
+      /* No composite checkdigit for MRV-A. */
+      return null;
+    default:
+      throw new IllegalStateException("Unsupported document type");
     }
   }
 
@@ -1667,25 +1504,25 @@ public class MRZInfo extends AbstractLDSInfo {
     }
 
     switch (length) {
-      case 90:
+    case 90:
+      /* Document-code must start with C, I, or A. */
+      return DocumentType.TD1;
+    case 72:
+      if (documentCode.startsWith("V")) {
+        return DocumentType.MRVB;
+      } else {
         /* Document-code must start with C, I, or A. */
-        return DocumentType.TD1;
-      case 72:
-        if (documentCode.startsWith("V")) {
-          return DocumentType.MRVB;
-        } else {
-          /* Document-code must start with C, I, or A. */
-          return DocumentType.TD2;
-        }
-      case 88:
-        if (documentCode.startsWith("V")) {
-          return DocumentType.MRVA;
-        } else {
-          /* Document-code must start with P. */
-          return DocumentType.TD3;
-        }
-      default:
-        return DocumentType.UNKNOWN;
+        return DocumentType.TD2;
+      }
+    case 88:
+      if (documentCode.startsWith("V")) {
+        return DocumentType.MRVA;
+      } else {
+        /* Document-code must start with P. */
+        return DocumentType.TD3;
+      }
+    default:
+      return DocumentType.UNKNOWN;
     }
   }
 
@@ -1767,18 +1604,18 @@ public class MRZInfo extends AbstractLDSInfo {
     }
 
     switch (documentType) {
-      case TD1:
-        /* Fall through... */
-      case TD2:
-        return documentCode.startsWith("C") || documentCode.startsWith("I") || documentCode.startsWith("A");
-      case TD3:
-        return documentCode.startsWith("P");
-      case MRVA:
-        /* Fall through... */
-      case MRVB:
-        return documentCode.startsWith("V");
-      default:
-          return false;
+    case TD1:
+      /* Fall through... */
+    case TD2:
+      return documentCode.startsWith("C") || documentCode.startsWith("I") || documentCode.startsWith("A");
+    case TD3:
+      return documentCode.startsWith("P");
+    case MRVA:
+      /* Fall through... */
+    case MRVB:
+      return documentCode.startsWith("V");
+    default:
+      return false;
     }
   }
 
@@ -1793,18 +1630,18 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   private static boolean isOptionalDataConsistentWithDocumentType(DocumentType documentType, String optionalData1, String optionalData2) {
     switch (documentType) {
-      case TD1:
-        return (optionalData1 == null || optionalData1.length() <= 15) && (optionalData2 == null || optionalData2.length() <= 11);
-      case TD2:
-        return (optionalData1 == null || optionalData1.length() <= 7) && optionalData2 == null;
-      case MRVB:
-        return (optionalData1 == null || optionalData1.length() <= 8) && optionalData2 == null;
-      case TD3:
-        return (optionalData1 == null || optionalData1.length() <= 15) && optionalData2 == null;
-      case MRVA:
-        return (optionalData1 == null || optionalData1.length() <= 16) && optionalData2 == null;
-      default:
-          return false;
+    case TD1:
+      return (optionalData1 == null || optionalData1.length() <= 15) && (optionalData2 == null || optionalData2.length() <= 11);
+    case TD2:
+      return (optionalData1 == null || optionalData1.length() <= 7) && optionalData2 == null;
+    case MRVB:
+      return (optionalData1 == null || optionalData1.length() <= 8) && optionalData2 == null;
+    case TD3:
+      return (optionalData1 == null || optionalData1.length() <= 15) && optionalData2 == null;
+    case MRVA:
+      return (optionalData1 == null || optionalData1.length() <= 16) && optionalData2 == null;
+    default:
+      return false;
     }
   }
 
@@ -1858,107 +1695,107 @@ public class MRZInfo extends AbstractLDSInfo {
    */
   private static int decodeMRZDigit(byte ch) {
     switch (ch) {
-      case '<':
-      case '0':
-        return 0;
-      case '1':
-        return 1;
-      case '2':
-        return 2;
-      case '3':
-        return 3;
-      case '4':
-        return 4;
-      case '5':
-        return 5;
-      case '6':
-        return 6;
-      case '7':
-        return 7;
-      case '8':
-        return 8;
-      case '9':
-        return 9;
-      case 'a':
-      case 'A':
-        return 10;
-      case 'b':
-      case 'B':
-        return 11;
-      case 'c':
-      case 'C':
-        return 12;
-      case 'd':
-      case 'D':
-        return 13;
-      case 'e':
-      case 'E':
-        return 14;
-      case 'f':
-      case 'F':
-        return 15;
-      case 'g':
-      case 'G':
-        return 16;
-      case 'h':
-      case 'H':
-        return 17;
-      case 'i':
-      case 'I':
-        return 18;
-      case 'j':
-      case 'J':
-        return 19;
-      case 'k':
-      case 'K':
-        return 20;
-      case 'l':
-      case 'L':
-        return 21;
-      case 'm':
-      case 'M':
-        return 22;
-      case 'n':
-      case 'N':
-        return 23;
-      case 'o':
-      case 'O':
-        return 24;
-      case 'p':
-      case 'P':
-        return 25;
-      case 'q':
-      case 'Q':
-        return 26;
-      case 'r':
-      case 'R':
-        return 27;
-      case 's':
-      case 'S':
-        return 28;
-      case 't':
-      case 'T':
-        return 29;
-      case 'u':
-      case 'U':
-        return 30;
-      case 'v':
-      case 'V':
-        return 31;
-      case 'w':
-      case 'W':
-        return 32;
-      case 'x':
-      case 'X':
-        return 33;
-      case 'y':
-      case 'Y':
-        return 34;
-      case 'z':
-      case 'Z':
-        return 35;
-      default:
-        throw new NumberFormatException("Could not decode MRZ character " + ch + " ('" + Character.toString((char) ch) + "')");
+    case '<':
+    case '0':
+      return 0;
+    case '1':
+      return 1;
+    case '2':
+      return 2;
+    case '3':
+      return 3;
+    case '4':
+      return 4;
+    case '5':
+      return 5;
+    case '6':
+      return 6;
+    case '7':
+      return 7;
+    case '8':
+      return 8;
+    case '9':
+      return 9;
+    case 'a':
+    case 'A':
+      return 10;
+    case 'b':
+    case 'B':
+      return 11;
+    case 'c':
+    case 'C':
+      return 12;
+    case 'd':
+    case 'D':
+      return 13;
+    case 'e':
+    case 'E':
+      return 14;
+    case 'f':
+    case 'F':
+      return 15;
+    case 'g':
+    case 'G':
+      return 16;
+    case 'h':
+    case 'H':
+      return 17;
+    case 'i':
+    case 'I':
+      return 18;
+    case 'j':
+    case 'J':
+      return 19;
+    case 'k':
+    case 'K':
+      return 20;
+    case 'l':
+    case 'L':
+      return 21;
+    case 'm':
+    case 'M':
+      return 22;
+    case 'n':
+    case 'N':
+      return 23;
+    case 'o':
+    case 'O':
+      return 24;
+    case 'p':
+    case 'P':
+      return 25;
+    case 'q':
+    case 'Q':
+      return 26;
+    case 'r':
+    case 'R':
+      return 27;
+    case 's':
+    case 'S':
+      return 28;
+    case 't':
+    case 'T':
+      return 29;
+    case 'u':
+    case 'U':
+      return 30;
+    case 'v':
+    case 'V':
+      return 31;
+    case 'w':
+    case 'W':
+      return 32;
+    case 'x':
+    case 'X':
+      return 33;
+    case 'y':
+    case 'Y':
+      return 34;
+    case 'z':
+    case 'Z':
+      return 35;
+    default:
+      throw new NumberFormatException("Could not decode MRZ character " + ch + " ('" + Character.toString((char) ch) + "')");
     }
   }
 }

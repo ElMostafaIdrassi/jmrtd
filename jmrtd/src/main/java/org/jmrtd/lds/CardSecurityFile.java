@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -391,7 +392,7 @@ public class CardSecurityFile implements Serializable {
     ASN1Set set = (ASN1Set)encapsulatedContent;
     Set<SecurityInfo> securityInfos = new HashSet<SecurityInfo>();
     for (int i = 0; i < set.size(); i++) {
-      ASN1Primitive object = set.getObjectAt(i).toASN1Primitive();
+      ASN1Encodable object = set.getObjectAt(i);
       try {
         SecurityInfo securityInfo = SecurityInfo.getInstance(object);
         if (securityInfo == null) {
