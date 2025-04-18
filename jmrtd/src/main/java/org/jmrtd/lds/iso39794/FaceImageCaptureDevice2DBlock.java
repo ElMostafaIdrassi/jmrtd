@@ -81,11 +81,11 @@ public class FaceImageCaptureDevice2DBlock extends Block {
     this.captureDeviceTechnologyId2D = captureDeviceTechnologyId2D;
   }
 
-  // CaptureDevice2DBlock ::= SEQUENCE {
-  //   captureDeviceSpectral2DBlock [0] CaptureDeviceSpectral2DBlock OPTIONAL,
-  //   captureDeviceTechnologyId2D [1] CaptureDeviceTechnologyId2D OPTIONAL,
-  //   ...
-  // }
+  //  CaptureDevice2DBlock ::= SEQUENCE {
+  //    captureDeviceSpectral2DBlock [0] CaptureDeviceSpectral2DBlock OPTIONAL,
+  //    captureDeviceTechnologyId2D [1] CaptureDeviceTechnologyId2D OPTIONAL,
+  //    ...
+  //  }
 
   FaceImageCaptureDevice2DBlock(ASN1Encodable asn1Encodable) {
     if (asn1Encodable == null) {

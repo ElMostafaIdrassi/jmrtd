@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2025  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
 /**
  * File structure for the EF_DG2 file.
  * Datagroup 2 contains the facial features of the document holder.
- * See A 13.3 in MRTD's LDS document (or equivalent in Doc 9303).
+ * Based on ISO/IEC 19794-5 and ISO/IEC 39794-5.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -73,9 +73,15 @@ public class DG2File extends CBEFFDataGroup {
     /* 7F2E */
     decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
       public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+        if (sbh != null && sbh.hasFormatType(StandardBiometricHeader.ISO_19794_FACE_IMAGE_FORMAT_TYPE_VALUE)) {
+          return new FaceInfo(sbh, inputStream);
+        }
+        if (sbh != null && sbh.hasFormatType(StandardBiometricHeader.ISO_39794_FACE_IMAGE_FORMAT_TYPE_VALUE)) {
+          LOGGER.warning("Unexpected format type in standard biometric header, assuming ISO 39794 encoding");
+        }
         TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
         int tag = tlvInputStream.readTag(); // 0xA1
-        if (tag != 0xA1) {
+        if (tag != ISO781611.BIOMETRIC_HEADER_TEMPLATE_BASE_TAG) {
           /* ISO/IEC 39794-5 Application Profile for eMRTDs Version – 1.00: Table 2: Data Structure under DO7F2E. */
           LOGGER.warning("Expected tag A1, found " + Integer.toHexString(tag));
         }
@@ -83,6 +89,7 @@ public class DG2File extends CBEFFDataGroup {
         return new FaceImageDataBlock(sbh, inputStream);
       }
     });
+
     return decoders;
   }
 

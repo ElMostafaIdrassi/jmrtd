@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -48,6 +50,8 @@ import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.jmrtd.ASN1Util;
 import org.jmrtd.cbeff.BiometricDataBlock;
+import org.jmrtd.cbeff.CBEFFInfo;
+import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 
 public class IrisImageDataBlock extends Block implements BiometricDataBlock {
@@ -75,6 +79,7 @@ public class IrisImageDataBlock extends Block implements BiometricDataBlock {
   //  }
 
   IrisImageDataBlock(StandardBiometricHeader sbh, ASN1Encodable asn1Encodable) {
+    this.sbh = sbh;
     asn1Encodable = ASN1Util.checkTag(asn1Encodable, BERTags.APPLICATION, 6);
     if (!(asn1Encodable instanceof ASN1Sequence)) {
       throw new IllegalArgumentException("Cannot decode!");
@@ -95,8 +100,27 @@ public class IrisImageDataBlock extends Block implements BiometricDataBlock {
     return representationBlocks;
   }
 
+  /**
+   * Returns the standard biometric header of this iris info.
+   *
+   * @return the standard biometric header
+   */
   @Override
   public StandardBiometricHeader getStandardBiometricHeader() {
+    if (sbh == null) {
+      byte[] biometricType = { (byte)CBEFFInfo.BIOMETRIC_TYPE_IRIS };
+      byte[] biometricSubtype = { (byte)getBiometricSubtype() };
+      byte[] formatOwner = { (byte)((StandardBiometricHeader.JTC1_SC37_FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(StandardBiometricHeader.JTC1_SC37_FORMAT_OWNER_VALUE & 0xFF) };
+      byte[] formatType = { (byte)((StandardBiometricHeader.ISO_39794_IRIS_IMAGE_FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(StandardBiometricHeader.ISO_39794_IRIS_IMAGE_FORMAT_TYPE_VALUE & 0xFF) };
+
+      SortedMap<Integer, byte[]> elements = new TreeMap<Integer, byte[]>();
+      elements.put(ISO781611.BIOMETRIC_TYPE_TAG, biometricType); // 81 -> 0x10
+      elements.put(ISO781611.BIOMETRIC_SUBTYPE_TAG, biometricSubtype); // 82 -> depends on left/right eye
+      elements.put(ISO781611.FORMAT_OWNER_TAG, formatOwner); // 87 -> 0x0101
+      elements.put(ISO781611.FORMAT_TYPE_TAG, formatType); // 88 -> 0x002c
+
+      sbh = new StandardBiometricHeader(elements);
+    }
     return sbh;
   }
 
@@ -139,5 +163,29 @@ public class IrisImageDataBlock extends Block implements BiometricDataBlock {
     taggedObjects.put(0, versionBlock.getASN1Object());
     taggedObjects.put(1, ISO39794Util.encodeBlocks(representationBlocks));
     return  new DERTaggedObject(6, ASN1Util.encodeTaggedObjects(taggedObjects));
+  }
+
+  /* PRIVATE */
+
+  /**
+   * Returns the biometric sub-type bit mask for the iris images.
+   *
+   * @return a biometric sub-type bit mask
+   */
+  private int getBiometricSubtype() {
+    int result = CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+    boolean isFirst = true;
+
+    List<IrisImageRepresentationBlock> blocks = getRepresentationBlocks();;
+    for (IrisImageRepresentationBlock block: blocks) {
+      int subType = block.getBiometricSubtype();
+      if (isFirst) {
+        result = subType;
+        isFirst = false;
+      } else {
+        result &= subType;
+      }
+    }
+    return result;
   }
 }

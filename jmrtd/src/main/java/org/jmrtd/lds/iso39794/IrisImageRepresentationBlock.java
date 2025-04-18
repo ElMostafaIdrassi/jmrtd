@@ -547,6 +547,14 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     return result;
   }
 
+  /* NOTE: 39795-6 code value happens to be consistent with 19794-6 defined subtype. */
+  int getBiometricSubtype() {
+    if (eyeLabelCode == null) {
+      return EyeLabelCode.UNKNOWN.getCode();
+    }
+    return eyeLabelCode.getCode();
+  }
+
   /* PRIVATE */
 
   private void decodeRangeOrError(ASN1Encodable asn1Encodable) {

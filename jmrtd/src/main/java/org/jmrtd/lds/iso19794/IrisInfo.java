@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2025  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -61,15 +61,6 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
 
   /** Version number. */
   private static final int VERSION_NUMBER = 0x30313000;
-
-  /** Format owner identifier of ISO/IEC JTC1/SC37. */
-  private static final int FORMAT_OWNER_VALUE = 0x0101;
-
-  /**
-   * ISO/IEC JTC1/SC37 uses 0x0009 according to <a href="http://www.ibia.org/cbeff/_bdb.php">IBIA</a>.
-   * (ISO FCD 19794-6 specified this as 0x0601).
-   */
-  private static final int FORMAT_TYPE_VALUE = 0x0009;
 
   /** Image format. */
   public static final int IMAGEFORMAT_MONO_RAW = 2; /* (0x0002) */
@@ -568,8 +559,8 @@ public class IrisInfo extends AbstractListInfo<IrisBiometricSubtypeInfo> impleme
     if (sbh == null) {
       byte[] biometricType = { (byte)CBEFFInfo.BIOMETRIC_TYPE_FINGERPRINT };
       byte[] biometricSubtype = { (byte)getBiometricSubtype() };
-      byte[] formatOwner = { (byte)((FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(FORMAT_OWNER_VALUE & 0xFF) };
-      byte[] formatType = { (byte)((FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(FORMAT_TYPE_VALUE & 0xFF) };
+      byte[] formatOwner = { (byte)((StandardBiometricHeader.JTC1_SC37_FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(StandardBiometricHeader.JTC1_SC37_FORMAT_OWNER_VALUE & 0xFF) };
+      byte[] formatType = { (byte)((StandardBiometricHeader.ISO_19794_IRIS_IMAGE_FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(StandardBiometricHeader.ISO_19794_IRIS_IMAGE_FORMAT_TYPE_VALUE & 0xFF) };
 
       SortedMap<Integer, byte[]> elements = new TreeMap<Integer, byte[]>();
       elements.put(ISO781611.BIOMETRIC_TYPE_TAG, biometricType);

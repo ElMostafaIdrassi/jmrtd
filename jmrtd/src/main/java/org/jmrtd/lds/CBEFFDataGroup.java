@@ -1,7 +1,7 @@
 /*
  * JMRTD - A Java API for accessing machine readable travel documents.
  *
- * Copyright (C) 2006 - 2018  The JMRTD team
+ * Copyright (C) 2006 - 2025  The JMRTD team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -80,6 +80,7 @@ public abstract class CBEFFDataGroup extends DataGroup {
       List<? extends BiometricDataBlock> subRecords, boolean shouldAddRandomDataIfEmpty) {
     super(dataGroupTag);
     addAll(subRecords);
+    this.encodingType = encodingType;
     this.shouldAddRandomDataIfEmpty = shouldAddRandomDataIfEmpty;
     this.random = new SecureRandom();
   }
@@ -110,6 +111,7 @@ public abstract class CBEFFDataGroup extends DataGroup {
   @Override
   protected void readContent(InputStream inputStream) throws IOException {
     ISO781611Decoder<BiometricDataBlock> decoder = getDecoder();
+    this.encodingType = decoder.getEncodingType();
     ComplexCBEFFInfo<BiometricDataBlock> complexCBEFFInfo = decoder.decode(inputStream);
     List<CBEFFInfo<BiometricDataBlock>> records = complexCBEFFInfo.getSubRecords();
     for (CBEFFInfo<BiometricDataBlock> cbeffInfo: records) {

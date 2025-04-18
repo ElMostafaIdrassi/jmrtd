@@ -53,6 +53,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERVisibleString;
 import org.jmrtd.ASN1Util;
+import org.jmrtd.cbeff.CBEFFInfo;
 import org.jmrtd.lds.ImageInfo;
 
 public class FingerImageRepresentationBlock extends Block implements ImageInfo {
@@ -203,10 +204,10 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
       throw new IllegalArgumentException("Cannot decode!");
     }
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
-    position = decodePosition(taggedObjects.get(0));
-    impression = decodeImpression(taggedObjects.get(1));
-    imageDataFormat = decodeImageDataFormat(taggedObjects.get(2));
-    imageData = decodeImageData(taggedObjects.get(3));
+    position = FingerImagePositionCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(0)));
+    impression = ImpressionCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(1)));
+    imageDataFormat = ImageDataFormatCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(taggedObjects.get(2)));
+    imageData = (ASN1OctetString.getInstance(taggedObjects.get(3))).getOctets();
     if (taggedObjects.containsKey(4)) {
       captureDateTimeBlock = new DateTimeBlock(taggedObjects.get(4));
     }
@@ -420,6 +421,15 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
 
   /* PACKAGE */
 
+  /**
+   * Returns the biometric sub-type.
+   *
+   * @return the ICAO/CBEFF (BHT) biometric sub-type
+   */
+  int getBiometricSubtype() {
+    return toBiometricSubtype(position);
+  }
+
   @Override
   ASN1Encodable getASN1Object() {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
@@ -485,22 +495,6 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
 
   /* PRIVATE */
 
-  private FingerImagePositionCode decodePosition(ASN1Encodable asn1Encodable) {
-    return FingerImagePositionCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
-
-  private ImpressionCode decodeImpression(ASN1Encodable asn1Encodable) {
-    return ImpressionCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
-
-  private static ImageDataFormatCode decodeImageDataFormat(ASN1Encodable asn1Encodable) {
-    return ImageDataFormatCode.fromCode(ISO39794Util.decodeCodeFromChoiceExtensionBlockFallback(asn1Encodable));
-  }
-
-  private static byte[] decodeImageData(ASN1Encodable asn1Encodable) {
-    return (ASN1OctetString.getInstance(asn1Encodable)).getOctets();
-  }
-
   private static List<String> decodeCommentBlocks(ASN1Encodable asn1Encodable) {
     if (asn1Encodable instanceof ASN1Sequence) {
       List<ASN1Encodable> blockASN1Objects = ASN1Util.list(asn1Encodable);
@@ -524,5 +518,82 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
       asn1Objects[i++] = new DERVisibleString(comment);
     }
     return new DERSequence(asn1Objects);
+  }
+
+  /**
+   * Converts from 37984-4 position coding to 7816-11 (BHT) coding.
+   *
+   * @param position an ISO 39794-4 finger position code
+   *
+   * @return a ISO7816-11 biometric subtype mask combination
+   */
+  private static int toBiometricSubtype(FingerImagePositionCode position) {
+    if (position ==  null) {
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+    }
+    switch (position) {
+    case UNKNOWN_POSITION:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+    case RIGHT_THUMB_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
+    case RIGHT_INDEX_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER;
+    case RIGHT_MIDDLE_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER;
+    case RIGHT_RING_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RING_FINGER;
+    case RIGHT_LITTLE_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER;
+    case LEFT_THUMB_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
+    case LEFT_INDEX_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_POINTER_FINGER;
+    case LEFT_MIDDLE_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_MIDDLE_FINGER;
+    case LEFT_RING_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RING_FINGER;
+    case LEFT_LITTLE_FINGER:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LITTLE_FINGER;
+    case RIGHT_FOUR_FINGERS:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case LEFT_FOUR_FINGERS:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case BOTH_THUMB_FINGERS:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_THUMB;
+    case UNKNOWN_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+    case RIGHT_FULL_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case RIGHT_WRITERS_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+    case LEFT_FULL_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case LEFT_WRITERS_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case RIGHT_LOWER_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case RIGHT_UPPER_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case LEFT_LOWER_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case LEFT_UPPER_PALM:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case RIGHT_INTERDIGITAL:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case RIGHT_THENAR:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case RIGHT_HYPOTHENAR:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_RIGHT;
+    case LEFT_INTERDIGITAL:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case LEFT_THENAR:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case LEFT_HYPOTHENAR:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE | CBEFFInfo.BIOMETRIC_SUBTYPE_MASK_LEFT;
+    case OTHER_POSITION:
+      // Fall through...
+    default:
+      return CBEFFInfo.BIOMETRIC_SUBTYPE_NONE;
+    }
   }
 }

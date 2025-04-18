@@ -172,13 +172,25 @@ public class DateTimeBlock extends Block {
   @Override
   ASN1Encodable getASN1Object() {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
-    taggedObjects.put(0,ASN1Util.encodeInt(year));
-    if (month >= 0) { taggedObjects.put(1, ASN1Util.encodeInt(month)); }
-    if (day >= 0) { taggedObjects.put(2, ASN1Util.encodeInt(day)); }
-    if (hour >= 0) { taggedObjects.put(3, ASN1Util.encodeInt(hour)); }
-    if (minute >= 0) { taggedObjects.put(4, ASN1Util.encodeInt(minute)); }
-    if (second >= 0) { taggedObjects.put(5, ASN1Util.encodeInt(second)); }
-    if (millisecond >= 0) { taggedObjects.put(6, ASN1Util.encodeInt(millisecond)); }
+    taggedObjects.put(0, ASN1Util.encodeInt(year));
+    if (month >= 0) {
+      taggedObjects.put(1, ASN1Util.encodeInt(month));
+    }
+    if (day >= 0) {
+      taggedObjects.put(2, ASN1Util.encodeInt(day));
+    }
+    if (hour >= 0) {
+      taggedObjects.put(3, ASN1Util.encodeInt(hour));
+    }
+    if (minute >= 0) {
+      taggedObjects.put(4, ASN1Util.encodeInt(minute));
+    }
+    if (second >= 0) {
+      taggedObjects.put(5, ASN1Util.encodeInt(second));
+    }
+    if (millisecond >= 0) {
+      taggedObjects.put(6, ASN1Util.encodeInt(millisecond));
+    }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 }

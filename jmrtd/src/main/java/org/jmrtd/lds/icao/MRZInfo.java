@@ -622,14 +622,14 @@ public class MRZInfo extends AbstractLDSInfo {
    * Returns the passport holder's gender.
    *
    * @return gender
-   * 
+   *
    * @deprecated Result type will be changed to {@linkplain String} in future version. Use {@link #getGenderCode()} instead.
    */
   @Deprecated
   public Gender getGender() {
     return stringToGender(gender);
   }
-  
+
   /**
    * Returns the passport holder's gender.
    *
@@ -1238,7 +1238,7 @@ public class MRZInfo extends AbstractLDSInfo {
 
   /**
    * Converts a gender string to a value of the {@linkplain Gender} enum.
-   * 
+   *
    * @param genderStr a gender string
    * @return
    */

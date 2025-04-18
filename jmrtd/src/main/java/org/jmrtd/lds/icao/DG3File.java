@@ -47,7 +47,7 @@ import net.sf.scuba.tlv.TLVOutputStream;
 
 /**
  * File structure for the EF_DG3 file.
- * Partially specified in ISO/IEC FCD 19794-4 aka Annex F.
+ * based on ISO/IEC 19794-4 and ISO/IEC 39794-4.
  *
  * @author The JMRTD team (info@jmrtd.org)
  *
@@ -72,15 +72,23 @@ public class DG3File extends CBEFFDataGroup {
     /* 7F2E */
     decoders.put(ISO781611.BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG, new BiometricDataBlockDecoder<BiometricDataBlock>() {
       public BiometricDataBlock decode(InputStream inputStream, StandardBiometricHeader sbh, int index, int length) throws IOException {
+        if (sbh != null && sbh.hasFormatType(StandardBiometricHeader.ISO_19794_FINGER_IMAGE_FORMAT_TYPE_VALUE)) {
+          return new FingerInfo(sbh, inputStream);
+        }
+        if (sbh != null && sbh.hasFormatType(StandardBiometricHeader.ISO_39794_FINGER_IMAGE_FORMAT_TYPE_VALUE)) {
+          LOGGER.warning("Unexpected format type in standard biometric header, assuming ISO 39794 encoding");
+        }
         TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
         int tag = tlvInputStream.readTag(); // 0xA1
-        if (tag != 0xA1) {
+        if (tag != ISO781611.BIOMETRIC_HEADER_TEMPLATE_BASE_TAG) {
+          /* ISO/IEC 39794-5 Application Profile for eMRTDs Version – 1.00: Table 2: Data Structure under DO7F2E. */
           LOGGER.warning("Expected tag A1, found " + Integer.toHexString(tag));
         }
         tlvInputStream.readLength();
         return new FingerImageDataBlock(sbh, inputStream);
       }
     });
+
     return decoders;
   }
 
@@ -119,9 +127,16 @@ public class DG3File extends CBEFFDataGroup {
    *
    * @param fingerInfos records
    * @param shouldAddRandomDataIfEmpty whether to add random data when there are no records to encode
+   *
+   * @deprecated Use the corresponding factory method for ISO19794 instead
    */
+  @Deprecated
   public DG3File(List<FingerInfo> fingerInfos, boolean shouldAddRandomDataIfEmpty) {
-    super(EF_DG3_TAG, BiometricEncodingType.ISO_19794, fromFingerInfos(fingerInfos), shouldAddRandomDataIfEmpty);
+    this(BiometricEncodingType.ISO_19794, fingerInfos, shouldAddRandomDataIfEmpty);
+  }
+
+  private DG3File(BiometricEncodingType encodingType, List<? extends BiometricDataBlock> dataBlocks, boolean shouldAddRandomDataIfEmpty) {
+    super(EF_DG3_TAG, encodingType, dataBlocks, shouldAddRandomDataIfEmpty);
   }
 
   /**
@@ -133,6 +148,14 @@ public class DG3File extends CBEFFDataGroup {
    */
   public DG3File(InputStream inputStream) throws IOException {
     super(EF_DG3_TAG, inputStream, false);
+  }
+
+  public static DG3File createISO19794DG3File(List<FingerInfo> fingerInfos) {
+    return new DG3File(BiometricEncodingType.ISO_19794, fingerInfos, false);
+  }
+
+  public static DG3File createISO39794DG3File(List<FingerImageDataBlock> fingerImageDataBlocks) {
+    return new DG3File(BiometricEncodingType.ISO_39794, fingerImageDataBlocks, false);
   }
 
   @Override
@@ -198,19 +221,6 @@ public class DG3File extends CBEFFDataGroup {
 
     DG3File other = (DG3File)obj;
     return shouldAddRandomDataIfEmpty == other.shouldAddRandomDataIfEmpty;
-  }
-
-  private static List<BiometricDataBlock> fromFingerInfos(List<FingerInfo> fingerInfos) {
-    if (fingerInfos == null) {
-      return null;
-    }
-
-    List<BiometricDataBlock> records = new ArrayList<BiometricDataBlock>(fingerInfos.size());
-    for (FingerInfo fingerInfo: fingerInfos) {
-      records.add(fingerInfo);
-    }
-
-    return records;
   }
 
   private static List<FingerInfo> toFingerInfos(List<BiometricDataBlock> records) {

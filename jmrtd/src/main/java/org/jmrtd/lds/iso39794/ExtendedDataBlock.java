@@ -52,11 +52,6 @@ public class ExtendedDataBlock extends Block {
 
   private static final long serialVersionUID = -1557206933986460059L;
 
-  //  ExtendedDataBlock ::= SEQUENCE {
-  //    dataTypeIdBlock         [0] RegistryIdBlock,
-  //    data                    [1] OCTET STRING
-  //  }
-
   private RegistryIdBlock dataTypeIdBlock;
 
   private byte[] data;
@@ -65,6 +60,11 @@ public class ExtendedDataBlock extends Block {
     this.dataTypeIdBlock = dataTypeIdBlock;
     this.data = data;
   }
+
+  //  ExtendedDataBlock ::= SEQUENCE {
+  //    dataTypeIdBlock         [0] RegistryIdBlock,
+  //    data                    [1] OCTET STRING
+  //  }
 
   ExtendedDataBlock(ASN1Encodable asn1Encodable) {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);

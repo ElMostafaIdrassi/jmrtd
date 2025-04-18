@@ -217,43 +217,6 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
         + "]";
   }
 
-  /* PRIVATE */
-
-  //  ImageRepresentation ::= CHOICE {
-  //    base [0] ImageRepresentationBase,
-  //    extensionBlock [1] ImageRepresentationExtensionBlock
-  //  }
-  //
-  //  ImageRepresentationBase ::= CHOICE {
-  //    imageRepresentation2DBlock [0] ImageRepresentation2DBlock
-  //  }
-  //
-  //  ImageRepresentationExtensionBlock ::= SEQUENCE {
-  //    ...
-  //  }
-
-  private static FaceImageRepresentation2DBlock decodeImageRepresentation2DBlock(ASN1Encodable asn1Encodable) {
-    Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
-    if (taggedObjects.containsKey(0)) {
-      Map<Integer, ASN1Encodable> baseTaggedObjects = ASN1Util.decodeTaggedObjects(taggedObjects.get(0));
-      if (baseTaggedObjects.containsKey(0)) {
-        return new FaceImageRepresentation2DBlock(baseTaggedObjects.get(0));
-      }
-
-      /* NOTE: Not supporting [1] ShapeRepresentation3DBlock... */
-    }
-
-    return null;
-  }
-
-  private static ASN1Encodable encodeImageRepresentation2DBlock(FaceImageRepresentation2DBlock faceImageRepresentation2DBlock) {
-    Map<Integer, ASN1Encodable> baseTaggedObjects = new HashMap<Integer, ASN1Encodable>();
-    baseTaggedObjects.put(0, faceImageRepresentation2DBlock.getASN1Object());
-
-    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
-    taggedObjects.put(0, ASN1Util.encodeTaggedObjects(baseTaggedObjects));
-    return ASN1Util.encodeTaggedObjects(taggedObjects);
-  }
 
   @Override
   public int getType() {
@@ -369,5 +332,43 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
     }
 
     return blocks;
+  }
+
+  /* PRIVATE */
+
+  //  ImageRepresentation ::= CHOICE {
+  //    base [0] ImageRepresentationBase,
+  //    extensionBlock [1] ImageRepresentationExtensionBlock
+  //  }
+  //
+  //  ImageRepresentationBase ::= CHOICE {
+  //    imageRepresentation2DBlock [0] ImageRepresentation2DBlock
+  //  }
+  //
+  //  ImageRepresentationExtensionBlock ::= SEQUENCE {
+  //    ...
+  //  }
+
+  private static FaceImageRepresentation2DBlock decodeImageRepresentation2DBlock(ASN1Encodable asn1Encodable) {
+    Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
+    if (taggedObjects.containsKey(0)) {
+      Map<Integer, ASN1Encodable> baseTaggedObjects = ASN1Util.decodeTaggedObjects(taggedObjects.get(0));
+      if (baseTaggedObjects.containsKey(0)) {
+        return new FaceImageRepresentation2DBlock(baseTaggedObjects.get(0));
+      }
+
+      /* NOTE: Not supporting [1] ShapeRepresentation3DBlock... */
+    }
+
+    return null;
+  }
+
+  private static ASN1Encodable encodeImageRepresentation2DBlock(FaceImageRepresentation2DBlock faceImageRepresentation2DBlock) {
+    Map<Integer, ASN1Encodable> baseTaggedObjects = new HashMap<Integer, ASN1Encodable>();
+    baseTaggedObjects.put(0, faceImageRepresentation2DBlock.getASN1Object());
+
+    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
+    taggedObjects.put(0, ASN1Util.encodeTaggedObjects(baseTaggedObjects));
+    return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 }

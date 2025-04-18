@@ -49,11 +49,6 @@ public class CoordinateCartesian2DUnsignedShortBlock extends Block implements Fa
 
   private static final long serialVersionUID = -3221155578581711766L;
 
-  //  CoordinateCartesian2DUnsignedShortBlock ::= SEQUENCE {
-  //    x               [0] INTEGER (0..65535),
-  //    y               [1] INTEGER (0..65535)
-  //  }
-
   private int x;
   private int y;
 
@@ -61,6 +56,11 @@ public class CoordinateCartesian2DUnsignedShortBlock extends Block implements Fa
     this.x = x;
     this.y = y;
   }
+
+  //  CoordinateCartesian2DUnsignedShortBlock ::= SEQUENCE {
+  //    x               [0] INTEGER (0..65535),
+  //    y               [1] INTEGER (0..65535)
+  //  }
 
   CoordinateCartesian2DUnsignedShortBlock(ASN1Encodable asn1Encodable) {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);

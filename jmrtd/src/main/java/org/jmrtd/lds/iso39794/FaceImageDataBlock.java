@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -48,6 +50,8 @@ import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.jmrtd.ASN1Util;
 import org.jmrtd.cbeff.BiometricDataBlock;
+import org.jmrtd.cbeff.CBEFFInfo;
+import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 
 public class FaceImageDataBlock extends Block implements BiometricDataBlock {
@@ -84,6 +88,7 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
   }
 
   FaceImageDataBlock(StandardBiometricHeader sbh, ASN1Encodable asn1Encodable) {
+    this.sbh = sbh;
     asn1Encodable = ASN1Util.checkTag(asn1Encodable, BERTags.APPLICATION, 5);
     if (!(asn1Encodable instanceof ASN1Sequence)) {
       throw new IllegalArgumentException("Cannot decode!");
@@ -108,6 +113,19 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
 
   @Override
   public StandardBiometricHeader getStandardBiometricHeader() {
+    if (sbh == null) {
+      byte[] biometricType = { (byte)CBEFFInfo.BIOMETRIC_TYPE_FACIAL_FEATURES };
+      byte[] biometricSubtype = { (byte)CBEFFInfo.BIOMETRIC_SUBTYPE_NONE };
+      byte[] formatOwner = { (byte)((StandardBiometricHeader.JTC1_SC37_FORMAT_OWNER_VALUE & 0xFF00) >> 8), (byte)(StandardBiometricHeader.JTC1_SC37_FORMAT_OWNER_VALUE & 0xFF) };
+      byte[] formatType = { (byte)((StandardBiometricHeader.ISO_39794_FACE_IMAGE_FORMAT_TYPE_VALUE & 0xFF00) >> 8), (byte)(StandardBiometricHeader.ISO_39794_FACE_IMAGE_FORMAT_TYPE_VALUE & 0xFF) };
+
+      SortedMap<Integer, byte[]> elements = new TreeMap<Integer, byte[]>();
+      elements.put(ISO781611.BIOMETRIC_TYPE_TAG, biometricType); // 81
+      elements.put(ISO781611.BIOMETRIC_SUBTYPE_TAG, biometricSubtype); // 82
+      elements.put(ISO781611.FORMAT_OWNER_TAG, formatOwner); // 87
+      elements.put(ISO781611.FORMAT_TYPE_TAG, formatType); // 88
+      sbh = new StandardBiometricHeader(elements);
+    }
     return sbh;
   }
 
