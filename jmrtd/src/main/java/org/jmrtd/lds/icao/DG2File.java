@@ -94,20 +94,35 @@ public class DG2File extends CBEFFDataGroup {
   }
 
   private static final ISO781611Encoder<BiometricDataBlock> ISO_19794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+
+    @Override
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof FaceInfo) {
         ((FaceInfo)info).writeObject(outputStream);
       }
     }
+
+    @Override
+    public BiometricEncodingType getEncodingType() {
+      return BiometricEncodingType.ISO_19794;
+    }
   });
 
   private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+
+    @Override
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof FaceImageDataBlock) {
         TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+        byte[] encodedFaceImageDataBlock = ((FaceImageDataBlock)info).getEncoded();
         tlvOutputStream.writeTag(0xA1);
-        tlvOutputStream.writeValue(((FaceImageDataBlock)info).getEncoded());
+        tlvOutputStream.writeValue(encodedFaceImageDataBlock);
       }
+    }
+
+    @Override
+    public BiometricEncodingType getEncodingType() {
+      return BiometricEncodingType.ISO_39794;
     }
   });
 

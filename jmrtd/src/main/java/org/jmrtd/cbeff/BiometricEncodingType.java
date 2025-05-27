@@ -35,10 +35,10 @@ public enum BiometricEncodingType {
   /** Unknown encoding. */
   UNKNOWN,
 
-  /** Uses FaceInfo records BDB. */
+  /** Uses ISO-19794 records BDB. */
   ISO_19794,
 
-  /** Used FaceImageDataBlock BDB. */
+  /** Used ISO-39794 records BDB. */
   ISO_39794;
 
   /**
@@ -58,6 +58,27 @@ public enum BiometricEncodingType {
       return ISO_39794;
     default:
       return UNKNOWN;
+    }
+  }
+
+  /**
+   * Maps encoding type to tag.
+   * Defaults to ISO-19794 ({@code 0x5F2E}).
+   *
+   * @param encodingType one of the enum values
+   *
+   * @return either {@code 0x5F2E} or {@code 0x7F2E}
+   */
+  public static int toBDBTag(BiometricEncodingType encodingType) {
+    switch (encodingType) {
+    case ISO_39794:
+      /* 7F2E */
+      return ISO781611.BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG;
+    case ISO_19794:
+      // Fall through...
+    default:
+      /* 5F2E */
+      return ISO781611.BIOMETRIC_DATA_BLOCK_TAG;
     }
   }
 }

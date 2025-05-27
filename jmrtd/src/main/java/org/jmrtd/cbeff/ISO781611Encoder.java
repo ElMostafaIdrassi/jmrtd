@@ -43,6 +43,8 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
 
   private BiometricDataBlockEncoder<B> bdbEncoder;
 
+  private BiometricEncodingType encodingType;
+
   /**
    * Constructs an ISO7816-11 encoder that uses the given BDB encoder.
    *
@@ -50,6 +52,7 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
    */
   public ISO781611Encoder(BiometricDataBlockEncoder<B> bdbEncoder) {
     this.bdbEncoder = bdbEncoder;
+    this.encodingType = bdbEncoder.getEncodingType();
   }
 
   /**
@@ -141,7 +144,7 @@ public class ISO781611Encoder<B extends BiometricDataBlock> implements ISO781611
    * @throws IOException on error writing to the stream
    */
   private void writeBiometricDataBlock(TLVOutputStream tlvOutputStream, B bdb) throws IOException {
-    tlvOutputStream.writeTag(BIOMETRIC_DATA_BLOCK_TAG); /* 5F2E or 7F2E */
+    tlvOutputStream.writeTag(BiometricEncodingType.toBDBTag(encodingType)); /* 5F2E or 7F2E */
 
     bdbEncoder.encode(bdb, tlvOutputStream);
     tlvOutputStream.writeValueEnd(); /* BIOMETRIC_DATA_BLOCK_TAG, i.e. 5F2E or 7F2E */

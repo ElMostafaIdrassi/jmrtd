@@ -47,4 +47,11 @@ public interface BiometricDataBlockEncoder<B extends BiometricDataBlock> {
    * @throws IOException if writing fails
    */
   void encode(B bdb, OutputStream out) throws IOException;
+
+  /**
+   * Returns the biometric encoding type to be used when encoding BITs.
+   *
+   * @return the biometric encoding type, either ISO-19794 or ISO-39794
+   */
+  BiometricEncodingType getEncodingType();
 }

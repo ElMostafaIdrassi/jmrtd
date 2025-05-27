@@ -52,8 +52,8 @@ public class CardSecurityFileTest extends TestCase {
       InputStream inputStream = createSampleInputStream();
       assertNotNull(inputStream);
       CardSecurityFile cardSecurityFile = new CardSecurityFile(inputStream);
-      
-      
+
+
 //      testAttributesSHA256withECDSASample(cardSecurityFile);
 
 //      /* Re-encode it, and test again. */

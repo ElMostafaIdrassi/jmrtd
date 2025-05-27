@@ -39,9 +39,7 @@ import org.jmrtd.cbeff.ISO781611Decoder;
 import org.jmrtd.cbeff.ISO781611Encoder;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
-import org.jmrtd.lds.iso19794.FingerInfo;
 import org.jmrtd.lds.iso19794.IrisInfo;
-import org.jmrtd.lds.iso39794.FingerImageDataBlock;
 import org.jmrtd.lds.iso39794.IrisImageDataBlock;
 
 import net.sf.scuba.tlv.TLVInputStream;
@@ -95,20 +93,34 @@ public class DG4File extends CBEFFDataGroup {
   }
 
   private static final ISO781611Encoder<BiometricDataBlock> ISO_19794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+
+    @Override
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof IrisInfo) {
         ((IrisInfo)info).writeObject(outputStream);
       }
     }
+
+    @Override
+    public BiometricEncodingType getEncodingType() {
+      return BiometricEncodingType.ISO_19794;
+    }
   });
 
   private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+
+    @Override
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof IrisImageDataBlock) {
         TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
         tlvOutputStream.writeTag(0xA1);
         tlvOutputStream.writeValue(((IrisImageDataBlock)info).getEncoded());
       }
+    }
+
+    @Override
+    public BiometricEncodingType getEncodingType() {
+      return BiometricEncodingType.ISO_39794;
     }
   });
 
