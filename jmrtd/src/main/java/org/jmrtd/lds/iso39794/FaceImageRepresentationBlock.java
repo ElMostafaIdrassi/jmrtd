@@ -260,7 +260,7 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
     if (imageSizeBlock == null) {
       return 0;
     }
-    return imageSizeBlock.getWidth();
+    return imageSizeBlock.getHeight();
   }
 
   @Override

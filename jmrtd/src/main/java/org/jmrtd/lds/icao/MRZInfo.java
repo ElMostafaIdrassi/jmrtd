@@ -1008,11 +1008,11 @@ public class MRZInfo extends AbstractLDSInfo {
        */
       writeString(documentNumber.substring(0, 9), dataOut, 9);
       dataOut.write('<'); /* NOTE: instead of check digit */
-      writeString(documentNumber.substring(9) + Character.toString(documentNumberCheckDigit) + "<" + optionalData1, dataOut, 15);
+      writeString(documentNumber.substring(9) + Character.toString(documentNumberCheckDigit) + "<" + (optionalData1 == null ? "" : optionalData1), dataOut, 15);
     } else {
       writeString(documentNumber, dataOut, 9); /* FIXME: max size of field */
       dataOut.write(documentNumberCheckDigit);
-      writeString(optionalData1, dataOut, 15); /* FIXME: max size of field */
+      writeString(optionalData1 == null ? "" : optionalData1, dataOut, 15); /* FIXME: max size of field */
     }
 
     /* middle line */
@@ -1022,7 +1022,7 @@ public class MRZInfo extends AbstractLDSInfo {
     writeDateOfExpiry(dataOut);
     dataOut.write(dateOfExpiryCheckDigit);
     writeCountryCode(nationality, dataOut);
-    writeString(optionalData2, dataOut, 11);
+    writeString(optionalData2 == null ? "" : optionalData2, dataOut, 11);
     dataOut.write(compositeCheckDigit);
 
     /* bottom line */
@@ -1062,12 +1062,12 @@ public class MRZInfo extends AbstractLDSInfo {
     writeDateOfExpiry(dataOut);
     dataOut.write(dateOfExpiryCheckDigit);
     if (documentType == DocumentType.MRVB) {
-      writeString(optionalData1, dataOut, 8);
+      writeString(optionalData1 == null ? "" : optionalData1, dataOut, 8);
     } else if (isExtendedDocumentNumber) {
       writeString(documentNumber.substring(9) + documentNumberCheckDigit + "<", dataOut, 7);
       dataOut.write(compositeCheckDigit);
     } else {
-      writeString(optionalData1, dataOut, 7);
+      writeString(optionalData1 == null ? "" : optionalData1, dataOut, 7);
       dataOut.write(compositeCheckDigit);
     }
   }
@@ -1097,10 +1097,10 @@ public class MRZInfo extends AbstractLDSInfo {
     writeDateOfExpiry(dataOut);
     dataOut.write(dateOfExpiryCheckDigit);
     if (documentType == DocumentType.MRVA) {
-      writeString(optionalData1, dataOut, 16);
+      writeString(optionalData1 == null ? "" : optionalData1, dataOut, 16);
     } else {
       // Must be TD3.
-      writeString(optionalData1, dataOut, 14);
+      writeString(optionalData1 == null ? "" : optionalData1, dataOut, 14);
       dataOut.write(personalNumberCheckDigit);
       dataOut.write(compositeCheckDigit);
     }
