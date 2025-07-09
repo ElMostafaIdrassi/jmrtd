@@ -224,7 +224,7 @@ public class ASN1Util {
     ASN1Encodable[] asn1Objects = new ASN1Encodable[taggedObjects.size()];
     int i = 0;
     for (Map.Entry<Integer, ASN1Encodable> entry: taggedObjects.entrySet()) {
-      asn1Objects[i++] = new DERTaggedObject(entry.getKey(), entry.getValue());
+      asn1Objects[i++] = new DERTaggedObject(false, entry.getKey(), entry.getValue());
     }
     return new DERSequence(asn1Objects);
   }
