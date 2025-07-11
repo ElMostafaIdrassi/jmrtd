@@ -162,7 +162,7 @@ public class IrisImageDataBlock extends Block implements BiometricDataBlock {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, versionBlock.getASN1Object());
     taggedObjects.put(1, ISO39794Util.encodeBlocks(representationBlocks));
-    return  new DERTaggedObject(6, ASN1Util.encodeTaggedObjects(taggedObjects));
+    return  new DERTaggedObject(false, BERTags.APPLICATION, 0x06, ASN1Util.encodeTaggedObjects(taggedObjects));
   }
 
   /* PRIVATE */

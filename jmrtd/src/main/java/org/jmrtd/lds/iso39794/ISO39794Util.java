@@ -52,7 +52,7 @@ class ISO39794Util {
   }
 
   public static ASN1Encodable encodeCodeAsChoiceExtensionBlockFallback(int code) {
-    return new DERTaggedObject(false, 0, ASN1Util.encodeInt(code));
+    return new DERTaggedObject(false, 1, new DERSequence(new DERTaggedObject(false, 0, ASN1Util.encodeInt(code))));
   }
 
   //  ScoreOrError ::= CHOICE {
