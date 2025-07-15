@@ -22,7 +22,6 @@
 
 package org.jmrtd.test.lds;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.logging.Level;

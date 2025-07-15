@@ -125,6 +125,13 @@ public class FaceImagePoseAngleBlock extends Block {
 
   private AngleDataBlock rollAngleDataBlock;
 
+  public FaceImagePoseAngleBlock(AngleDataBlock yawAngleDataBlock, AngleDataBlock pitchAngleDataBlock,
+      AngleDataBlock rollAngleDataBlock) {
+    this.yawAngleDataBlock = yawAngleDataBlock;
+    this.pitchAngleDataBlock = pitchAngleDataBlock;
+    this.rollAngleDataBlock = rollAngleDataBlock;
+  }
+
   //  PoseAngleBlock ::= SEQUENCE {
   //    yawAngleBlock [0] AngleDataBlock OPTIONAL,
   //    pitchAngleBlock [1] AngleDataBlock OPTIONAL,

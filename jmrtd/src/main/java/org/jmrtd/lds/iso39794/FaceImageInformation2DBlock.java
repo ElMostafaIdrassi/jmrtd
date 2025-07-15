@@ -341,12 +341,12 @@ public class FaceImageInformation2DBlock extends Block {
 
   private FaceImageReferenceColourMappingBlock referenceColourMappingBlock;
 
-  public FaceImageInformation2DBlock(ImageSizeBlock imageSizeBlock, ImageDataFormatCode imageDataFormatCode,
+  public FaceImageInformation2DBlock(ImageDataFormatCode imageDataFormatCode,
       FaceImageKind2DCode faceImageKind2DCode, FaceImagePostAcquisitionProcessingBlock postAcquisitionProcessingBlock,
       LossyTransformationAttemptsCode lossyTransformationAttemptsCode, Integer cameraToSubjectDistance,
-      Integer sensorDiagonal, Integer lensFocalLength, ImageFaceMeasurementsBlock imageFaceMeasurementsBlock,
-      ImageColourSpaceCode imageColourSpaceCode, FaceImageReferenceColourMappingBlock referenceColourMappingBlock) {
-    this.imageSizeBlock = imageSizeBlock;
+      Integer sensorDiagonal, Integer lensFocalLength, ImageSizeBlock imageSizeBlock,
+      ImageFaceMeasurementsBlock imageFaceMeasurementsBlock, ImageColourSpaceCode imageColourSpaceCode,
+      FaceImageReferenceColourMappingBlock referenceColourMappingBlock) {
     this.imageDataFormatCode = imageDataFormatCode;
     this.faceImageKind2DCode = faceImageKind2DCode;
     this.postAcquisitionProcessingBlock = postAcquisitionProcessingBlock;
@@ -354,6 +354,7 @@ public class FaceImageInformation2DBlock extends Block {
     this.cameraToSubjectDistance = cameraToSubjectDistance;
     this.sensorDiagonal = sensorDiagonal;
     this.lensFocalLength = lensFocalLength;
+    this.imageSizeBlock = imageSizeBlock;
     this.imageFaceMeasurementsBlock = imageFaceMeasurementsBlock;
     this.imageColourSpaceCode = imageColourSpaceCode;
     this.referenceColourMappingBlock = referenceColourMappingBlock;

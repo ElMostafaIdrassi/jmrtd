@@ -58,16 +58,13 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
 
   private static final long serialVersionUID = -7831183488053975281L;
 
-  private int representationId;
-
   private VersionBlock versionBlock;
   private List<FaceImageRepresentationBlock> representationBlocks;
 
   private StandardBiometricHeader sbh;
 
-  public FaceImageDataBlock(int representationId, VersionBlock versionBlock,
+  public FaceImageDataBlock(VersionBlock versionBlock,
       List<FaceImageRepresentationBlock> representationBlocks, StandardBiometricHeader sbh) {
-    this.representationId = representationId;
     this.versionBlock = versionBlock;
     this.representationBlocks = representationBlocks;
     this.sbh = sbh;
@@ -99,10 +96,6 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
     representationBlocks = FaceImageRepresentationBlock.decodeRepresentationBlocks(taggedObjects.get(1));
   }
 
-  public int getRepresentationId() {
-    return representationId;
-  }
-
   public VersionBlock getVersionBlock() {
     return versionBlock;
   }
@@ -131,7 +124,7 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
 
   @Override
   public int hashCode() {
-    return Objects.hash(representationBlocks, representationId, sbh, versionBlock);
+    return Objects.hash(representationBlocks, sbh, versionBlock);
   }
 
   @Override
@@ -148,15 +141,14 @@ public class FaceImageDataBlock extends Block implements BiometricDataBlock {
 
     FaceImageDataBlock other = (FaceImageDataBlock)obj;
     return Objects.equals(representationBlocks, other.representationBlocks)
-        && representationId == other.representationId && Objects.equals(sbh, other.sbh)
+        && Objects.equals(sbh, other.sbh)
         && Objects.equals(versionBlock, other.versionBlock);
   }
 
   @Override
   public String toString() {
     return "FaceImageDataBlock ["
-        + "representationId: " + representationId
-        + ", versionBlock: " + versionBlock
+        + "versionBlock: " + versionBlock
         + ", representationBlocks: " + representationBlocks
         + ", sbh: " + sbh
         + "]";
