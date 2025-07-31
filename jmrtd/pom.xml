@@ -5,7 +5,7 @@
 
   <groupId>org.jmrtd</groupId>
   <artifactId>jmrtd</artifactId>
-  <version>0.8.2-SNAPSHOT</version>
+  <version>0.8.2</version>
 
   <name>JMRTD</name>
   <description>Java Machine Readable Travel Documents API.</description>
@@ -114,14 +114,12 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.8.0</version>
         <extensions>true</extensions>
         <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            <publishingServerId>central</publishingServerId>
         </configuration>
       </plugin>
 
@@ -138,7 +136,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.3.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -153,9 +151,8 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.11.2</version>
             <configuration>
-              <!-- additionalOptions>-html5</additionalOptions -->
               <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
               <links>
                 <link>https://bouncycastle.org/docs/docs1.5on</link>
@@ -177,7 +174,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.2.8</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
