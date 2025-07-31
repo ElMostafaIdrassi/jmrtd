@@ -1413,7 +1413,7 @@ public class MRZInfoTest extends TestCase {
 
     String primaryIdentifier = mrzInfo.getPrimaryIdentifier();
     assertTrue(expectedNameOfHolder.contains(primaryIdentifier.replace(" ", "<")));
-    
+
     String secondaryIdentifier = mrzInfo.getSecondaryIdentifier();
     assertTrue(expectedNameOfHolder.contains(secondaryIdentifier.replace(" ", "<")));
   }

@@ -982,7 +982,7 @@ public final class Util {
    */
   public static PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) {
     try {
-      byte[] encodedPublicKeyInfoBytes = subjectPublicKeyInfo.getEncoded(ASN1Encoding.DER); // HIER
+      byte[] encodedPublicKeyInfoBytes = subjectPublicKeyInfo.getEncoded(ASN1Encoding.DER);
       KeySpec keySpec = new X509EncodedKeySpec(encodedPublicKeyInfoBytes);
       try {
         KeyFactory factory = KeyFactory.getInstance("DH");
