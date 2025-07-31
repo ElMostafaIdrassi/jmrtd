@@ -1,0 +1,7 @@
+0.8.2
+
+ - Bump BC version to 1.81.
+ - ISO-39794 encoding: Default SBH if not provided. Implicit tags. APPLICATION class tags.
+ - Fix copy-paste bug in FaceImageRepresentationBlock.getHeight().
+ - Fix MRZInfo encoding when optionalData2 was null.
+
