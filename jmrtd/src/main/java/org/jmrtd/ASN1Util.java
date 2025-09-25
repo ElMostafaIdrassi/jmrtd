@@ -221,12 +221,17 @@ public class ASN1Util {
   }
 
   public static ASN1Encodable encodeTaggedObjects(Map<Integer, ASN1Encodable> taggedObjects) {
-    ASN1Encodable[] asn1Objects = new ASN1Encodable[taggedObjects.size()];
-    int i = 0;
-    for (Map.Entry<Integer, ASN1Encodable> entry: taggedObjects.entrySet()) {
-      asn1Objects[i++] = new DERTaggedObject(false, entry.getKey(), entry.getValue());
+    if (taggedObjects == null) {
+      return null;
     }
-    return new DERSequence(asn1Objects);
+    List<ASN1Encodable> asn1Objects = new ArrayList<ASN1Encodable>(taggedObjects.size());
+    for (Map.Entry<Integer, ASN1Encodable> entry: taggedObjects.entrySet()) {
+      ASN1Encodable object = entry.getValue();
+      if (object != null) {
+        asn1Objects.add(new DERTaggedObject(false, entry.getKey(), object));
+      }
+    }
+    return new DERSequence(asn1Objects.toArray(new ASN1Encodable[0]));
   }
 
   /* PRIVATE. */

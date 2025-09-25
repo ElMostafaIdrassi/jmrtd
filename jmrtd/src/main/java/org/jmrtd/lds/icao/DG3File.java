@@ -75,8 +75,8 @@ public class DG3File extends CBEFFDataGroup {
         if (sbh != null && sbh.hasFormatType(StandardBiometricHeader.ISO_19794_FINGER_IMAGE_FORMAT_TYPE_VALUE)) {
           return new FingerInfo(sbh, inputStream);
         }
-        if (sbh != null && sbh.hasFormatType(StandardBiometricHeader.ISO_39794_FINGER_IMAGE_FORMAT_TYPE_VALUE)) {
-          LOGGER.warning("Unexpected format type in standard biometric header, assuming ISO 39794 encoding");
+        if (sbh != null && !sbh.hasFormatType(StandardBiometricHeader.ISO_39794_FINGER_IMAGE_FORMAT_TYPE_VALUE)) {
+          LOGGER.warning("Unexpected format type in standard biometric header " + sbh + ", assuming ISO-39794 encoding");
         }
         TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
         int tag = tlvInputStream.readTag(); // 0xA1

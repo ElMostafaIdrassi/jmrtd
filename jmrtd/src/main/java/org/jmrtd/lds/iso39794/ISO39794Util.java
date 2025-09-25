@@ -22,6 +22,7 @@
 
 package org.jmrtd.lds.iso39794;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,11 +80,15 @@ class ISO39794Util {
   }
 
   public static ASN1Encodable encodeBlocks(List<? extends Block> blocks) {
-    ASN1Encodable[] asn1Objects = new ASN1Encodable[blocks.size()];
-    int i = 0;
-    for (Block block: blocks) {
-      asn1Objects[i++] = block.getASN1Object();
+    if (blocks == null) {
+      return null;
     }
-    return new DERSequence(asn1Objects);
+    List<ASN1Encodable> asn1Objects = new ArrayList<ASN1Encodable>(blocks.size());
+    for (Block block: blocks) {
+      if (block != null) {
+        asn1Objects.add(block.getASN1Object());
+      }
+    }
+    return new DERSequence(asn1Objects.toArray(new ASN1Encodable[0]));
   }
 }

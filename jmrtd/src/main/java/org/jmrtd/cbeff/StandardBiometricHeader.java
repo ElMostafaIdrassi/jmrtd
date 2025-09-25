@@ -124,7 +124,9 @@ public class StandardBiometricHeader implements Serializable {
     if (actualFormatTypeValue.length != 2) {
       return false;
     }
-    return (((actualFormatTypeValue[0] & 0xFF) << 8) | (actualFormatTypeValue[1] & 0xFF)) == formatTypeValue;
+
+    int actualFormatTypeInt = ((actualFormatTypeValue[0] & 0xFF) << 8) | (actualFormatTypeValue[1] & 0xFF);
+    return actualFormatTypeInt == formatTypeValue;
   }
 
   @Override

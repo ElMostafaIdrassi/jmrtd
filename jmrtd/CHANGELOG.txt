@@ -1,3 +1,9 @@
+0.8.3
+
+ - Bump BC version to 1.82.
+ - ISO-39794: Fix "Unexpected format type" warning.
+ - ISO-39794: Minor changes in encoding, prefer collections over arrays.
+
 0.8.2
 
  - Bump BC version to 1.81.
