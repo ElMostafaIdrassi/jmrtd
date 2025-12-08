@@ -1257,21 +1257,25 @@ public class PACEProtocol {
     }
     if (publicKey instanceof ECPublicKey) {
       ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
-      try {
-        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        bOut.write(Util.ecPoint2OS(ecPublicKey.getW(), ecPublicKey.getParams().getCurve().getField().getFieldSize()));
-        byte[] encodedPublicKey = bOut.toByteArray();
-        bOut.close();
-        return encodedPublicKey;
-      } catch (IOException ioe) {
-        /* NOTE: Should never happen, we're writing to a ByteArrayOutputStream. */
-        throw new IllegalStateException("Internal error writing to memory", ioe);
-      }
+      return encodeECPointForSmartCard(ecPublicKey.getW(), ecPublicKey.getParams().getCurve().getField().getFieldSize());
     } else if (publicKey instanceof DHPublicKey) {
       DHPublicKey dhPublicKey = (DHPublicKey)publicKey;
       return Util.i2os(dhPublicKey.getY());
     } else {
       throw new InvalidKeyException("Unsupported public key: " + publicKey.getClass().getCanonicalName());
+    }
+  }
+
+  public static byte[] encodeECPointForSmartCard(ECPoint w, int bitLength) {
+    try {
+      ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+      bOut.write(Util.ecPoint2OS(w, bitLength));
+      byte[] encodedPublicKey = bOut.toByteArray();
+      bOut.close();
+      return encodedPublicKey;
+    } catch (IOException ioe) {
+      /* NOTE: Should never happen, we're writing to a ByteArrayOutputStream. */
+      throw new IllegalStateException("Internal error writing to memory", ioe);
     }
   }
 
