@@ -47,7 +47,7 @@ public class DG12FileTest extends TestCase {
 
   public void testToString() {
     DG12File dg12File = createTestObject();
-    String expectedPrefix = "DG12File [, 19711019, , , , , , 19711019";
+    String expectedPrefix = "DG12File [, 19711019, [], , , , , 19711019";
     assertTrue(dg12File.toString().startsWith(expectedPrefix));
   }
 
@@ -72,7 +72,6 @@ public class DG12FileTest extends TestCase {
 
       byte[] encodedCopy = copy.getEncoded();
       assertNotNull(encodedCopy);
-      //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encodedCopy));
 
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
 
@@ -145,9 +144,7 @@ public class DG12FileTest extends TestCase {
       assert(dg12.getNamesOfOtherPersons().size() > 0);
 
       byte[] encoded = dg12.getEncoded();
-      //			LOGGER.info("DEBUG: encoded = \n" + Hex.bytesToPrettyString(encoded));
       DG12File copy = new DG12File(new ByteArrayInputStream(encoded));
-
       assertEquals(copy.getIssuingAuthority(), "UTOPIA");
       assertEquals(copy.getDateOfIssue(), "19711019");
       assertNotNull(copy.getNamesOfOtherPersons());

@@ -22,36 +22,42 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG11File;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DG11FileTest extends TestCase {
+public class DG11FileTest {
 
-  private Logger LOGGER = Logger.getLogger("org.jmrtd");
+  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public DG11FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     DG11File dg11File = createTestObject();
     String expectedResult = "DG11File [, [], , 19711019, [], [], , , , , , [], ]";
     assertEquals(dg11File.toString(), expectedResult);
   }
 
+  @Test
   public void testDecodeEncode() {
     byte[] simpleDG11 = new byte[] {
         0x6B, 0x34, 0x5C, 0x10, 0x5F, 0x0E, 0x5F, 0x10,
@@ -66,7 +72,6 @@ public class DG11FileTest extends TestCase {
     try {
       DG11File dg11File = new DG11File(new ByteArrayInputStream(simpleDG11));
       byte[] encoded = dg11File.getEncoded();
-
       assertEquals(Hex.bytesToHexString(simpleDG11), Hex.bytesToHexString(encoded));
     } catch (IOException e) {
       LOGGER.log(Level.WARNING, "Exception", e);
@@ -74,6 +79,7 @@ public class DG11FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testReflexive() {
     testReflexive(createTestObject());
     testReflexive(createComplexTestObject());
@@ -81,25 +87,50 @@ public class DG11FileTest extends TestCase {
 
   public void testReflexive(DG11File dg11File) {
     try {
-      if (dg11File == null) {
-        fail("Input file is null");
-      }
+      assertNotNull(dg11File);
 
       byte[] encoded = dg11File.getEncoded();
       assertNotNull(encoded);
-      //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encoded));
 
       ByteArrayInputStream in = new ByteArrayInputStream(encoded);
       DG11File copy = new DG11File(in);
 
       assertNotNull(copy);
+
+      List<String> otherNames = dg11File.getOtherNames();
+      if (otherNames !=  null) {
+        assertNotNull(copy.getOtherNames());
+        assertEquals(otherNames.size(), copy.getOtherNames().size());
+        assertEquals(otherNames, copy.getOtherNames());
+      }
+
+      List<String> otherValidTDNumbers = dg11File.getOtherValidTDNumbers();
+      if (otherValidTDNumbers != null) {
+        assertNotNull(copy.getOtherValidTDNumbers());
+        assertEquals(otherValidTDNumbers.size(), copy.getOtherValidTDNumbers().size());
+      }
+
+      List<String> placeOfBirth = dg11File.getPlaceOfBirth();
+      if (placeOfBirth != null) {
+        assertNotNull(copy.getPlaceOfBirth());
+        assertEquals(placeOfBirth.size(), copy.getPlaceOfBirth().size());
+      }
+
+      List<String> permanentAddress = dg11File.getPermanentAddress();
+      if (permanentAddress != null) {
+        assertNotNull(copy.getPermanentAddress());
+        assertEquals(permanentAddress.size(), copy.getPermanentAddress().size());
+      }
+
       assertEquals(dg11File, copy);
 
       byte[] encodedCopy = copy.getEncoded();
       assertNotNull(encodedCopy);
-      //			LOGGER.info("DEBUG: encoded =\n" + Hex.bytesToPrettyString(encodedCopy));
 
       assertEquals(Hex.bytesToHexString(encoded), Hex.bytesToHexString(copy.getEncoded()));
+
+      assertEquals(dg11File, decodeEncode(dg11File));
+      assertEquals(dg11File, reconstruct(dg11File));
 
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
@@ -111,6 +142,7 @@ public class DG11FileTest extends TestCase {
    * Ronny is a fictional character.
    * Any resemblance to living persons is pure coincidence.
    */
+  @Test
   public void testRonny() {
     byte[] bytes = {
         0x6B, 0x2F, 0x5C, 0x02, 0x5F, 0x0E, 0x5F, 0x0E,
@@ -128,17 +160,13 @@ public class DG11FileTest extends TestCase {
       String primary = "WICHERS" + "<" + "SCHREUR";
       String secondary = "RONALDUS" + "<" + "JOHANNES" + "<" + "MARIA";
       assertEquals(file.getNameOfHolder(), primary + "<<" + secondary);
-      //				assertEquals(file.getFullNamePrimaryIdentifier(), "WICHERS<SCHREUR");
-      //				assertEquals(file.getFullNameSecondaryIdentifiers().size(), 3);
-      //				assertEquals(file.getFullNameSecondaryIdentifiers().get(0), "RONALDUS");
-      //				assertEquals(file.getFullNameSecondaryIdentifiers().get(1), "JOHANNES");
-      //				assertEquals(file.getFullNameSecondaryIdentifiers().get(2), "MARIA");
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSpecSample() {
     byte[] bytes = {
         0x6B, /* L */ 0x63,
@@ -185,14 +213,13 @@ public class DG11FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testComplex() {
     try {
       DG11File dg11 = createComplexTestObject();
       byte[] encoded = dg11.getEncoded();
-      //			LOGGER.info("DEBUG: encoded = \n" + Hex.bytesToPrettyString(encoded));
       DG11File copy = new DG11File(new ByteArrayInputStream(encoded));
       byte[] copyEncoded = copy.getEncoded();
-      //			LOGGER.info("DEBUG: copy encoded = \n" + Hex.bytesToPrettyString(copy.getEncoded()));
       assert(Arrays.equals(encoded, copyEncoded));
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
@@ -200,15 +227,159 @@ public class DG11FileTest extends TestCase {
     }
   }
 
+  @Test
+  public void testHappyAllFieldsNonEmpty() throws Exception {
+    DG11File dg11 = new DG11File(
+        "NAME OF HOLDER", // name of holder
+        Arrays.asList("OTHER", "NAMES"), // other names
+        "123456789", // personal number
+        new Date(), // full date of birth
+        Arrays.asList("PLACE", "OF BIRTH"), // place of birth
+        Arrays.asList("PERMANENT", "ADDRESS"), // permanent address
+        "555 2368", // telephone
+        "PROFESSION", // profession
+        "TITLE", // title
+        "PERSONAL SUMMARY", // personal summary
+        new byte[] { 0x00, 0x00 }, // proof of citizenship,
+        Arrays.asList("OTHER", "VALID", "TD", "NUMBERS"), // otherValidTDNumbers,
+        "CUSTODY INFORMATION"); // custodyInformation)
+
+    assertEquals(dg11, reconstruct(dg11));
+
+    DG11File reencoded = decodeEncode(dg11);
+
+    assertEquals(dg11.getTagPresenceList(), reencoded.getTagPresenceList());
+
+    assertEquals(dg11.getNameOfHolder(), reencoded.getNameOfHolder());
+    assertEquals(dg11.getOtherNames(), reencoded.getOtherNames());
+    assertEquals(dg11.getPersonalNumber(), reencoded.getPersonalNumber());
+    assertEquals(dg11.getFullDateOfBirth(), reencoded.getFullDateOfBirth());
+    assertEquals(dg11.getPlaceOfBirth(), reencoded.getPlaceOfBirth());
+    assertEquals(dg11.getPermanentAddress(), reencoded.getPermanentAddress());
+    assertEquals(dg11.getTelephone(), reencoded.getTelephone());
+    assertEquals(dg11.getProfession(), reencoded.getProfession());
+    assertEquals(dg11.getTitle(), reencoded.getTitle());
+    assertEquals(dg11.getPersonalSummary(), reencoded.getPersonalSummary());
+    assertTrue(Arrays.equals(dg11.getProofOfCitizenship(), reencoded.getProofOfCitizenship()));
+    assertEquals(dg11.getOtherValidTDNumbers(), reencoded.getOtherValidTDNumbers());
+    assertEquals(dg11.getCustodyInformation(), reencoded.getCustodyInformation());
+
+    assertEquals(dg11, reencoded);
+
+    assertEquals(dg11, reencoded);
+  }
+
   /**
    * https://sourceforge.net/p/jmrtd/bugs/65/
    */
+  @Test
   public void testNullDate() {
     String nameOfHolder = "SOME<MRZ_FORMATTED<NAME";
     DG11File dg11 = new DG11File(nameOfHolder, null, null, (Date)null, null, null, null, null, null, null, null, null, null);
     assertEquals(nameOfHolder, dg11.getNameOfHolder());
     assertNull(dg11.getFullDateOfBirth());
+    assertEquals(dg11, reconstruct(dg11));
+
+    testReflexive(dg11);
   }
+
+  @Test
+  public void testEmpty() throws Exception {
+    DG11File dg11 = new DG11File(
+        "", // name of holder
+        Arrays.asList("OTHER", "NAMES"), // other names
+        "123456789", // personal number
+        new Date(), // full date of birth
+        Arrays.asList("A", "B"), // place of birth
+        Arrays.asList("A", "B"), // permanent address
+        "", // telephone
+        "", // profession
+        "", // title
+        "", // personal summary
+        new byte[] { }, // proof of citizenship,
+        Arrays.asList("A", ""), // otherValidTDNumbers,
+        ""); // custodyInformation)
+
+    assertEquals(dg11, reconstruct(dg11));
+
+    DG11File reencoded = decodeEncode(dg11);
+
+    assertEquals(dg11.getTagPresenceList(), reencoded.getTagPresenceList());
+
+    assertEquals(dg11.getNameOfHolder(), reencoded.getNameOfHolder());
+    assertEquals(dg11.getOtherNames(), reencoded.getOtherNames());
+    assertEquals(dg11.getPersonalNumber(), reencoded.getPersonalNumber());
+    assertEquals(dg11.getFullDateOfBirth(), reencoded.getFullDateOfBirth());
+    assertEquals(dg11.getPlaceOfBirth(), reencoded.getPlaceOfBirth());
+    assertEquals(dg11.getPermanentAddress(), reencoded.getPermanentAddress());
+    assertEquals(dg11.getTelephone(), reencoded.getTelephone());
+    assertEquals(dg11.getProfession(), reencoded.getProfession());
+    assertEquals(dg11.getTitle(), reencoded.getTitle());
+    assertEquals(dg11.getPersonalSummary(), reencoded.getPersonalSummary());
+    assertTrue(Arrays.equals(dg11.getProofOfCitizenship(), reencoded.getProofOfCitizenship()));
+    assertEquals(dg11.getOtherValidTDNumbers(), reencoded.getOtherValidTDNumbers());
+    assertEquals(dg11.getCustodyInformation(), reencoded.getCustodyInformation());
+
+    assertEquals(dg11, reencoded);
+
+    assertEquals(dg11, decodeEncode(dg11));
+  }
+
+  @Test
+  public void testSingletonStringLists() {
+    List<String> placeOfBirth = Arrays.asList("");
+    List<String> permanentAddress = Arrays.asList("");
+    List<String> otherValidTDNumbers = Arrays.asList("");
+
+    DG11File dg11 = new DG11File(
+        "NAME OF HOLDER", // name of holder
+        null, // other names
+        "123456789", // personal number
+        new Date(), // full date of birth
+        placeOfBirth, // place of birth
+        permanentAddress, // permanent address
+        "555 2368", // telephone
+        "PROFESSION", // profession
+        "TITLE", // title
+        "PERSONAL SUMMARY", // personal summary
+        new byte[] { 0x00, 0x00 }, // proof of citizenship,
+        otherValidTDNumbers, // otherValidTDNumbers,
+        "CUSTODY INFORMATION"); // custodyInformation)
+
+    testReflexive(dg11);
+  }
+
+  @Test
+  public void testEmptyStringLists() {
+    List<String> placeOfBirth = Collections.emptyList();
+    List<String> permanentAddress = Collections.emptyList();
+    List<String> otherValidTDNumbers = Collections.emptyList();
+
+    DG11File dg11 = new DG11File(
+        "NAME OF HOLDER", // name of holder
+        null, // other names
+        "123456789", // personal number
+        new Date(), // full date of birth
+        placeOfBirth, // place of birth
+        permanentAddress, // permanent address
+        "555 2368", // telephone
+        "PROFESSION", // profession
+        "TITLE", // title
+        "PERSONAL SUMMARY", // personal summary
+        new byte[] { 0x00, 0x00 }, // proof of citizenship,
+        otherValidTDNumbers, // otherValidTDNumbers,
+        "CUSTODY INFORMATION"); // custodyInformation)
+
+    testReflexive(dg11);
+
+    /* NOTE: Replaces empty list with singleton with empty string. !!! */
+    assertNotEquals(placeOfBirth.size(), dg11.getPlaceOfBirth().size());
+    assertNotEquals(permanentAddress.size(), dg11.getPermanentAddress().size());
+    assertNotEquals(otherValidTDNumbers.size(), dg11.getOtherValidTDNumbers().size());
+
+  }
+
+  /* HELPERS */
 
   public static DG11File createComplexTestObject() {
     String fullNamePrimaryIdentifier = "TEST";
@@ -242,15 +413,16 @@ public class DG11FileTest extends TestCase {
     Calendar cal = Calendar.getInstance();
     cal.set(1971, 10 - 1, 19);
     Date fullDateOfBirth = cal.getTime();
-    List<String> placeOfBirth = new ArrayList<String>();
-    List<String> permanentAddress = new ArrayList<String>();
     String telephone = "";
     String profession = "";
     String title = "";
     String personalSummary = "";
     byte[] proofOfCitizenship = null;
-    List<String> otherValidTDNumbers = new ArrayList<String>();
     String custodyInformation = "";
+    List<String> placeOfBirth = Arrays.asList(""); // new ArrayList<String>();
+    List<String> permanentAddress = Arrays.asList(""); // new ArrayList<String>();
+    List<String> otherValidTDNumbers = Arrays.asList(""); // new ArrayList<String>();
+
     return new DG11File(nameOfHolder, otherNames, personalNumber,
         fullDateOfBirth, placeOfBirth, permanentAddress,
         telephone, profession, title,
@@ -258,11 +430,36 @@ public class DG11FileTest extends TestCase {
         otherValidTDNumbers, custodyInformation);
   }
 
-  public void testFile(InputStream in) {
+  private static DG11File decodeEncode(DG11File dg11) throws IOException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     try {
-      testReflexive(new DG11File(in));
-    } catch (IOException ioe) {
-      fail(ioe.toString());
+      byteArrayOutputStream.write(dg11.getEncoded());
+    } finally {
+      byteArrayOutputStream.close();
     }
+    byte[] encoded = byteArrayOutputStream.toByteArray();
+    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encoded);
+    try {
+      return new DG11File(byteArrayInputStream);
+    } finally {
+      byteArrayInputStream.close();
+    }
+  }
+
+  private static DG11File reconstruct(DG11File dg11) {
+    return new DG11File(
+        dg11.getNameOfHolder(),
+        dg11.getOtherNames(),
+        dg11.getPersonalNumber(),
+        dg11.getFullDateOfBirth(),
+        dg11.getPlaceOfBirth(),
+        dg11.getPermanentAddress(),
+        dg11.getTelephone(),
+        dg11.getProfession(),
+        dg11.getTitle(),
+        dg11.getPersonalSummary(),
+        dg11.getProofOfCitizenship(),
+        dg11.getOtherValidTDNumbers(),
+        dg11.getCustodyInformation());
   }
 }

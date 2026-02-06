@@ -22,26 +22,18 @@
 
 package org.jmrtd.lds.icao;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.jmrtd.lds.DataGroup;
+import java.util.Objects;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
-import net.sf.scuba.tlv.TLVUtil;
-import net.sf.scuba.util.Hex;
 
 /**
  * File structure for the EF_DG12 file.
@@ -51,11 +43,9 @@ import net.sf.scuba.util.Hex;
  *
  * @version $Revision$
  */
-public class DG12File extends DataGroup {
+public class DG12File extends AdditionalDetailDataGroup {
 
   private static final long serialVersionUID = -1979367459379125674L;
-
-  private static final int TAG_LIST_TAG = 0x5C;
 
   public static final int ISSUING_AUTHORITY_TAG = 0x5F19;
   public static final int DATE_OF_ISSUE_TAG = 0x5F26;  // yyyymmdd
@@ -84,8 +74,6 @@ public class DG12File extends DataGroup {
 
   private List<Integer> tagPresenceList;
 
-  private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
-
   /**
    * Constructs a new file.
    *
@@ -108,7 +96,8 @@ public class DG12File extends DataGroup {
         dateOfIssue == null ? null : new SimpleDateFormat(SDF).format(dateOfIssue),
         namesOfOtherPersons, endorsementsAndObservations,
         taxOrExitRequirements, imageOfFront,
-        imageOfRear, dateAndTimeOfPersonalization == null ? null : new SimpleDateFormat(SDTF).format(dateAndTimeOfPersonalization),
+        imageOfRear,
+        dateAndTimeOfPersonalization == null ? null : new SimpleDateFormat(SDTF).format(dateAndTimeOfPersonalization),
         personalizationSystemSerialNumber);
   }
 
@@ -133,7 +122,7 @@ public class DG12File extends DataGroup {
     super(EF_DG12_TAG);
     this.issuingAuthority = issuingAuthority;
     this.dateOfIssue = dateOfIssue;
-    this.namesOfOtherPersons = namesOfOtherPersons == null ? new ArrayList<String>() : new ArrayList<String>(namesOfOtherPersons);
+    this.namesOfOtherPersons = namesOfOtherPersons == null ? null : new ArrayList<String>(namesOfOtherPersons);
     this.endorsementsAndObservations = endorsementsAndObservations;
     this.taxOrExitRequirements = taxOrExitRequirements;
     this.imageOfFront = imageOfFront;
@@ -153,110 +142,12 @@ public class DG12File extends DataGroup {
     super(EF_DG12_TAG, inputStream);
   }
 
-  @Override
-  protected void readContent(InputStream inputStream) throws IOException {
-    TLVInputStream tlvInputStream = inputStream instanceof TLVInputStream ? (TLVInputStream)inputStream : new TLVInputStream(inputStream);
-    int tagListTag = tlvInputStream.readTag();
-    if (tagListTag != TAG_LIST_TAG) {
-      throw new IllegalArgumentException("Expected tag list in DG12");
-    }
-
-    int tagListLength = tlvInputStream.readLength();
-    int tagListBytesRead = 0;
-
-    int expectedTagCount = tagListLength / 2;
-
-    ByteArrayInputStream tagListBytesInputStream = new ByteArrayInputStream(tlvInputStream.readValue());
-    try {
-      /* Find out which tags are present. */
-      List<Integer> tagList = new ArrayList<Integer>(expectedTagCount + 1);
-      while (tagListBytesRead < tagListLength) {
-        /* We're using another TLV inputstream everytime to read each tag. */
-        TLVInputStream anotherTLVInputStream = new TLVInputStream(tagListBytesInputStream);
-        int tag = anotherTLVInputStream.readTag();
-        tagListBytesRead += TLVUtil.getTagLength(tag);
-        tagList.add(tag);
-      }
-
-      /* Now read the fields in order. */
-      for (int t: tagList) {
-        readField(t, tlvInputStream);
-      }
-    } finally {
-      tagListBytesInputStream.close();
-    }
-  }
-
-  @Override
-  protected void writeContent(OutputStream outputStream) throws IOException {
-    TLVOutputStream tlvOut = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
-    tlvOut.writeTag(TAG_LIST_TAG);
-    List<Integer> tags = getTagPresenceList();
-    DataOutputStream dataOut = new DataOutputStream(tlvOut);
-    for (int tag: tags) {
-      dataOut.writeShort(tag);
-    }
-    dataOut.flush();
-    tlvOut.writeValueEnd(); /* TAG_LIST_TAG */
-    for (int tag: tags) {
-      switch (tag) {
-        case ISSUING_AUTHORITY_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(issuingAuthority.trim().getBytes("UTF-8"));
-          break;
-        case DATE_OF_ISSUE_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(dateOfIssue.getBytes("UTF-8"));
-          break;
-        case NAME_OF_OTHER_PERSON_TAG:
-          if (namesOfOtherPersons == null) {
-            namesOfOtherPersons = new ArrayList<String>();
-          }
-          tlvOut.writeTag(CONTENT_SPECIFIC_CONSTRUCTED_TAG);
-          tlvOut.writeTag(COUNT_TAG);
-          tlvOut.write(namesOfOtherPersons.size());
-          tlvOut.writeValueEnd(); /* COUNT_TAG */
-          for (String nameOfOtherPerson: namesOfOtherPersons) {
-            tlvOut.writeTag(NAME_OF_OTHER_PERSON_TAG);
-            tlvOut.writeValue(nameOfOtherPerson.trim().getBytes("UTF-8"));
-          }
-          tlvOut.writeValueEnd(); /* CONTENT_SPECIFIC_CONSTRUCTED_TAG */
-          break;
-        case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(endorsementsAndObservations.trim().getBytes("UTF-8"));
-          break;
-        case TAX_OR_EXIT_REQUIREMENTS_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(taxOrExitRequirements.trim().getBytes("UTF-8"));
-          break;
-        case IMAGE_OF_FRONT_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(imageOfFront);
-          break;
-        case IMAGE_OF_REAR_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(imageOfRear);
-          break;
-        case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(dateAndTimeOfPersonalization.getBytes("UTF-8"));
-          break;
-        case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
-          tlvOut.writeTag(tag);
-          tlvOut.writeValue(personalizationSystemSerialNumber.trim().getBytes("UTF-8"));
-          break;
-        default:
-          throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
-      }
-    }
-  }
-
   /**
    * Returns the tags of fields actually present in this file.
    *
    * @return a list of tags
    */
+  @Override
   public List<Integer> getTagPresenceList() {
     if (tagPresenceList != null) {
       return tagPresenceList;
@@ -268,7 +159,7 @@ public class DG12File extends DataGroup {
     if (dateOfIssue != null) {
       tagPresenceList.add(DATE_OF_ISSUE_TAG);
     }
-    if (namesOfOtherPersons != null && !namesOfOtherPersons.isEmpty()) {
+    if (namesOfOtherPersons != null) {
       tagPresenceList.add(NAME_OF_OTHER_PERSON_TAG);
     }
     if (endorsementsAndObservations != null) {
@@ -291,82 +182,6 @@ public class DG12File extends DataGroup {
     }
     return tagPresenceList;
   }
-
-  /**
-   * Reads a field from a stream.
-   *
-   * @param expectedFieldTag the tag to expect
-   * @param tlvInputStream the stream to read from
-   *
-   * @throws IOException on error reading from the stream
-   */
-  private void readField(int expectedFieldTag, TLVInputStream tlvInputStream) throws IOException {
-    int tag = tlvInputStream.readTag();
-    if (tag == CONTENT_SPECIFIC_CONSTRUCTED_TAG) {
-      /* int contentSpecificLength = */ tlvInputStream.readLength();
-      int countTag = tlvInputStream.readTag();
-      if (countTag != COUNT_TAG) {
-        throw new IllegalArgumentException("Expected " + Integer.toHexString(COUNT_TAG) + ", found " + Integer.toHexString(countTag));
-      }
-      int countLength = tlvInputStream.readLength();
-      if (countLength != 1) {
-        throw new IllegalArgumentException("Expected length 1 count length, found " + countLength);
-      }
-      byte[] countValue = tlvInputStream.readValue();
-      if (countValue == null || countValue.length != 1) {
-        throw new IllegalArgumentException("Number of content specific fields should be encoded in single byte, found " + Arrays.toString(countValue));
-      }
-      int count = countValue[0] & 0xFF;
-      for (int i = 0; i < count; i++) {
-        tag = tlvInputStream.readTag();
-        if (tag != NAME_OF_OTHER_PERSON_TAG) {
-          throw new IllegalArgumentException("Expected " + Integer.toHexString(NAME_OF_OTHER_PERSON_TAG) + ", found " + Integer.toHexString(tag));
-        }
-        /* int otherPersonFieldLength = */ tlvInputStream.readLength();
-        byte[] value = tlvInputStream.readValue();
-        parseNameOfOtherPerson(value);
-      }
-    } else {
-      if (tag != expectedFieldTag) {
-        throw new IllegalArgumentException("Expected " + Integer.toHexString(expectedFieldTag) + ", but found " + Integer.toHexString(tag));
-      }
-      /* int length = */ tlvInputStream.readLength();
-      byte[] value = tlvInputStream.readValue();
-      switch (tag) {
-        case ISSUING_AUTHORITY_TAG:
-          parseIssuingAuthority(value);
-          break;
-        case DATE_OF_ISSUE_TAG:
-          parseDateOfIssue(value);
-          break;
-        case NAME_OF_OTHER_PERSON_TAG:
-          parseNameOfOtherPerson(value);
-          break;
-        case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
-          parseEndorsementsAndObservations(value);
-          break;
-        case TAX_OR_EXIT_REQUIREMENTS_TAG:
-          parseTaxOrExitRequirements(value);
-          break;
-        case IMAGE_OF_FRONT_TAG:
-          parseImageOfFront(value);
-          break;
-        case IMAGE_OF_REAR_TAG:
-          parseImageOfRear(value);
-          break;
-        case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
-          parseDateAndTimeOfPersonalization(value);
-          break;
-        case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
-          parsePersonalizationSystemSerialNumber(value);
-          break;
-        default:
-          throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
-      }
-    }
-  }
-
-  /* Accessors below. */
 
   /**
    * Returns the issuing authority.
@@ -465,7 +280,7 @@ public class DG12File extends DataGroup {
         .append("DG12File [")
         .append(issuingAuthority == null ? "" : issuingAuthority).append(", ")
         .append(dateOfIssue == null ? "" : dateOfIssue).append(", ")
-        .append(namesOfOtherPersons == null || namesOfOtherPersons.isEmpty() ? "" : namesOfOtherPersons).append(", ")
+        .append(namesOfOtherPersons == null || namesOfOtherPersons.isEmpty() ? "[]" : namesOfOtherPersons).append(", ")
         .append(endorsementsAndObservations == null ? "" : endorsementsAndObservations).append(", ")
         .append(taxOrExitRequirements == null ? "" : taxOrExitRequirements).append(", ")
         .append(imageOfFront == null ? "" : "image (" + imageOfFront.length + ")").append(", ")
@@ -477,174 +292,112 @@ public class DG12File extends DataGroup {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (obj == this) {
-      return true;
-    }
-    if (!obj.getClass().equals(this.getClass())) {
-      return false;
-    }
-    DG12File other = (DG12File)obj;
-    return this.toString().equals(other.toString());
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(imageOfFront);
+    result = prime * result + Arrays.hashCode(imageOfRear);
+    result = prime * result
+        + Objects.hash(dateAndTimeOfPersonalization, dateOfIssue, endorsementsAndObservations, issuingAuthority,
+            namesOfOtherPersons, personalizationSystemSerialNumber, taxOrExitRequirements);
+    return result;
   }
 
   @Override
-  public int hashCode() {
-    return 13 * toString().hashCode() + 112;
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    DG12File other = (DG12File) obj;
+    return Objects.equals(dateAndTimeOfPersonalization, other.dateAndTimeOfPersonalization)
+        && Objects.equals(dateOfIssue, other.dateOfIssue)
+        && Objects.equals(endorsementsAndObservations, other.endorsementsAndObservations)
+        && Arrays.equals(imageOfFront, other.imageOfFront) && Arrays.equals(imageOfRear, other.imageOfRear)
+        && Objects.equals(issuingAuthority, other.issuingAuthority)
+        && Objects.equals(namesOfOtherPersons, other.namesOfOtherPersons)
+        && Objects.equals(personalizationSystemSerialNumber, other.personalizationSystemSerialNumber)
+        && Objects.equals(taxOrExitRequirements, other.taxOrExitRequirements);
   }
 
-  /* Field parsing below. */
-
-  /**
-   * Parses the personalization system serial number.
-   *
-   * @param value the value of the personalization system serial number
-   */
-  private void parsePersonalizationSystemSerialNumber(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      personalizationSystemSerialNumber = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      personalizationSystemSerialNumber = new String(value).trim();
+  @Override
+  protected void readField(int expectedTag, TLVInputStream tlvInputStream) throws IOException {
+    int tag = tlvInputStream.readTag();
+    if (tag != CONTENT_SPECIFIC_CONSTRUCTED_TAG && tag != expectedTag) {
+      throw new IllegalArgumentException("Expected " + Integer.toHexString(expectedTag) + ", but found " + Integer.toHexString(tag));
+    }
+    tlvInputStream.readLength();
+    switch (tag) {
+    case ISSUING_AUTHORITY_TAG:
+      issuingAuthority = readString(tlvInputStream);
+      break;
+    case DATE_OF_ISSUE_TAG:
+      dateOfIssue = readFullDate(tlvInputStream);
+      break;
+    case CONTENT_SPECIFIC_CONSTRUCTED_TAG:
+      namesOfOtherPersons = readContentSpecificFieldsList(tlvInputStream);
+      break;
+    case NAME_OF_OTHER_PERSON_TAG:
+      /* Work around non-compliant early samples. */
+      namesOfOtherPersons = Collections.singletonList(readString(tlvInputStream));
+      break;
+    case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
+      endorsementsAndObservations = readString(tlvInputStream);
+      break;
+    case TAX_OR_EXIT_REQUIREMENTS_TAG:
+      taxOrExitRequirements = readString(tlvInputStream);
+      break;
+    case IMAGE_OF_FRONT_TAG:
+      imageOfFront = readBytes(tlvInputStream);
+      break;
+    case IMAGE_OF_REAR_TAG:
+      imageOfRear = readBytes(tlvInputStream);
+      break;
+    case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
+      dateAndTimeOfPersonalization = readString(tlvInputStream);
+      break;
+    case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
+      personalizationSystemSerialNumber = readString(tlvInputStream);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
     }
   }
 
-  /**
-   * Parses the date and time of personalization.
-   *
-   * @param value the value of the date and time of personalization data object
-   */
-  private void parseDateAndTimeOfPersonalization(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      dateAndTimeOfPersonalization = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: never happens, UTF-8 is supported. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-    }
-  }
-
-  /**
-   * Parses the image of front field.
-   *
-   * @param value the value of the image of front data object
-   */
-  private void parseImageOfFront(byte[] value) {
-    imageOfFront =  value;
-  }
-
-  /**
-   * Parses the image of rear field.
-   *
-   * @param value the value of the image of read data object
-   */
-  private void parseImageOfRear(byte[] value) {
-    imageOfRear =  value;
-  }
-
-  /**
-   * Parses the tax or exit requirements.
-   *
-   * @param value the value of the tax or exit requirements data object
-   */
-  private void parseTaxOrExitRequirements(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      taxOrExitRequirements = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      taxOrExitRequirements = new String(value).trim();
-    }
-  }
-
-  /**
-   * Parses the endorsements and observations field.
-   *
-   * @param value the value of the endorsements and observations data object
-   */
-  private void parseEndorsementsAndObservations(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      endorsementsAndObservations = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      endorsementsAndObservations = new String(value).trim();
-    }
-  }
-
-  /**
-   * Parses the name of other person field.
-   *
-   * @param value the value of the name of other person data object
-   */
-  private synchronized void parseNameOfOtherPerson(byte[] value) {
-    if (namesOfOtherPersons == null) {
-      namesOfOtherPersons = new ArrayList<String>();
-    }
-    try {
-      String field = new String(value, "UTF-8");
-      namesOfOtherPersons.add(field.trim());
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: UTF-8 not supported? Unlikely. In any case use default charset. */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      namesOfOtherPersons.add(new String(value).trim());
-    }
-  }
-
-  /**
-   * Parses the data of issue field.
-   *
-   * @param value the value of the date of issue data object
-   */
-  private void parseDateOfIssue(byte[] value) {
-    if (value == null) {
-      throw new IllegalArgumentException("Wrong date format");
-    }
-
-    /* Try to interpret value as a ccyymmdd formatted date string as per Doc 9303. */
-    if (value.length == 8) {
-      try {
-        String dateString = new String(value, "UTF-8");
-        dateOfIssue = dateString.trim();
-        return;
-      } catch (UnsupportedEncodingException usee) {
-        /* NOTE: never happens, UTF-8 is supported. */
-        LOGGER.log(Level.WARNING, "Exception", usee);
-      }
-    }
-    LOGGER.warning("DG12 date of issue is not in expected ccyymmdd ASCII format");
-
-    /* Some live French MRTDs encode the date as ccyymmdd but in BCD, not in ASCII. */
-    if (value.length == 4) {
-      String dateString = Hex.bytesToHexString(value);
-      dateOfIssue = dateString.trim();
-      return;
-    }
-
-    /* Giving up... we can't parse this date. */
-    throw new IllegalArgumentException("Wrong date format");
-  }
-
-  /**
-   * Parses the issuing authority field.
-   *
-   * @param value the value of the issuing authority data object
-   */
-  private void parseIssuingAuthority(byte[] value) {
-    try {
-      String field = new String(value, "UTF-8");
-      issuingAuthority = field.trim();
-    } catch (UnsupportedEncodingException usee) {
-      /* NOTE: Default charset, wtf, UTF-8 not supported? */
-      LOGGER.log(Level.WARNING, "Exception", usee);
-      issuingAuthority = (new String(value)).trim();
+  @Override
+  protected void writeField(int tag, TLVOutputStream tlvOut) throws IOException {
+    switch (tag) {
+    case ISSUING_AUTHORITY_TAG:;
+    writeString(tag, issuingAuthority, tlvOut);
+    break;
+    case DATE_OF_ISSUE_TAG:
+      writeString(tag, dateOfIssue, tlvOut);
+      break;
+    case NAME_OF_OTHER_PERSON_TAG:
+      writeContentSpecificFieldsList(tag, namesOfOtherPersons, tlvOut);
+      break;
+    case ENDORSEMENTS_AND_OBSERVATIONS_TAG:
+      writeString(tag, endorsementsAndObservations, tlvOut);
+      break;
+    case TAX_OR_EXIT_REQUIREMENTS_TAG:
+      writeString(tag, taxOrExitRequirements, tlvOut);
+      break;
+    case IMAGE_OF_FRONT_TAG:
+      writeBytes(tag, imageOfFront, tlvOut);
+      break;
+    case IMAGE_OF_REAR_TAG:
+      writeBytes(tag, imageOfRear, tlvOut);
+      break;
+    case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
+      writeString(tag, dateAndTimeOfPersonalization, tlvOut);
+      break;
+    case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
+      writeString(tag, personalizationSystemSerialNumber, tlvOut);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown field tag in DG12: " + Integer.toHexString(tag));
     }
   }
 }
