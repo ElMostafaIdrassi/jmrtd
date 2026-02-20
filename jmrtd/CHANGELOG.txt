@@ -1,3 +1,9 @@
+0.8.4
+
+ - Bump BC version to 1.83.
+ - Bug #87: Refactor to fix DG11 and DG12 parsing of empty strings.
+ - Improve exception handling in DefaultFileSystem.
+
 0.8.3
 
  - Bump BC version to 1.82.

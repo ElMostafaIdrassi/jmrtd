@@ -154,11 +154,15 @@ public class DefaultFileSystem implements FileSystemStructured {
    * @throws CardServiceException on error
    */
   public synchronized FileInfo[] getSelectedPath() throws CardServiceException {
-    DefaultFileInfo fileInfo = getFileInfo();
-    if (fileInfo == null) {
+    try {
+      DefaultFileInfo fileInfo = getFileInfo();
+      if (fileInfo == null) {
+        return null;
+      } else {
+        return new DefaultFileInfo[] { fileInfo };
+      }
+    } catch (Exception e) {
       return null;
-    } else {
-      return new DefaultFileInfo[] { fileInfo };
     }
   }
 
