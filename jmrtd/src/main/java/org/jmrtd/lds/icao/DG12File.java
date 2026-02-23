@@ -356,7 +356,7 @@ public class DG12File extends AdditionalDetailDataGroup {
       imageOfRear = readBytes(tlvInputStream);
       break;
     case DATE_AND_TIME_OF_PERSONALIZATION_TAG:
-      dateAndTimeOfPersonalization = readString(tlvInputStream);
+      dateAndTimeOfPersonalization = readFullDateTime(tlvInputStream);
       break;
     case PERSONALIZATION_SYSTEM_SERIAL_NUMBER_TAG:
       personalizationSystemSerialNumber = readString(tlvInputStream);

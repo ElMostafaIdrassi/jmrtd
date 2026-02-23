@@ -154,15 +154,11 @@ public class DefaultFileSystem implements FileSystemStructured {
    * @throws CardServiceException on error
    */
   public synchronized FileInfo[] getSelectedPath() throws CardServiceException {
-    try {
-      DefaultFileInfo fileInfo = getFileInfo();
-      if (fileInfo == null) {
-        return null;
-      } else {
-        return new DefaultFileInfo[] { fileInfo };
-      }
-    } catch (Exception e) {
+    DefaultFileInfo fileInfo = getFileInfo();
+    if (fileInfo == null) {
       return null;
+    } else {
+      return new DefaultFileInfo[] { fileInfo };
     }
   }
 
@@ -332,6 +328,10 @@ public class DefaultFileSystem implements FileSystemStructured {
       return fileInfo;
     } catch (IOException ioe) {
       throw new CardServiceException("Error getting file info for " + Integer.toHexString(selectedFID), ioe);
+    } catch (CardServiceException cse) {
+      fileInfo = new DefaultFileInfo(selectedFID, -1);
+      fileInfos.put(selectedFID, fileInfo);
+      return fileInfo;
     }
   }
 
@@ -366,6 +366,9 @@ public class DefaultFileSystem implements FileSystemStructured {
       int tlLength = prefix.length - byteArrayInputStream.available();
       int fileLength = tlLength + valueLength;
       return fileLength;
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      return -1;
     } finally {
       try {
         tlvInputStream.close();
@@ -443,7 +446,9 @@ public class DefaultFileSystem implements FileSystemStructured {
      */
     public DefaultFileInfo(short fid, int length) {
       this.fid = fid;
-      this.buffer = new FragmentBuffer(length);
+      if (length >= 0) {
+        this.buffer = new FragmentBuffer(length);
+      }
     }
 
     /**

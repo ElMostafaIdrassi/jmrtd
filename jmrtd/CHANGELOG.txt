@@ -1,3 +1,8 @@
+0.8.5
+
+ - Bug #88: Work around BCD encoded data-times in DG12.
+ - Improve exception handling in DefaultFileSystem.
+
 0.8.4
 
  - Bump BC version to 1.83.

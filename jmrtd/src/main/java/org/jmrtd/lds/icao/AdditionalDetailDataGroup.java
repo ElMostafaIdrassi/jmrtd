@@ -180,7 +180,25 @@ abstract class AdditionalDetailDataGroup extends DataGroup {
       /* Either France or Belgium uses this encoding for dates. */
       field = Hex.bytesToHexString(value);
     } else {
-      /* Assume length 8 yyyMMdd as per spec, or whatever was put in. */
+      /* Assume length 8 yyyyMMdd as per spec, or whatever was put in. */
+      field = new String(value);
+      try {
+        field = new String(value, "UTF-8");
+      } catch (UnsupportedEncodingException usee) {
+        LOGGER.log(Level.WARNING, "Exception", usee);
+      }
+    }
+    return field;
+  }
+
+  protected static String readFullDateTime(TLVInputStream tlvInputStream) throws IOException {
+    byte[] value = tlvInputStream.readValue();
+    String field = null;
+    if (value.length == 7) {
+      /* Bosnia apparently uses this encoding for dates. */
+      field = Hex.bytesToHexString(value);
+    } else {
+      /* Assume length 8 yyyyMMddHHmmss as per spec, or whatever was put in. */
       field = new String(value);
       try {
         field = new String(value, "UTF-8");
