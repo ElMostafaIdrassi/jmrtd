@@ -180,6 +180,10 @@ public class DefaultFileSystem implements FileSystemStructured {
 
     selectedFID = fid;
     isSelected = false;
+    DefaultFileInfo fileInfo = getFileInfo();
+    if (fileInfo == null || fileInfo.getBuffer() == null) {
+      throw new CardServiceException("Could not select file");
+    }
   }
 
   /**
@@ -202,7 +206,7 @@ public class DefaultFileSystem implements FileSystemStructured {
       /* Check buffer to see if we already have some of the bytes. */
       fileInfo = getFileInfo();
       if (fileInfo == null) {
-        throw new IllegalStateException("Could not get file info");
+        throw new CardServiceException("Could not get file info");
       }
 
       length = Math.min(length, maxReadBinaryLength);
@@ -457,6 +461,9 @@ public class DefaultFileSystem implements FileSystemStructured {
      * @return the buffer
      */
     public byte[] getBuffer() {
+      if (buffer == null) {
+        return null;
+      }
       return buffer.getBuffer();
     }
 
@@ -477,6 +484,9 @@ public class DefaultFileSystem implements FileSystemStructured {
      */
     @Override
     public int getFileLength() {
+      if (buffer ==  null) {
+        return -1;
+      }
       return buffer.getLength();
     }
 
@@ -499,6 +509,9 @@ public class DefaultFileSystem implements FileSystemStructured {
      * @return a fragment smaller than or equal to the fragment indicated by <code>offset</code> and <code>length</code>
      */
     public Fragment getSmallestUnbufferedFragment(int offset, int length) {
+      if (buffer == null) {
+        return null;
+      }
       return buffer.getSmallestUnbufferedFragment(offset, length);
     }
 
@@ -509,7 +522,11 @@ public class DefaultFileSystem implements FileSystemStructured {
      * @param bytes the bytes to be added
      */
     public void addFragment(int offset, byte[] bytes) {
-      buffer.addFragment(offset, bytes);
+      if (buffer == null) {
+        LOGGER.warning("Not adding fragment to null");
+      } else {
+        buffer.addFragment(offset, bytes);
+      }
     }
   }
 }
