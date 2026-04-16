@@ -1,3 +1,7 @@
+0.8.6
+
+ - Bump BC version to 1.84.
+
 0.8.5
 
  - Bug #88: Work around BCD encoded data-times in DG12.

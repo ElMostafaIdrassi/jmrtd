@@ -267,7 +267,7 @@ abstract class AdditionalDetailDataGroup extends DataGroup {
         } else {
           encodedString.append('<');
         }
-        encodedString.append(detail.trim());
+        encodedString.append(detail ==  null ? "" : detail.trim());
       }
       tlvOut.writeValue(encodedString.toString().getBytes("UTF-8"));
     }
