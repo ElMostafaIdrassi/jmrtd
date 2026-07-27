@@ -449,9 +449,8 @@ public final class Util {
    * @throws IOException on error
    */
   public static byte[] getRawECDSASignature(byte[] signedData, int keySize) throws IOException {
-    ASN1InputStream asn1In = new ASN1InputStream(signedData, true);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    try {
+    try (ASN1InputStream asn1In = new ASN1InputStream(signedData, true);
+         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       ASN1Sequence obj = (ASN1Sequence)asn1In.readObject();
       Enumeration<ASN1Primitive> e = obj.getObjects();
       while (e.hasMoreElements()) {
@@ -462,9 +461,6 @@ public final class Util {
       }
       out.flush();
       return out.toByteArray();
-    } finally {
-      asn1In.close();
-      out.close();
     }
   }
 
@@ -1622,15 +1618,12 @@ public final class Util {
    * @return the encoding
    */
   public static byte[] toOIDBytes(String oid) {
-    byte[] oidBytes = null;
     try {
-      TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()));
-      try {
+      byte[] oidBytes;
+      try (TLVInputStream oidTLVIn = new TLVInputStream(new ByteArrayInputStream(new ASN1ObjectIdentifier(oid).getEncoded()))) {
         oidTLVIn.readTag(); /* Should be 0x06 */
         oidTLVIn.readLength();
         oidBytes = oidTLVIn.readValue();
-      } finally {
-        oidTLVIn.close();
       }
       return TLVUtil.wrapDO(0x80, oidBytes); /* FIXME: define constant for 0x80. */
     } catch (IOException ioe) {
