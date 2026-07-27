@@ -99,7 +99,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
    */
   public void testStackOverflowTim() {
     try {
-      Security.insertProviderAt(BC_PROVIDER, 1);
+      Security.addProvider(BC_PROVIDER);
       SecretKey encKey = new SecretKeySpec(Hex.hexStringToBytes("3DE649F8AEA41C04FB6D4CD9043757AD"), "DESede");
 
       SecretKey macKey = new SecretKeySpec(Hex.hexStringToBytes("8C34AD61974F68CEBA3E0EAEA1456476"), "DESede");
