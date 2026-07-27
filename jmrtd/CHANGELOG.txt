@@ -1,3 +1,8 @@
+0.8.7
+
+ - Improve exception handling in DefaultFileSystem.
+ - Bump BC version to 1.85.
+
 0.8.6
 
  - Bump BC version to 1.84.
