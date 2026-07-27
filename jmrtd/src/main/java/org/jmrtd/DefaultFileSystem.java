@@ -174,7 +174,8 @@ public class DefaultFileSystem implements FileSystemStructured {
    * @throws CardServiceException on error communicating over the service
    */
   public synchronized void selectFile(short fid) throws CardServiceException {
-    if (selectedFID == fid) {
+    DefaultFileInfo cachedFileInfo = fileInfos.get(fid);
+    if (selectedFID == fid && cachedFileInfo != null) {
       return;
     }
 
@@ -333,9 +334,9 @@ public class DefaultFileSystem implements FileSystemStructured {
     } catch (IOException ioe) {
       throw new CardServiceException("Error getting file info for " + Integer.toHexString(selectedFID), ioe);
     } catch (CardServiceException cse) {
-      fileInfo = new DefaultFileInfo(selectedFID, -1);
-      fileInfos.put(selectedFID, fileInfo);
-      return fileInfo;
+      fileInfos.remove(selectedFID);
+      isSelected = false;
+      throw cse;
     }
   }
 
