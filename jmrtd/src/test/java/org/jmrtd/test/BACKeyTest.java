@@ -22,14 +22,17 @@
 
 package org.jmrtd.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.text.SimpleDateFormat;
 
 import org.jmrtd.BACKey;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class BACKeyTest {
 
-public class BACKeyTest extends TestCase {
-
+  @Test
   public void testBACKey() {
     String documentNumber = "123456789";
     String dateOfBirthString = "710121";
@@ -42,6 +45,7 @@ public class BACKeyTest extends TestCase {
     assertEquals(dateOfExpiryString, bacKey.getDateOfExpiry());
   }
 
+  @Test
   public void testBACKeyNoNull() {
     String documentNumber = "123456789";
     String dateOfBirthString = "710121";
@@ -68,6 +72,7 @@ public class BACKeyTest extends TestCase {
     }
   }
 
+  @Test
   public void testBACKeyEquals() {
     String documentNumber = "123456789";
     String dateOfBirthString = "710121";
@@ -81,6 +86,7 @@ public class BACKeyTest extends TestCase {
     assertEquals(bacKey.toString(), anotherBACKey.toString());
   }
 
+  @Test
   public void testBACKeyDates() {
     try {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -93,6 +99,7 @@ public class BACKeyTest extends TestCase {
     }
   }
 
+  @Test
   public void testBACKeyShortDocumentNumber() {
     String dateOfBirthString = "710121";
     String dateOfExpiryString = "310309";
@@ -120,6 +127,7 @@ public class BACKeyTest extends TestCase {
     assertEquals("<<<<<<<<<", (new BACKey("<<<<<<<<<", dateOfBirthString, dateOfExpiryString)).getDocumentNumber());
   }
 
+  @Test
   public void testBACKeyLongDocumentNumber() {
     String dateOfBirthString = "710121";
     String dateOfExpiryString = "310309";

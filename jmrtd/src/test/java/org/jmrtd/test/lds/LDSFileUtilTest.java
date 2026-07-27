@@ -22,6 +22,9 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -39,8 +42,7 @@ import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.DG2File;
 import org.jmrtd.lds.icao.DG3File;
 import org.jmrtd.lds.icao.DG4File;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests some of the functionality provided by the {@code LDSFileUtil} class.
@@ -49,10 +51,11 @@ import junit.framework.TestCase;
  *
  * @version $Revision$
  */
-public class LDSFileUtilTest extends TestCase {
+public class LDSFileUtilTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd.test.lds");
 
+  @Test
   public void testGetLDSFile() {
 
     try {
@@ -95,6 +98,7 @@ public class LDSFileUtilTest extends TestCase {
     }
   }
 
+  @Test
   public void testCompatibilityDataGroups() {
     for (int dgNumber = 1; dgNumber <= 16; dgNumber++) {
       testCompatibilityDataGroups(dgNumber);
@@ -128,6 +132,7 @@ public class LDSFileUtilTest extends TestCase {
     assertEquals(fileNameByTag, fileNameByFID);
   }
 
+  @Test
   public void testDGNumbers() {
     COMFile comFile = COMFileTest.createTestObject();
     List<Integer> dgNumbersFromCOM = LDSFileUtil.getDataGroupNumbers(comFile);

@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,13 +37,13 @@ import javax.imageio.ImageIO;
 
 import org.jmrtd.lds.iso19794.IrisImageInfo;
 import org.jmrtd.lds.iso19794.IrisInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class IrisImageInfoTest extends TestCase {
+public class IrisImageInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testToString() {
     try {
       IrisImageInfo info = createTestObject();
@@ -53,6 +57,7 @@ public class IrisImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testLength() {
     IrisImageInfo irisImageInfo = createTestObject();
     int imageLength = irisImageInfo.getImageLength();

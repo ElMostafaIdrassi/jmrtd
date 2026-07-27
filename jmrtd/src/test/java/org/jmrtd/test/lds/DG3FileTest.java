@@ -22,6 +22,12 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -35,20 +41,17 @@ import org.jmrtd.lds.icao.DG3File;
 import org.jmrtd.lds.iso19794.FingerImageInfo;
 import org.jmrtd.lds.iso19794.FingerInfo;
 import org.jmrtd.test.ResourceUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DG3FileTest extends TestCase {
+public class DG3FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final String TEST_FILE = "/lds/bsi2008/Datagroup3.bin";
 
-  public DG3FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testConstruct() {
     try {
       DG3File dg3 = new DG3File(Arrays.asList(new FingerInfo[] { }));
@@ -60,6 +63,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testFile() {
     try {
       DG3File dg3 = getTestObjectFromResource();
@@ -86,6 +90,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testDecodeEncode() {
     try {
       testDecodeEncode(ResourceUtil.getInputStream(TEST_FILE));
@@ -157,12 +162,13 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testElements() {
     testElements(getTestObjectFromResource());
   }
 
   public void testElements(DG3File dg3File) {
-    FingerInfoTest fingerInfoTest = new FingerInfoTest("DG3FileTest#testElements");
+    FingerInfoTest fingerInfoTest = new FingerInfoTest();
     List<FingerInfo> records = dg3File.getFingerInfos();
     for (FingerInfo fingerInfo: records) {
       fingerInfoTest.testEncodeDecode(fingerInfo);
@@ -185,6 +191,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testImageBytes() {
     try {
       DG3File dg3 = getTestObjectFromResource();
@@ -202,6 +209,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testImageBytes0() {
     try {
       InputStream inputStream = ResourceUtil.getInputStream(TEST_FILE);
@@ -222,6 +230,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testImageBytes2() {
     try {
       /* Test with byte array input stream as carrier. */
@@ -249,6 +258,7 @@ public class DG3FileTest extends TestCase {
 
   }
 
+  @Test
   public void testDecodeSecondImage() {
     try {
       DG3File dg3 = new DG3File(ResourceUtil.getInputStream(TEST_FILE));
@@ -272,6 +282,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode1() {
     try {
       /* Fetch the contents of the binary file. */
@@ -302,7 +313,6 @@ public class DG3FileTest extends TestCase {
 
       for (int i = 0; i < encodedFromByteArrayStream.length; i++) {
         if (bytes[i] != encodedFromByteArrayStream[i]) {
-          LOGGER.info("DEBUG: difference at " + i);
           break;
         }
       }
@@ -327,7 +337,6 @@ public class DG3FileTest extends TestCase {
       assertEquals(bytes.length, encodedFromFileStream.length);
       for (int i = 0; i < encodedFromByteArrayStream.length; i++) {
         if (bytes[i] != encodedFromFileStream[i]) {
-          LOGGER.info("DEBUG: difference at " + i);
           break;
         }
       }
@@ -339,6 +348,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode2() {
     try {
       /* Fetch the contents of the binary file. */
@@ -365,6 +375,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode() {
     try {
       DG3File dg3 = getTestObjectFromResource();
@@ -391,7 +402,6 @@ public class DG3FileTest extends TestCase {
 
       for (int i = 0; i < dg3Bytes.length; i++) {
         if (dg3Bytes[i] != copyBytes[i]) {
-          LOGGER.info("DEBUG: difference at " + i);
           break;
         }
       }
@@ -403,6 +413,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testZeroInstanceTestObjectNotEquals() {
     try {
       DG3File dg3 = new DG3File(new LinkedList<FingerInfo>());
@@ -426,6 +437,7 @@ public class DG3FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testCreate() {
     DG3File dg3 = createTestObject();
     byte[] header = new byte[256];
@@ -433,6 +445,7 @@ public class DG3FileTest extends TestCase {
 //    LOGGER.info(Hex.bytesToPrettyString(header));
   }
 
+  @Test
   public void testFromBin() {
     try {
       InputStream inputStream = ResourceUtil.getInputStream(TEST_FILE);

@@ -22,6 +22,9 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -31,13 +34,13 @@ import java.util.logging.Logger;
 import org.jmrtd.lds.DisplayedImageInfo;
 import org.jmrtd.lds.ImageInfo;
 import org.jmrtd.lds.icao.DG6File;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class DG6FileTest extends TestCase {
+public class DG6FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testDG6File() {
     try {
 

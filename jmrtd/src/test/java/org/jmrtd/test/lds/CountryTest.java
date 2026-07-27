@@ -22,15 +22,22 @@
 
 package org.jmrtd.test.lds;
 
-import org.jmrtd.lds.icao.ICAOCountry;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import org.jmrtd.lds.icao.ICAOCountry;
+import org.junit.Test;
+
 import net.sf.scuba.data.Country;
 import net.sf.scuba.data.ISOCountry;
 import net.sf.scuba.data.UnicodeCountry;
 
-public class CountryTest extends TestCase {
+public class CountryTest {
 
+  @Test
   public void testCountryValues() {
     Country[] values = Country.values();
     assertNotNull(values);
@@ -39,6 +46,7 @@ public class CountryTest extends TestCase {
     }
   }
 
+  @Test
   public void testGermany() {
     Country icaoGermany = ICAOCountry.getInstance("D<<");
     Country isoGermany = Country.getInstance("DEU");
@@ -50,6 +58,7 @@ public class CountryTest extends TestCase {
     assertEquals(isoGermany.toAlpha2Code(), icaoGermany.toAlpha2Code());
   }
 
+  @Test
   public void testTaiwan() {
     Country icaoCountry = ICAOCountry.getInstance("TWN");
     assertNotNull(icaoCountry);
@@ -59,12 +68,14 @@ public class CountryTest extends TestCase {
     assertFalse(icaoCountry.getName().toLowerCase().contains("china"));
   }
 
+  @Test
   public void testNetherlands() {
     assertTrue(Country.getInstance("NLD") == ISOCountry.NL || Country.getInstance("NLD") == UnicodeCountry.NL);
     assertTrue(ISOCountry.NL.equals(Country.getInstance("NLD")) || UnicodeCountry.NL.equals(Country.getInstance("NLD")));
     assertEquals(ISOCountry.NL.getName(), UnicodeCountry.NL.getName());
   }
 
+  @Test
   public void testUtopia() {
     Country utopia = Country.getInstance("UT");
     assertNotNull(utopia);

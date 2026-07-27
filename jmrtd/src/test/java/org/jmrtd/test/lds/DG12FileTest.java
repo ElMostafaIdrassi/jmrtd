@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,24 +38,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG12File;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DG12FileTest extends TestCase {
+public class DG12FileTest {
 
   Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public DG12FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     DG12File dg12File = createTestObject();
     String expectedPrefix = "DG12File [, 19711019, [], , , , , 19711019";
     assertTrue(dg12File.toString().startsWith(expectedPrefix));
   }
 
+  @Test
   public void testReflexive() {
     testReflexive(createTestObject());
   }
@@ -81,6 +84,7 @@ public class DG12FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testEarlySpecSample() {
     byte[] bytes = {
 
@@ -107,6 +111,7 @@ public class DG12FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testNewSpecSample() {
     byte[] bytes = {
 
@@ -135,6 +140,7 @@ public class DG12FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testComplex() {
     try {
       DG12File dg12 = createComplexTestObject();

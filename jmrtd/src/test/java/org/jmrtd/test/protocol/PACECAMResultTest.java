@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -44,15 +48,15 @@ import org.jmrtd.protocol.AESSecureMessagingWrapper;
 import org.jmrtd.protocol.PACECAMResult;
 import org.jmrtd.protocol.PACEMappingResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class PACECAMResultTest extends TestCase {
+public class PACECAMResultTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
+  @Test
   public void testPACECAMResult() {
     try {
       String documentNumner = "123456789";
@@ -101,6 +105,7 @@ public class PACECAMResultTest extends TestCase {
     }
   }
 
+  @Test
   public void testPACECAMResultEquals() {
     try {
       String documentNumner = "123456789";

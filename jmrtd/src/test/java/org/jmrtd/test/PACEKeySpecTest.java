@@ -22,6 +22,11 @@
 
 package org.jmrtd.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,13 +35,13 @@ import org.jmrtd.BACKey;
 import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PACESecretKeySpec;
 import org.jmrtd.PassportService;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class PACEKeySpecTest extends TestCase {
+public class PACEKeySpecTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testPACEKeySpec() {
     try {
       String can = "12345";
@@ -67,6 +72,7 @@ public class PACEKeySpecTest extends TestCase {
     }
   }
 
+  @Test
   public void testPACESecretKeySpec() {
     try {
       String algorithm = "AES"; // ???

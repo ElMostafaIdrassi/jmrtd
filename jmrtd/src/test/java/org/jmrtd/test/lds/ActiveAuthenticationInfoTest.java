@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,13 +36,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.ActiveAuthenticationInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class ActiveAuthenticationInfoTest extends TestCase {
+public class ActiveAuthenticationInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testActiveAuthenticationInfo() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID); //  0.4.0.127.0.7.1.1.4.1.3
 
@@ -46,6 +51,7 @@ public class ActiveAuthenticationInfoTest extends TestCase {
     assertEquals(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID, aaInfo.getSignatureAlgorithmOID());
   }
 
+  @Test
   public void testActiveAuthenticationInfoEquals() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID); //  0.4.0.127.0.7.1.1.4.1.3
     ActiveAuthenticationInfo anotherAAInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID); //  0.4.0.127.0.7.1.1.4.1.3
@@ -55,6 +61,7 @@ public class ActiveAuthenticationInfoTest extends TestCase {
     assertEquals(aaInfo.toString(), anotherAAInfo.toString());
   }
 
+  @Test
   public void testActiveAuthenticationInfoSerializable() {
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     try {

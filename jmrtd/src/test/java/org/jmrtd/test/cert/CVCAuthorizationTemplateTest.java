@@ -22,14 +22,17 @@
 
 package org.jmrtd.test.cert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.jmrtd.cert.CVCAuthorizationTemplate;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Permission;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class CVCAuthorizationTemplateTest {
 
-public class CVCAuthorizationTemplateTest extends TestCase {
-
+  @Test
   public void testCVCAuthorizationTemplate() {
     for (Role role: Role.values()) {
       for (Permission permission: Permission.values()) {
@@ -50,6 +53,7 @@ public class CVCAuthorizationTemplateTest extends TestCase {
 //    }
 //  }
 
+  @Test
   public void testPermissionImplicationReflexive() {
     for (Permission permission: Permission.values()) {
       assertTrue(permission.implies(permission));

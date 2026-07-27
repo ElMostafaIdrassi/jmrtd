@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,19 +42,16 @@ import org.jmrtd.lds.ImageInfo;
 import org.jmrtd.lds.iso19794.FaceImageInfo;
 import org.jmrtd.lds.iso19794.FaceImageInfo.EyeColor;
 import org.jmrtd.lds.iso19794.FaceImageInfo.FeaturePoint;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.data.Gender;
 import net.sf.scuba.util.Hex;
 
-public class FaceImageInfoTest extends TestCase {
+public class FaceImageInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public FaceImageInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     FaceImageInfo imageInfo = createNonEmptyTestObject();
     try {
@@ -62,6 +64,7 @@ public class FaceImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testNonNullEncoded() {
     FaceImageInfo imageInfo = createNonEmptyTestObject();
     assertNotNull(imageInfo);
@@ -69,6 +72,7 @@ public class FaceImageInfoTest extends TestCase {
     assertNotNull(encoded);
   }
 
+  @Test
   public void testEncodeDecode() {
     testEncodeDecode(createNonEmptyTestObject());
   }
@@ -89,11 +93,13 @@ public class FaceImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testNumExtractImageOnce() {
     FaceImageInfo imageInfo = createNonEmptyTestObject(50, 50);
     testExtractImage(imageInfo, 50, 50);
   }
 
+  @Test
   public void testNumExtractImage() {
     for (int width = 100; width < 1000; width += 200) {
       for (int height = 100; height < 1000; height += 200) {
@@ -118,6 +124,7 @@ public class FaceImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testValidType() {
     FaceImageInfo portraitInfo = createTestObject();
     testValidType(portraitInfo);
@@ -128,6 +135,7 @@ public class FaceImageInfoTest extends TestCase {
     assertEquals(type, ImageInfo.TYPE_PORTRAIT);
   }
 
+  @Test
   public void testLength() {
     FaceImageInfo faceImageInfo = createTestObject();
     int imageLength = faceImageInfo.getImageLength();
@@ -143,6 +151,7 @@ public class FaceImageInfoTest extends TestCase {
     return createNonEmptyTestObject(1, 1);
   }
 
+  @Test
   public void testCreateAndExtract() {
     try {
       FaceImageInfo imageInfo = createNonEmptyTestObject();

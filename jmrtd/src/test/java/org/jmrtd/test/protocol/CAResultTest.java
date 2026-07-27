@@ -22,6 +22,9 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -39,8 +42,7 @@ import org.jmrtd.protocol.AESSecureMessagingWrapper;
 import org.jmrtd.protocol.EACCAProtocol;
 import org.jmrtd.protocol.EACCAResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests for CAResult class.
@@ -51,10 +53,11 @@ import junit.framework.TestCase;
  *
  * @since 0.6.2
  */
-public class CAResultTest extends TestCase {
+public class CAResultTest {
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
+  @Test
   public void testCAResult() {
     try {
       BigInteger keyId = BigInteger.valueOf(-1L);
@@ -83,6 +86,7 @@ public class CAResultTest extends TestCase {
     }
   }
 
+  @Test
   public void testCAResultEquals() {
     try {
       BigInteger keyId = BigInteger.valueOf(-1L);

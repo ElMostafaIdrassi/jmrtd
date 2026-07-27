@@ -22,16 +22,20 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
 import org.jmrtd.lds.CVCAFile;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class CVCAFileTest {
 
-public class CVCAFileTest extends TestCase {
-
+  @Test
   public void test1() {
     String name1 = "CAReference00001";
     CVCAFile f = new CVCAFile(name1, null);
@@ -39,6 +43,7 @@ public class CVCAFileTest extends TestCase {
     assertEquals(null, f.getAltCAReference());
   }
 
+  @Test
   public void test2() {
     String name1 = "CAReference00001";
     String name2 = "CAReference00002";
@@ -47,6 +52,7 @@ public class CVCAFileTest extends TestCase {
     assertEquals(name2, f.getAltCAReference().getName());
   }
 
+  @Test
   public void testReflexive1() {
     try {
       String name1 = "CAReference00001";
@@ -60,6 +66,7 @@ public class CVCAFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testReflexive2() {
     try {
       String name1 = "CAReference00001";

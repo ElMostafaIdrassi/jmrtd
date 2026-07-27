@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -34,17 +39,13 @@ import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.iso19794.IrisBiometricSubtypeInfo;
 import org.jmrtd.lds.iso19794.IrisImageInfo;
 import org.jmrtd.lds.iso19794.IrisInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class IrisInfoTest extends TestCase {
+public class IrisInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public IrisInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     try {
       IrisInfo info = createTestObject();
@@ -58,6 +59,7 @@ public class IrisInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testSBHFields() {
     IrisInfo irisInfo = createTestObject();
     testMandatorySBHFields(irisInfo);

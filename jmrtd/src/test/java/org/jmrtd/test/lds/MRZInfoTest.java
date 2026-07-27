@@ -22,6 +22,12 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,13 +39,13 @@ import java.util.logging.Logger;
 import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.jmrtd.lds.icao.MRZInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.data.Country;
 import net.sf.scuba.data.Gender;
 import net.sf.scuba.data.ISOCountry;
 
-public class MRZInfoTest extends TestCase {
+public class MRZInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -145,10 +151,7 @@ public class MRZInfoTest extends TestCase {
 
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyMMdd");
 
-  public MRZInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testVanPassel() {
     try {
       MRZInfo mrzInfo = new MRZInfo(MRZ_MICHAEL_VAN_PASSEL_3LINE_ID1);
@@ -158,23 +161,27 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testOliveira() {
     testLength(new MRZInfo(MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1));
     testToString(new MRZInfo(MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1), MRZ_MARIA_SILVA_OLIVEIRA_3LINE_ID1);
   }
 
+  @Test
   public void testToStringLoes() {
     MRZInfo mrzInfo = createTestObject();
     String expectedResult = "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<\nXX00000000NLD7110195F1108280123456782<<<<<<2\n";
     testToString(mrzInfo, expectedResult);
   }
 
+  @Test
   public void testToStringHappy() {
     String mrz = "P<USATRAVELER<<HAPPY<<<<<<<<<<<<<<<<<<<<<<<<\n"
         + "1500000035USA5609165M0811150<<<<<<<<<<<<<<08\n";
     testToString(new MRZInfo(mrz), mrz);
   }
 
+  @Test
   public void testToStringSamples() {
     for (String str: MRZ_SAMPLES) {
       testToString(new MRZInfo(str), str);
@@ -185,6 +192,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(getMRZString(mrzInfo), getMRZString(expectedResult));
   }
 
+  @Test
   public void testLength()  {
     MRZInfo mrzInfo = createTestObject();
     testLength(mrzInfo);
@@ -207,6 +215,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeToString() {
     MRZInfo mrzInfo = createTestObject();
     testEncodeToString(mrzInfo);
@@ -230,6 +239,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode() {
     MRZInfo mrzInfo = createTestObject();
     byte[] encoded = mrzInfo.getEncoded();
@@ -242,6 +252,7 @@ public class MRZInfoTest extends TestCase {
     assertTrue(Arrays.equals(encoded, copy.getEncoded()));
   }
 
+  @Test
   public void testDecodeEncode() {
     try {
       testDecodeEncode(MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT, "P", "NLD", "MEULENDIJK", new String[] { "LOES", "ALBERTINE" }, "XX0000000", "711019", Gender.FEMALE, "110828", "NLD");
@@ -257,6 +268,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testBelgianMRZ() {
     try {
       String specimenSampleMRZ = "IDBEL590330101085020100200<<<<" +
@@ -276,6 +288,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testStringConstructor() {
     MRZInfo mrzInfo = new MRZInfo(MRZ_ERIKA_MUSTERMAN_2LINE_ID3);
     MRZInfo mrzInfo1 = MRZInfo.createTD3MRZInfo(
@@ -307,6 +320,7 @@ public class MRZInfoTest extends TestCase {
    * Document number should have length 9 (for example for BAC key derivation),
    * but MRZInfo trims following '<' chars.
    */
+  @Test
   public void testShortDocumentNumber() {
     MRZInfo mrzInfo1 = new MRZInfo(MRZ_ANNA_ERIKSSON_2LINE_ID3);
 
@@ -333,6 +347,7 @@ public class MRZInfoTest extends TestCase {
     assertTrue(documentNumber1.indexOf('<') < 0);
   }
 
+  @Test
   public void testFillerZeroCheckDigit() {
     MRZInfo mrzInfo1 = new MRZInfo(MRZ_LOES_MEULENDIJK_2LINE_ID3_FILLER_CHECKDIGIT);
     MRZInfo mrzInfo2 = new MRZInfo(MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT);
@@ -341,6 +356,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo1.getPersonalNumber(), mrzInfo2.getPersonalNumber());
   }
 
+  @Test
   public void testEqualsId3() {
     testEquals(MRZ_LOES_MEULENDIJK_2LINE_ID3_FILLER_CHECKDIGIT);
     testEquals(MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT);
@@ -349,6 +365,7 @@ public class MRZInfoTest extends TestCase {
     testEquals(MRZ_HAPPY_TRAVELER_2LINE_ID3);
   }
 
+  @Test
   public void testEqualsId1() {
     testEquals(MRZ_SUSANNA_SAMPLE_3LINE_ID1);
     testEquals(MRZ_PETER_STEVENSON_3LINE_ID1);
@@ -365,6 +382,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testNationality() {
     //    testNationality(MRZ_LOES_MEULENDIJK_2LINE_ID3_ZERO_CHECKDIGIT, Country.getInstance("NL"));
     //    testNationality(MRZ_HAPPY_TRAVELER_2LINE_ID3, Country.getInstance("US"));
@@ -384,6 +402,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testArnjlotMalaysia() {
     String anonymizedSample =
         "P<MYSABC<DEFG<HIJKLMNOP<QRS<TUV<XYZABCDEFGHI"
@@ -394,6 +413,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("", mrzInfo.getSecondaryIdentifier());
   }
 
+  @Test
   public void testArnjlotLongPrimaryIdenfitier() {
     String sampleWithLongPrimaryIdentifier =
         "P<MYSMEGAN<ELLA<RUTH<BIN<ISMAELAR<EZZAHUDDIN"
@@ -417,6 +437,7 @@ public class MRZInfoTest extends TestCase {
    * Document number check digit indicates extension in optional data,
    * but optional data is empty.
    */
+  @Test
   public void testMRZWithEmptyExtendedDocumentNumber() throws Exception {
     String mrz = getMRZString("I<UTOD23145890<<<<<<<<<<<<<<<<" +
         "7408122F1204159UTO<<<<<<<<<<<6" +
@@ -428,6 +449,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("740812", mrzInfo.getDateOfBirth());
   }
 
+  @Test
   public void testTD2EncodeDecode() {
     try {
       String mrz = "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<"
@@ -466,6 +488,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testTD2ExtendedDocumentNumber() {
     try {
       MRZInfo mrzInfo = MRZInfo.createTD2MRZInfo("I<", "UTO", "ERIKSSON", "ANNA MARIA", "12345678910", "UTO", "740812", Gender.FEMALE, "120415", null);
@@ -487,6 +510,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testMRVA() {
     try {
       MRZInfo constructedMRZInfo = MRZInfo.createMRVAMRZInfo("V<", "UTO", "ERIKSSON", "ANNA MARIA", "L8988901C",
@@ -508,6 +532,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testMRVB() {
     try {
       String mrz = getMRZString("V<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<"
@@ -563,6 +588,7 @@ public class MRZInfoTest extends TestCase {
   }
 
   /* https://sourceforge.net/p/jmrtd/bugs/63/ */
+  @Test
   public void testBug63() {
     String mrzString = getMRZString("IDBRA123456789712345R00F4569<<"
         + "7006012F0212311UTO<<<HDFDTR091"
@@ -571,6 +597,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzString, getMRZString(mrzInfo));
   }
 
+  @Test
   public void testPRTFromPrado() {
     String documentCode = "I";
     String issuingState = "PRT";
@@ -597,6 +624,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals('8', MRZInfo.checkDigit("000024759<ZZ72<<<<<<<<<<<80101002006017<<<<<<<<<<<"));
   }
 
+  @Test
   public void testBug65() {
     String documentCode = "I";
     String issuingState = "PRT";
@@ -632,6 +660,7 @@ public class MRZInfoTest extends TestCase {
    * TD1 MRZ with non-empty optional data 1 and
    * empty optional data 2.
    */
+  @Test
   public void testLVATD1EmptyOptionalData2() throws Exception {
     String mrzString =
         getMRZString("I<LVAPA99220658324951<45849<<<"
@@ -672,6 +701,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(optionalData2, optionalData2ContructedWithNoFillers);
   }
 
+  @Test
   public void testNLDTD3Old() {
     String mrzString = getMRZString("P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<<"
         + "SPECI20142NLD6503101F2403096999999990<<<<<84");
@@ -699,6 +729,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, mrzInfoConstructedWithNoFillers);
   }
 
+  @Test
   public void testVietnam() {
     MRZInfo mrzInfo = MRZInfo.createTD3MRZInfo(
         "P", "VNM", "DE BRUIJN", "WILLEKE LISELOTTE",
@@ -706,6 +737,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(88, getMRZString(mrzInfo).length());
   }
 
+  @Test
   public void testNLDTD3New() {
     String mrzString = getMRZString("P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<<"
         + "SPECI20212NLD6503101F3108309<<<<<<<<<<<<<<<0");
@@ -741,6 +773,7 @@ public class MRZInfoTest extends TestCase {
   /*
    * TD3 MRZ, empty optional data. Country codes have trailing fillers.
    */
+  @Test
   public void testDEUTD3() {
     String mrzString = getMRZString("P<D<<MUSTERMANN<<ERIKA<<<<<<<<<<<<<<<<<<<<<<"
         + "C01XGY7661D<<6408125F2707196<<<<<<<<<<<<<<<2");
@@ -788,6 +821,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, mrzInfoConstructedWithFillers);
   }
 
+  @Test
   public void testGBRTD3() {
     String mrzString = getMRZString("P<GBRUK<SPECIMEN<<ANGELA<ZOE<<<<<<<<<<<<<<<<"
         + "9992307632GBR9501016F2911272<<<<<<<<<<<<<<02");
@@ -818,6 +852,7 @@ public class MRZInfoTest extends TestCase {
   /*
    * TD3 with non-empty optional data.
    */
+  @Test
   public void testNORTD3() {
     String mrzString = getMRZString("PUNORSPECIMEN<<PLACEBO<<<<<<<<<<<<<<<<<<<<<<"
         + "00000000<0UTO0508104F19110135200508102468906");
@@ -854,6 +889,7 @@ public class MRZInfoTest extends TestCase {
   /*
    * TD3 MRZ with empty optional data (1) and 0 optional data check digit.
    */
+  @Test
   public void testNZLTD3OptionalData() {
     String mrzString = getMRZString("P<NZLWATA<<AROHA<MERE<TERESA<<<<<<<<<<<<<<<<"
         + "LF100358<5NZL9010015F2512152<<<<<<<<<<<<<<02");
@@ -884,6 +920,7 @@ public class MRZInfoTest extends TestCase {
    * document number (overflowing) and
    * non-empty optional data 2.
    */
+  @Test
   public void testBELID() {
     String mrzString = getMRZString("IDBEL000000387<2899<<<<<<<<<<<"
         + "9502286F3001064BEL950228998741"
@@ -929,6 +966,7 @@ public class MRZInfoTest extends TestCase {
   /*
    * TD1 MRZ with empty optional data 1 and empty optional data 2.
    */
+  @Test
   public void testNLDTD1EmptyOptionalData1() throws Exception {
     String mrzString = getMRZString("I<NLDSPECI20212<<<<<<<<<<<<<<<"
         + "6503101F3108022NLD<<<<<<<<<<<8"
@@ -962,6 +1000,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, mrzInfoConstructedWithNoFillers);
   }
 
+  @Test
   public void testTD1LongDocumentNumberAndAlsoOptionalData1() {
     MRZInfo mrzInfo = new MRZInfo(
         "I<NLD123456789<010<OHDA1<<<<<<\n"
@@ -979,6 +1018,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(getMRZString(mrzInfo), getMRZString(reconstructedMRZInfo));
   }
 
+  @Test
   public void testTD1ConstructedLongDocumentNumberAndAlsoOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "I<", "NLD", "12345678901", "OHDA1",
@@ -1006,6 +1046,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("OHDA1", reconstructedResconstructedMRZInfo.getOptionalData1());
   }
 
+  @Test
   public void testTD1ConstructedLongDocumentNumberAndAlsoMaxOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "I<", "NLD", "1234567890", "OHDA1234567X",
@@ -1033,6 +1074,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("OHDA1234567X", reconstructedResconstructedMRZInfo.getOptionalData1());
   }
 
+  @Test
   public void testTD1ConstructedLongMaxDocumentNumberAndAlsoOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "I<", "NLD", "123456789012345678801", "X",
@@ -1061,6 +1103,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("X", reconstructedResconstructedMRZInfo.getOptionalData1());
   }
 
+  @Test
   public void testTD1ConstructedMaxDocumentNumberAndNoOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "I<", "NLD", "1234567890123456788012", "",
@@ -1089,6 +1132,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("", reconstructedResconstructedMRZInfo.getOptionalData1());
   }
 
+  @Test
   public void testTD1AUTDocumentNumberAndOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "ID", "AUT", "PA1234567", "",
@@ -1103,6 +1147,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, reconstruct(mrzInfo));
   }
 
+  @Test
   public void testTD1BELDocumentNumberAndOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "ID", "BEL", "600001131775", "",
@@ -1117,6 +1162,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, reconstruct(mrzInfo));
   }
 
+  @Test
   public void testTD1ESPDocumentNumberAndOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "ID", "ESP", "CAA000000", "99999999R",
@@ -1133,6 +1179,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, reconstruct(mrzInfo));
   }
 
+  @Test
   public void testTD1ESTDocumentNumberAndOptionalData1() {
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
         "ID", "EST", "AS0002262", "38001085718",
@@ -1149,6 +1196,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzInfo, reconstruct(mrzInfo));
   }
 
+  @Test
   public void testTD1LongDocumentNumberNoOptionalData1() {
     String optionalData1 = "";
     MRZInfo mrzInfo = MRZInfo.createTD1MRZInfo(
@@ -1158,6 +1206,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("", mrzInfo.getOptionalData1());
   }
 
+  @Test
   public void testOptionalData1TD1() {
     // Old style NIK (Dutch Id card)
     String bsn = "299496892";
@@ -1187,6 +1236,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("OPT<DATA3", mrzInfoNew.getOptionalData2());
   }
 
+  @Test
   public void testCompositeCheckDigitTD3() {
     MRZInfo mrzInfo = MRZInfo.createTD3MRZInfo(
         "P", "GBR",
@@ -1198,6 +1248,7 @@ public class MRZInfoTest extends TestCase {
         getMRZString(mrzInfo));
   }
 
+  @Test
   public void testOptionalData1TD3() {
     MRZInfo mrzInfo = MRZInfo.createTD3MRZInfo(
         "P", "GBR",
@@ -1228,6 +1279,7 @@ public class MRZInfoTest extends TestCase {
     assertNull(mrzInfoNoOptionalData.getOptionalData2());
   }
 
+  @Test
   public void testOptionalData1TD2() {
     MRZInfo mrzInfo = MRZInfo.createTD2MRZInfo(
         "A", "UTO",
@@ -1242,6 +1294,7 @@ public class MRZInfoTest extends TestCase {
         getMRZString(mrzInfo));
   }
 
+  @Test
   public void testOptionalData1MRVA() {
     MRZInfo mrzInfo = MRZInfo.createMRVAMRZInfo(
         "V", "GBR",
@@ -1261,6 +1314,7 @@ public class MRZInfoTest extends TestCase {
     assertNull(reconstructedMRZInfo.getOptionalData2());
   }
 
+  @Test
   public void testOptionalDataMRVB() {
     MRZInfo mrzInfo = MRZInfo.createMRVBMRZInfo(
         "V", "UTO",
@@ -1300,6 +1354,7 @@ public class MRZInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testMRVBMRZFormatFields() {
     MRZInfo mrzInfo = MRZInfo.createMRVBMRZInfo(
         "V", "UTO",
@@ -1327,6 +1382,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(mrzString, getMRZString(mrzInfo2));
   }
 
+  @Test
   public void testTD3MRVAOptionalDataCompositeCheckDigit() {
     MRZInfo mrzInfoTD3 =  new MRZInfo("P<GBROTHER<FORTYFOUR<<ANNA<NICHOLA<<<<<<<<<<CCC0143561GBR6001010F27080121234567890123450");
     MRZInfo mrzInfoMRVA = new MRZInfo("V<GBROTHER<FORTYFOUR<<ANNA<NICHOLA<<<<<<<<<<CCC0143561GBR6001010F27080121234567890123450");
@@ -1334,6 +1390,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(16, mrzInfoMRVA.getOptionalData1().length());
   }
 
+  @Test
   public void testTD2MRVBOptionalDataCompositeCheckDigit() {
     MRZInfo mrzInfoTD2 = new MRZInfo("I<UTOOTHER<FORTYFOUR<<ANNA<NICHOLA<<CCC0143561GBR6001010F270801234567892");
     MRZInfo mrzInfoMRVB = new MRZInfo("V<UTOOTHER<FORTYFOUR<<ANNA<NICHOLA<<CCC0143561GBR6001010F270801234567892");
@@ -1341,6 +1398,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(8, mrzInfoMRVB.getOptionalData1().length());
   }
 
+  @Test
   public void testTD1OptionalData1OptionalData2() {
     String optionalData1 = "OPT DATA1     1"; // Length 15
     String optionalData2 = "OPT DATA  2"; // Length 11
@@ -1368,6 +1426,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals(expectedOptionalData2, reparsedMRZInfo.getOptionalData2());
   }
 
+  @Test
   public void testGBRNoPrimary() {
     MRZInfo mrzInfo = new MRZInfo("IRGBRZU12345673<<<<<<<<<<<<<<<"
         + "6608198F0808088COU<<<<<<<<<<<6"
@@ -1377,6 +1436,7 @@ public class MRZInfoTest extends TestCase {
     assertEquals("", mrzInfo.getSecondaryIdentifier());
   }
 
+  @Test
   public void testGetNameOfHolder() {
     testGetNameOfHolder("OTHER<FORTYFOUR<<ANNA<NICHOLA", new MRZInfo("P<GBROTHER<FORTYFOUR<<ANNA<NICHOLA<<<<<<<<<<"
         + "CCC0143561GBR6001010F27080121234567890123450"));
@@ -1418,6 +1478,7 @@ public class MRZInfoTest extends TestCase {
     assertTrue(expectedNameOfHolder.contains(secondaryIdentifier.replace(" ", "<")));
   }
 
+  @Test
   public void testConstructTD1() {
     try {
 

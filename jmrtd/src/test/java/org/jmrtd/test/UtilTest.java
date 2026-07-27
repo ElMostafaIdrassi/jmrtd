@@ -22,6 +22,12 @@
 
 package org.jmrtd.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -38,8 +44,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
 /**
@@ -51,10 +57,11 @@ import net.sf.scuba.util.Hex;
  *
  * @since 0.6.2
  */
-public class UtilTest extends TestCase {
+public class UtilTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testPadding() {
     testPadding(3, 64);
     testPadding(31, 64);
@@ -86,6 +93,7 @@ public class UtilTest extends TestCase {
     }
   }
 
+  @Test
   public void testApproximateSignatureSize() {
     Security.addProvider(Util.getBouncyCastleProvider());
     try {
@@ -142,6 +150,7 @@ public class UtilTest extends TestCase {
     assertTrue(expectedSize <= sigSize && sigSize <= expectedSize + (expectedSize / 2));
   }
 
+  @Test
   public void testPartition() {
     for (int dataSize = 23; dataSize < 987; dataSize++) {
       for (int segmentSize = 13; segmentSize < 63; segmentSize ++) {
@@ -172,6 +181,7 @@ public class UtilTest extends TestCase {
     assertTrue(isLasts.get(segments.size() - 1));
   }
 
+  @Test
   public void testStripLeadingZeroes() {
     byte[] example = { 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04 };
     byte[] stripped = Util.stripLeadingZeroes(example);
@@ -179,6 +189,7 @@ public class UtilTest extends TestCase {
     assertTrue(Arrays.equals(new byte[] { 0x01, 0x02, 0x03, 0x04 }, stripped));
   }
 
+  @Test
   public void testBigIntegerI2OSStripLeadingZeroes() {
     for (long i = 0; i < 66666; i++) {
       BigInteger bigInteger = BigInteger.valueOf(i);
@@ -188,6 +199,7 @@ public class UtilTest extends TestCase {
     }
   }
 
+  @Test
   public void testECPointSerDeser() {
 
     BigInteger x = new BigInteger("1711296670204813060243268632676822234344359677243986977215350947079259342020");
@@ -222,6 +234,7 @@ public class UtilTest extends TestCase {
   /**
    * https://sourceforge.net/p/jmrtd/bugs/57/
    */
+  @Test
   public void testECPointLeadingZeroes() {
     BigInteger x = new BigInteger(Hex.hexStringToBytes("13426B4FE5577053F0374CF79ACFA6F7750B8E0D60DCA9FE627AB49A21D2C4C4"));
     BigInteger y = new BigInteger(Hex.hexStringToBytes("004D3F9BC97AFDF8ABD9B561E63C0239763976A9FEB1EFFD816A140D791217CF"));

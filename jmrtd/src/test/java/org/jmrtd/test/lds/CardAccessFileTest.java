@@ -22,6 +22,8 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,11 +33,11 @@ import org.jmrtd.lds.ActiveAuthenticationInfo;
 import org.jmrtd.lds.CardAccessFile;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.SecurityInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class CardAccessFileTest {
 
-public class CardAccessFileTest extends TestCase {
-
+  @Test
   public void testCardAccessFile() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID);
     PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
@@ -46,6 +48,7 @@ public class CardAccessFileTest extends TestCase {
     assertEquals(new HashSet<SecurityInfo>(securityInfos), new HashSet<SecurityInfo>(actualSecurityInfos));
   }
 
+  @Test
   public void testCardAccessFileEquals() {
     ActiveAuthenticationInfo aaInfo = new ActiveAuthenticationInfo(ActiveAuthenticationInfo.ECDSA_PLAIN_SHA256_OID);
     PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);

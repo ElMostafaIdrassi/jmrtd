@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
+
 //import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,11 +42,11 @@ import org.jmrtd.lds.icao.DG2File;
 import org.jmrtd.lds.iso19794.FaceImageInfo;
 import org.jmrtd.lds.iso19794.FaceInfo;
 import org.jmrtd.test.ResourceUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DG2FileTest extends TestCase {
+public class DG2FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -50,10 +55,7 @@ public class DG2FileTest extends TestCase {
 
   private static final boolean SHOULD_SHOW_FRAME = false;
 
-  public DG2FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testConstruct() {
     try {
       DG2File dg2 = new DG2File(Arrays.asList(new FaceInfo[] { }));
@@ -79,6 +81,7 @@ public class DG2FileTest extends TestCase {
     return buffer.toByteArray();
   }
 
+  @Test
   public void testReflexive() {
     try {
       testReflexive(getTestObject(BSI_TEST_FILE));
@@ -104,6 +107,7 @@ public class DG2FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testWriteObject() {
     try {
       testDecodeEncode(getTestObject(BSI_TEST_FILE), 2);
@@ -153,6 +157,7 @@ public class DG2FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testElements() {
     try {
       testElements(getTestObject(BSI_TEST_FILE));
@@ -166,7 +171,7 @@ public class DG2FileTest extends TestCase {
   public void testElements(DG2File dg2File) {
     testDecodeEncode(dg2File, 2);
 
-    FaceInfoTest faceInfoTest = new FaceInfoTest("DG2FileTest");
+    FaceInfoTest faceInfoTest = new FaceInfoTest();
     List<FaceInfo> faceInfos = dg2File.getFaceInfos();
 //    LOGGER.info("DEBUG: faceInfos: " + faceInfos.size());
     for (FaceInfo faceInfo: faceInfos) {
@@ -176,6 +181,7 @@ public class DG2FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testImageBytes() {
     try {
       testImageBytes(getTestObject(BSI_TEST_FILE));
@@ -198,6 +204,7 @@ public class DG2FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testImageBytes0() {
     testImageBytes0(BSI_TEST_FILE);
     testImageBytes0(LOES_TEST_FILE);
@@ -218,6 +225,7 @@ public class DG2FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testCreate() {
     try {
       DG2File dg2 = createTestObject();
@@ -230,17 +238,15 @@ public class DG2FileTest extends TestCase {
     }
   }
 
-  public void testTruncate() {
-    try {
-      DG2File dg2File = getDefaultTestObject();
-      byte[] dg2Bytes = dg2File.getEncoded();
-      byte[] partialBytes = new byte[(int)(0.8 * dg2Bytes.length)];
-      System.arraycopy(dg2Bytes, 0, partialBytes, 0, partialBytes.length);
-      DG2File partialDG2File = new DG2File(new ByteArrayInputStream(partialBytes));
-      fail("Should be exception");
-    } catch (Exception expected) {
-      LOGGER.log(Level.INFO, "Exception", expected);
-    }
+  @Test
+  public void testTruncate() throws Exception {
+    DG2File dg2File = getDefaultTestObject();
+    byte[] dg2Bytes = dg2File.getEncoded();
+    byte[] partialBytes = new byte[(int)(0.8 * dg2Bytes.length)];
+    System.arraycopy(dg2Bytes, 0, partialBytes, 0, partialBytes.length);
+    assertThrows(Exception.class, () -> {
+      new DG2File(new ByteArrayInputStream(partialBytes));
+    });
   }
 
   public static DG2File createTestObject() {

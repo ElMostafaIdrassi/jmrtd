@@ -22,6 +22,9 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
@@ -32,13 +35,13 @@ import java.security.PublicKey;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class ChipAuthenticationPublicKeyInfoTest extends TestCase {
+public class ChipAuthenticationPublicKeyInfoTest {
 
   private static final Provider BC_PROVIDER = new BouncyCastleProvider();
 
+  @Test
   public void testConstruct() {
     try {
       ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo = getSampleObject();
@@ -47,6 +50,7 @@ public class ChipAuthenticationPublicKeyInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testChipAuthenticationPublicKeyInfoEquals() {
     ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo = getSampleObject();
     ChipAuthenticationPublicKeyInfo anotherChipAuthenticationPublicKeyInfo = new ChipAuthenticationPublicKeyInfo(chipAuthenticationPublicKeyInfo.getSubjectPublicKey(), chipAuthenticationPublicKeyInfo.getKeyId());
@@ -55,6 +59,7 @@ public class ChipAuthenticationPublicKeyInfoTest extends TestCase {
     assertEquals(chipAuthenticationPublicKeyInfo.toString(), anotherChipAuthenticationPublicKeyInfo.toString());
   }
 
+  @Test
   public void testSerializable() {
     try {
       ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo = getSampleObject();

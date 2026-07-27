@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -29,23 +34,20 @@ import java.util.logging.Logger;
 
 import org.jmrtd.lds.LDSFile;
 import org.jmrtd.lds.icao.COMFile;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class COMFileTest extends TestCase {
+public class COMFileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public COMFileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     COMFile dg1File = createTestObject();
     String expectedResult = "COMFile LDS 01.07, Unicode 04.00.00, [DG1, DG2, DG15]";
     assertEquals(dg1File.toString(), expectedResult);
   }
 
+  @Test
   public void testReflexive() {
     testReflexive(createTestObject());
   }
@@ -67,6 +69,7 @@ public class COMFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testSpecSample() {
     byte[] bytes = { 0x60, /* L */ 0x16,
         0x5F, 0x01, /* L */ 0x04,
@@ -95,6 +98,7 @@ public class COMFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testAlternativeConstructor() {
     int[] tagList1 = new int[2];
     tagList1[0] = LDSFile.EF_DG1_TAG;

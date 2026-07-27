@@ -22,6 +22,9 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -43,15 +46,15 @@ import org.jmrtd.protocol.AESSecureMessagingWrapper;
 import org.jmrtd.protocol.PACEMappingResult;
 import org.jmrtd.protocol.PACEResult;
 import org.jmrtd.protocol.SecureMessagingWrapper;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class PACEResultTest extends TestCase {
+public class PACEResultTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
+  @Test
   public void testPACEResult() {
     try {
       String oid = PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256;
@@ -90,6 +93,7 @@ public class PACEResultTest extends TestCase {
     }
   }
 
+  @Test
   public void testPACEResultEquals() {
       try {
         String oid = PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256;

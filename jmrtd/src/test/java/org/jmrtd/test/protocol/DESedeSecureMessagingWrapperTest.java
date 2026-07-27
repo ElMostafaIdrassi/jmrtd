@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
@@ -36,17 +40,18 @@ import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.smartcards.CommandAPDU;
 import net.sf.scuba.util.Hex;
 
-public class DESedeSecureMessagingWrapperTest extends TestCase {
+public class DESedeSecureMessagingWrapperTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
+  @Test
   public void testDESedeSecureMessagingWrapper() {
     try {
       SecretKey encKey = getRandomDESedeKey();
@@ -60,6 +65,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     }
   }
 
+  @Test
   public void testDESedeSecureMessagingWrapperEquals() {
     try {
       SecretKey encKey = getRandomDESedeKey();
@@ -74,6 +80,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
     }
   }
 
+  @Test
   public void testDESedeSecureMessagingWrapperWrapUnwrap() {
     try {
       SecretKey encKey = getRandomDESedeKey();
@@ -97,6 +104,7 @@ public class DESedeSecureMessagingWrapperTest extends TestCase {
   /*
    * See https://stackoverflow.com/q/47307716/27190.
    */
+  @Test
   public void testStackOverflowTim() {
     try {
       Security.addProvider(BC_PROVIDER);

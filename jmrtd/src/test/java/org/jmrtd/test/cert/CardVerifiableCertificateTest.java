@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.cert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
@@ -35,8 +39,7 @@ import org.jmrtd.cert.CVCAuthorizationTemplate.Permission;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests for the card verifiable certificate class.
@@ -47,10 +50,11 @@ import junit.framework.TestCase;
  *
  * @since 0.6.2
  */
-public class CardVerifiableCertificateTest extends TestCase {
+public class CardVerifiableCertificateTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testCardVerifiableCertificate() {
     try {
       CVCPrincipal authorityReference = new CVCPrincipal("UTDVCS00001");
@@ -95,8 +99,6 @@ public class CardVerifiableCertificateTest extends TestCase {
   /* Adapted from: https://stackoverflow.com/a/2517954/27190 */
   private static boolean isSameDay(Date date1, Date date2) {
     SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
-    LOGGER.info("DEBUG: 1 = " + fmt.format(date1));
-    LOGGER.info("DEBUG: 2 = " + fmt.format(date2));
     return fmt.format(date1).equals(fmt.format(date2));
   }
 

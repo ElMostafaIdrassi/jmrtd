@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -62,10 +67,9 @@ import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.TerminalAuthenticationInfo;
 import org.jmrtd.lds.icao.DG14File;
 import org.jmrtd.test.ResourceUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class DG14FileTest extends TestCase {
+public class DG14FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -74,6 +78,7 @@ public class DG14FileTest extends TestCase {
     Security.addProvider(BC_PROVIDER);
   }
 
+  @Test
   public void testConstruct() {
     try {
       Map<Integer, PublicKey> keys = new TreeMap<Integer, PublicKey>();
@@ -128,6 +133,7 @@ public class DG14FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode() {
     try {
       DG14File dg14 = getSampleObject();
@@ -149,6 +155,7 @@ public class DG14FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testDecodeEncode() {
     DG14File dg14 = getSampleObject();
     Collection<SecurityInfo> securityInfos = dg14.getSecurityInfos();
@@ -163,6 +170,7 @@ public class DG14FileTest extends TestCase {
     assertTrue(Arrays.equals(encoded, copyEncoded));
   }
 
+  @Test
   public void testDecodeEncode1() {
     try {
       DG14File dg14 = getSampleObject();
@@ -176,6 +184,7 @@ public class DG14FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testSerializable() {
     try {
       DG14File dg14 = getSampleObject();
@@ -210,6 +219,7 @@ public class DG14FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testSpecSample() {
     try {
       byte[] specSample = getSpecSampleDG14File();
@@ -239,6 +249,7 @@ public class DG14FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testSpecSample1() {
     try {
       byte[] encoded0 = getSpecSampleDG14File();
@@ -256,6 +267,7 @@ public class DG14FileTest extends TestCase {
   }
 
   /** Tests a specific sample. */
+  @Test
   public void testGWSample() {
     try {
       DG14File dg14 = getGWSample();
@@ -278,6 +290,7 @@ public class DG14FileTest extends TestCase {
    * See https://www.bsi.bund.de/EN/Publications/TechnicalGuidelines/TR03105/BSITR03105.html.
    */
 
+  @Test
   public void testLDS_E_1() {
     try {
       Collection<DG14File> dg14s = getSampleObjects();
@@ -302,6 +315,7 @@ public class DG14FileTest extends TestCase {
     assertTrue(length <= encoded.length);
   }
 
+  @Test
   public void testLDS_E_2() {
     try {
       Collection<DG14File> dg14s = getSampleObjects();
@@ -339,6 +353,7 @@ public class DG14FileTest extends TestCase {
     assertTrue(chipAuthenticationPublicKeyInfoCount > 0);
   }
 
+  @Test
   public void testLDS_E_3() {
     try {
       Collection<DG14File> dg14s = getSampleObjects();
@@ -553,8 +568,6 @@ public class DG14FileTest extends TestCase {
     for (SecurityInfo securityInfo: securityInfos) {
       if (securityInfo instanceof ChipAuthenticationPublicKeyInfo) {
         ChipAuthenticationPublicKeyInfo chipAuthenticationPublicKeyInfo = (ChipAuthenticationPublicKeyInfo)securityInfo;
-        LOGGER.info("DEBUG: ChipAuthenticationPublicKeyInfo oid = " + chipAuthenticationPublicKeyInfo.getObjectIdentifier());
-        LOGGER.info("DEBUG: ChipAuthenticationPublicKeyInfo keyId = "+ chipAuthenticationPublicKeyInfo.getKeyId());
         PublicKey publicKey = chipAuthenticationPublicKeyInfo.getSubjectPublicKey();
         String algorithm = publicKey.getAlgorithm();
         if ("EC".equals(algorithm)) {
@@ -564,8 +577,6 @@ public class DG14FileTest extends TestCase {
         }
       } else if (securityInfo instanceof ChipAuthenticationInfo) {
         ChipAuthenticationInfo chipAuthenticationInfo = (ChipAuthenticationInfo)securityInfo;
-        LOGGER.info("DEBUG: ChipAuthenticationInfo oid = " + chipAuthenticationInfo.getObjectIdentifier());
-        LOGGER.info("DEBUG: ChipAuthenticationInfo keyId = "+ chipAuthenticationInfo.getKeyId());
       }
     }
   }
@@ -574,26 +585,18 @@ public class DG14FileTest extends TestCase {
   private void showSubjectPublicKeyInfo(PublicKey publicKey) {
     ECPublicKey ecPublicKey = (ECPublicKey)publicKey;
     ECPoint w = ecPublicKey.getW();
-    LOGGER.info("DEBUG: w = " + toString(w));
     ECParameterSpec params = ecPublicKey.getParams();
     ECPoint g = params.getGenerator();
-    LOGGER.info("DEBUG: g = " + toString(g));
     BigInteger order = params.getOrder();
-    LOGGER.info("DEBUG: order = " + order); // n
     int coFactor = params.getCofactor(); // h
-    LOGGER.info("DEBUG: coFactor = " + coFactor);
     EllipticCurve curve = params.getCurve();
     BigInteger a = curve.getA();
-    LOGGER.info("DEBUG: A = " + a);
     BigInteger b = curve.getB();
-    LOGGER.info("DEBUG: B = " + b);
     ECField field = curve.getField();
     if (field instanceof ECFieldFp) {
       BigInteger p = ((ECFieldFp)field).getP();
-      LOGGER.info("DEBUG: Field is F_" + p);
     } else if (field instanceof ECFieldF2m) {
       int m = ((ECFieldF2m)field).getM();
-      LOGGER.info("DEBUG: Field is F_2^" + m);
     }
   }
 

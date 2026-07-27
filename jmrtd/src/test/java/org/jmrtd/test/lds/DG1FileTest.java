@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -34,25 +39,23 @@ import java.util.logging.Logger;
 
 import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.MRZInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.data.Gender;
 import net.sf.scuba.util.Hex;
 
-public class DG1FileTest extends TestCase {
+public class DG1FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public DG1FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     DG1File dg1File = createTestObject();
     String expectedResult = "DG1File P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<XX00000000NLD7110195F1108280123456782<<<<<<2";
     assertEquals(dg1File.toString(), expectedResult);
   }
 
+  @Test
   public void testReflexive() {
     testReflexive(createTestObject());
   }
@@ -73,6 +76,7 @@ public class DG1FileTest extends TestCase {
   private static final String SMITH_SAMPLE = "P<ATASMITH<<JOHN<T<<<<<<<<<<<<<<<<<<<<<<<<<<123456789<HMD7406222M10123130121<<<<<<<<<<54";
   private static final String LOES_SAMPLE = "P<NLDMEULENDIJK<<LOES<ALBERTINE<<<<<<<<<<<<<XA00277324NLD7110195F0610010123456782<<<<<08";
 
+  @Test
   public void testSpecSample() {
     try {
       DG1File file = getSpecSampleObject(SMITH_SAMPLE);
@@ -87,6 +91,7 @@ public class DG1FileTest extends TestCase {
   }
 
   /* Doc 9303 - Part 5. */
+  @Test
   public void testTD1() throws Exception {
     DG1File dg1File = new DG1File(MRZInfo.createTD1MRZInfo(
         "I", "UTO", "123456789", "",
@@ -99,6 +104,7 @@ public class DG1FileTest extends TestCase {
   }
 
   /* Doc 9303 - part 6. */
+  @Test
   public void testTD2() throws Exception {
     DG1File dg1File = new DG1File(MRZInfo.createTD2MRZInfo(
         "A", "UTO", "ERIKSSON", "ANNA MARIA",
@@ -110,6 +116,7 @@ public class DG1FileTest extends TestCase {
   }
 
   /* Doc 9303 - Part 4. */
+  @Test
   public void testTD3() throws Exception {
     DG1File dg1File = new DG1File(MRZInfo.createTD3MRZInfo(
         "P", "UTO", "VILARCHO FERNANDEZ", "JOSE RAMON",
@@ -120,6 +127,7 @@ public class DG1FileTest extends TestCase {
     assertEquals(MRZInfo.DOC_TYPE_ID3, reencodedDG1File.getMRZInfo().getDocumentType());
   }
 
+  @Test
   public void testLength() {
     Collection<DG1File> dg1s = getTestObjects();
     for (DG1File dg1: dg1s) {
@@ -133,7 +141,6 @@ public class DG1FileTest extends TestCase {
 
     int length = dg1.getLength();
     if (length <= 0) {
-      LOGGER.info("DEBUG: O_o: length = " + length);
     }
     assertTrue(length > 0);
 

@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,18 +37,15 @@ import javax.imageio.ImageIO;
 
 import org.jmrtd.lds.DisplayedImageInfo;
 import org.jmrtd.lds.ImageInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DisplayedImageInfoTest extends TestCase {
+public class DisplayedImageInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public DisplayedImageInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     testToString(createNonEmptyTestObject(), "DisplayedImageInfo [type: Signature or usual mark, size: ");
   }
@@ -60,6 +62,7 @@ public class DisplayedImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testNonNullEncoded() {
     DisplayedImageInfo imageInfo = createNonEmptyTestObject();
     assertNotNull(imageInfo);
@@ -67,6 +70,7 @@ public class DisplayedImageInfoTest extends TestCase {
     assertNotNull(encoded);
   }
 
+  @Test
   public void testEncodeDecode() {
     testEncodeDecode(createNonEmptyTestObject());
   }
@@ -88,6 +92,7 @@ public class DisplayedImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testValidType() {
     DisplayedImageInfo signatureInfo = createNonEmptyTestObject(ImageInfo.TYPE_SIGNATURE_OR_MARK, 800, 266);
     testValidType(signatureInfo);

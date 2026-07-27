@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,13 +34,13 @@ import java.util.logging.Logger;
 import org.jmrtd.lds.iso19794.IrisBiometricSubtypeInfo;
 import org.jmrtd.lds.iso19794.IrisImageInfo;
 import org.jmrtd.lds.iso19794.IrisInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class IrisBiometricSubtypeInfoTest extends TestCase {
+public class IrisBiometricSubtypeInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testCreate() {
     IrisBiometricSubtypeInfo irisSubtypeInfo = createTestObject();
     int subtypeId = irisSubtypeInfo.getBiometricSubtype();
@@ -47,6 +51,7 @@ public class IrisBiometricSubtypeInfoTest extends TestCase {
     assertTrue(imageFormat >= 0);
   }
 
+  @Test
   public void testToString() {
     try {
       IrisBiometricSubtypeInfo info = createTestObject();

@@ -22,12 +22,15 @@
 
 package org.jmrtd.test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests explicitly if we have unlimited strength cryptography installed on this VM.
@@ -36,10 +39,11 @@ import junit.framework.TestCase;
  *
  * @version $Revision$
  */
-public class UnlimitedStrengthCryptoTest extends TestCase {
+public class UnlimitedStrengthCryptoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testUnlimitedStrength() {
     try {
 //      LOGGER.info("DEBUG: Checking unlimited crypto for VM " +  System.getProperties());

@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,18 +42,15 @@ import org.jmrtd.lds.icao.DG3File;
 import org.jmrtd.lds.iso19794.FingerImageInfo;
 import org.jmrtd.lds.iso19794.FingerInfo;
 import org.jmrtd.test.ResourceUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class FingerImageInfoTest extends TestCase {
+public class FingerImageInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public FingerImageInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     try {
       FingerImageInfo imageInfo = createRightIndexFingerTestObject();
@@ -61,6 +63,7 @@ public class FingerImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testNonNullEncoded() {
     FingerImageInfo imageInfo = createRightIndexFingerTestObject();
     assertNotNull(imageInfo);
@@ -68,11 +71,13 @@ public class FingerImageInfoTest extends TestCase {
     assertNotNull(encoded);
   }
 
+  @Test
   public void testEncodeDecode() {
     FingerImageInfo testObject = createRightIndexFingerTestObject();
     testEncodeDecode(testObject);
   }
 
+  @Test
   public void testBSI() {
     try {
       byte[] imageBytes = ResourceUtil.getBytes("/lds/wsq/fp.wsq");
@@ -85,6 +90,7 @@ public class FingerImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testCreateExtract() {
     try {
       FingerImageInfo fingerImageInfo = createNonEmptyTestObject();
@@ -125,6 +131,7 @@ public class FingerImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testWidthHeight() {
     try {
       FingerImageInfo imageInfo = createRightIndexFingerTestObject();
@@ -139,6 +146,7 @@ public class FingerImageInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testViewCountAndNumber() {
     FingerImageInfo fingerImageInfo = createRightIndexFingerTestObject();
     testViewCountAndNumber(fingerImageInfo);
@@ -151,6 +159,7 @@ public class FingerImageInfoTest extends TestCase {
     assertTrue(viewNumber <= viewCount);
   }
 
+  @Test
   public void testValidType() {
     FingerImageInfo portraitInfo = createRightIndexFingerTestObject();
     testValidType(portraitInfo);
@@ -161,6 +170,7 @@ public class FingerImageInfoTest extends TestCase {
     assertEquals(type, ImageInfo.TYPE_FINGER);
   }
 
+  @Test
   public void testLength() {
     FingerImageInfo fingerImageInfo = createRightIndexFingerTestObject();
     int imageLength = fingerImageInfo.getImageLength();

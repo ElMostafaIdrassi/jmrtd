@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -55,11 +60,11 @@ import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
 import org.jmrtd.protocol.PACEGMWithECDHAgreement;
 import org.jmrtd.protocol.PACEProtocol;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class PACEProtocolTest extends TestCase {
+public class PACEProtocolTest {
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
@@ -81,6 +86,7 @@ public class PACEProtocolTest extends TestCase {
   //	PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   //	PARAM_ID_ECP_NIST_P512_R1 = 18;
 
+  @Test
   public void testMacs() {
     try {
       Mac macDESede = Mac.getInstance("DESedeMac", BC_PROVIDER);
@@ -90,6 +96,7 @@ public class PACEProtocolTest extends TestCase {
     }
   }
 
+  @Test
   public void testPoint() {
     try {
       byte[] paceInfoBytes = Hex.hexStringToBytes("3012060A 04007F00 07020204 02020201 0202010D");
@@ -122,6 +129,7 @@ public class PACEProtocolTest extends TestCase {
    * This example is based on ECDH applying the standardized BrainpoolP256r1 domain parameters
    * (see RFC 5639).
    */
+  @Test
   public void testSupplementSampleECDHGM() {
     //    Security.insertProviderAt(BC_PROVIDER, 4);
     try {
@@ -416,6 +424,7 @@ public class PACEProtocolTest extends TestCase {
     ECPoint Q = Util.multiply(BigInteger.ONE, params.getGenerator(), params);
   }
 
+  @Test
   public void testSupplementDHGMSample() {
     /*
      * G.1.2. DH based example
@@ -604,6 +613,7 @@ public class PACEProtocolTest extends TestCase {
     }
   }
 
+  @Test
   public void testDutch2014PassportWithGMAndECDH() {
     try {
       String oid = "0.4.0.127.0.7.2.2.4.2.4"; // id-PACE-ECDH-GM-AES-CBC-CMAC-256
@@ -678,6 +688,7 @@ public class PACEProtocolTest extends TestCase {
    *    A2F8FF2D F50E52C6 599F386A DCB595D2
    *    29F6A167 ADE2BE5F 2C3296AD D5B7430E
    */
+  @Test
   public void testPseudoRandomFunctionWorkedExampleH1() {
     try {
       ECParameterSpec params = (ECParameterSpec)PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_BRAINPOOL_P256_R1);
@@ -702,6 +713,7 @@ public class PACEProtocolTest extends TestCase {
    *
    * This example is based on the BrainpoolP256r1 elliptic curve.
    */
+  @Test
   public void testSpecSamplePACEIMWithECDHPointEncodingExampleH1() {
     try {
       byte[] expectedMappedGeneratorX = Hex.hexStringToBytes("8E82D315 59ED0FDE 92A4D049 8ADD3C23"
@@ -750,6 +762,7 @@ public class PACEProtocolTest extends TestCase {
    *    570417B7 90FF7F74 7E57F432 B04E1236
    *    819E0DFE F5B6E77C A4999925 328182D2
    */
+  @Test
   public void testPACEIMWithDHWorkedExampleH2() {
     try {
       BigInteger p = new BigInteger(("B10B8F96 A080E01D DE92DE5E AE5D54EC"

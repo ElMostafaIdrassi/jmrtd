@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,13 +41,13 @@ import java.util.logging.Logger;
 import org.jmrtd.lds.DisplayedImageInfo;
 import org.jmrtd.lds.ImageInfo;
 import org.jmrtd.lds.icao.DG5File;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class DG5FileTest extends TestCase {
+public class DG5FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testDG5File() {
     byte[] imageBytes = { 0x01, 0x02 };
     DisplayedImageInfo image = new DisplayedImageInfo(ImageInfo.TYPE_PORTRAIT, imageBytes);
@@ -57,6 +62,7 @@ public class DG5FileTest extends TestCase {
     assertTrue(Arrays.equals(expectedEncoded, dg5File.getEncoded()));
   }
 
+  @Test
   public void testDG5FileDecode() {
     try {
       byte[] encoded = { 0x65, 0x08, 0x02, 0x01, 0x01, 0x5F, 0x40, 0x02, 0x01, 0x02 };
@@ -74,6 +80,7 @@ public class DG5FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testDG5FileSerializable() {
     try {
       byte[] imageBytes = { 0x01, 0x02 };

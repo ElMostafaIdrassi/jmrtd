@@ -22,6 +22,12 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.math.BigInteger;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECParameterSpec;
@@ -33,10 +39,9 @@ import java.util.logging.Logger;
 import javax.crypto.spec.DHParameterSpec;
 
 import org.jmrtd.lds.PACEInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class PACEInfoTest extends TestCase {
+public class PACEInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -56,6 +61,7 @@ public class PACEInfoTest extends TestCase {
   //	PARAM_ID_ECP_BRAINPOOL_P512_R1 = 17,
   //	PARAM_ID_ECP_NIST_P512_R1 = 18;
 
+  @Test
   public void testPACEInfo() {
     PACEInfo paceInfo = new PACEInfo(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_256, 2, PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
 
@@ -71,6 +77,7 @@ public class PACEInfoTest extends TestCase {
     assertEquals(paceInfo.toString(), anotherPACEInfo.toString());
   }
 
+  @Test
   public void testPACEInfoCanCreate() {
     testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_128, 2, PACEInfo.PARAM_ID_ECP_NIST_P224_R1);
     testPACEInfoCanCreate(PACEInfo.ID_PACE_ECDH_GM_AES_CBC_CMAC_192, 2, PACEInfo.PARAM_ID_ECP_NIST_P192_R1);
@@ -99,6 +106,7 @@ public class PACEInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testPACEInfoGetProtocolOIDString() {
     testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-3DES-CBC-CBC", PACEInfo.ID_PACE_DH_GM_3DES_CBC_CBC);
     testPACEInfoGetProtocolOIDString("id-PACE-DH-GM-AES-CBC-CMAC-128", PACEInfo.ID_PACE_DH_GM_AES_CBC_CMAC_128);
@@ -134,6 +142,7 @@ public class PACEInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testToParameterSpecNotNull() {
     testToParameterSpecNotNull(0);
     testToParameterSpecNotNull(1);
@@ -156,6 +165,7 @@ public class PACEInfoTest extends TestCase {
     assertNotNull(paramSpec);
   }
 
+  @Test
   public void testToParameterSpecDHParameterSpecOrECParameterSpec() {
     testGetParameterSpecDHParameterSpecOrECParameterSpec(0);
     testGetParameterSpecDHParameterSpecOrECParameterSpec(1);
@@ -178,6 +188,7 @@ public class PACEInfoTest extends TestCase {
     assertTrue(paramSpec instanceof DHParameterSpec || paramSpec instanceof ECParameterSpec);
   }
 
+  @Test
   public void testECDHPrime() {
     AlgorithmParameterSpec paramSpec = PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_NIST_P256_R1);
     assertTrue(paramSpec instanceof ECParameterSpec);

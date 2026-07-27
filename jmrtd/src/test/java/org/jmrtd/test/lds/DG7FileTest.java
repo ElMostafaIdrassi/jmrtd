@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,18 +41,15 @@ import javax.imageio.ImageIO;
 import org.jmrtd.lds.DisplayedImageInfo;
 import org.jmrtd.lds.ImageInfo;
 import org.jmrtd.lds.icao.DG7File;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DG7FileTest extends TestCase {
+public class DG7FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public DG7FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     testToString(createEmptyTestObject(), "DG7File []");
   }
@@ -63,6 +64,7 @@ public class DG7FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testType() {
     testType(createEmptyTestObject());
 
@@ -83,6 +85,7 @@ public class DG7FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testNonNullEncoded() {
     DG7File dg7File = createEmptyTestObject();
     assertNotNull(dg7File);
@@ -90,10 +93,12 @@ public class DG7FileTest extends TestCase {
     assertNotNull(encoded);
   }
 
+  @Test
   public void testReflexive() {
     testEncodeDecode(createEmptyTestObject());
   }
 
+  @Test
   public void testNum() {
     for (int n = 1; n < 10; n++) {
       DG7File dg7File = createNumTestObject(n);
@@ -130,6 +135,7 @@ public class DG7FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testCreate() {
     try {
       DG7File dg7 = createTestObject();

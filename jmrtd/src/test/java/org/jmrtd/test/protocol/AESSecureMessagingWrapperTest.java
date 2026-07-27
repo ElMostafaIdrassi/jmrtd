@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,14 +35,15 @@ import javax.crypto.SecretKey;
 
 import org.jmrtd.protocol.AESSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.smartcards.CommandAPDU;
 
-public class AESSecureMessagingWrapperTest extends TestCase {
+public class AESSecureMessagingWrapperTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testAESSecureMessagingWrapper() {
     try {
       SecretKey encKey = getRandomAESKey();
@@ -52,6 +57,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     }
   }
 
+  @Test
   public void testAESSecureMessagingWrapperEquals() {
     try {
       SecretKey encKey = getRandomAESKey();
@@ -66,6 +72,7 @@ public class AESSecureMessagingWrapperTest extends TestCase {
     }
   }
 
+  @Test
   public void testAESSecureMessagingWrapperWrapUnwrap() {
     try {
       SecretKey encKey = getRandomAESKey();

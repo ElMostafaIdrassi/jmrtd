@@ -22,6 +22,10 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.KeyGenerator;
@@ -33,8 +37,7 @@ import org.jmrtd.PassportService;
 import org.jmrtd.protocol.BACResult;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Test cases for BACResult, the result of the BAC protocol.
@@ -45,8 +48,9 @@ import junit.framework.TestCase;
  *
  * @since 0.6.2
  */
-public class BACResultTest extends TestCase {
+public class BACResultTest {
 
+  @Test
   public void testBACResult() {
     try {
       BACResult bacResult = new BACResult(new BACKey("123456789", "700101", "171108"), new DESedeSecureMessagingWrapper(getRandomDESedeKey(), getRandomDESedeKey(), PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, true, 0L));
@@ -62,6 +66,7 @@ public class BACResultTest extends TestCase {
     }
   }
 
+  @Test
   public void testBACResultEquals() {
     try {
       SecretKey encKey = getRandomDESedeKey();

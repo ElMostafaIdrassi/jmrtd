@@ -22,6 +22,9 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,20 +41,17 @@ import java.util.logging.Logger;
 
 import org.jmrtd.Util;
 import org.jmrtd.lds.icao.DG15File;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class DG15FileTest extends TestCase {
+public class DG15FileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
-  public DG15FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testReflexive() {
     testReflexive(createTestObject());
   }
@@ -75,6 +75,7 @@ public class DG15FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testGetPublic() {
     try {
       KeyPair keyPair = createTestKeyPair();
@@ -88,6 +89,7 @@ public class DG15FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testNewNonX509() {
     try {
       //			Security.insertProviderAt(BC_PROVIDER, 4);

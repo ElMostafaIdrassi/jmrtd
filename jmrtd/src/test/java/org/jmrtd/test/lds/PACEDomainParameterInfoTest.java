@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.spec.ECFieldFp;
@@ -39,11 +44,11 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.jce.ECPointUtil;
 import org.jmrtd.lds.PACEDomainParameterInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class PACEDomainParameterInfoTest extends TestCase {
+public class PACEDomainParameterInfoTest {
 
   private static final String ID_PRIME_FIELD = "1.2.840.10045.1.1";
   private static final String ID_EC_PUBLIC_KEY = "1.2.840.10045.2.1";
@@ -53,6 +58,7 @@ public class PACEDomainParameterInfoTest extends TestCase {
   /**
    * Testing some internal functions here, these should be removed at some point.
    */
+  @Test
   public void testECParameterSpec() {
     try {
       ECParameterSpec ecParameterSpec = getSampleECParameterSpec();

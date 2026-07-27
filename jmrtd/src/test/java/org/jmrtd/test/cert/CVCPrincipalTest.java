@@ -22,29 +22,36 @@
 
 package org.jmrtd.test.cert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.lds.icao.ICAOCountry;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.data.TestCountry;
 
-public class CVCPrincipalTest extends TestCase {
+public class CVCPrincipalTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testCVCPrincipalFromUT() {
     CVCPrincipal principal = new CVCPrincipal("UTDVCS00001");
     assertEquals(TestCountry.UT, principal.getCountry());
   }
 
+  @Test
   public void testCVCPrincipalFromNL() {
     CVCPrincipal principal = new CVCPrincipal("NLDVCS00001");
     assertEquals(ICAOCountry.getInstance("NLD"), principal.getCountry());
   }
 
+  @Test
   public void testCVCPrincipalFromUnknown() {
     try {
       CVCPrincipal principal = new CVCPrincipal("XYDVCS00001");

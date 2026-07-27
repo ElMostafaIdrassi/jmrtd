@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -30,8 +35,7 @@ import java.util.logging.Logger;
 import org.jmrtd.lds.CardSecurityFile;
 import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.test.ResourceUtil;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests for the CardSecurity file.
@@ -42,10 +46,11 @@ import junit.framework.TestCase;
  *
  * @since 0.5.6
  */
-public class CardSecurityFileTest extends TestCase {
+public class CardSecurityFileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testParseSampleCardSecurityFileFromResource() {
     try {
       InputStream inputStream = createSampleInputStream();

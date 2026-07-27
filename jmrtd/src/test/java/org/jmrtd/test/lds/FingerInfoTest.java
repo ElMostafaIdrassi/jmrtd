@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,15 +41,11 @@ import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.iso19794.FingerImageInfo;
 import org.jmrtd.lds.iso19794.FingerInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class FingerInfoTest {
 
-public class FingerInfoTest extends TestCase {
-
-  public FingerInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     try {
       FingerInfo imageInfo = createSingleRightIndexFingerTestObject();
@@ -58,16 +59,19 @@ public class FingerInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testEncodeDecode(fingerInfo);
   }
 
+  @Test
   public void testReflexive() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testReflexiveReconstruct(fingerInfo);
   }
 
+  @Test
   public void testElements() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testElements(fingerInfo);
@@ -75,6 +79,7 @@ public class FingerInfoTest extends TestCase {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  @Test
   public void testFields() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testFieldsReasonable(fingerInfo);
@@ -101,7 +106,7 @@ public class FingerInfoTest extends TestCase {
   public void testElements(FingerInfo fingerInfo) {
     List<FingerImageInfo> imageInfos = fingerInfo.getFingerImageInfos();
     for (FingerImageInfo imageInfo: imageInfos) {
-      FingerImageInfoTest imageInfoTest = new FingerImageInfoTest("FingerInfoTest_testElements");
+      FingerImageInfoTest imageInfoTest = new FingerImageInfoTest();
       imageInfoTest.testEncodeDecode(imageInfo);
       imageInfoTest.testViewCountAndNumber(imageInfo);
       imageInfoTest.testValidType(imageInfo);
@@ -179,6 +184,7 @@ public class FingerInfoTest extends TestCase {
     assertEquals(fingerInfo.getFingerImageInfos(), fingerInfo2.getFingerImageInfos());
   }
 
+  @Test
   public void testSBHFields() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testMandatorySBHFields(fingerInfo);
@@ -241,6 +247,7 @@ public class FingerInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testBiometricSubType() {
     FingerInfo fingerInfo = createSingleRightIndexFingerTestObject();
     testBiometricSubType(fingerInfo);

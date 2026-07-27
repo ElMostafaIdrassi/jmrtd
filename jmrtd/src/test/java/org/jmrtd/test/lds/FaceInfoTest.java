@@ -22,6 +22,12 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,17 +43,13 @@ import org.jmrtd.cbeff.ISO781611;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.iso19794.FaceImageInfo;
 import org.jmrtd.lds.iso19794.FaceInfo;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class FaceInfoTest extends TestCase {
+public class FaceInfoTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public FaceInfoTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testToString() {
     try {
       FaceInfo info = createTestObject();
@@ -60,6 +62,7 @@ public class FaceInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testElements() {
     FaceInfo faceInfo = createTestObject();
     testElements(faceInfo);
@@ -68,11 +71,12 @@ public class FaceInfoTest extends TestCase {
   public void testElements(FaceInfo FaceInfo) {
     List<FaceImageInfo> imageInfos = FaceInfo.getFaceImageInfos();
     for (FaceImageInfo imageInfo: imageInfos) {
-      FaceImageInfoTest imageInfoTest = new FaceImageInfoTest("FaceInfoTest_testElements");
+      FaceImageInfoTest imageInfoTest = new FaceImageInfoTest();
       imageInfoTest.testEncodeDecode(imageInfo);
     }
   }
 
+  @Test
   public void testSBHFields() {
     try {
       FaceInfo faceInfo = createTestObject();
@@ -124,19 +128,18 @@ public class FaceInfoTest extends TestCase {
     }
   }
 
+  @Test
   public void testTruncate() {
-    try {
-      FaceInfo faceInfo = createTestObject();
-      byte[] bytes = faceInfo.getEncoded();
-      byte[] partialBytes = new byte[(int)(0.8 * bytes.length)];
-      System.arraycopy(bytes, 0, partialBytes, 0, partialBytes.length);
-      FaceInfo partialFaceInfo = new FaceInfo(new ByteArrayInputStream(partialBytes));
-      fail("Should be exception");
-    } catch (Exception expected) {
-      LOGGER.log(Level.INFO, "Expected", expected);
-    }
+    FaceInfo faceInfo = createTestObject();
+    byte[] bytes = faceInfo.getEncoded();
+    byte[] partialBytes = new byte[(int)(0.8 * bytes.length)];
+    System.arraycopy(bytes, 0, partialBytes, 0, partialBytes.length);
+    assertThrows(Exception.class, () -> {
+      new FaceInfo(new ByteArrayInputStream(partialBytes));
+    });
   }
 
+  @Test
   public void testEncoded() {
     try {
       FaceInfo faceInfo = createTestObject();

@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,19 +46,15 @@ import org.jmrtd.lds.iso19794.IrisBiometricSubtypeInfo;
 import org.jmrtd.lds.iso19794.IrisImageInfo;
 import org.jmrtd.lds.iso19794.IrisInfo;
 import org.jmrtd.test.ResourceUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class DG4FileTest extends TestCase {
+public class DG4FileTest {
 
   public static final String TEST_FILE = "/lds/bsi2008/Datagroup4.bin";
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  public DG4FileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testConstruct() {
     try {
       DG4File dg4 = new DG4File(Arrays.asList(new IrisInfo[] { }));
@@ -65,6 +66,7 @@ public class DG4FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testReflexive() {
     DG4File dg4 = createTestObject();
     testReflexive(dg4);
@@ -84,6 +86,7 @@ public class DG4FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testEncodeDecode() {
     DG4File dg4 = getTestObject();
     testEncodeDecode(dg4);
@@ -108,6 +111,7 @@ public class DG4FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testZeroInstanceTestObjectNotEquals() {
     try {
       DG4File dg4 = new DG4File(new LinkedList<IrisInfo>());
@@ -131,6 +135,7 @@ public class DG4FileTest extends TestCase {
     }
   }
 
+  @Test
   public void testFile() {
     try {
       DG4File dg4 = getTestObject();

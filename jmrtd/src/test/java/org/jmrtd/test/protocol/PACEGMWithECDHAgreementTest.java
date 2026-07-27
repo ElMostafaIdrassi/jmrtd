@@ -22,6 +22,8 @@
 
 package org.jmrtd.test.protocol;
 
+import static org.junit.Assert.assertEquals;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -33,15 +35,15 @@ import java.util.logging.Logger;
 
 import org.jmrtd.Util;
 import org.jmrtd.protocol.PACEGMWithECDHAgreement;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class PACEGMWithECDHAgreementTest extends TestCase {
+public class PACEGMWithECDHAgreementTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
 
+  @Test
   public void testPACEGMWithECDHAgreementSameSharedPoint() {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", BC_PROVIDER);

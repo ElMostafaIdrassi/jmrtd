@@ -22,6 +22,11 @@
 
 package org.jmrtd.test.lds;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -65,11 +70,11 @@ import org.jmrtd.lds.icao.COMFile;
 import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.DG2File;
 import org.jmrtd.test.ResourceUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 import net.sf.scuba.util.Hex;
 
-public class SODFileTest extends TestCase {
+public class SODFileTest {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
@@ -77,10 +82,7 @@ public class SODFileTest extends TestCase {
   private static final Provider BC_PROVIDER = Util.getBouncyCastleProvider();
   private static final String BC_PROVIDER_NAME = BC_PROVIDER == null ? null : BC_PROVIDER.getName();
 
-  public SODFileTest(String name) {
-    super(name);
-  }
-
+  @Test
   public void testReflexive() {
     testReflexive(createTestObject("SHA-1", "SHA1WithRSA"));
     testReflexive(createTestObject("SHA-256", "SHA256WithRSA"));
@@ -98,6 +100,7 @@ public class SODFileTest extends TestCase {
     return buffer.toByteArray();
   }
 
+  @Test
   public void testDecodeEncode() {
     testDecodeEncode(createMustermannSampleInputStream());
   }
@@ -148,8 +151,6 @@ public class SODFileTest extends TestCase {
       SODFile sodFile = new SODFile(ResourceUtil.getInputStream(file));
       X509Certificate cert = sodFile.getDocSigningCertificate();
       BigInteger serial = cert == null ? null : cert.getSerialNumber();
-      LOGGER.info("DEBUG: cert = " + (cert == null ? "null" : cert.toString()));
-      LOGGER.info("DEBUG: serial number = " + (serial == null ? "null" : serial.toString()));
     } catch (FileNotFoundException e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       return; // inconclusive!
@@ -158,6 +159,7 @@ public class SODFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testFields() {
     testFields(createTestObject("SHA-1", "SHA1WithRSA"));
     testFields(createTestObject("SHA-256", "SHA256WithRSA"));
@@ -208,6 +210,7 @@ public class SODFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testMustermann() {
     testFile(createMustermannSampleInputStream());
   }
@@ -223,6 +226,7 @@ public class SODFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testReconstructionViaOtherConstructor() {
     try {
       SODFile sodFile = createTestObject("SHA-1", "SHA256WithRSA");
@@ -239,6 +243,7 @@ public class SODFileTest extends TestCase {
     }
   }
 
+  @Test
   public void testBCX500Name() {
     try {
       SODFile sodFile = createTestObject("SHA-1", "SHA256WithRSA");
