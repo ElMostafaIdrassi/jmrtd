@@ -47,6 +47,10 @@ public class ASN1Util {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  /** Prevents instantiation. */
+  private ASN1Util() {
+  }
+
   public static ASN1Encodable readASN1Object(InputStream inputStream) throws IOException {
     ASN1InputStream asn1InputStream = new ASN1InputStream(inputStream, true);
     return asn1InputStream.readObject();

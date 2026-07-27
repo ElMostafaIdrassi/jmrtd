@@ -32,6 +32,10 @@ public class ResourceUtil {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
+  /** Prevents instantiation. */
+  private ResourceUtil() {
+  }
+
   public static byte[] getBytes(String resource) throws IOException {
     InputStream is = getInputStream(resource);
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
