@@ -24,6 +24,7 @@ package org.jmrtd.cert;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,9 +44,9 @@ public class CVCPrincipal implements Principal, Serializable {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd");
 
-  private Country country;
-  private String mnemonic;
-  private String seqNumber;
+  private final String countryCode;
+  private final String mnemonic;
+  private final String seqNumber;
 
   /**
    * Constructs a principal.
@@ -60,12 +61,85 @@ public class CVCPrincipal implements Principal, Serializable {
       throw new IllegalArgumentException("Name should be <Country (2F)><Mnemonic (9V)><SeqNum (5F)> formatted, found \"" + name + "\"");
     }
 
-    final String alpha2Code = name.substring(0, 2).toUpperCase();
+    countryCode = name.substring(0, 2).toUpperCase(Locale.ROOT);
+    mnemonic = name.substring(2, name.length() - 5);
+    seqNumber = name.substring(name.length() - 5);
+  }
+
+  /**
+   * Constructs a principal without requiring the country code to be recognized.
+   *
+   * @param countryCode the two-character country code
+   * @param mnemonic the mnemonic
+   * @param seqNumber the sequence number
+   */
+  public CVCPrincipal(String countryCode, String mnemonic, String seqNumber) {
+    if (countryCode == null || countryCode.length() != 2) {
+      throw new IllegalArgumentException("Wrong length countryCode");
+    }
+    if (mnemonic == null || mnemonic.length() > 9) {
+      throw new IllegalArgumentException("Wrong length mnemonic");
+    }
+    if (seqNumber == null || seqNumber.length() != 5) {
+      throw new IllegalArgumentException("Wrong length seqNumber");
+    }
+    this.countryCode = countryCode.toUpperCase(Locale.ROOT);
+    this.mnemonic = mnemonic;
+    this.seqNumber = seqNumber;
+  }
+
+  /**
+   * Constructs a principal.
+   *
+   * @param country the country
+   * @param mnemonic the mnemonic
+   * @param seqNumber the sequence number
+   */
+  public CVCPrincipal(Country country, String mnemonic, String seqNumber) {
+    this(country == null ? null : country.toAlpha2Code(), mnemonic, seqNumber);
+  }
+
+  /**
+   * Consists of the concatenation of
+   * country code (length 2), mnemonic (length &lt; 9) and
+   * sequence number (length 5).
+   *
+   * @return the name of the principal
+   */
+  public String getName() {
+    return countryCode + mnemonic + seqNumber;
+  }
+
+  /**
+   * Returns a textual representation of this principal.
+   *
+   * @return a textual representation of this principal
+   */
+  @Override
+  public String toString() {
+    return countryCode + "/" + mnemonic + "/" + seqNumber;
+  }
+
+  /**
+   * Returns the two-character country code as encoded in the reference.
+   *
+   * @return the country code
+   */
+  public String getCountryCode() {
+    return countryCode;
+  }
+
+  /**
+   * Returns the country.
+   *
+   * @return the country
+   */
+  public Country getCountry() {
     try {
-      country = Country.getInstance(alpha2Code);
+      return Country.getInstance(countryCode);
     } catch (IllegalArgumentException iae) {
-      LOGGER.log(Level.FINE, "Could not find country for " + alpha2Code, iae);
-      country = new Country() {
+      LOGGER.log(Level.FINE, "Could not find country for " + countryCode, iae);
+      return new Country() {
 
         private static final long serialVersionUID = 345841304964161797L;
 
@@ -86,7 +160,7 @@ public class CVCPrincipal implements Principal, Serializable {
 
         @Override
         public String toAlpha2Code() {
-          return alpha2Code;
+          return countryCode;
         }
 
         @Override
@@ -96,57 +170,6 @@ public class CVCPrincipal implements Principal, Serializable {
 
       };
     }
-    mnemonic = name.substring(2, name.length() - 5);
-    seqNumber = name.substring(name.length() - 5, name.length());
-  }
-
-  /**
-   * Constructs a principal.
-   *
-   * @param country the country
-   * @param mnemonic the mnemonic
-   * @param seqNumber the sequence number
-   */
-  public CVCPrincipal(Country country, String mnemonic, String seqNumber) {
-    if (mnemonic == null || mnemonic.length() > 9) {
-      throw new IllegalArgumentException("Wrong length mnemonic");
-    }
-    if (seqNumber == null || seqNumber.length() != 5) {
-      throw new IllegalArgumentException("Wrong length seqNumber");
-    }
-    this.country = country;
-    this.mnemonic = mnemonic;
-    this.seqNumber = seqNumber;
-  }
-
-  /**
-   * Consists of the concatenation of
-   * country code (length 2), mnemonic (length &lt; 9) and
-   * sequence number (length 5).
-   *
-   * @return the name of the principal
-   */
-  public String getName() {
-    return country.toAlpha2Code() + mnemonic + seqNumber;
-  }
-
-  /**
-   * Returns a textual representation of this principal.
-   *
-   * @return a textual representation of this principal
-   */
-  @Override
-  public String toString() {
-    return country.toAlpha2Code() + "/" + mnemonic + "/" + seqNumber;
-  }
-
-  /**
-   * Returns the country.
-   *
-   * @return the country
-   */
-  public Country getCountry() {
-    return country;
   }
 
   /**
@@ -187,7 +210,7 @@ public class CVCPrincipal implements Principal, Serializable {
     }
 
     CVCPrincipal otherPrincipal = (CVCPrincipal)otherObj;
-    return otherPrincipal.country.equals(this.country)
+    return otherPrincipal.countryCode.equals(this.countryCode)
         && otherPrincipal.mnemonic.equals(this.mnemonic)
         && otherPrincipal.seqNumber.equals(this.seqNumber);
   }

@@ -31,6 +31,7 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -185,22 +186,34 @@ public class EACTAProtocol {
        */
 
       /*
-       * Check if first cert is/has the expected CVCA, and remove it from chain if it
-       * is the CVCA.
+       * Work on a copy because a self-signed CVCA certificate is a local
+       * trust-anchor marker, not a certificate that should be sent to the IC.
        */
-      CardVerifiableCertificate firstCert = terminalCertificates.get(0);
+      List<CardVerifiableCertificate> certificatesToSend =
+          new ArrayList<CardVerifiableCertificate>(terminalCertificates);
+      CardVerifiableCertificate firstCert = certificatesToSend.get(0);
       Role firstCertRole = firstCert.getAuthorizationTemplate().getRole();
       if (Role.CVCA.equals(firstCertRole)) {
+        CVCPrincipal firstCertAuthorityReference = firstCert.getAuthorityReference();
         CVCPrincipal firstCertHolderReference = firstCert.getHolderReference();
-        if (caReference != null && !caReference.equals(firstCertHolderReference)) {
-          throw new CardServiceException("First certificate holds wrong authority, found \""
-              + firstCertHolderReference.getName() + "\", expected \"" + caReference.getName() + "\"");
+        boolean isSelfSignedTrustAnchor =
+            firstCertAuthorityReference.equals(firstCertHolderReference);
+        if (isSelfSignedTrustAnchor) {
+          if (caReference != null && !caReference.equals(firstCertHolderReference)) {
+            throw new CardServiceException("First certificate holds wrong authority, found \""
+                + firstCertHolderReference.getName() + "\", expected \"" + caReference.getName() + "\"");
+          }
+          if (caReference == null) {
+            caReference = firstCertHolderReference;
+          }
+          certificatesToSend.remove(0);
+          if (certificatesToSend.isEmpty()) {
+            throw new CardServiceException(
+                "Certificate chain only contains a self-signed CVCA certificate");
+          }
         }
-        if (caReference == null) {
-          caReference = firstCertHolderReference;
-        }
-        terminalCertificates.remove(0);
       }
+      firstCert = certificatesToSend.get(0);
       CVCPrincipal firstCertAuthorityReference = firstCert.getAuthorityReference();
       if (caReference != null && !caReference.equals(firstCertAuthorityReference)) {
         throw new CardServiceException("First certificate not signed by expected CA, found "
@@ -211,7 +224,7 @@ public class EACTAProtocol {
       }
 
       /* Check if the last cert is an IS cert. */
-      CardVerifiableCertificate lastCert = terminalCertificates.get(terminalCertificates.size() - 1);
+      CardVerifiableCertificate lastCert = certificatesToSend.get(certificatesToSend.size() - 1);
       Role lastCertRole = lastCert.getAuthorizationTemplate().getRole();
       if (!Role.IS.equals(lastCertRole)) {
         throw new CardServiceException("Last certificate in chain (" + lastCert.getHolderReference().getName()
@@ -220,7 +233,7 @@ public class EACTAProtocol {
       CardVerifiableCertificate terminalCert = lastCert;
 
       /* Have the MRTD check our chain. */
-      for (CardVerifiableCertificate cert: terminalCertificates) {
+      for (CardVerifiableCertificate cert: certificatesToSend) {
         try {
           CVCPrincipal authorityReference = cert.getAuthorityReference();
 
@@ -304,7 +317,7 @@ public class EACTAProtocol {
         }
 
         service.sendMutualAuthenticate(wrapper, signedData);
-        return new EACTAResult(chipAuthenticationResult, caReference, terminalCertificates, terminalKey, null, rPICC);
+        return new EACTAResult(chipAuthenticationResult, caReference, certificatesToSend, terminalKey, null, rPICC);
       } catch (Exception e) {
         LOGGER.log(Level.WARNING, "Exception", e);
         throw new CardServiceProtocolException("Exception in External Authenticate", 5, e);
@@ -367,4 +380,3 @@ public class EACTAProtocol {
     throw new NoSuchAlgorithmException("Unsupported agreement algorithm " + publicKeyAlg);
   }
 }
-

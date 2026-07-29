@@ -57,7 +57,7 @@ public class CardVerifiableCertificateTest {
   @Test
   public void testCardVerifiableCertificate() {
     try {
-      CVCPrincipal authorityReference = new CVCPrincipal("UTDVCS00001");
+      CVCPrincipal authorityReference = new CVCPrincipal("CBDVCS00001");
       CVCPrincipal holderReference = new CVCPrincipal("UTIS00001");
 
       KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");

@@ -51,8 +51,6 @@ import org.ejbca.cvc.OIDField;
 import org.ejbca.cvc.ReferenceField;
 import org.ejbca.cvc.exception.ConstructionException;
 
-import net.sf.scuba.data.Country;
-
 /**
  * Card verifiable certificates as specified in TR 03110.
  *
@@ -121,8 +119,8 @@ public class CardVerifiableCertificate extends Certificate {
       byte[] signatureData) {
     this(null);
     try {
-      CAReferenceField authorityRef = new CAReferenceField(authorityReference.getCountry().toAlpha2Code(), authorityReference.getMnemonic(), authorityReference.getSeqNumber());
-      HolderReferenceField  holderRef = new HolderReferenceField(holderReference.getCountry().toAlpha2Code(), holderReference.getMnemonic(), holderReference.getSeqNumber());
+      CAReferenceField authorityRef = new CAReferenceField(authorityReference.getCountryCode(), authorityReference.getMnemonic(), authorityReference.getSeqNumber());
+      HolderReferenceField holderRef = new HolderReferenceField(holderReference.getCountryCode(), holderReference.getMnemonic(), holderReference.getSeqNumber());
       AuthorizationRoleEnum authRole = CVCAuthorizationTemplate.fromRole(role);
       AccessRightEnum accessRight = CVCAuthorizationTemplate.fromPermission(permission);
       CVCertificateBody body = new CVCertificateBody(authorityRef, org.ejbca.cvc.KeyFactory.createInstance(publicKey, algorithm, authRole), holderRef, authRole, accessRight, notBefore, notAfter);
@@ -332,9 +330,7 @@ public class CardVerifiableCertificate extends Certificate {
   public CVCPrincipal getAuthorityReference() throws CertificateException {
     try  {
       ReferenceField rf = cvCertificate.getCertificateBody().getAuthorityReference();
-      final String countryCode = rf.getCountry().toUpperCase();
-      Country country = Country.getInstance(countryCode);
-      return new CVCPrincipal(country, rf.getMnemonic(), rf.getSequence());
+      return new CVCPrincipal(rf.getCountry(), rf.getMnemonic(), rf.getSequence());
     } catch (NoSuchFieldException nsfe) {
       throw new CertificateException("No such field", nsfe);
     }
@@ -350,7 +346,7 @@ public class CardVerifiableCertificate extends Certificate {
   public CVCPrincipal getHolderReference() throws CertificateException {
     try  {
       ReferenceField rf = cvCertificate.getCertificateBody().getHolderReference();
-      return new CVCPrincipal(Country.getInstance(rf.getCountry().toUpperCase()), rf.getMnemonic(), rf.getSequence());
+      return new CVCPrincipal(rf.getCountry(), rf.getMnemonic(), rf.getSequence());
     } catch (NoSuchFieldException nsfe) {
       throw new CertificateException("No such field", nsfe);
     }

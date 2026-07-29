@@ -82,10 +82,10 @@ public class CVCertificateBuilder {
   ConstructionException {
     return new CardVerifiableCertificate(org.ejbca.cvc.CertificateGenerator
         .createCertificate(publicKey, signerKey, algorithmName,
-            new CAReferenceField(caRef.getCountry().toAlpha2Code(),
+            new CAReferenceField(caRef.getCountryCode(),
                 caRef.getMnemonic(), caRef.getSeqNumber()),
-            new HolderReferenceField(holderRef.getCountry()
-                .toAlpha2Code(), holderRef.getMnemonic(),
+            new HolderReferenceField(holderRef.getCountryCode(),
+                holderRef.getMnemonic(),
                 holderRef.getSeqNumber()), getRole(authZTemplate.getRole()), getAccessRight(authZTemplate.getAccessRight()),
             validFrom, validTo, provider));
   }

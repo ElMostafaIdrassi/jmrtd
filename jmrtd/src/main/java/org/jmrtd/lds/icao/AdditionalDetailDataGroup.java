@@ -121,8 +121,8 @@ abstract class AdditionalDetailDataGroup extends DataGroup {
       /* Find out which tags are present. */
       List<Integer> tagList = new ArrayList<Integer>();
       while (tagListBytesRead < tagListLength) {
-        /* We're using another TLV inputstream every time to read each tag. 
-         * This is required by SCUBA's state machine, which doesn't allow 
+        /* We're using another TLV inputstream every time to read each tag.
+         * This is required by SCUBA's state machine, which doesn't allow
          * calling readTag() repeatedly on a single TLVInputStream. */
         TLVInputStream anotherTLVInputStream = new TLVInputStream(tagListBytesInputStream);
         int tag = anotherTLVInputStream.readTag();

@@ -42,12 +42,14 @@ public class CVCPrincipalTest {
   @Test
   public void testCVCPrincipalFromUT() {
     CVCPrincipal principal = new CVCPrincipal("UTDVCS00001");
+    assertEquals("UT", principal.getCountryCode());
     assertEquals(TestCountry.UT, principal.getCountry());
   }
 
   @Test
   public void testCVCPrincipalFromNL() {
     CVCPrincipal principal = new CVCPrincipal("NLDVCS00001");
+    assertEquals("NL", principal.getCountryCode());
     assertEquals(ICAOCountry.getInstance("NLD"), principal.getCountry());
   }
 
@@ -55,6 +57,8 @@ public class CVCPrincipalTest {
   public void testCVCPrincipalFromUnknown() {
     try {
       CVCPrincipal principal = new CVCPrincipal("XYDVCS00001");
+      assertEquals("XY", principal.getCountryCode());
+      assertEquals("XYDVCS00001", principal.getName());
       assertNotNull(principal.getCountry());
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Unexpected exception", e);
