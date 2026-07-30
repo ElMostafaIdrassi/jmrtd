@@ -300,9 +300,9 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
   //    horizontalOrientationCode [4]          HorizontalOrientationCode,
   //    verticalOrientationCode   [5]          VerticalOrientationCode,
   //    compressionHistoryCode    [6]          CompressionHistoryCode,
-  //    range                     [7]          RangeOrError,
-  //    captureDateTimeBlock      [8]          CaptureDateTimeBlock,
-  //    irisImageData             [9]          OCTET STRING,
+  //    captureDateTimeBlock      [7]          CaptureDateTimeBlock,
+  //    irisImageData             [8]          OCTET STRING,
+  //    range                     [9]          RangeOrError                   OPTIONAL,
   //    captureDeviceBlock        [10]         CaptureDeviceBlock             OPTIONAL,
   //    qualityBlocks             [11]         QualityBlocks                  OPTIONAL,
   //    rollAngleBlock            [12]         RollAngleBlock                 OPTIONAL,
@@ -323,9 +323,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     horizontalOrientationCode =  HorizontalOrientationCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(4)));
     verticalOrientationCode =  VerticalOrientationCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(5)));
     compressionHistoryCode =  CompressionHistoryCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(6)));
-    decodeRangeOrError(taggedObjects.get(7));
-    captureDateTimeBlock = new DateTimeBlock(taggedObjects.get(8));
-    imageData = (ASN1OctetString.getInstance(taggedObjects.get(9))).getOctets();
+    captureDateTimeBlock = new DateTimeBlock(taggedObjects.get(7));
+    imageData = (ASN1OctetString.getInstance(taggedObjects.get(8))).getOctets();
+    if (taggedObjects.containsKey(9)) {
+      decodeRangeOrError(taggedObjects.get(9));
+    }
     if (taggedObjects.containsKey(10)) {
       captureDeviceBlock = new IrisImageCaptureDeviceBlock(taggedObjects.get(10));
     }
@@ -508,18 +510,16 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
     taggedObjects.put(4, ASN1Util.encodeInt(horizontalOrientationCode.getCode()));
     taggedObjects.put(5, ASN1Util.encodeInt(verticalOrientationCode.getCode()));
     taggedObjects.put(6, ASN1Util.encodeInt(compressionHistoryCode.getCode()));
-    if (range != null) {
-      taggedObjects.put(7, ASN1Util.encodeInt(range));
-    } else if (rangingErrorCode != null) {
-      taggedObjects.put(7, ASN1Util.encodeInt(rangingErrorCode.getCode()));
+    taggedObjects.put(7, captureDateTimeBlock.getASN1Object());
+    taggedObjects.put(8, new DEROctetString(imageData));
+    if (range != null || rangingErrorCode != null) {
+      taggedObjects.put(9, encodeRangeOrError());
     }
-    taggedObjects.put(8, captureDateTimeBlock.getASN1Object());
-    taggedObjects.put(9, new DEROctetString(imageData));
     if (captureDeviceBlock != null) {
       taggedObjects.put(10, captureDeviceBlock.getASN1Object());
     }
     if (qualityBlocks != null) {
-      taggedObjects.put(10, ISO39794Util.encodeBlocks(qualityBlocks));
+      taggedObjects.put(11, ISO39794Util.encodeBlocks(qualityBlocks));
     }
     if (rollAngleBlock != null) {
       taggedObjects.put(12, rollAngleBlock.getASN1Object());
@@ -566,5 +566,15 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
       range = null;
       rangingErrorCode = RangingErrorCode.fromCode(ASN1Util.decodeInt(taggedObjects.get(1)));
     }
+  }
+
+  private ASN1Encodable encodeRangeOrError() {
+    Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
+    if (range != null) {
+      taggedObjects.put(0, ASN1Util.encodeInt(range));
+    } else if (rangingErrorCode != null) {
+      taggedObjects.put(1, ASN1Util.encodeInt(rangingErrorCode.getCode()));
+    }
+    return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 }

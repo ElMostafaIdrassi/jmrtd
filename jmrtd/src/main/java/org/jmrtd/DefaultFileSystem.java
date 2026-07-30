@@ -124,7 +124,7 @@ public class DefaultFileSystem implements FileSystemStructured {
    * @param wrapper an APDU wrapper
    */
   public void setWrapper(APDUWrapper wrapper) {
-    oldWrapper = this.wrapper;
+    oldWrapper = wrapper == null ? null : this.wrapper;
     this.wrapper = wrapper;
   }
 

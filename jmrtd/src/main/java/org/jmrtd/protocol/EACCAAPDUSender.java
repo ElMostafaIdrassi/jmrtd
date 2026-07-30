@@ -178,6 +178,7 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
     if (sw == ISO7816.SW_WRONG_LENGTH) {
       capdu = new CommandAPDU(isLast ? ISO7816.CLA_ISO7816 : ISO7816.CLA_COMMAND_CHAINING, INS_BSI_GENERAL_AUTHENTICATE, 0x00, 0x00, commandData, 256);
       rapdu = secureMessagingSender.transmit(wrapper, capdu);
+      sw = (short)rapdu.getSW();
     }
 
     if (sw != ISO7816.SW_NO_ERROR) {

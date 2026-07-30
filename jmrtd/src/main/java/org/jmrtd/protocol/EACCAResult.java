@@ -63,7 +63,7 @@ public class EACCAResult implements Serializable {
   public EACCAResult(BigInteger keyId, PublicKey piccPublicKey, byte[] keyHash, PublicKey pcdPublicKey, PrivateKey pcdPrivateKey, SecureMessagingWrapper wrapper) {
     this.keyId = keyId;
     this.piccPublicKey = piccPublicKey;
-    this.keyHash = keyHash;
+    this.keyHash = keyHash == null ? null : Arrays.copyOf(keyHash, keyHash.length);
     this.pcdPublicKey = pcdPublicKey;
     this.pcdPrivateKey = pcdPrivateKey;
     this.wrapper = wrapper;
@@ -181,7 +181,7 @@ public class EACCAResult implements Serializable {
    * @return the hash of the ephemeral public key of the terminal
    */
   public byte[] getKeyHash() {
-    return keyHash;
+    return keyHash == null ? null : Arrays.copyOf(keyHash, keyHash.length);
   }
 
   /**

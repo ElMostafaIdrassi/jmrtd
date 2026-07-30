@@ -77,7 +77,7 @@ public class EACTAResult implements Serializable {
     }
     this.terminalKey = terminalKey;
     this.documentNumber = documentNumber;
-    this.cardChallenge = cardChallenge;
+    this.cardChallenge = cardChallenge == null ? null : Arrays.copyOf(cardChallenge, cardChallenge.length);
   }
 
   /**
@@ -133,7 +133,7 @@ public class EACTAResult implements Serializable {
    * @return the card's challenge
    */
   public byte[] getCardChallenge() {
-    return cardChallenge;
+    return cardChallenge == null ? null : Arrays.copyOf(cardChallenge, cardChallenge.length);
   }
 
   /**

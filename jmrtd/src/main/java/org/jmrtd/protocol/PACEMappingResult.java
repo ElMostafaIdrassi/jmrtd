@@ -89,7 +89,7 @@ public abstract class PACEMappingResult implements Serializable {
    * @return the nonce
    */
   public byte[] getPICCNonce() {
-    return piccNonce;
+    return piccNonce == null ? null : Arrays.copyOf(piccNonce, piccNonce.length);
   }
 
   @Override

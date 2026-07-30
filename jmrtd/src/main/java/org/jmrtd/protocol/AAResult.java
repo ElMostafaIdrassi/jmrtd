@@ -60,8 +60,8 @@ public class AAResult implements Serializable {
     this.publicKey = publicKey;
     this.digestAlgorithm = digestAlgorithm;
     this.signatureAlgorithm = signatureAlgorithm;
-    this.challenge = challenge;
-    this.response = response;
+    this.challenge = challenge == null ? null : Arrays.copyOf(challenge, challenge.length);
+    this.response = response == null ? null : Arrays.copyOf(response, response.length);
   }
 
   /**
@@ -70,7 +70,7 @@ public class AAResult implements Serializable {
    * @return the challenge
    */
   public byte[] getChallenge() {
-    return challenge;
+    return challenge == null ? null : Arrays.copyOf(challenge, challenge.length);
   }
 
   /**
@@ -79,7 +79,7 @@ public class AAResult implements Serializable {
    * @return the response that was sent back by the ICC
    */
   public byte[] getResponse() {
-    return response;
+    return response == null ? null : Arrays.copyOf(response, response.length);
   }
 
   /**

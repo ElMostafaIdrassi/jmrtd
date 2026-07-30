@@ -362,6 +362,8 @@ public class PassportService extends AbstractMRTDCardService {
   public void sendSelectMF() throws CardServiceException {
     readBinarySender.sendSelectMF();
     wrapper = null;
+    rootFileSystem.setWrapper(null);
+    appletFileSystem.setWrapper(null);
   }
 
   /**
@@ -549,6 +551,8 @@ public class PassportService extends AbstractMRTDCardService {
     try {
       service.close();
       wrapper = null;
+      rootFileSystem.setWrapper(null);
+      appletFileSystem.setWrapper(null);
     } finally {
       isOpen = false;
     }

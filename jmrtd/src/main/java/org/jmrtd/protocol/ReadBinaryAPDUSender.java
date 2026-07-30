@@ -197,16 +197,35 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
      * FIXME: Use TLVUtil.tlvEncode(...) here. -- MO
      */
     byte[] data = responseData;
-    int index = 0;
-    if (data[index++] != (byte)0x53) { // FIXME: Constant for 0x53.
+    if (data.length < 2 || data[0] != (byte)0x53) { // FIXME: Constant for 0x53.
       throw new CardServiceException("Malformed read binary long response data");
     }
-    if ((byte)(data[index] & 0x80) == (byte)0x80) {
-      index += (data[index] & 0xF);
+
+    int index = 1;
+    int valueLength = data[index++] & 0xFF;
+    if ((valueLength & 0x80) != 0) {
+      int lengthByteCount = valueLength & 0x7F;
+      if (lengthByteCount == 0 || lengthByteCount > 4 || data.length - index < lengthByteCount) {
+        throw new CardServiceException("Malformed read binary long response data");
+      }
+      if ((data[index] & 0xFF) == 0) {
+        throw new CardServiceException("Malformed read binary long response data");
+      }
+      long longValueLength = 0;
+      for (int i = 0; i < lengthByteCount; i++) {
+        longValueLength = (longValueLength << 8) | (data[index++] & 0xFF);
+      }
+      if (longValueLength < 128 || longValueLength > Integer.MAX_VALUE) {
+        throw new CardServiceException("Malformed read binary long response data");
+      }
+      valueLength = (int)longValueLength;
     }
-    index++;
-    responseData = new byte[data.length - index];
-    System.arraycopy(data, index, responseData, 0, responseData.length);
+    if (valueLength != data.length - index) {
+      throw new CardServiceException("Malformed read binary long response data");
+    }
+
+    responseData = new byte[valueLength];
+    System.arraycopy(data, index, responseData, 0, valueLength);
     return responseData;
   }
 
