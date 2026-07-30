@@ -76,7 +76,7 @@ public class ASN1Util {
     }
 
     ASN1TaggedObject asn1TaggedObject = ASN1TaggedObject.getInstance(asn1Encodable);
-    if (asn1TaggedObject.getTagClass() != tagClass && asn1TaggedObject.getTagNo() != tagNo) {
+    if (asn1TaggedObject.getTagClass() != tagClass || asn1TaggedObject.getTagNo() != tagNo) {
       throw new IllegalArgumentException("Expected "
           + "[" + tagClassToString(tagClass) + " " + tagNo + "], found "
           + "[" + tagClassToString(asn1TaggedObject.getTagClass())

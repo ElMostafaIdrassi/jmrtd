@@ -72,7 +72,9 @@ public class PositionInputStream extends InputStream {
   @Override
   public int read(byte[] dest, int offset, int length) throws IOException {
     int bytesRead = carrier.read(dest, offset, length);
-    position += bytesRead;
+    if (bytesRead > 0) {
+      position += bytesRead;
+    }
     return bytesRead;
   }
 
