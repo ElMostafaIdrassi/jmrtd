@@ -57,17 +57,25 @@ public class PADScoreBlock extends Block {
 
   private RegistryIdBlock mechanismIdBlock;
 
-  private int score;
+  private ScoreOrError scoreOrError;
 
   public PADScoreBlock(RegistryIdBlock mechanismIdBlock, int score) {
+    this(mechanismIdBlock, score >= 0 ? new ScoreOrError(score)
+        : new ScoreOrError(ScoreOrError.ScoringErrorCode.FAILURE_TO_ASSESS));
+  }
+
+  public PADScoreBlock(RegistryIdBlock mechanismIdBlock, ScoreOrError scoreOrError) {
+    if (scoreOrError == null) {
+      throw new IllegalArgumentException("Null score or error");
+    }
     this.mechanismIdBlock = mechanismIdBlock;
-    this.score = score;
+    this.scoreOrError = scoreOrError;
   }
 
   PADScoreBlock(ASN1Encodable asn1Encodable) {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
     mechanismIdBlock = new RegistryIdBlock(taggedObjects.get(0));
-    score = ISO39794Util.decodeScoreOrError(taggedObjects.get(1));
+    scoreOrError = new ScoreOrError(taggedObjects.get(1));
   }
 
   public RegistryIdBlock getMechanismIdBlock() {
@@ -77,12 +85,16 @@ public class PADScoreBlock extends Block {
   //  Score ::= INTEGER       (0..100)
   /* NOTE: -1 for error. */
   public int getScore() {
-    return score;
+    return scoreOrError.isScore() ? scoreOrError.getScore() : -1;
+  }
+
+  public ScoreOrError getScoreOrError() {
+    return scoreOrError;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(mechanismIdBlock, score);
+    return Objects.hash(mechanismIdBlock, scoreOrError);
   }
 
   @Override
@@ -98,19 +110,20 @@ public class PADScoreBlock extends Block {
     }
 
     PADScoreBlock other = (PADScoreBlock) obj;
-    return Objects.equals(mechanismIdBlock, other.mechanismIdBlock) && score == other.score;
+    return Objects.equals(mechanismIdBlock, other.mechanismIdBlock)
+        && Objects.equals(scoreOrError, other.scoreOrError);
   }
 
   @Override
   public String toString() {
-    return "PADScoreBlock [mechanismIdBlock: " + mechanismIdBlock + ", score: " + score + "]";
+    return "PADScoreBlock [mechanismIdBlock: " + mechanismIdBlock + ", scoreOrError: " + scoreOrError + "]";
   }
 
   @Override
   ASN1Encodable getASN1Object() {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, mechanismIdBlock.getASN1Object());
-    taggedObjects.put(1, ISO39794Util.encodeScoreOrError(score));
+    taggedObjects.put(1, scoreOrError.getASN1Object());
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 

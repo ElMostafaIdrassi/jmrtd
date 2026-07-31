@@ -53,11 +53,18 @@ public class FingerImageSegmentBlock extends Block {
   private List<CoordinateCartesian2DUnsignedShortBlock> enclosingCoordinatesBlock; // SIZE(2..MAX)
   private Integer orientation;
   private List<QualityBlock> qualityBlocks;
-  private int confidence;
+  private ScoreOrError confidence;
 
   public FingerImageSegmentBlock(FingerImagePositionCode positionCode,
       List<CoordinateCartesian2DUnsignedShortBlock> enclosingCoordinatesBlock, Integer orientation,
       List<QualityBlock> qualityBlocks, int confidence) {
+    this(positionCode, enclosingCoordinatesBlock, orientation, qualityBlocks,
+        confidence >= 0 ? new ScoreOrError(confidence) : null);
+  }
+
+  public FingerImageSegmentBlock(FingerImagePositionCode positionCode,
+      List<CoordinateCartesian2DUnsignedShortBlock> enclosingCoordinatesBlock, Integer orientation,
+      List<QualityBlock> qualityBlocks, ScoreOrError confidence) {
     this.positionCode = positionCode;
     this.enclosingCoordinatesBlock = enclosingCoordinatesBlock;
     this.orientation = orientation;
@@ -85,7 +92,7 @@ public class FingerImageSegmentBlock extends Block {
       qualityBlocks = QualityBlock.decodeQualityBlocks(taggedObjects.get(3));
     }
     if (taggedObjects.containsKey(4)) {
-      confidence = ISO39794Util.decodeScoreOrError(taggedObjects.get(4));
+      confidence = new ScoreOrError(taggedObjects.get(4));
     }
   }
 
@@ -106,6 +113,13 @@ public class FingerImageSegmentBlock extends Block {
   }
 
   public int getConfidence() {
+    if (confidence == null) {
+      return -1;
+    }
+    return confidence.isScore() ? confidence.getScore() : -1;
+  }
+
+  public ScoreOrError getConfidenceScoreOrError() {
     return confidence;
   }
 
@@ -127,7 +141,8 @@ public class FingerImageSegmentBlock extends Block {
     }
 
     FingerImageSegmentBlock other = (FingerImageSegmentBlock) obj;
-    return confidence == other.confidence && Objects.equals(enclosingCoordinatesBlock, other.enclosingCoordinatesBlock)
+    return Objects.equals(confidence, other.confidence)
+        && Objects.equals(enclosingCoordinatesBlock, other.enclosingCoordinatesBlock)
         && Objects.equals(orientation, other.orientation) && positionCode == other.positionCode
         && Objects.equals(qualityBlocks, other.qualityBlocks);
   }
@@ -169,8 +184,8 @@ public class FingerImageSegmentBlock extends Block {
     if (qualityBlocks != null) {
       taggedObjects.put(3, ISO39794Util.encodeBlocks(qualityBlocks));
     }
-    if (confidence >= 0) {
-      taggedObjects.put(4, ISO39794Util.encodeScoreOrError(confidence));
+    if (confidence != null) {
+      taggedObjects.put(4, confidence.getASN1Object());
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

@@ -57,17 +57,25 @@ public class QualityBlock extends Block {
 
   private RegistryIdBlock algorithmIdBlock;
 
-  private int score;
+  private ScoreOrError scoreOrError;
 
   public QualityBlock(RegistryIdBlock algorithmIdBlock, int score) {
+    this(algorithmIdBlock, score >= 0 ? new ScoreOrError(score)
+        : new ScoreOrError(ScoreOrError.ScoringErrorCode.FAILURE_TO_ASSESS));
+  }
+
+  public QualityBlock(RegistryIdBlock algorithmIdBlock, ScoreOrError scoreOrError) {
+    if (scoreOrError == null) {
+      throw new IllegalArgumentException("Null score or error");
+    }
     this.algorithmIdBlock = algorithmIdBlock;
-    this.score = score;
+    this.scoreOrError = scoreOrError;
   }
 
   QualityBlock(ASN1Encodable asn1Encodable) {
     Map<Integer, ASN1Encodable> taggedObjects = ASN1Util.decodeTaggedObjects(asn1Encodable);
     algorithmIdBlock = new RegistryIdBlock(taggedObjects.get(0));
-    score = ISO39794Util.decodeScoreOrError(taggedObjects.get(1));
+    scoreOrError = new ScoreOrError(taggedObjects.get(1));
   }
 
   public RegistryIdBlock getAlgorithmIdBlock() {
@@ -75,12 +83,16 @@ public class QualityBlock extends Block {
   }
 
   public int getScore() {
-    return score;
+    return scoreOrError.isScore() ? scoreOrError.getScore() : -1;
+  }
+
+  public ScoreOrError getScoreOrError() {
+    return scoreOrError;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(algorithmIdBlock, score);
+    return Objects.hash(algorithmIdBlock, scoreOrError);
   }
 
   @Override
@@ -96,23 +108,22 @@ public class QualityBlock extends Block {
     }
 
     QualityBlock other = (QualityBlock) obj;
-    return Objects.equals(algorithmIdBlock, other.algorithmIdBlock) && score == other.score;
+    return Objects.equals(algorithmIdBlock, other.algorithmIdBlock)
+        && Objects.equals(scoreOrError, other.scoreOrError);
   }
 
   @Override
   public String toString() {
     return "QualityBlock ["
         + "algorithmIdBlock: " + algorithmIdBlock
-        + ", score: " + score
+        + ", scoreOrError: " + scoreOrError
         + "]";
   }
 
   ASN1Encodable getASN1Object() {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, algorithmIdBlock.getASN1Object());
-    if (score >= 0) {
-      taggedObjects.put(1, ISO39794Util.encodeScoreOrError(score));
-    }
+    taggedObjects.put(1, scoreOrError.getASN1Object());
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 
