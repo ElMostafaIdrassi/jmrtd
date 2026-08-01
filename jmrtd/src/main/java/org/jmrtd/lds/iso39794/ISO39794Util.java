@@ -53,17 +53,34 @@ class ISO39794Util {
   }
 
   public static ASN1Encodable encodeCodeAsChoiceExtensionBlockFallback(int code) {
-    return new DERSequence(new DERTaggedObject(false, 0, ASN1Util.encodeInt(code)));
+    return encodeCodeAsChoiceExtensionBlockFallback(code, false);
+  }
+
+  public static ASN1Encodable encodeCodeAsChoiceExtensionBlockFallback(int code,
+      ISO39794EncodingProfile profile, ISO39794EncodingProfile.ChoiceType choiceType) {
+    return encodeCodeAsChoiceExtensionBlockFallback(code, profile.usesExtensionBlockFallback(choiceType));
+  }
+
+  private static ASN1Encodable encodeCodeAsChoiceExtensionBlockFallback(int code, boolean useExtensionBlock) {
+    if (!useExtensionBlock) {
+      return new DERSequence(new DERTaggedObject(false, 0, ASN1Util.encodeInt(code)));
+    }
+    ASN1Encodable fallback = new DERSequence(new DERTaggedObject(false, 0, ASN1Util.encodeInt(code)));
+    return new DERSequence(new DERTaggedObject(false, 1, fallback));
   }
 
   public static ASN1Encodable encodeBlocks(List<? extends Block> blocks) {
+    return encodeBlocks(blocks, ISO39794EncodingProfile.BASE);
+  }
+
+  public static ASN1Encodable encodeBlocks(List<? extends Block> blocks, ISO39794EncodingProfile profile) {
     if (blocks == null) {
       return null;
     }
     List<ASN1Encodable> asn1Objects = new ArrayList<ASN1Encodable>(blocks.size());
     for (Block block: blocks) {
       if (block != null) {
-        asn1Objects.add(block.getASN1Object());
+        asn1Objects.add(block.getASN1Object(profile));
       }
     }
     return new DERSequence(asn1Objects.toArray(new ASN1Encodable[0]));

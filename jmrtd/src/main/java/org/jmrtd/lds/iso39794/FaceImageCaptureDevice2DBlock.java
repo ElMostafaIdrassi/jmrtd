@@ -146,12 +146,18 @@ public class FaceImageCaptureDevice2DBlock extends Block {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     if (captureDeviceSpectral2DBlock != null) {
       taggedObjects.put(0, captureDeviceSpectral2DBlock.getASN1Object());
     }
     if (captureDeviceTechnologyId2D != null) {
-      taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(captureDeviceTechnologyId2D.getCode()));
+      taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(captureDeviceTechnologyId2D.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.CAPTURE_DEVICE_TECHNOLOGY_2D));
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

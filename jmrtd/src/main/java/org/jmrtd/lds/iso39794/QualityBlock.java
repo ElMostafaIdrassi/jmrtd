@@ -121,9 +121,14 @@ public class QualityBlock extends Block {
   }
 
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, algorithmIdBlock.getASN1Object());
-    taggedObjects.put(1, scoreOrError.getASN1Object());
+    taggedObjects.put(1, scoreOrError.getASN1Object(profile));
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
 

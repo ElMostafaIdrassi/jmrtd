@@ -328,27 +328,36 @@ public class PADDataBlock extends Block {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     if (padDecisionCode != null) {
-      taggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padDecisionCode.getCode()));
+      taggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padDecisionCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.PAD_DECISION));
     }
     if (padScoreBlocks != null) {
-      taggedObjects.put(1, ISO39794Util.encodeBlocks(padScoreBlocks));
+      taggedObjects.put(1, ISO39794Util.encodeBlocks(padScoreBlocks, profile));
     }
     if (padExtendedDataBlocks != null) {
       taggedObjects.put(2, ISO39794Util.encodeBlocks(padExtendedDataBlocks));
     }
     if (padCaptureContextCode != null) {
-      taggedObjects.put(3, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padCaptureContextCode.getCode()));
+      taggedObjects.put(3, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padCaptureContextCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.PAD_CAPTURE_CONTEXT));
     }
     if (padSupervisionLevelCode != null) {
-      taggedObjects.put(4, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padSupervisionLevelCode.getCode()));
+      taggedObjects.put(4, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padSupervisionLevelCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.PAD_SUPERVISION_LEVEL));
     }
     if (riskLevel >= 0) {
       taggedObjects.put(5, ASN1Util.encodeInt(riskLevel));
     }
     if (padCriteriaCategoryCode != null) {
-      taggedObjects.put(6, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padCriteriaCategoryCode.getCode()));
+      taggedObjects.put(6, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(padCriteriaCategoryCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.PAD_CRITERIA_CATEGORY));
     }
     if (parameter != null) {
       taggedObjects.put(7, new DEROctetString(parameter));

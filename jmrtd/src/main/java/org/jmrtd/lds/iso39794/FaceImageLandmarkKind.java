@@ -411,11 +411,17 @@ public interface FaceImageLandmarkKind {
   }
 
   static ASN1Encodable encodeLandmarkKind(FaceImageLandmarkKind landmarkKind) {
+    return encodeLandmarkKind(landmarkKind, ISO39794EncodingProfile.BASE);
+  }
+
+  static ASN1Encodable encodeLandmarkKind(FaceImageLandmarkKind landmarkKind, ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> baseTaggedObjects = new HashMap<Integer, ASN1Encodable>();
     if (landmarkKind instanceof MPEGFeaturePointCode) {
-      baseTaggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(((MPEGFeaturePointCode)landmarkKind).getCode()));
+      baseTaggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(
+          ((MPEGFeaturePointCode)landmarkKind).getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.MPEG4_FEATURE_POINT));
     } else {
-      baseTaggedObjects.put(1, encodeAnthropmetricLandmark(landmarkKind));
+      baseTaggedObjects.put(1, encodeAnthropmetricLandmark(landmarkKind, profile));
     }
 
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
@@ -424,13 +430,24 @@ public interface FaceImageLandmarkKind {
   }
 
   static ASN1Encodable encodeAnthropmetricLandmark(FaceImageLandmarkKind landmarkKind) {
+    return encodeAnthropmetricLandmark(landmarkKind, ISO39794EncodingProfile.BASE);
+  }
+
+  static ASN1Encodable encodeAnthropmetricLandmark(FaceImageLandmarkKind landmarkKind,
+      ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> baseTaggedObjects = new HashMap<Integer, ASN1Encodable>();
     if (landmarkKind instanceof AnthropometricLandmarkNameCode) {
-      baseTaggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(((AnthropometricLandmarkNameCode)landmarkKind).getCode()));
+      baseTaggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(
+          ((AnthropometricLandmarkNameCode)landmarkKind).getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.ANTHROPOMETRIC_LANDMARK_NAME));
     } else if (landmarkKind instanceof AnthropometricLandmarkPointNameCode) {
-      baseTaggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(((AnthropometricLandmarkPointNameCode)landmarkKind).getCode()));
+      baseTaggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(
+          ((AnthropometricLandmarkPointNameCode)landmarkKind).getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.ANTHROPOMETRIC_LANDMARK_POINT_NAME));
     } else if (landmarkKind instanceof AnthropometricLandmarkPointIdCode) {
-      baseTaggedObjects.put(2, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(((AnthropometricLandmarkPointIdCode)landmarkKind).getCode()));
+      baseTaggedObjects.put(2, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(
+          ((AnthropometricLandmarkPointIdCode)landmarkKind).getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.ANTHROPOMETRIC_LANDMARK_POINT_ID));
     }
 
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();

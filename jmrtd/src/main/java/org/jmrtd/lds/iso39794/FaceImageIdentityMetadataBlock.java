@@ -262,15 +262,23 @@ public class FaceImageIdentityMetadataBlock extends Block {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     if (genderCode != null) {
-      taggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(genderCode.getCode()));
+      taggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(genderCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.GENDER));
     }
     if (eyeColourCode != null) {
-      taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(eyeColourCode.getCode()));
+      taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(eyeColourCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.EYE_COLOUR));
     }
     if (hairColourCode != null) {
-      taggedObjects.put(2, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(hairColourCode.getCode()));
+      taggedObjects.put(2, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(hairColourCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.HAIR_COLOUR));
     }
     if (subjectHeight >= 0) {
       taggedObjects.put(3, ASN1Util.encodeInt(subjectHeight));

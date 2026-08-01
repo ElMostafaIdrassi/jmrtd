@@ -37,9 +37,20 @@ abstract class Block implements Serializable {
 
   abstract ASN1Encodable getASN1Object();
 
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
+    return getASN1Object();
+  }
+
   public byte[] getEncoded() {
+    return getEncoded(ISO39794EncodingProfile.BASE);
+  }
+
+  public byte[] getEncoded(ISO39794EncodingProfile profile) {
     try {
-      return getASN1Object().toASN1Primitive().getEncoded("DER");
+      if (profile == null) {
+        throw new IllegalArgumentException("Encoding profile must not be null");
+      }
+      return getASN1Object(profile).toASN1Primitive().getEncoded("DER");
     } catch (IOException ioe) {
       LOGGER.log(Level.WARNING, "Error decoding", ioe);
       return null;

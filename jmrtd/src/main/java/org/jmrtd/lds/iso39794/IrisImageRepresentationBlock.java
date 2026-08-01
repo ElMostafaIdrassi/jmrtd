@@ -502,6 +502,11 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, ASN1Util.encodeInt(eyeLabelCode.getCode()));
     taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(irisImageKind.getCode()));
@@ -519,7 +524,7 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
       taggedObjects.put(10, captureDeviceBlock.getASN1Object());
     }
     if (qualityBlocks != null) {
-      taggedObjects.put(11, ISO39794Util.encodeBlocks(qualityBlocks));
+      taggedObjects.put(11, ISO39794Util.encodeBlocks(qualityBlocks, profile));
     }
     if (rollAngleBlock != null) {
       taggedObjects.put(12, rollAngleBlock.getASN1Object());
@@ -528,7 +533,7 @@ public class IrisImageRepresentationBlock extends Block implements ImageInfo {
       taggedObjects.put(13, localisationBlock.getASN1Object());
     }
     if (padDataBlock != null) {
-      taggedObjects.put(14, padDataBlock.getASN1Object());
+      taggedObjects.put(14, padDataBlock.getASN1Object(profile));
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

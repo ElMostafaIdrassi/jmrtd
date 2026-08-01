@@ -164,10 +164,15 @@ public class FingerImageDataBlock extends Block implements BiometricDataBlock {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, versionBlock.getASN1Object());
-    taggedObjects.put(1, ISO39794Util.encodeBlocks(representationBlocks));
-    return  new DERTaggedObject(false, BERTags.APPLICATION, 0x04, ASN1Util.encodeTaggedObjects(taggedObjects));
+    taggedObjects.put(1, ISO39794Util.encodeBlocks(representationBlocks, profile));
+    return new DERTaggedObject(false, BERTags.APPLICATION, 0x04, ASN1Util.encodeTaggedObjects(taggedObjects));
   }
 
   /* PRIVATE */

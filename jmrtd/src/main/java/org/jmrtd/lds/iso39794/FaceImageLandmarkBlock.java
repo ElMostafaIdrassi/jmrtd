@@ -114,8 +114,13 @@ public class FaceImageLandmarkBlock extends Block {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
-    taggedObjects.put(0, FaceImageLandmarkKind.encodeLandmarkKind(landmarkKind));
+    taggedObjects.put(0, FaceImageLandmarkKind.encodeLandmarkKind(landmarkKind, profile));
     if (landmarkCoordinates != null) { taggedObjects.put(1, FaceImageLandmarkCoordinates.encodeLandmarkCoordinates(landmarkCoordinates)); }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

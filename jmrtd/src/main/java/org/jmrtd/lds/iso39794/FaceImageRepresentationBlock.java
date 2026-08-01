@@ -288,17 +288,26 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, ASN1Util.encodeBigInteger(representationId));
-    taggedObjects.put(1, encodeImageRepresentation2DBlock(imageRepresentation2DBlock));
+    taggedObjects.put(1, encodeImageRepresentation2DBlock(imageRepresentation2DBlock, profile));
     if (captureDateTimeBlock != null) {
       taggedObjects.put(2, captureDateTimeBlock.getASN1Object());
     }
     if (qualityBlocks != null) {
-      taggedObjects.put(3, ISO39794Util.encodeBlocks(qualityBlocks));
+      taggedObjects.put(3, ISO39794Util.encodeBlocks(qualityBlocks, profile));
     }
     if (padDataBlocks != null) {
-      taggedObjects.put(4, ISO39794Util.encodeBlocks(padDataBlocks));
+      if (profile == ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1 && padDataBlocks.size() == 1) {
+        taggedObjects.put(4, padDataBlocks.get(0).getASN1Object(profile));
+      } else {
+        taggedObjects.put(4, ISO39794Util.encodeBlocks(padDataBlocks, profile));
+      }
     }
     if (sessionId != null) {
       taggedObjects.put(5, ASN1Util.encodeBigInteger(sessionId));
@@ -310,10 +319,10 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
       taggedObjects.put(7, captureDeviceBlock.getASN1Object());
     }
     if (identityMetadataBlock != null) {
-      taggedObjects.put(8, identityMetadataBlock.getASN1Object());
+      taggedObjects.put(8, identityMetadataBlock.getASN1Object(profile));
     }
     if (landmarkBlocks != null) {
-      taggedObjects.put(9, ISO39794Util.encodeBlocks(landmarkBlocks));
+      taggedObjects.put(9, ISO39794Util.encodeBlocks(landmarkBlocks, profile));
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }
@@ -363,9 +372,10 @@ public class FaceImageRepresentationBlock extends Block implements ImageInfo {
     return null;
   }
 
-  private static ASN1Encodable encodeImageRepresentation2DBlock(FaceImageRepresentation2DBlock faceImageRepresentation2DBlock) {
+  private static ASN1Encodable encodeImageRepresentation2DBlock(FaceImageRepresentation2DBlock faceImageRepresentation2DBlock,
+      ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> baseTaggedObjects = new HashMap<Integer, ASN1Encodable>();
-    baseTaggedObjects.put(0, faceImageRepresentation2DBlock.getASN1Object());
+    baseTaggedObjects.put(0, faceImageRepresentation2DBlock.getASN1Object(profile));
 
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, ASN1Util.encodeTaggedObjects(baseTaggedObjects));

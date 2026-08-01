@@ -41,6 +41,7 @@ import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.FingerInfo;
 import org.jmrtd.lds.iso39794.FingerImageDataBlock;
+import org.jmrtd.lds.iso39794.ISO39794EncodingProfile;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
@@ -92,6 +93,8 @@ public class DG3File extends CBEFFDataGroup {
     return decoders;
   }
 
+  private ISO39794EncodingProfile iso39794EncodingProfile = ISO39794EncodingProfile.BASE;
+
   private static final ISO781611Encoder<BiometricDataBlock> ISO_19794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
 
     @Override
@@ -107,14 +110,21 @@ public class DG3File extends CBEFFDataGroup {
     }
   });
 
-  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = createISO39794Encoder(ISO39794EncodingProfile.BASE);
+
+  private static final ISO781611Encoder<BiometricDataBlock> ICAO_39794_5_ENCODER =
+      createISO39794Encoder(ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1);
+
+  private static ISO781611Encoder<BiometricDataBlock> createISO39794Encoder(final ISO39794EncodingProfile profile) {
+    return new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
 
     @Override
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof FingerImageDataBlock) {
         TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
+        byte[] encodedFingerImageDataBlock = ((FingerImageDataBlock)info).getEncoded(profile);
         tlvOutputStream.writeTag(0xA1);
-        tlvOutputStream.writeValue(((FingerImageDataBlock)info).getEncoded());
+        tlvOutputStream.writeValue(encodedFingerImageDataBlock);
       }
     }
 
@@ -122,7 +132,8 @@ public class DG3File extends CBEFFDataGroup {
     public BiometricEncodingType getEncodingType() {
       return BiometricEncodingType.ISO_39794;
     }
-  });
+    });
+  }
 
   /**
    * Creates a new file with the specified records.
@@ -150,7 +161,16 @@ public class DG3File extends CBEFFDataGroup {
   }
 
   private DG3File(BiometricEncodingType encodingType, List<? extends BiometricDataBlock> dataBlocks, boolean shouldAddRandomDataIfEmpty) {
+    this(encodingType, dataBlocks, shouldAddRandomDataIfEmpty, ISO39794EncodingProfile.BASE);
+  }
+
+  private DG3File(BiometricEncodingType encodingType, List<? extends BiometricDataBlock> dataBlocks, boolean shouldAddRandomDataIfEmpty,
+      ISO39794EncodingProfile iso39794EncodingProfile) {
     super(EF_DG3_TAG, encodingType, dataBlocks, shouldAddRandomDataIfEmpty);
+    if (iso39794EncodingProfile == null) {
+      throw new IllegalArgumentException("Encoding profile must not be null");
+    }
+    this.iso39794EncodingProfile = iso39794EncodingProfile;
   }
 
   /**
@@ -162,6 +182,7 @@ public class DG3File extends CBEFFDataGroup {
    */
   public DG3File(InputStream inputStream) throws IOException {
     super(EF_DG3_TAG, inputStream, false);
+    this.iso39794EncodingProfile = ISO39794EncodingProfile.BASE;
   }
 
   public static DG3File createISO19794DG3File(List<FingerInfo> fingerInfos) {
@@ -170,6 +191,18 @@ public class DG3File extends CBEFFDataGroup {
 
   public static DG3File createISO39794DG3File(List<FingerImageDataBlock> fingerImageDataBlocks) {
     return new DG3File(BiometricEncodingType.ISO_39794, fingerImageDataBlocks, false);
+  }
+
+  /**
+   * Creates an ISO/IEC 39794 DG3 using the specified encoding profile.
+   *
+   * @param fingerImageDataBlocks finger image records
+   * @param profile encoding profile
+   * @return a DG3 file
+   */
+  public static DG3File createISO39794DG3File(List<FingerImageDataBlock> fingerImageDataBlocks,
+      ISO39794EncodingProfile profile) {
+    return new DG3File(BiometricEncodingType.ISO_39794, fingerImageDataBlocks, false, profile);
   }
 
   @Override
@@ -186,7 +219,8 @@ public class DG3File extends CBEFFDataGroup {
     case ISO_19794:
       return ISO_19794_ENCODER;
     case ISO_39794:
-      return ISO_39794_ENCODER;
+      return iso39794EncodingProfile == ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1
+          ? ICAO_39794_5_ENCODER : ISO_39794_ENCODER;
     default:
       return ISO_19794_ENCODER;
     }

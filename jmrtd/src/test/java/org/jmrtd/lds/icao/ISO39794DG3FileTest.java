@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.iso39794.FingerImageDataBlock;
+import org.jmrtd.lds.iso39794.ISO39794EncodingProfile;
 import org.junit.Test;
 
 public class ISO39794DG3FileTest {
@@ -45,6 +46,33 @@ public class ISO39794DG3FileTest {
       byte[] reEncoded = reconstructed.getEncoded();
       assertEquals(encoded.length, reEncoded.length);
       assertTrue(Arrays.equals(encoded, reEncoded));
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Exception", e);
+      fail(e.getMessage());
+    }
+  }
+
+  @Test
+  public void testCreateISO39794DG3FileWithProfile() {
+    try {
+      InputStream inputStream = ISO39794DG3FileTest.class.getResourceAsStream("/lds/dg3/iso39794/sample-39794-4-ed-1-v1.der");
+      assertNotNull(inputStream);
+      FingerImageDataBlock dataBlock = new FingerImageDataBlock(inputStream);
+      
+      // Create DG3 file with ICAO profile
+      DG3File dg3File = DG3File.createISO39794DG3File(
+          java.util.Collections.singletonList(dataBlock),
+          ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1
+      );
+      assertNotNull(dg3File);
+      
+      byte[] encoded = dg3File.getEncoded();
+      assertNotNull(encoded);
+      
+      // Parse it back
+      DG3File reconstructed = new DG3File(new java.io.ByteArrayInputStream(encoded));
+      assertEquals(1, reconstructed.getSubRecords().size());
+      assertEquals(dataBlock, reconstructed.getSubRecords().get(0));
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Exception", e);
       fail(e.getMessage());

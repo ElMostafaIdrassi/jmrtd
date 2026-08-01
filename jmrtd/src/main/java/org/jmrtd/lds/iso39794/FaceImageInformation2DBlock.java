@@ -519,17 +519,24 @@ public class FaceImageInformation2DBlock extends Block {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(imageDataFormatCode.getCode()));
     if (faceImageKind2DCode != null) {
-      taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(faceImageKind2DCode.getCode()));
+      taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(faceImageKind2DCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.FACE_IMAGE_KIND_2D));
     }
     if (postAcquisitionProcessingBlock != null) {
       taggedObjects.put(2, postAcquisitionProcessingBlock.getASN1Object());
     }
     if (lossyTransformationAttemptsCode != null) {
       taggedObjects.put(3,
-          ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(lossyTransformationAttemptsCode.getCode()));
+          ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(lossyTransformationAttemptsCode.getCode(), profile,
+              ISO39794EncodingProfile.ChoiceType.LOSSY_TRANSFORMATION_ATTEMPTS));
     }
     if (cameraToSubjectDistance != null) {
       taggedObjects.put(4, ASN1Util.encodeInt(cameraToSubjectDistance));
@@ -547,7 +554,8 @@ public class FaceImageInformation2DBlock extends Block {
       taggedObjects.put(8, imageFaceMeasurementsBlock.getASN1Object());
     }
     if (imageColourSpaceCode != null) {
-      taggedObjects.put(9, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(imageColourSpaceCode.getCode()));
+      taggedObjects.put(9, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(imageColourSpaceCode.getCode(), profile,
+          ISO39794EncodingProfile.ChoiceType.IMAGE_COLOUR_SPACE));
     }
     if (referenceColourMappingBlock != null) {
       taggedObjects.put(10, referenceColourMappingBlock.getASN1Object());

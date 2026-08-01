@@ -151,6 +151,11 @@ public final class ScoreOrError extends Block {
     return getASN1Object(false);
   }
 
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
+    return getASN1Object(profile.usesExtensionBlockFallback(ISO39794EncodingProfile.ChoiceType.SCORING_ERROR));
+  }
+
   /**
    * Encodes this value, optionally using an extension block with a fallback error code.
    * The latter form is required by some application profiles.

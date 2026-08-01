@@ -432,6 +432,11 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(position.getCode()));
     taggedObjects.put(1, ISO39794Util.encodeCodeAsChoiceExtensionBlockFallback(impression.getCode()));
@@ -444,7 +449,7 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
       taggedObjects.put(5, captureDeviceBlock.getASN1Object());
     }
     if (qualityBlocks != null) {
-      taggedObjects.put(6, ISO39794Util.encodeBlocks(qualityBlocks));
+      taggedObjects.put(6, ISO39794Util.encodeBlocks(qualityBlocks, profile));
     }
     if (spatialSamplingRateBlock != null) {
       taggedObjects.put(7, spatialSamplingRateBlock.getASN1Object());
@@ -462,19 +467,19 @@ public class FingerImageRepresentationBlock extends Block implements ImageInfo {
       taggedObjects.put(11, ASN1Util.encodeBoolean(isImageHasBeenLossilyCompressed));
     }
     if (segmentationBlocks != null) {
-      taggedObjects.put(12, ISO39794Util.encodeBlocks(segmentationBlocks));
+      taggedObjects.put(12, ISO39794Util.encodeBlocks(segmentationBlocks, profile));
     }
     if (annotationBlocks != null) {
-      taggedObjects.put(13, ISO39794Util.encodeBlocks(annotationBlocks));
+      taggedObjects.put(13, ISO39794Util.encodeBlocks(annotationBlocks, profile));
     }
     if (padDataBlock != null) {
-      taggedObjects.put(14, padDataBlock.getASN1Object());
+      taggedObjects.put(14, padDataBlock.getASN1Object(profile));
     }
     if (commentBlocks != null) {
       taggedObjects.put(15, encodeCommentBlocks(commentBlocks));
     }
     if (vendorSpecificDataBlocks != null) {
-      taggedObjects.put(16, ISO39794Util.encodeBlocks(vendorSpecificDataBlocks));
+      taggedObjects.put(16, ISO39794Util.encodeBlocks(vendorSpecificDataBlocks, profile));
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

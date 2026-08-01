@@ -147,11 +147,16 @@ public class FaceImageRepresentation2DBlock extends Block {
 
   @Override
   ASN1Encodable getASN1Object() {
+    return getASN1Object(ISO39794EncodingProfile.BASE);
+  }
+
+  @Override
+  ASN1Encodable getASN1Object(ISO39794EncodingProfile profile) {
     Map<Integer, ASN1Encodable> taggedObjects = new HashMap<Integer, ASN1Encodable>();
     taggedObjects.put(0, new DEROctetString(representationData2DBytes));
-    taggedObjects.put(1, imageInformation2DBlock.getASN1Object());
+    taggedObjects.put(1, imageInformation2DBlock.getASN1Object(profile));
     if (captureDevice2DBlock != null) {
-      taggedObjects.put(2, captureDevice2DBlock.getASN1Object());
+      taggedObjects.put(2, captureDevice2DBlock.getASN1Object(profile));
     }
     return ASN1Util.encodeTaggedObjects(taggedObjects);
   }

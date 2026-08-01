@@ -1,5 +1,6 @@
 package org.jmrtd.lds.icao;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -55,6 +56,7 @@ import org.jmrtd.lds.iso39794.FaceImagePropertiesBlock;
 import org.jmrtd.lds.iso39794.FaceImageReferenceColourMappingBlock;
 import org.jmrtd.lds.iso39794.FaceImageRepresentation2DBlock;
 import org.jmrtd.lds.iso39794.FaceImageRepresentationBlock;
+import org.jmrtd.lds.iso39794.ISO39794EncodingProfile;
 import org.jmrtd.lds.iso39794.PADDataBlock;
 import org.jmrtd.lds.iso39794.PADDataBlock.PADCaptureContextCode;
 import org.jmrtd.lds.iso39794.PADDataBlock.PADCriteriaCategoryCode;
@@ -111,8 +113,10 @@ public class ISO39794DG2FileTest {
     StandardBiometricHeader sbh = new StandardBiometricHeader(sbhMap);
     FaceImageDataBlock faceImageDataBlock = new FaceImageDataBlock(versionBlock, representationBlocks, sbh);
 
-    DG2File dg2File = DG2File.createISO39794DG2File(Collections.singletonList(faceImageDataBlock));
+    DG2File dg2File = DG2File.createISO39794DG2File(Collections.singletonList(faceImageDataBlock),
+        ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1);
     assertNotNull(dg2File);
+    assertArrayEquals(readResource("/lds/dg2/dg2_silver_mandatory_fields.bin"), dg2File.getEncoded());
 
     DG2File reEncodedDG2File = LDSFileUtil.getDG2File(new ByteArrayInputStream(dg2File.getEncoded()));
     assertNotNull(reEncodedDG2File);
@@ -208,8 +212,10 @@ public class ISO39794DG2FileTest {
     StandardBiometricHeader sbh = new StandardBiometricHeader(sbhMap);
     FaceImageDataBlock faceImageDataBlock = new FaceImageDataBlock(versionBlock, representationBlocks, sbh);
 
-    DG2File dg2File = DG2File.createISO39794DG2File(Collections.singletonList(faceImageDataBlock));
+    DG2File dg2File = DG2File.createISO39794DG2File(Collections.singletonList(faceImageDataBlock),
+        ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1);
     assertNotNull(dg2File);
+    assertArrayEquals(readResource("/lds/dg2/dg2_silver_all_fields.bin"), dg2File.getEncoded());
 //    FileOutputStream fOut = new FileOutputStream("silver_all.bin");
 //    fOut.write(dg2File.getEncoded());
 //    fOut.flush();
@@ -289,6 +295,34 @@ public class ISO39794DG2FileTest {
   public void testDG2File() {
     testDG2File("/lds/dg2/dg2_silver_all_fields.bin", 1);
     //    testDG2File("/lds/dg2/dg2_silver_mandatory_fields.bin", 1);
+  }
+
+  @Test
+  public void testSilverMandatoryRoundTrip() throws Exception {
+    byte[] originalBytes = readResource("/lds/dg2/dg2_silver_mandatory_fields.bin");
+    DG2File dg2File = new DG2File(new ByteArrayInputStream(originalBytes));
+    assertNotNull(dg2File);
+
+    @SuppressWarnings("unchecked")
+    List<FaceImageDataBlock> subRecords = (List<FaceImageDataBlock>)(List<?>) dg2File.getSubRecords();
+    DG2File roundTripDG2File = DG2File.createISO39794DG2File(subRecords, ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1);
+
+    byte[] reEncodedBytes = roundTripDG2File.getEncoded();
+    assertArrayEquals(originalBytes, reEncodedBytes);
+  }
+
+  @Test
+  public void testSilverAllRoundTrip() throws Exception {
+    byte[] originalBytes = readResource("/lds/dg2/dg2_silver_all_fields.bin");
+    DG2File dg2File = new DG2File(new ByteArrayInputStream(originalBytes));
+    assertNotNull(dg2File);
+
+    @SuppressWarnings("unchecked")
+    List<FaceImageDataBlock> subRecords = (List<FaceImageDataBlock>)(List<?>) dg2File.getSubRecords();
+    DG2File roundTripDG2File = DG2File.createISO39794DG2File(subRecords, ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1);
+
+    byte[] reEncodedBytes = roundTripDG2File.getEncoded();
+    assertArrayEquals(originalBytes, reEncodedBytes);
   }
 
   private void testFaceImageDataBlock(String resource) {

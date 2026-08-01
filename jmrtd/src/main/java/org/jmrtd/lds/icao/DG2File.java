@@ -41,6 +41,7 @@ import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.FaceInfo;
 import org.jmrtd.lds.iso39794.FaceImageDataBlock;
+import org.jmrtd.lds.iso39794.ISO39794EncodingProfile;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;
@@ -59,6 +60,8 @@ public class DG2File extends CBEFFDataGroup {
   private static final long serialVersionUID = 414300652684010416L;
 
   private static final ISO781611Decoder<BiometricDataBlock> DECODER = new ISO781611Decoder<BiometricDataBlock>(getDecoderMap());
+
+  private ISO39794EncodingProfile iso39794EncodingProfile = ISO39794EncodingProfile.BASE;
 
   private static Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> getDecoderMap() {
     Map<Integer, BiometricDataBlockDecoder<BiometricDataBlock>> decoders = new HashMap<Integer, BiometricDataBlockDecoder<BiometricDataBlock>>();
@@ -108,13 +111,19 @@ public class DG2File extends CBEFFDataGroup {
     }
   });
 
-  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
+  private static final ISO781611Encoder<BiometricDataBlock> ISO_39794_ENCODER = createISO39794Encoder(ISO39794EncodingProfile.BASE);
+
+  private static final ISO781611Encoder<BiometricDataBlock> ICAO_39794_5_ENCODER =
+      createISO39794Encoder(ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1);
+
+  private static ISO781611Encoder<BiometricDataBlock> createISO39794Encoder(final ISO39794EncodingProfile profile) {
+    return new ISO781611Encoder<BiometricDataBlock>(new BiometricDataBlockEncoder<BiometricDataBlock>() {
 
     @Override
     public void encode(BiometricDataBlock info, OutputStream outputStream) throws IOException {
       if (info instanceof FaceImageDataBlock) {
         TLVOutputStream tlvOutputStream = outputStream instanceof TLVOutputStream ? (TLVOutputStream)outputStream : new TLVOutputStream(outputStream);
-        byte[] encodedFaceImageDataBlock = ((FaceImageDataBlock)info).getEncoded();
+        byte[] encodedFaceImageDataBlock = ((FaceImageDataBlock)info).getEncoded(profile);
         tlvOutputStream.writeTag(0xA1);
         tlvOutputStream.writeValue(encodedFaceImageDataBlock);
       }
@@ -124,7 +133,8 @@ public class DG2File extends CBEFFDataGroup {
     public BiometricEncodingType getEncodingType() {
       return BiometricEncodingType.ISO_39794;
     }
-  });
+    });
+  }
 
   /**
    * Creates a new file with the specified records.
@@ -147,10 +157,20 @@ public class DG2File extends CBEFFDataGroup {
    */
   public DG2File(InputStream inputStream) throws IOException {
     super(EF_DG2_TAG, inputStream, false);
+    iso39794EncodingProfile = ISO39794EncodingProfile.BASE;
   }
 
   private DG2File(BiometricEncodingType encodingType, List<? extends BiometricDataBlock> biometricDataBlocks) {
+    this(encodingType, biometricDataBlocks, ISO39794EncodingProfile.BASE);
+  }
+
+  private DG2File(BiometricEncodingType encodingType, List<? extends BiometricDataBlock> biometricDataBlocks,
+      ISO39794EncodingProfile iso39794EncodingProfile) {
     super(EF_DG2_TAG, encodingType, biometricDataBlocks, false);
+    if (iso39794EncodingProfile == null) {
+      throw new IllegalArgumentException("Encoding profile must not be null");
+    }
+    this.iso39794EncodingProfile = iso39794EncodingProfile;
   }
 
   public static DG2File createISO19794DG2File(List<FaceInfo> faceInfos) {
@@ -159,6 +179,18 @@ public class DG2File extends CBEFFDataGroup {
 
   public static DG2File createISO39794DG2File(List<FaceImageDataBlock> faceImageDataBlocks) {
     return new DG2File(BiometricEncodingType.ISO_39794, faceImageDataBlocks);
+  }
+
+  /**
+   * Creates an ISO/IEC 39794 DG2 using the specified encoding profile.
+   *
+   * @param faceImageDataBlocks face image records
+   * @param profile encoding profile
+   * @return a DG2 file
+   */
+  public static DG2File createISO39794DG2File(List<FaceImageDataBlock> faceImageDataBlocks,
+      ISO39794EncodingProfile profile) {
+    return new DG2File(BiometricEncodingType.ISO_39794, faceImageDataBlocks, profile);
   }
 
   @Override
@@ -175,7 +207,8 @@ public class DG2File extends CBEFFDataGroup {
     case ISO_19794:
       return ISO_19794_ENCODER;
     case ISO_39794:
-      return ISO_39794_ENCODER;
+      return iso39794EncodingProfile == ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1
+          ? ICAO_39794_5_ENCODER : ISO_39794_ENCODER;
     default:
       return ISO_19794_ENCODER;
     }
