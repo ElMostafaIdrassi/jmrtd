@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,18 +59,44 @@ public class SecureMessagingAPDUSender {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
 
-  private CardService service;
+  private static final Map<CardService, AtomicInteger> APDU_COUNTS = new WeakHashMap<CardService, AtomicInteger>();
 
-  private int apduCount;
+  private CardService service;
 
   /**
    * Creates an APDU sender for tranceiving wrapped APDUs.
    *
    * @param service the card service for tranceiving the APDUs
    */
-  public SecureMessagingAPDUSender(CardService service) {
+  public SecureMessagingAPDUSender(final CardService service) {
     this.service = service;
-    this.apduCount = 0;
+    service.addAPDUListener(new APDUListener() {
+      @Override
+      public void exchangedAPDU(APDUEvent event) {
+        synchronized (APDU_COUNTS) {
+          AtomicInteger count = APDU_COUNTS.get(SecureMessagingAPDUSender.this.service);
+          if (count == null) {
+            count = new AtomicInteger(0);
+            APDU_COUNTS.put(SecureMessagingAPDUSender.this.service, count);
+          }
+          int seq = event.getSequenceNumber();
+          if (seq > count.get()) {
+            count.set(seq);
+          }
+        }
+      }
+    });
+  }
+
+  private int getCurrentSequenceNumber() {
+    synchronized (APDU_COUNTS) {
+      AtomicInteger count = APDU_COUNTS.get(service);
+      if (count == null) {
+        count = new AtomicInteger(0);
+        APDU_COUNTS.put(service, count);
+      }
+      return count.get();
+    }
   }
 
   /**
@@ -88,8 +117,11 @@ public class SecureMessagingAPDUSender {
     ResponseAPDU responseAPDU = service.transmit(commandAPDU);
     ResponseAPDU rawRapdu = responseAPDU;
     short sw = (short)responseAPDU.getSW();
+
+    int seq = getCurrentSequenceNumber();
+
     if (wrapper == null) {
-      notifyExchangedAPDU(new APDUEvent(this, "PLAIN", ++apduCount, commandAPDU, responseAPDU));
+      notifyExchangedAPDU(new APDUEvent(this, "PLAIN", seq, commandAPDU, responseAPDU));
     } else {
       try {
         if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH) {
@@ -107,7 +139,7 @@ public class SecureMessagingAPDUSender {
         throw new CardServiceException("Exception during transmission of wrapped APDU"
             + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
       } finally {
-        notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), ++apduCount, plainCapdu, responseAPDU, commandAPDU, rawRapdu));
+        notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), seq, plainCapdu, responseAPDU, commandAPDU, rawRapdu));
       }
     }
 
