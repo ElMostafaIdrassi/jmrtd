@@ -31,12 +31,8 @@ import java.security.Security;
 import java.util.Date;
 
 import org.jmrtd.Util;
-import org.jmrtd.cert.CVCAuthorizationTemplate;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Permission;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
-import org.jmrtd.cert.CVCPrincipal;
-import org.jmrtd.cert.CVCertificateBuilder;
-import org.jmrtd.cert.CardVerifiableCertificate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

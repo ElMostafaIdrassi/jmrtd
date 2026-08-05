@@ -35,7 +35,6 @@ import java.io.ObjectOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.ActiveAuthenticationInfo;
 import org.junit.Test;
 
 public class ActiveAuthenticationInfoTest {

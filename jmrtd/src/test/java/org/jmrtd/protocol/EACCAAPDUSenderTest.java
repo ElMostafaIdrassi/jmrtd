@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.jmrtd.protocol.EACCAAPDUSender;
 import org.jmrtd.ScriptedCardService;
 import org.junit.Test;
 
@@ -31,7 +30,7 @@ public class EACCAAPDUSenderTest {
     ScriptedCardService service = new ScriptedCardService(
         response(ISO7816.SW_WRONG_LENGTH),
         response(new byte[] { 0x7C, 0x03, 0x01, 0x02, 0x03 }, ISO7816.SW_NO_ERROR));
-    EACCAAPDUSender sender = new EACCAAPDUSender(service);
+    EACCAAPDUSender sender = new EACCAAPDUSender(new SecureMessagingAPDUSender(service));
 
     byte[] result = sender.sendGeneralAuthenticate(null, new byte[] { 0x11, 0x22 }, 65536, true);
 
@@ -47,7 +46,7 @@ public class EACCAAPDUSenderTest {
   public void usesCommandChainingClassForNonFinalSegment() throws Exception {
     ScriptedCardService service = new ScriptedCardService(
         response(new byte[] { 0x7C, 0x00 }, ISO7816.SW_NO_ERROR));
-    EACCAAPDUSender sender = new EACCAAPDUSender(service);
+    EACCAAPDUSender sender = new EACCAAPDUSender(new SecureMessagingAPDUSender(service));
 
     assertArrayEquals(new byte[0],
         sender.sendGeneralAuthenticate(null, new byte[] { 0x01 }, 256, false));

@@ -40,8 +40,8 @@ import org.jmrtd.cbeff.ISO781611Encoder;
 import org.jmrtd.cbeff.StandardBiometricHeader;
 import org.jmrtd.lds.CBEFFDataGroup;
 import org.jmrtd.lds.iso19794.IrisInfo;
-import org.jmrtd.lds.iso39794.IrisImageDataBlock;
 import org.jmrtd.lds.iso39794.ISO39794EncodingProfile;
+import org.jmrtd.lds.iso39794.IrisImageDataBlock;
 
 import net.sf.scuba.tlv.TLVInputStream;
 import net.sf.scuba.tlv.TLVOutputStream;

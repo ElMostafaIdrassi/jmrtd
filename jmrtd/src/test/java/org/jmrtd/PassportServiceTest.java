@@ -22,8 +22,6 @@ import java.lang.reflect.Field;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.jmrtd.DefaultFileSystem;
-import org.jmrtd.PassportService;
 import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;

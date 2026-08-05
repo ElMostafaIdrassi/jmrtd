@@ -58,17 +58,17 @@ public class ISO39794DG3FileTest {
       InputStream inputStream = ISO39794DG3FileTest.class.getResourceAsStream("/lds/dg3/iso39794/sample-39794-4-ed-1-v1.der");
       assertNotNull(inputStream);
       FingerImageDataBlock dataBlock = new FingerImageDataBlock(inputStream);
-      
+
       // Create DG3 file with ICAO profile
       DG3File dg3File = DG3File.createISO39794DG3File(
           java.util.Collections.singletonList(dataBlock),
           ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1
       );
       assertNotNull(dg3File);
-      
+
       byte[] encoded = dg3File.getEncoded();
       assertNotNull(encoded);
-      
+
       // Parse it back
       DG3File reconstructed = new DG3File(new java.io.ByteArrayInputStream(encoded));
       assertEquals(1, reconstructed.getSubRecords().size());

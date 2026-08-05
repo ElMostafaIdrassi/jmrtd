@@ -51,6 +51,7 @@ import org.jmrtd.protocol.PACEAPDUSender;
 import org.jmrtd.protocol.PACEProtocol;
 import org.jmrtd.protocol.PACEResult;
 import org.jmrtd.protocol.ReadBinaryAPDUSender;
+import org.jmrtd.protocol.SecureMessagingAPDUSender;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import net.sf.scuba.smartcards.APDUEvent;
@@ -256,6 +257,7 @@ public class PassportService extends AbstractMRTDCardService {
 
   private DefaultFileSystem appletFileSystem;
 
+  private SecureMessagingAPDUSender secureMessagingSender;
   private BACAPDUSender bacSender;
   private PACEAPDUSender paceSender;
   private AAAPDUSender aaSender;
@@ -293,12 +295,19 @@ public class PassportService extends AbstractMRTDCardService {
   public PassportService(CardService service, int maxTranceiveLengthForPACEProtocol, int maxTranceiveLengthForSecureMessaging, int maxBlockSize, boolean isSFIEnabled, boolean shouldCheckMAC) {
     this.service = service;
 
-    this.bacSender = new BACAPDUSender(service);
-    this.paceSender = new PACEAPDUSender(service);
-    this.aaSender = new AAAPDUSender(service);
-    this.eacCASender = new EACCAAPDUSender(service);
-    this.eacTASender = new EACTAAPDUSender(service);
-    this.readBinarySender = new ReadBinaryAPDUSender(service);
+    /*
+     * A single SecureMessagingAPDUSender is shared by all protocol senders below, so there is
+     * exactly one APDU sequence number / listener registry for the whole session, and a listener
+     * registered through any one of them (see addAPDUListener) observes all APDU traffic. -- MO
+     */
+    SecureMessagingAPDUSender secureMessagingSender = new SecureMessagingAPDUSender(service);
+    this.secureMessagingSender = secureMessagingSender;
+    this.bacSender = new BACAPDUSender(secureMessagingSender);
+    this.paceSender = new PACEAPDUSender(secureMessagingSender);
+    this.aaSender = new AAAPDUSender(secureMessagingSender);
+    this.eacCASender = new EACCAAPDUSender(secureMessagingSender);
+    this.eacTASender = new EACTAAPDUSender(secureMessagingSender);
+    this.readBinarySender = new ReadBinaryAPDUSender(secureMessagingSender);
 
     this.maxTranceiveLengthForPACEProtocol = maxTranceiveLengthForPACEProtocol;
     this.maxTranceiveLengthForSecureMessaging = maxTranceiveLengthForSecureMessaging;
@@ -679,17 +688,25 @@ public class PassportService extends AbstractMRTDCardService {
 
   @Override
   public void addAPDUListener(APDUListener l) {
-    service.addAPDUListener(l);
+    /*
+     * All of bacSender, paceSender, aaSender, eacCASender, eacTASender and readBinarySender
+     * share listener/sequence-number state per underlying CardService (see
+     * SecureMessagingAPDUSender.SharedState), so registering through any one of them (here:
+     * readBinarySender) is enough to observe APDU traffic from all of them, without also
+     * separately observing the underlying CardService's own raw notification for the same
+     * exchange. -- MO
+     */
+    readBinarySender.addAPDUListener(l);
   }
 
   @Override
   public void removeAPDUListener(APDUListener l) {
-    service.removeAPDUListener(l);
+    readBinarySender.removeAPDUListener(l);
   }
 
   @Override
   public Collection<APDUListener> getAPDUListeners() {
-    return service.getAPDUListeners();
+    return readBinarySender.getAPDUListeners();
   }
 
   @Override
@@ -702,5 +719,10 @@ public class PassportService extends AbstractMRTDCardService {
     for (APDUListener apduListener: apduListeners) {
       apduListener.exchangedAPDU(event);
     }
+  }
+
+  @Override
+  public SecureMessagingAPDUSender getSecureMessagingAPDUSender() {
+    return secureMessagingSender;
   }
 }

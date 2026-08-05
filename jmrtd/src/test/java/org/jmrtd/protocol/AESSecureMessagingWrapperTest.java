@@ -33,8 +33,6 @@ import java.util.logging.Logger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import org.jmrtd.protocol.AESSecureMessagingWrapper;
-import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;
 
 import net.sf.scuba.smartcards.CommandAPDU;

@@ -38,7 +38,6 @@ import java.util.logging.Logger;
 
 import javax.crypto.spec.DHParameterSpec;
 
-import org.jmrtd.lds.PACEInfo;
 import org.junit.Test;
 
 public class PACEInfoTest {

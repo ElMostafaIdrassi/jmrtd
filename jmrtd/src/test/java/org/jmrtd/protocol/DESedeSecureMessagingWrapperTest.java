@@ -22,10 +22,10 @@
 
 package org.jmrtd.protocol;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
@@ -43,8 +43,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
-import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
-import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;
 
 import net.sf.scuba.smartcards.CommandAPDU;

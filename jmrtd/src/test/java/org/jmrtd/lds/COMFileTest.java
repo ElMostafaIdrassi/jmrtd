@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.LDSFile;
 import org.jmrtd.lds.icao.COMFile;
 import org.junit.Test;
 

@@ -1,11 +1,13 @@
 package org.jmrtd.protocol;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.APDULevelReadBinaryCapable;
 
+import net.sf.scuba.smartcards.APDUListener;
 import net.sf.scuba.smartcards.APDUWrapper;
 import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
@@ -29,16 +31,56 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
 
   private SecureMessagingAPDUSender secureMessagingSender;
 
-  private CardService service;
-
   /**
    * Creates an APDU sender.
    *
    * @param service the card service for tranceiving APDUs
+   *
+   * @deprecated use {@link #ReadBinaryAPDUSender(SecureMessagingAPDUSender)} instead, sharing a
+   *             single {@link SecureMessagingAPDUSender} between all senders wrapping the same
+   *             underlying card service (see {@code PassportService.getSecureMessagingAPDUSender()})
    */
+  @Deprecated
   public ReadBinaryAPDUSender(CardService service) {
-    this.service = service;
-    this.secureMessagingSender = new SecureMessagingAPDUSender(service);
+    this(new SecureMessagingAPDUSender(service));
+  }
+
+  /**
+   * Creates an APDU sender.
+   *
+   * @param secureMessagingSender the (shared) secure messaging APDU sender for tranceiving APDUs
+   */
+  public ReadBinaryAPDUSender(SecureMessagingAPDUSender secureMessagingSender) {
+    this.secureMessagingSender = secureMessagingSender;
+  }
+
+  /**
+   * Adds a listener. The listener is notified once per APDU exchange, whether or not secure
+   * messaging is in effect for that exchange.
+   *
+   * @param l the listener to add
+   */
+  public void addAPDUListener(APDUListener l) {
+    secureMessagingSender.addAPDUListener(l);
+  }
+
+  /**
+   * Removes a listener.
+   * If the specified listener is not present, this method has no effect.
+   *
+   * @param l the listener to remove
+   */
+  public void removeAPDUListener(APDUListener l) {
+    secureMessagingSender.removeAPDUListener(l);
+  }
+
+  /**
+   * Returns the currently registered listeners.
+   *
+   * @return the currently registered listeners
+   */
+  public Collection<APDUListener> getAPDUListeners() {
+    return secureMessagingSender.getAPDUListeners();
   }
 
   /**
@@ -145,7 +187,7 @@ public class ReadBinaryAPDUSender implements APDULevelReadBinaryCapable {
       responseAPDU = secureMessagingSender.transmit(wrapper, commandAPDU);
       sw = (short)responseAPDU.getSW();
     } catch (CardServiceException cse) {
-      if (service.isConnectionLost(cse)) {
+      if (secureMessagingSender.isConnectionLost(cse)) {
         /*
          * If fatal, we rethrow the underlying exception.
          * If not, we will probably throw an exception later on (in checkStatusWord...).

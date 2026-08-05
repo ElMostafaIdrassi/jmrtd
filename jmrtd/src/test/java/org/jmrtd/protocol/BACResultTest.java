@@ -34,9 +34,6 @@ import javax.crypto.SecretKey;
 import org.jmrtd.AccessKeySpec;
 import org.jmrtd.BACKey;
 import org.jmrtd.PassportService;
-import org.jmrtd.protocol.BACResult;
-import org.jmrtd.protocol.DESedeSecureMessagingWrapper;
-import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;
 
 /**

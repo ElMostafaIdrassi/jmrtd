@@ -41,11 +41,11 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import org.jmrtd.ResourceUtil;
 import org.jmrtd.lds.icao.DG4File;
 import org.jmrtd.lds.iso19794.IrisBiometricSubtypeInfo;
 import org.jmrtd.lds.iso19794.IrisImageInfo;
 import org.jmrtd.lds.iso19794.IrisInfo;
-import org.jmrtd.ResourceUtil;
 import org.junit.Test;
 
 public class DG4FileTest {

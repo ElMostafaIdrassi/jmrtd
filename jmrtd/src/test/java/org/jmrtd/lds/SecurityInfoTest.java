@@ -40,13 +40,6 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jce.ECPointUtil;
-import org.jmrtd.lds.ActiveAuthenticationInfo;
-import org.jmrtd.lds.ChipAuthenticationInfo;
-import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
-import org.jmrtd.lds.PACEDomainParameterInfo;
-import org.jmrtd.lds.PACEInfo;
-import org.jmrtd.lds.SecurityInfo;
-import org.jmrtd.lds.TerminalAuthenticationInfo;
 import org.junit.Test;
 
 import net.sf.scuba.util.Hex;

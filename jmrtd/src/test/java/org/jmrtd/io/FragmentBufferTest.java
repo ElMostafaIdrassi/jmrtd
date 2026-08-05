@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.jmrtd.io.FragmentBuffer;
 import org.jmrtd.io.FragmentBuffer.Fragment;
 import org.junit.Test;
 
@@ -66,7 +65,7 @@ public class FragmentBufferTest {
   public void testOverlapScenarios() {
     FragmentBuffer fb = new FragmentBuffer(100);
     fb.addFragment(10, new byte[] { 1, 2, 3, 4, 5 }); // covers [10..14]
-    
+
     // Add completely contained fragment
     fb.addFragment(11, new byte[] { 99 });
     assertEquals(5, fb.getBytesBuffered());
@@ -82,7 +81,7 @@ public class FragmentBufferTest {
     FragmentBuffer fb = new FragmentBuffer(10);
     byte[] data = new byte[20];
     fb.addFragment(5, data);
-    
+
     assertTrue(fb.getLength() >= 25);
     assertTrue(fb.isCoveredByFragment(5, 20));
     assertEquals(25, fb.getPosition());

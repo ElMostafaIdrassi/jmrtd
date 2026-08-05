@@ -34,11 +34,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.cert.CVCAuthorizationTemplate;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Permission;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
-import org.jmrtd.cert.CVCPrincipal;
-import org.jmrtd.cert.CardVerifiableCertificate;
 import org.junit.Test;
 
 /**

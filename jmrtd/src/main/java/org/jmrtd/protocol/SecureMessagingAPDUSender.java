@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,12 +56,20 @@ public class SecureMessagingAPDUSender {
 
   private static final Logger LOGGER = Logger.getLogger("org.jmrtd.protocol");
 
-  private static final Map<CardService, AtomicInteger> APDU_COUNTS = new WeakHashMap<CardService, AtomicInteger>();
-
   private CardService service;
+
+  private int sequenceNumber;
+
+  private final Collection<APDUListener> listeners = new ArrayList<APDUListener>();
 
   /**
    * Creates an APDU sender for tranceiving wrapped APDUs.
+   *
+   * <p>Callers should create a single instance per underlying card service and share it
+   * (e.g. by constructor injection) between all senders wrapping that service, rather than
+   * creating one instance per sender. That way there is exactly one internal listener
+   * registered with the underlying service, and one sequence number / listener registry for
+   * the whole session.</p>
    *
    * @param service the card service for tranceiving the APDUs
    */
@@ -73,30 +78,24 @@ public class SecureMessagingAPDUSender {
     service.addAPDUListener(new APDUListener() {
       @Override
       public void exchangedAPDU(APDUEvent event) {
-        synchronized (APDU_COUNTS) {
-          AtomicInteger count = APDU_COUNTS.get(SecureMessagingAPDUSender.this.service);
-          if (count == null) {
-            count = new AtomicInteger(0);
-            APDU_COUNTS.put(SecureMessagingAPDUSender.this.service, count);
-          }
-          int seq = event.getSequenceNumber();
-          if (seq > count.get()) {
-            count.set(seq);
-          }
-        }
+        /*
+         * Keeps our sequence number in sync with scuba's. Never forwards to public listeners --
+         * notifyExchangedAPDU is the single place that does that, exactly once per transmit(...)
+         * call, so listeners never see both a raw and a wrapped notification for one exchange.
+         */
+        updateSequenceNumber(event.getSequenceNumber());
       }
     });
   }
 
-  private int getCurrentSequenceNumber() {
-    synchronized (APDU_COUNTS) {
-      AtomicInteger count = APDU_COUNTS.get(service);
-      if (count == null) {
-        count = new AtomicInteger(0);
-        APDU_COUNTS.put(service, count);
-      }
-      return count.get();
+  private synchronized void updateSequenceNumber(int seq) {
+    if (seq > sequenceNumber) {
+      sequenceNumber = seq;
     }
+  }
+
+  private synchronized int getCurrentSequenceNumber() {
+    return sequenceNumber;
   }
 
   /**
@@ -121,29 +120,42 @@ public class SecureMessagingAPDUSender {
     int seq = getCurrentSequenceNumber();
 
     if (wrapper == null) {
-      notifyExchangedAPDU(new APDUEvent(this, "PLAIN", seq, commandAPDU, responseAPDU));
-    } else {
-      try {
-        if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH) {
-          return responseAPDU;
-        }
-        if (responseAPDU.getBytes().length <= 2) {
-          throw new CardServiceException("Exception during transmission of wrapped APDU"
-              + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);
-        }
-
-        responseAPDU = wrapper.unwrap(responseAPDU);
-      } catch (CardServiceException cse) {
-        throw cse;
-      } catch (Exception e) {
-        throw new CardServiceException("Exception during transmission of wrapped APDU"
-            + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
-      } finally {
-        notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), seq, plainCapdu, responseAPDU, commandAPDU, rawRapdu));
-      }
+      /*
+       * Scuba's underlying card service already notified its own (private, internal-only)
+       * listener of this exchange, to keep our sequence number in sync -- see the constructor.
+       * Public listeners are only ever registered on this instance, not on the underlying
+       * service, so we notify them here, using the same "RAW" type scuba itself uses.
+       */
+      notifyExchangedAPDU(new APDUEvent(this, "RAW", seq, commandAPDU, responseAPDU));
+      return responseAPDU;
     }
 
-    return responseAPDU;
+    ResponseAPDU plainTextResponseAPDU = null;
+    try {
+      if ((sw & ISO7816.SW_WRONG_LENGTH) == ISO7816.SW_WRONG_LENGTH) {
+        return responseAPDU;
+      }
+      if (responseAPDU.getBytes().length <= 2) {
+        throw new CardServiceException("Exception during transmission of wrapped APDU"
+            + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), sw);
+      }
+
+      responseAPDU = wrapper.unwrap(responseAPDU);
+      plainTextResponseAPDU = responseAPDU;
+      return responseAPDU;
+    } catch (CardServiceException cse) {
+      throw cse;
+    } catch (Exception e) {
+      throw new CardServiceException("Exception during transmission of wrapped APDU"
+          + ", C=" + Hex.bytesToHexString(plainCapdu.getBytes()), e, sw);
+    } finally {
+      /*
+       * plainTextResponseAPDU is null here if wrapper.unwrap(...) was never reached
+       * (SW_WRONG_LENGTH, short response, or an exception), so listeners can tell
+       * "not unwrapped" apart from an actual plaintext response. -- MO
+       */
+      notifyExchangedAPDU(new WrappedAPDUEvent(this, wrapper.getType(), seq, plainCapdu, plainTextResponseAPDU, commandAPDU, rawRapdu));
+    }
   }
 
   /**
@@ -156,12 +168,25 @@ public class SecureMessagingAPDUSender {
   }
 
   /**
+   * Determines whether an exception indicates a tag is lost event.
+   *
+   * @param e an exception
+   *
+   * @return whether the exception indicates a tag is lost event
+   */
+  public boolean isConnectionLost(Exception e) {
+    return service.isConnectionLost(e);
+  }
+
+  /**
    * Adds a listener.
    *
    * @param l the listener to add
    */
-  public void addAPDUListener(APDUListener l) {
-    service.addAPDUListener(l);
+  public synchronized void addAPDUListener(APDUListener l) {
+    if (l != null && !listeners.contains(l)) {
+      listeners.add(l);
+    }
   }
 
   /**
@@ -170,18 +195,29 @@ public class SecureMessagingAPDUSender {
    *
    * @param l the listener to remove
    */
-  public void removeAPDUListener(APDUListener l) {
-    service.removeAPDUListener(l);
+  public synchronized void removeAPDUListener(APDUListener l) {
+    listeners.remove(l);
+  }
+
+  /**
+   * Returns the currently registered listeners.
+   *
+   * @return the currently registered listeners
+   */
+  public synchronized Collection<APDUListener> getAPDUListeners() {
+    return new ArrayList<APDUListener>(listeners);
   }
 
   /**
    * Notifies listeners about APDU event.
+   * Called exactly once per {@link #transmit(APDUWrapper, CommandAPDU)} call, so listeners never
+   * see both a raw and a wrapped notification for the same exchange.
    *
    * @param event the APDU event
    */
   protected void notifyExchangedAPDU(APDUEvent event) {
-    Collection<APDUListener> apduListeners = service.getAPDUListeners();
-    if (apduListeners == null || apduListeners.isEmpty()) {
+    Collection<APDUListener> apduListeners = getAPDUListeners();
+    if (apduListeners.isEmpty()) {
       return;
     }
 

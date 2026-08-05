@@ -63,13 +63,11 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.jmrtd.ResourceUtil;
 import org.jmrtd.Util;
-import org.jmrtd.lds.LDSFile;
-import org.jmrtd.lds.SODFile;
 import org.jmrtd.lds.icao.COMFile;
 import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.DG2File;
-import org.jmrtd.ResourceUtil;
 import org.junit.Test;
 
 import net.sf.scuba.util.Hex;

@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jmrtd.ResourceUtil;
 import org.jmrtd.lds.icao.DG2File;
 import org.jmrtd.lds.iso19794.FaceImageInfo;
 import org.jmrtd.lds.iso19794.FaceInfo;
-import org.jmrtd.ResourceUtil;
 import org.junit.Test;
 
 import net.sf.scuba.util.Hex;

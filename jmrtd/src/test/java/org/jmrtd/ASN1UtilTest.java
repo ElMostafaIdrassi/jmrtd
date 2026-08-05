@@ -23,6 +23,7 @@ package org.jmrtd;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -32,8 +33,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertNull;
-
 import org.bouncycastle.asn1.ASN1Boolean;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -42,7 +41,6 @@ import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.jmrtd.ASN1Util;
 import org.junit.Test;
 
 public class ASN1UtilTest {

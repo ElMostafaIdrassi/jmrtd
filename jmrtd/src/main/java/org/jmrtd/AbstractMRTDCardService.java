@@ -38,6 +38,7 @@ import org.jmrtd.protocol.BACResult;
 import org.jmrtd.protocol.EACCAResult;
 import org.jmrtd.protocol.EACTAResult;
 import org.jmrtd.protocol.PACEResult;
+import org.jmrtd.protocol.SecureMessagingAPDUSender;
 import org.jmrtd.protocol.SecureMessagingWrapper;
 
 import net.sf.scuba.smartcards.CardServiceException;
@@ -227,4 +228,15 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    * @return the currently set maximum length to be requested in READ BINARY commands
    */
   public abstract int getMaxReadBinaryLength();
+
+  /**
+   * Returns the secure messaging APDU sender shared by this service's protocol senders, if any.
+   * Intended for callers migrating off the deprecated {@code (CardService)} constructors of the
+   * {@code org.jmrtd.protocol} APDU senders, who need a {@link SecureMessagingAPDUSender} to share.
+   *
+   * @return the shared secure messaging APDU sender, or {@code null} if this service does not expose one
+   */
+  public SecureMessagingAPDUSender getSecureMessagingAPDUSender() {
+    return null;
+  }
 }

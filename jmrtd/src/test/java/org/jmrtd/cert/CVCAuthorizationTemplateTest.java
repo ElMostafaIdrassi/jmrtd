@@ -25,7 +25,6 @@ package org.jmrtd.cert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.jmrtd.cert.CVCAuthorizationTemplate;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Permission;
 import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 import org.junit.Test;

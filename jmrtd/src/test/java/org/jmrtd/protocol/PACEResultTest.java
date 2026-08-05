@@ -43,10 +43,6 @@ import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.MappingType;
-import org.jmrtd.protocol.AESSecureMessagingWrapper;
-import org.jmrtd.protocol.PACEMappingResult;
-import org.jmrtd.protocol.PACEResult;
-import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;
 
 public class PACEResultTest {

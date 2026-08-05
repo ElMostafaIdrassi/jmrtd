@@ -38,7 +38,6 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import org.jmrtd.lds.ImageInfo;
 import org.jmrtd.lds.iso19794.FaceImageInfo;
 import org.jmrtd.lds.iso19794.FaceImageInfo.EyeColor;
 import org.jmrtd.lds.iso19794.FaceImageInfo.FeaturePoint;

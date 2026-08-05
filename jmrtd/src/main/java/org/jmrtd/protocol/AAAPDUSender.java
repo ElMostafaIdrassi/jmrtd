@@ -54,9 +54,23 @@ public class AAAPDUSender implements APDULevelAACapable {
    * Creates an APDU sender for tranceiving Active Authentication protocol APDUs.
    *
    * @param service the card service for tranceiving APDUs
+   *
+   * @deprecated use {@link #AAAPDUSender(SecureMessagingAPDUSender)} instead, sharing a single
+   *             {@link SecureMessagingAPDUSender} between all senders wrapping the same underlying
+   *             card service (see {@code PassportService.getSecureMessagingAPDUSender()})
    */
+  @Deprecated
   public AAAPDUSender(CardService service) {
-    this.secureMessagingSender = new SecureMessagingAPDUSender(service);
+    this(new SecureMessagingAPDUSender(service));
+  }
+
+  /**
+   * Creates an APDU sender for tranceiving Active Authentication protocol APDUs.
+   *
+   * @param secureMessagingSender the (shared) secure messaging APDU sender for tranceiving APDUs
+   */
+  public AAAPDUSender(SecureMessagingAPDUSender secureMessagingSender) {
+    this.secureMessagingSender = secureMessagingSender;
   }
 
   /**

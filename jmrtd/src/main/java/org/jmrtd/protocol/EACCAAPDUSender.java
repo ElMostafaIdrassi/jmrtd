@@ -62,9 +62,23 @@ public class EACCAAPDUSender implements APDULevelEACCACapable {
    * Creates an APDU sender for the EAC-CA protocol.
    *
    * @param service the card service for tranceiving APDUs
+   *
+   * @deprecated use {@link #EACCAAPDUSender(SecureMessagingAPDUSender)} instead, sharing a single
+   *             {@link SecureMessagingAPDUSender} between all senders wrapping the same underlying
+   *             card service (see {@code PassportService.getSecureMessagingAPDUSender()})
    */
+  @Deprecated
   public EACCAAPDUSender(CardService service) {
-    this.secureMessagingSender = new SecureMessagingAPDUSender(service);
+    this(new SecureMessagingAPDUSender(service));
+  }
+
+  /**
+   * Creates an APDU sender for the EAC-CA protocol.
+   *
+   * @param secureMessagingSender the (shared) secure messaging APDU sender for tranceiving APDUs
+   */
+  public EACCAAPDUSender(SecureMessagingAPDUSender secureMessagingSender) {
+    this.secureMessagingSender = secureMessagingSender;
   }
 
   /**

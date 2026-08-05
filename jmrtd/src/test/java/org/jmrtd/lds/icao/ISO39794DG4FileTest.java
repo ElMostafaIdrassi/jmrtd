@@ -12,8 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.lds.DG4FileTest;
-import org.jmrtd.lds.iso39794.IrisImageDataBlock;
 import org.jmrtd.lds.iso39794.ISO39794EncodingProfile;
+import org.jmrtd.lds.iso39794.IrisImageDataBlock;
 import org.junit.Test;
 
 public class ISO39794DG4FileTest {
@@ -65,17 +65,17 @@ public class ISO39794DG4FileTest {
       InputStream inputStream = ISO39794DG4FileTest.class.getResourceAsStream("/lds/dg4/iso39794/sample-39794-6-ed-1-v1.der");
       assertNotNull(inputStream);
       IrisImageDataBlock dataBlock = new IrisImageDataBlock(inputStream);
-      
+
       // Create DG4 file with ICAO profile
       DG4File dg4File = DG4File.createISO39794DG4File(
           java.util.Collections.singletonList(dataBlock),
           ISO39794EncodingProfile.ICAO_39794_5_EMRTD_V1
       );
       assertNotNull(dg4File);
-      
+
       byte[] encoded = dg4File.getEncoded();
       assertNotNull(encoded);
-      
+
       // Parse it back
       DG4File reconstructed = new DG4File(new java.io.ByteArrayInputStream(encoded));
       assertEquals(1, reconstructed.getSubRecords().size());

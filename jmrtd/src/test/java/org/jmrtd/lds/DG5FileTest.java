@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.DisplayedImageInfo;
-import org.jmrtd.lds.ImageInfo;
 import org.jmrtd.lds.icao.DG5File;
 import org.junit.Test;
 

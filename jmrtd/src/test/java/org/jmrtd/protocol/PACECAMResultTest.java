@@ -45,10 +45,6 @@ import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo.MappingType;
-import org.jmrtd.protocol.AESSecureMessagingWrapper;
-import org.jmrtd.protocol.PACECAMResult;
-import org.jmrtd.protocol.PACEMappingResult;
-import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;
 
 public class PACECAMResultTest {

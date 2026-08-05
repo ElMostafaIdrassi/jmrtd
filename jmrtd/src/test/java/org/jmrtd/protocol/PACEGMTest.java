@@ -13,7 +13,6 @@ import javax.crypto.SecretKeyFactory;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
-import org.jmrtd.protocol.PACEProtocol;
 import org.junit.Test;
 
 public class PACEGMTest {

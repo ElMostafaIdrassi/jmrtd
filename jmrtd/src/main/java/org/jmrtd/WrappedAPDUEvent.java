@@ -52,7 +52,8 @@ public class WrappedAPDUEvent extends APDUEvent {
    * @param type the type of event, typically this identifies the APDU wrapper somehow
    * @param sequenceNumber the sequence number of the APDU exchange within a session
    * @param plainTextCommandAPDU the unprotected command APDU
-   * @param plainTextResponseAPDU the unprotected response APDU
+   * @param plainTextResponseAPDU the unprotected response APDU, or {@code null} if the response was
+   *     never unwrapped (e.g. the exchange failed before unwrapping was attempted)
    * @param wrappedCommandAPDU the protected command APDU
    * @param wrappedResponseAPDU the protected command APDU
    */
@@ -76,7 +77,8 @@ public class WrappedAPDUEvent extends APDUEvent {
   /**
    * Returns the unprotected, plain-text Response APDU.
    *
-   * @return the unprotected, plain-text Response APDU
+   * @return the unprotected, plain-text Response APDU, or {@code null} if the response was never
+   *     unwrapped (e.g. the exchange failed before unwrapping was attempted)
    */
   public ResponseAPDU getPlainTextResponseAPDU() {
     return plainTextResponseAPDU;

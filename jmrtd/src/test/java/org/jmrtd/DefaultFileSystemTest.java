@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jmrtd.APDULevelReadBinaryCapable;
-import org.jmrtd.DefaultFileSystem;
-import org.jmrtd.PassportService;
 import org.junit.Test;
 
 import net.sf.scuba.smartcards.APDUWrapper;

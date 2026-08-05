@@ -32,8 +32,6 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.lds.CardSecurityFile;
-import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.ResourceUtil;
 import org.junit.Test;
 

@@ -29,10 +29,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.jmrtd.lds.ActiveAuthenticationInfo;
-import org.jmrtd.lds.CardAccessFile;
-import org.jmrtd.lds.PACEInfo;
-import org.jmrtd.lds.SecurityInfo;
 import org.junit.Test;
 
 public class CardAccessFileTest {

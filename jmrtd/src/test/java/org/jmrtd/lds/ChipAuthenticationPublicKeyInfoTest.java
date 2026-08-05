@@ -34,7 +34,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
 import org.junit.Test;
 
 public class ChipAuthenticationPublicKeyInfoTest {

@@ -32,9 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.PassportService;
-import org.jmrtd.lds.LDSFile;
-import org.jmrtd.lds.LDSFileUtil;
-import org.jmrtd.lds.SODFile;
 import org.jmrtd.lds.icao.COMFile;
 import org.jmrtd.lds.icao.DG14File;
 import org.jmrtd.lds.icao.DG15File;

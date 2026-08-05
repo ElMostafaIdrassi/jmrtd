@@ -59,14 +59,9 @@ import java.util.logging.Logger;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 
-import org.jmrtd.Util;
-import org.jmrtd.lds.ChipAuthenticationInfo;
-import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo;
-import org.jmrtd.lds.PACEInfo;
-import org.jmrtd.lds.SecurityInfo;
-import org.jmrtd.lds.TerminalAuthenticationInfo;
-import org.jmrtd.lds.icao.DG14File;
 import org.jmrtd.ResourceUtil;
+import org.jmrtd.Util;
+import org.jmrtd.lds.icao.DG14File;
 import org.junit.Test;
 
 public class DG14FileTest {

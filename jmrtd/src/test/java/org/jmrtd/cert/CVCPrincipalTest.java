@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.lds.icao.ICAOCountry;
 import org.junit.Test;
 

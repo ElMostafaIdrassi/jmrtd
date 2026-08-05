@@ -32,9 +32,6 @@ import org.jmrtd.cert.CVCAuthorizationTemplate.Role;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CVCertificateBuilder;
 import org.jmrtd.cert.CardVerifiableCertificate;
-import org.jmrtd.protocol.EACCAResult;
-import org.jmrtd.protocol.EACTAProtocol;
-import org.jmrtd.protocol.EACTAResult;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

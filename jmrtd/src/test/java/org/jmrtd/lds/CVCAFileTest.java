@@ -30,7 +30,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.jmrtd.lds.CVCAFile;
 import org.junit.Test;
 
 public class CVCAFileTest {

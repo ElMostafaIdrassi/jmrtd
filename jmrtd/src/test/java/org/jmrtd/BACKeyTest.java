@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 
 import java.text.SimpleDateFormat;
 
-import org.jmrtd.BACKey;
 import org.junit.Test;
 
 public class BACKeyTest {

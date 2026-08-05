@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.jmrtd.io.PositionInputStream;
 import org.junit.Test;
 
 public class PositionInputStreamTest {

@@ -43,7 +43,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.jce.ECPointUtil;
-import org.jmrtd.lds.PACEDomainParameterInfo;
 import org.junit.Test;
 
 import net.sf.scuba.util.Hex;

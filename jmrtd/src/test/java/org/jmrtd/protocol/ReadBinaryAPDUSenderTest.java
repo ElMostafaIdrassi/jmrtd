@@ -15,7 +15,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import org.jmrtd.protocol.ReadBinaryAPDUSender;
 import org.jmrtd.ScriptedCardService;
 import org.junit.Test;
 
@@ -29,7 +28,7 @@ public class ReadBinaryAPDUSenderTest {
   @Test
   public void encodesStandardAndSFIReads() throws Exception {
     ScriptedCardService standardService = new ScriptedCardService(response(new byte[] { 1, 2 }, ISO7816.SW_NO_ERROR));
-    ReadBinaryAPDUSender standardSender = new ReadBinaryAPDUSender(standardService);
+    ReadBinaryAPDUSender standardSender = new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(standardService));
     assertArrayEquals(new byte[] { 1, 2 },
         standardSender.sendReadBinary(null, 0, 0x1234, 2, false, false));
     CommandAPDU standard = standardService.getCommands().get(0);
@@ -38,7 +37,7 @@ public class ReadBinaryAPDUSenderTest {
     assertEquals(0x34, standard.getP2());
 
     ScriptedCardService sfiService = new ScriptedCardService(response(new byte[] { 3 }, ISO7816.SW_NO_ERROR));
-    ReadBinaryAPDUSender sfiSender = new ReadBinaryAPDUSender(sfiService);
+    ReadBinaryAPDUSender sfiSender = new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(sfiService));
     assertArrayEquals(new byte[] { 3 },
         sfiSender.sendReadBinary(null, 0x81, 0x44, 1, true, false));
     CommandAPDU sfi = sfiService.getCommands().get(0);
@@ -50,7 +49,7 @@ public class ReadBinaryAPDUSenderTest {
   public void encodesAndDecodesLongRead() throws Exception {
     ScriptedCardService service = new ScriptedCardService(
         response(new byte[] { 0x53, 0x03, 0x21, 0x22, 0x23 }, ISO7816.SW_NO_ERROR));
-    ReadBinaryAPDUSender sender = new ReadBinaryAPDUSender(service);
+    ReadBinaryAPDUSender sender = new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(service));
 
     assertArrayEquals(new byte[] { 0x21, 0x22, 0x23 },
         sender.sendReadBinary(null, 0, 0x8123, 3, false, true));
@@ -75,13 +74,13 @@ public class ReadBinaryAPDUSenderTest {
     ScriptedCardService length81Service = new ScriptedCardService(
         response(tlvResponse(new byte[] { (byte)0x81, (byte)0x80 }, value128),
             ISO7816.SW_NO_ERROR));
-    assertArrayEquals(value128, new ReadBinaryAPDUSender(length81Service)
+    assertArrayEquals(value128, new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(length81Service))
         .sendReadBinary(null, 0, 0, value128.length, false, true));
 
     ScriptedCardService length82Service = new ScriptedCardService(
         response(tlvResponse(new byte[] { (byte)0x82, 0x01, 0x00 }, value256),
             ISO7816.SW_NO_ERROR));
-    assertArrayEquals(value256, new ReadBinaryAPDUSender(length82Service)
+    assertArrayEquals(value256, new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(length82Service))
         .sendReadBinary(null, 0, 0, value256.length, false, true));
   }
 
@@ -90,11 +89,11 @@ public class ReadBinaryAPDUSenderTest {
     ScriptedCardService withData = new ScriptedCardService(
         response(new byte[] { 0x55 }, ISO7816.SW_END_OF_FILE));
     assertArrayEquals(new byte[] { 0x55 },
-        new ReadBinaryAPDUSender(withData).sendReadBinary(null, 0, 0, 1, false, false));
+        new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(withData)).sendReadBinary(null, 0, 0, 1, false, false));
 
     ScriptedCardService withoutData = new ScriptedCardService(response(ISO7816.SW_END_OF_FILE));
     assertThrows(CardServiceException.class,
-        () -> new ReadBinaryAPDUSender(withoutData).sendReadBinary(null, 0, 0, 1, false, false));
+        () -> new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(withoutData)).sendReadBinary(null, 0, 0, 1, false, false));
   }
 
   @Test
@@ -122,7 +121,7 @@ public class ReadBinaryAPDUSenderTest {
   private static void assertMalformed(byte[] data) {
     final ScriptedCardService service = new ScriptedCardService(response(data, ISO7816.SW_NO_ERROR));
     assertThrows(CardServiceException.class,
-        () -> new ReadBinaryAPDUSender(service).sendReadBinary(null, 0, 0, 1, false, true));
+        () -> new ReadBinaryAPDUSender(new SecureMessagingAPDUSender(service)).sendReadBinary(null, 0, 0, 1, false, true));
   }
 
   private static ResponseAPDU response(short sw) {

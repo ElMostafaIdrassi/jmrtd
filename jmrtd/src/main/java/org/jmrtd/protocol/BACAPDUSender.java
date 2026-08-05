@@ -35,7 +35,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
   /** Initialization vector used by the cipher below. */
   private static final IvParameterSpec ZERO_IV_PARAM_SPEC = new IvParameterSpec(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
-  private CardService service;
+  private SecureMessagingAPDUSender secureMessagingSender;
 
   /** DESede encryption/decryption cipher. */
   private Cipher cipher;
@@ -47,9 +47,23 @@ public class BACAPDUSender implements APDULevelBACCapable {
    * Creates an APDU sender for tranceiving BAC protocol APDUs.
    *
    * @param service the card service for tranceiving APDUs
+   *
+   * @deprecated use {@link #BACAPDUSender(SecureMessagingAPDUSender)} instead, sharing a single
+   *             {@link SecureMessagingAPDUSender} between all senders wrapping the same underlying
+   *             card service (see {@code PassportService.getSecureMessagingAPDUSender()})
    */
+  @Deprecated
   public BACAPDUSender(CardService service) {
-    this.service = service;
+    this(new SecureMessagingAPDUSender(service));
+  }
+
+  /**
+   * Creates an APDU sender for tranceiving BAC protocol APDUs.
+   *
+   * @param secureMessagingSender the (shared) secure messaging APDU sender for tranceiving APDUs
+   */
+  public BACAPDUSender(SecureMessagingAPDUSender secureMessagingSender) {
+    this.secureMessagingSender = secureMessagingSender;
 
     try {
       this.mac = Mac.getInstance("ISO9797Alg3Mac", BC_PROVIDER);
@@ -82,7 +96,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
    */
   public synchronized byte[] sendGetChallenge(APDUWrapper wrapper) throws CardServiceException {
     CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_GET_CHALLENGE, 0x00, 0x00, 8);
-    ResponseAPDU responseAPDU = service.transmit(commandAPDU);
+    ResponseAPDU responseAPDU = secureMessagingSender.transmit(null, commandAPDU);
     byte[] challenge = responseAPDU.getData();
     if (challenge == null || challenge.length != 8) {
       throw new CardServiceException("Get challenge failed", responseAPDU.getSW());
@@ -152,7 +166,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
       System.arraycopy(mactext, 0, data, 32, 8);
       int le = 40; /* 40 means max ne is 40 (0x28). */
       CommandAPDU commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
-      ResponseAPDU responseAPDU = service.transmit(commandAPDU);
+      ResponseAPDU responseAPDU = secureMessagingSender.transmit(null, commandAPDU);
 
       if (responseAPDU == null) {
         throw new CardServiceException("Mutual authentication failed, received null response APDU");
@@ -168,7 +182,7 @@ public class BACAPDUSender implements APDULevelBACCapable {
       if (sw != ISO7816.SW_NO_ERROR) {
         le = 0; /* 0 means ne is max 256 (0xFF). */
         commandAPDU = new CommandAPDU(ISO7816.CLA_ISO7816, ISO7816.INS_EXTERNAL_AUTHENTICATE, p1, p2, data, le);
-        responseAPDU = service.transmit(commandAPDU);
+        responseAPDU = secureMessagingSender.transmit(null, commandAPDU);
         responseAPDUBytes = responseAPDU.getBytes();
         sw = (short)responseAPDU.getSW();
       }

@@ -58,8 +58,6 @@ import javax.crypto.spec.DHPublicKeySpec;
 import org.jmrtd.Util;
 import org.jmrtd.lds.PACEInfo;
 import org.jmrtd.lds.PACEInfo.DHCParameterSpec;
-import org.jmrtd.protocol.PACEGMWithECDHAgreement;
-import org.jmrtd.protocol.PACEProtocol;
 import org.junit.Test;
 
 import net.sf.scuba.util.Hex;

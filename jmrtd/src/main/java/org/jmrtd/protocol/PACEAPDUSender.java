@@ -75,9 +75,23 @@ public class PACEAPDUSender implements APDULevelPACECapable {
    * Creates an APDU sender to support the PACE protocol.
    *
    * @param service the card service to tranceive APDUs
+   *
+   * @deprecated use {@link #PACEAPDUSender(SecureMessagingAPDUSender)} instead, sharing a single
+   *             {@link SecureMessagingAPDUSender} between all senders wrapping the same underlying
+   *             card service (see {@code PassportService.getSecureMessagingAPDUSender()})
    */
+  @Deprecated
   public PACEAPDUSender(CardService service) {
-    this.secureMessagingSender = new SecureMessagingAPDUSender(service);
+    this(new SecureMessagingAPDUSender(service));
+  }
+
+  /**
+   * Creates an APDU sender to support the PACE protocol.
+   *
+   * @param secureMessagingSender the (shared) secure messaging APDU sender to tranceive APDUs
+   */
+  public PACEAPDUSender(SecureMessagingAPDUSender secureMessagingSender) {
+    this.secureMessagingSender = secureMessagingSender;
   }
 
   /**

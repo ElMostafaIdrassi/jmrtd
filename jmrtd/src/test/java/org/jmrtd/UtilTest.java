@@ -43,7 +43,6 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jmrtd.Util;
 import org.junit.Test;
 
 import net.sf.scuba.util.Hex;

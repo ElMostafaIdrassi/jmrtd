@@ -24,7 +24,6 @@ package org.jmrtd.lds;
 
 import static org.junit.Assert.assertEquals;
 
-import org.jmrtd.lds.TerminalAuthenticationInfo;
 import org.junit.Test;
 
 /**

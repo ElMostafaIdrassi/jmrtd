@@ -48,9 +48,23 @@ public class EACTAAPDUSender implements APDULevelEACTACapable {
    * Creates an APDU sender.
    *
    * @param service the card service for tranceiving APDUs
+   *
+   * @deprecated use {@link #EACTAAPDUSender(SecureMessagingAPDUSender)} instead, sharing a single
+   *             {@link SecureMessagingAPDUSender} between all senders wrapping the same underlying
+   *             card service (see {@code PassportService.getSecureMessagingAPDUSender()})
    */
+  @Deprecated
   public EACTAAPDUSender(CardService service) {
-    this.secureMessagingSender = new SecureMessagingAPDUSender(service);
+    this(new SecureMessagingAPDUSender(service));
+  }
+
+  /**
+   * Creates an APDU sender.
+   *
+   * @param secureMessagingSender the (shared) secure messaging APDU sender for tranceiving APDUs
+   */
+  public EACTAAPDUSender(SecureMessagingAPDUSender secureMessagingSender) {
+    this.secureMessagingSender = secureMessagingSender;
   }
 
   /**

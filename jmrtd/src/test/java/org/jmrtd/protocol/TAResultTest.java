@@ -43,11 +43,6 @@ import org.jmrtd.PassportService;
 import org.jmrtd.Util;
 import org.jmrtd.cert.CVCPrincipal;
 import org.jmrtd.cert.CardVerifiableCertificate;
-import org.jmrtd.protocol.AESSecureMessagingWrapper;
-import org.jmrtd.protocol.EACCAProtocol;
-import org.jmrtd.protocol.EACCAResult;
-import org.jmrtd.protocol.EACTAResult;
-import org.jmrtd.protocol.SecureMessagingWrapper;
 import org.junit.Test;
 
 /**

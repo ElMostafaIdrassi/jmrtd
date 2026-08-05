@@ -39,7 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
-import org.jmrtd.protocol.AAResult;
 import org.junit.Test;
 
 public class AAResultTest {

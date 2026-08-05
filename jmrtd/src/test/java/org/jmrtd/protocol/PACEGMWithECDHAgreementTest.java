@@ -34,7 +34,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jmrtd.Util;
-import org.jmrtd.protocol.PACEGMWithECDHAgreement;
 import org.junit.Test;
 
 public class PACEGMWithECDHAgreementTest {
